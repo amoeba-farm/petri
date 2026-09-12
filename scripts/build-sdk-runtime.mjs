@@ -65,10 +65,14 @@ if(!sdkCheckout){
 const sdk = path.join(stage, 'sdk');
 fs.mkdirSync(sdk);
 execFileSync('git', ['archive', '--format=tar', `--output=${path.join(stage,'sdk.tar')}`, publicSource?.commit ?? commit], { cwd:sdkCheckout, windowsHide:true });
-run('tar', ['-xf', path.join(stage,'sdk.tar'), '-C', sdk], root);
+const tar = process.platform === 'win32' ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe') : 'tar';
+run(tar, ['-xf', path.join(stage,'sdk.tar'), '-C', sdk], root);
 // Invoke npm through Node, never a shell with caller-controlled arguments.
-const npm = process.env.npm_execpath || path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js');
-if (!fs.existsSync(npm)) throw new Error('Run using a Node installation with npm available beside it.');
+const npm = [process.env.npm_execpath,
+  path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js'),
+  path.resolve(path.dirname(process.execPath), '../lib/node_modules/npm/bin/npm-cli.js'),
+].find(candidate => candidate && fs.existsSync(candidate));
+if (!npm) throw new Error('Run using a Node installation with npm available.');
 run(process.execPath, [npm, 'ci', '--ignore-scripts', '--no-audit', '--no-fund', '--cache',path.join(target,'sdk-npm-cache')], sdk);
 run(process.execPath, [path.join(sdk,'node_modules/typescript/bin/tsc'), '-p', 'tsconfig.json'], sdk);
 // Build-only, opt-in projection. Runtime resources and external dependencies
