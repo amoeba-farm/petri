@@ -148,68 +148,6 @@ pub(in super::super) fn home_help_link_lines(cli: &Cli, app: &LabApp) -> Vec<Lin
     ]
 }
 
-pub(in super::super) fn home_help_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    match app.home_help_topic {
-        HomeHelpTopic::Overview => home_help_overview_lines(cli),
-        HomeHelpTopic::Agents => home_help_agent_lines(cli, app),
-    }
-}
-
-pub(in super::super) fn home_help_overview_lines(cli: &Cli) -> Vec<Line<'static>> {
-    vec![
-        Line::from(Span::styled(
-            "What Amoeba Farm is",
-            style(cli, Color::Cyan).add_modifier(Modifier::BOLD),
-        )),
-        Line::from(Span::styled(
-            "Amoeba Farm is a market and oracle system for synthetic exposure to hardware and industrial input markets.",
-            style(cli, Color::White),
-        )),
-        Line::from(Span::styled(
-            "It turns scattered hardware price information into defined monthly markets, transparent oracle recipes, and bounded-risk contracts.",
-            style(cli, Color::Gray),
-        )),
-        Line::from(Span::styled(
-            "In v1, users trade fixed-risk monthly exposure to a published settlement result, not physical delivery.",
-            style(cli, Color::Gray),
-        )),
-        Line::from(""),
-        Line::from(Span::styled(
-            "What each home lane does",
-            style(cli, Color::Yellow).add_modifier(Modifier::BOLD),
-        )),
-        Line::from(Span::styled(
-            "Trade options: browse capped call and put spreads, then review max loss and max payout before trading.",
-            style(cli, Color::Gray),
-        )),
-        Line::from(Span::styled(
-            "View chart: inspect fair price, recent movement, volume, and liquidity for the selected market.",
-            style(cli, Color::Gray),
-        )),
-        Line::from(Span::styled(
-            "Oracle evidence: see the source trail and settlement rules that decide the monthly result.",
-            style(cli, Color::Gray),
-        )),
-        Line::from(Span::styled(
-            "Wallet ledger: review recent wallet activity, Amoeba trades, and indexed account history.",
-            style(cli, Color::Gray),
-        )),
-        Line::from(Span::styled(
-            "Staking: queue AMBA for seven days, activate it into transferable sAMBA, track embedded rewards, or cancel the queue.",
-            style(cli, Color::Gray),
-        )),
-        Line::from(""),
-        Line::from(Span::styled(
-            "Use the links panel for the GitBook and Terms of Service. Open Connect your AI agent from Home for MCP setup.",
-            style(cli, Color::DarkGray),
-        )),
-    ]
-}
-
-pub(in super::super) fn home_help_agent_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    home_help_agent_lines_for_width(cli, app, 72)
-}
-
 pub(in super::super) fn home_help_agent_lines_for_width(
     cli: &Cli,
     app: &LabApp,
