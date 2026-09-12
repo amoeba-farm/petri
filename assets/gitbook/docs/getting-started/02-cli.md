@@ -6,18 +6,17 @@ Use it when you want a repeatable way to inspect markets, check wallet state, re
 
 ## Install from source
 
-Petri currently ships as a pre-production DevNet source preview. Official
-macOS and Windows downloads are not published yet; they will be offered only
-after their platform signatures are configured and independently verified.
-
-The generated public source destination is `SPACE999978/amoeba-cli`. The exact
-SDK and Spread Git dependencies require authorized private-repository access;
-anonymous source installation is not available. With those dependencies supplied,
-install [Rust with rustup](https://rustup.rs/) and run inside that checkout:
+Petri is a pre-production Devnet preview. Windows and macOS downloads and CLI
+installers are at [amoeba-farm/petri](https://github.com/amoeba-farm/petri#readme).
+Preview packages are not publisher-signed or Apple-notarized; verify their
+checksums before opening. The public SDK and native dependencies need no private
+repository access. To build a complete source checkout, install Rust 1.93.1 and
+Node.js 22–24, then run:
 
 ```bash
-cargo install --locked --path . --bin petri
-petri --version
+node scripts/build-sdk-runtime.mjs
+cargo build --release --locked --bin petri
+./target/release/petri --version
 ```
 
 Use a dedicated testing wallet and do not use production funds.

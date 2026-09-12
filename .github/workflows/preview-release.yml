@@ -6,7 +6,7 @@ on:
         description: Release tag on the current public main commit
         type: string
         required: true
-        default: v0.1.1
+        default: v0.1.2
 permissions:
   contents: read
 concurrency:
@@ -21,7 +21,7 @@ jobs:
         os: [windows-latest, macos-14, macos-15-intel]
     runs-on: ${{ matrix.os }}
     env:
-      CARGO_BUILD_JOBS: '2'
+      CARGO_BUILD_JOBS: '3'
       PETRI_REQUIRE_SDK_RUNTIME: '1'
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -33,13 +33,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
         with:
           toolchain: '1.93.1'
-      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        id: build-cache
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
+            target/release
+            target/sdk-compressed-verifier
+            target/petri-sdk-runtime.bin
           key: petri-preview-${{ matrix.os }}-${{ hashFiles('Cargo.lock', 'release/public-sdk-source.json', 'scripts/sdk-*.mjs') }}
+          restore-keys: petri-preview-${{ matrix.os }}-
       - name: Build bundled SDK runtime
         shell: bash
         run: node scripts/build-sdk-runtime.mjs --verify || node scripts/build-sdk-runtime.mjs
@@ -48,13 +52,27 @@ jobs:
         run: |
           set -euo pipefail
           export CARGO_ENCODED_RUSTFLAGS="--remap-path-prefix=$GITHUB_WORKSPACE=."$'\x1f'"--remap-path-prefix=$HOME=<home>"
-          cargo build --release --locked --bin petri -j2
+          cargo build --release --locked --bin petri -j3
           target/release/petri --version
           target/release/petri --help
           target/release/petri --json config show
           node scripts/build-sdk-runtime.mjs --verify
+          export PETRI_CONFIG_PATH="$RUNNER_TEMP/petri-launch-smoke/config.json"
+          target/release/petri config set backend-url http://127.0.0.1:4000
+          target/release/petri config reset backend-url
+          node scripts/verify-sdk-runtime.mjs
       - name: Package explicit unsigned preview
         run: node scripts/package-petri-preview.mjs
+      - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        if: always() && steps.build-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/release
+            target/sdk-compressed-verifier
+            target/petri-sdk-runtime.bin
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: ${{ matrix.os }}

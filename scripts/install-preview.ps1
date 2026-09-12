@@ -26,7 +26,7 @@ New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
 foreach ($Name in @('petri.exe','Petri.ico','LICENSE','THIRD_PARTY_NOTICES.md','THIRD_PARTY_LICENSES.md','README.txt')) {
   Copy-Item -LiteralPath (Join-Path $Package $Name) -Destination (Join-Path $InstallRoot $Name) -Force
 }
-$UserPath = [Environment]::GetEnvironmentVariable('Path','User')
+$UserPath = [string][Environment]::GetEnvironmentVariable('Path','User')
 if (($UserPath -split ';') -notcontains $InstallRoot) { [Environment]::SetEnvironmentVariable('Path', (($UserPath.TrimEnd(';') + ';' + $InstallRoot).TrimStart(';')), 'User') }
 if (-not $NoShortcut) {
   $Shell = New-Object -ComObject WScript.Shell

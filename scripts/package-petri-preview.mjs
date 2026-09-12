@@ -4,6 +4,8 @@ import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 const root=process.cwd();
+const version=fs.readFileSync('Cargo.toml','utf8').match(/^version = "([0-9]+\.[0-9]+\.[0-9]+)"/m)?.[1];
+if(!version) throw new Error('Missing package version');
 const platform=process.platform==='win32'?'windows':process.platform==='darwin'?'macos':'linux';
 const arch=process.arch==='x64'?(platform==='windows'?'x64':'x86_64'):process.arch;
 const stem=`Petri-${platform}-${arch}`;
@@ -19,7 +21,7 @@ if(platform==='macos') {
   fs.copyFileSync('assets/Petri.icns',path.join(binDir,'Petri.icns'));
   write(path.join(binDir,'petri.command'),'#!/bin/bash\nset -euo pipefail\nexec "$(cd "$(dirname "$0")" && pwd)/petri" tui\n',0o755);
   write(path.join(app,'Contents/MacOS/Petri'),'#!/bin/bash\nset -euo pipefail\n/usr/bin/open -a Terminal "$(cd "$(dirname "$0")/.." && pwd)/Resources/petri.command"\n',0o755);
-  write(path.join(app,'Contents/Info.plist'),'<?xml version="1.0" encoding="UTF-8"?><plist version="1.0"><dict><key>CFBundleExecutable</key><string>Petri</string><key>CFBundleIdentifier</key><string>farm.amoeba.petri.preview</string><key>CFBundleName</key><string>Petri</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleIconFile</key><string>Petri.icns</string><key>CFBundleVersion</key><string>0.1.0</string><key>CFBundleShortVersionString</key><string>0.1.0</string><key>LSMinimumSystemVersion</key><string>14.0</string></dict></plist>\n');
+  write(path.join(app,'Contents/Info.plist'),`<?xml version="1.0" encoding="UTF-8"?><plist version="1.0"><dict><key>CFBundleExecutable</key><string>Petri</string><key>CFBundleIdentifier</key><string>farm.amoeba.petri.preview</string><key>CFBundleName</key><string>Petri</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleIconFile</key><string>Petri.icns</string><key>CFBundleVersion</key><string>${version}</string><key>CFBundleShortVersionString</key><string>${version}</string><key>LSMinimumSystemVersion</key><string>14.0</string></dict></plist>\n`);
 }
 const exe=platform==='windows'?'petri.exe':'petri';
 fs.copyFileSync(path.join('target/release',exe),path.join(binDir,exe));
@@ -29,7 +31,7 @@ if(platform==='windows') fs.copyFileSync('assets/Petri.ico',path.join(stage,'Pet
 const installer=platform==='windows'?'install-preview.ps1':'install-preview.sh';
 fs.copyFileSync(path.join('scripts',installer),path.join(stage,installer));
 fs.chmodSync(path.join(stage,installer),0o755);
-write(path.join(stage,'README.txt'),`Petri 0.1.0 — Devnet preview\n\nThis preview is not publisher-signed or notarized. Verify the release SHA-256 before opening it.\nWindows: double-click petri.exe, or run powershell -ExecutionPolicy Bypass -File .\\install-preview.ps1\nmacOS: open Petri.app (opens Terminal), or run bash ./install-preview.sh\nmacOS may require Privacy & Security > Open Anyway for this specific app. Do not disable system security globally.\nLinux: run bash ./install-preview.sh\nThe installer adds the petri terminal command; restart your terminal afterward.\nUpdates: rerun the preview installer. The signed automatic updater does not accept unsigned preview packages.\nSource and install instructions: https://github.com/amoeba-farm/petri\n`);
+write(path.join(stage,'README.txt'),`Petri ${version} — Devnet preview\n\nThis preview is not publisher-signed or notarized. Verify the release SHA-256 before opening it.\nWindows: double-click petri.exe, or run powershell -ExecutionPolicy Bypass -File .\\install-preview.ps1\nmacOS: open Petri.app (opens Terminal), or run bash ./install-preview.sh\nmacOS may require Privacy & Security > Open Anyway for this specific app. Do not disable system security globally.\nLinux: run bash ./install-preview.sh\nThe installer adds the petri terminal command; restart your terminal afterward.\nUpdates: rerun the preview installer. The signed automatic updater does not accept unsigned preview packages.\nSource and install instructions: https://github.com/amoeba-farm/petri\n`);
 if(platform==='macos') {
   run('codesign',['--force','--deep','--sign','-',path.join(stage,'Petri.app')]);
   run('codesign',['--verify','--deep','--strict',path.join(stage,'Petri.app')]);

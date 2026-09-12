@@ -1419,7 +1419,7 @@ fn checked_private_temp_name(
     let opened = file.metadata().map_err(|error| {
         format!("failed to inspect opened temporary Petri configuration: {error}")
     })?;
-    if named.st_dev != opened.dev()
+    if named.st_dev as u64 != opened.dev()
         || named.st_ino != opened.ino()
         || named.st_mode & libc::S_IFMT != libc::S_IFREG
     {
