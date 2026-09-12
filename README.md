@@ -108,6 +108,8 @@ petri --version
 
 On Windows the output is `target\release\petri.exe`. Linux source builds also
 require `libssl-dev`, `libudev-dev`, and `pkg-config` (Debian/Ubuntu package names).
+On macOS, run `export CARGO_PROFILE_RELEASE_LTO=false` before building; this avoids
+an LLVM bitcode incompatibility with Apple's system linker.
 
 ## Start here
 

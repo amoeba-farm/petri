@@ -1,16 +1,10 @@
-name: Preview binaries
+name: Finish macOS preview release
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Release tag on the current public main commit
-        type: string
-        required: true
-        default: v0.1.3
 permissions:
   contents: read
 concurrency:
-  group: preview-release
+  group: preview-macos-release
   cancel-in-progress: false
 jobs:
   build:
@@ -18,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-14, macos-15-intel]
+        os: [macos-14, macos-15-intel]
     runs-on: ${{ matrix.os }}
     env:
       CARGO_BUILD_JOBS: '3'
@@ -27,6 +21,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
+          ref: 55c6915d4b70403e4e3da940e51549b0355c53a5
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22.22.1'
@@ -42,7 +37,7 @@ jobs:
             target/release
             target/sdk-compressed-verifier
             target/petri-sdk-runtime.bin
-          key: petri-preview-${{ matrix.os }}-${{ hashFiles('Cargo.lock', 'release/public-sdk-source.json', 'scripts/sdk-*.mjs') }}
+          key: petri-preview-${{ matrix.os }}-no-lto-${{ hashFiles('Cargo.lock', 'release/public-sdk-source.json', 'scripts/sdk-*.mjs') }}
           restore-keys: petri-preview-${{ matrix.os }}-
       - name: Build bundled SDK runtime
         shell: bash
@@ -87,25 +82,38 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: 55c6915d4b70403e4e3da940e51549b0355c53a5
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           path: artifacts
           merge-multiple: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: windows-latest
+          path: artifacts
+          run-id: 34725488647
+          github-token: ${{ github.token }}
       - name: Publish preview downloads
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_TAG: v0.1.3
         shell: bash
         run: |
           set -euo pipefail
           test "$RELEASE_TAG" = "v$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)"
-          test "$(git rev-list -n 1 "$RELEASE_TAG")" = "$GITHUB_SHA"
-          test "$(gh api repos/amoeba-farm/petri/git/ref/heads/main --jq .object.sha)" = "$GITHUB_SHA"
+          test "$(git rev-list -n 1 "$RELEASE_TAG")" = "55c6915d4b70403e4e3da940e51549b0355c53a5"
+          test "$(git rev-parse HEAD)" = "55c6915d4b70403e4e3da940e51549b0355c53a5"
+          git fetch origin main
+          git merge-base --is-ancestor HEAD origin/main
+          test "$(gh api repos/amoeba-farm/petri/actions/runs/34725488647 --jq .head_sha)" = "55c6915d4b70403e4e3da940e51549b0355c53a5"
           test "$(find artifacts -maxdepth 1 -type f | wc -l)" -eq 6
           (cd artifacts; sha256sum -c ./*.sha256)
           gh release create "$RELEASE_TAG" artifacts/* --verify-tag --latest --title "Petri $RELEASE_TAG — Devnet preview" --notes-file release/preview-notes.md
+
+
