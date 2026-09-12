@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "fps": 30,
+  "cols": 240,
+  "rows": 83,
+  "frameCount": 187,
+  "charset": " .:-=+*#%@",
+  "encoding": "u8-index-rgb-raw",
+  "data": "frames.bin.zlib",
+  "terminal": {
+    "frameCount": 207,
+    "frameDurationMs": 30,
+    "cols": 211,
+    "rows": 67,
+    "charset": " .=+*#@",
+    "encoding": "u8-display-index-bright-bit7",
+    "brightMask": 128,
+    "data": "terminal-frames.bin.zlib",
+    "sourceView": {
+      "left": 15,
+      "right": 226,
+      "top": 8,
+      "bottom": 75
+    },
+    "storage": {
+      "codec": "zlib",
+      "bytes": 2926359,
+      "sha256": "2feff30af371f34989edfb7a18114840bf498d42a43cc8beca66a8c0058b472f"
+    }
+  },
+  "storage": {
+    "codec": "zlib",
+    "bytes": 14900160,
+    "sha256": "90a1c8c8776fe380ee1ac1f48f3227d64c1610bb748d883ccb945da1db7840af"
+  }
+}

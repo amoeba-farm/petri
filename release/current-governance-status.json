@@ -1,0 +1,344 @@
+{
+  "schema": "ameba.petri.current-governance-status.v1",
+  "schemaVersion": 1,
+  "preparedDate": "2026-09-12",
+  "packageSource": {
+    "repository": "SPACE999978/ameba_cli",
+    "implementationBaseCommit": "84ea8e580dac110b886d2904f2c3029bf1cd7f85",
+    "candidateCommit": null,
+    "status": "local-source-unqualified"
+  },
+  "sdk": {
+    "repository": "SPACE999978/ameba_sdk",
+    "commit": "a21b324a7a64da87046c7650355b80ea20c47540",
+    "status": "published-immutable-source"
+  },
+  "sourceHeads": {
+    "lean": "0c69f9e33bb7c1fce2840ca074e5a8ea21a4db52",
+    "leanFixtures": "d20e12ab03d5c0c20df04b21d6054dfffa29d311",
+    "cliBase": "0b82d5f990089d043a2c98b792b120044c578805",
+    "cliGovernedRestoration": "1765d345014a2e91688d3b60c39e1019be279d4b",
+    "spreadTools": "397bd8403c7803574597a7ff3650a303b92f96c0",
+    "governance": "1a8ca8e3169d79029bac5ebd95af58e9d99ddc84"
+  },
+  "readerSemanticBaseline": {
+    "release": "v0.1.0-rc.44",
+    "spreadSourceCommit": "1b2230d96e51f6582155d8284900fbfc11ff1f18",
+    "currentWriteEligible": false
+  },
+  "liveDeployment": {
+    "kind": "finalized-account-deployment-identity",
+    "provenance": "finalized-rpc-account",
+    "releaseLabel": "spread-refactor-20260912",
+    "cluster": "devnet",
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG",
+    "stateNamespace": "ameba-spread-v2",
+    "sourceCommit": "b1931fecff5229da232f06e9c5c43b1d6328806d",
+    "artifactSourceCommit": "b1931fecff5229da232f06e9c5c43b1d6328806d",
+    "programId": "2jVQSPny9eFoaG1ZWoJVAezQ5VgqJtF8rQCQXMktuBVw",
+    "programDataAddress": "8KR6hgcQehz32jm7CvrAriYNhvT2Bu9JuUWHce81J1oh",
+    "programAccountBytes": 36,
+    "programAccountSha256": "83be84ac424d864aacf03e489ff8fe3f0a6957e8726c8f9c48f572df6b522e75",
+    "programDataAccountBytes": 1385357,
+    "programDataAccountSha256": "df5e426d74dadcca84c42e999489ad3089421fe99c4ad5fc718e4b18eee5e610",
+    "programDataPayloadBytes": 1385312,
+    "programDataPayloadSha256": "903c58504f44e8820e5c9f99765b26be15a97504ec5fdd0855f3668f29927fee",
+    "artifactBytes": 1385312,
+    "artifactSha256": "903c58504f44e8820e5c9f99765b26be15a97504ec5fdd0855f3668f29927fee",
+    "mandatoryZeroPaddingBytes": 0,
+    "programDataSlot": 497328581,
+    "upgradeAuthority": {
+      "mode": "external-authority",
+      "address": "4hsEKyThDv85YA4HjUaGWn2nWnVbM5V23XcLrEX3UKzn"
+    },
+    "writeCompatibility": "governance-gate-v1",
+    "liveReadProfileId": "ameba-spread-v2-deployed-b1931fec",
+    "buildFeatures": [
+      "devnet-v3-governance-controller",
+      "devnet-solo-backfill-2026"
+    ],
+    "minimumContextSlot": 497359082,
+    "finalizedObservationSlot": 497359082,
+    "observedAt": "2026-09-12T20:19:29.568Z",
+    "receiptPath": "release/refactor-deployment-evidence-20260912.json",
+    "descriptorPath": "release/spread-refactor-final-20260912.json",
+    "identityGeneration": 3,
+    "reviewedBridgeSourceCommit": "60d7a856f627f880a62fb93c951a1252615e1198",
+    "qualifiedToolsSourceCommit": "60d7a856f627f880a62fb93c951a1252615e1198",
+    "byteEvidence": "parent-captured-finalized-rpc-account",
+    "descriptorRepository": "SPACE999978/ameba_sdk",
+    "descriptorCommit": "ac30e32bbd151d8819e4a06eafdf33570bab0eab",
+    "descriptorSha256": "edfaa6410d3fddcb758ad3a83b58c4c0f8a0045505d645f58ca86949dac46ab8"
+  },
+  "liveGovernance": {
+    "identityGeneration": 3,
+    "live": true,
+    "environment": "devnet",
+    "controllerProgramId": "8fhNi6QHU5TYNhoPDM4vs89ZBztnpxp3LnBXRgkBVKtx",
+    "controllerProgramData": "7eW9UXcCDrpEAQ93fP7o2zgGMKhAKi3zJLihELjR8xYd",
+    "controllerConfigPda": "Ec5H8jsGvaLU3T3gp6qTayPjY2qF3geBbVKWz4rsaEHB",
+    "protocolGatePda": "Cdym9p7FvtxEAjF8XuCqSrishB7LmBDXaZGDMMgWczu",
+    "targetProgramId": "2jVQSPny9eFoaG1ZWoJVAezQ5VgqJtF8rQCQXMktuBVw",
+    "targetProgramData": "8KR6hgcQehz32jm7CvrAriYNhvT2Bu9JuUWHce81J1oh",
+    "controllerSourceCommit": "6b6518c280211c9fc14ea393051092bc3d0b2318",
+    "artifactSha256": "93392770af3d0251092d736c3ab8718349b8f5811527bab402ea7a235e947d96",
+    "programDataSha256": "1470f1ac6a1c57a310c128d5da0f2f2ff56a62c94cc401f0a3be6d968c7a779c",
+    "deploymentReceiptSha256": "6fba0fb69384d2a2aad3bbd2b8049df1d940b26c26dcc735282a620be24e4f76",
+    "mainnetAllowed": false,
+    "upgradeAuthority": {
+      "mode": "governed-authority",
+      "address": "Frc28QFQxqUxF9HPgzcmm5VkqorqUb2LeLPE5uKU6Ycp"
+    },
+    "bridgeAbi": {
+      "gateDiscriminatorAscii": "AGVGAT01",
+      "gateLength": 192,
+      "gateVersion": 1,
+      "tailMagicAscii": "AGV1",
+      "tailLength": 16,
+      "tailVersion": 1
+    },
+    "pinnedObservation": {
+      "status": "Active",
+      "epoch": "24",
+      "accountSha256": "a4fabe984158fed49b8470148ab1f915d8cbd5cc6cc5fd22aeee607abf5a90a1",
+      "observedAt": "2026-09-12T20:19:29.568Z",
+      "observedAtOrAfterSlot": 497359082,
+      "provenance": "finalized-rpc-account"
+    },
+    "identityManifestSha256": "c8207cb4175756230e3f3b257498d89720122e6075767e83990ad7d645decf73"
+  },
+  "reviewedGeneration2Candidate": {
+    "live": false,
+    "identityGeneration": 2,
+    "controllerProgramId": "FqCshwTvCzQRZYHFiX96nwiG93xwgWRMyCj5onvoo7Lm",
+    "controllerConfigPda": "CvWy6F8YAB1FZD9kuDFBpKU11V1w93nbXXizFobSmYR8",
+    "protocolGatePda": "CiszKKUZAUAb4DrZF8FBUJf136SVLY73d6J2MdyrinLL",
+    "reviewedControllerSourceCommit": "b54648cf4753a8093ac0e21a0dceb0db8eebb29b",
+    "governanceToolingHead": "bfb79641641009839e8e73fd92ee45fda51314e5",
+    "mainnetAllowed": false,
+    "activationEvidence": null
+  },
+  "writeRelease": {
+    "available": true,
+    "compatibility": "governance-gate-v1",
+    "governedSpreadReleaseCommit": "397bd8403c7803574597a7ff3650a303b92f96c0",
+    "governedInstructionManifestSha256": "1aed01b9e8b251a01996ac880511d84fd42db48d259d385557a38de662387736",
+    "reason": "Package capability only; finalized active gate, initialized unpaused business state and action admission remain required."
+  },
+  "authorization": {
+    "deploymentEnabled": false,
+    "upgradeAuthorized": false,
+    "authorityHandoffAuthorized": false,
+    "productionEnabled": false,
+    "mainnetEnabled": false
+  },
+  "runtimePermission": {
+    "available": false,
+    "observationOnly": true,
+    "observedAt": "2026-09-12T20:19:29.568Z",
+    "gateStatus": "Active",
+    "businessState": "live-action-specific-revalidation-required",
+    "revalidateBeforeEveryWrite": true
+  },
+  "businessParity": {
+    "schema": "ameba-v3-dated-business-parity-v1",
+    "verifiedAt": "2026-09-07T03:23:42.152Z",
+    "scope": "issuance + writers + DLMM final-state parity with user-approved oracle differences; terminal settlement evidence remains pending expiry; not transaction-history equality",
+    "status": "audited-final-state-with-approved-oracle-differences",
+    "observationSlots": {
+      "market": 494386396,
+      "retainedMarkets": 494386404,
+      "oracles": {
+        "NANDX-202609-CALL-01": {
+          "manifest": 494386584,
+          "sources": 494386602,
+          "economics": 494386605
+        },
+        "NANDX-202609-PUT-01": {
+          "manifest": 494386613,
+          "sources": 494386623,
+          "economics": 494386632
+        },
+        "NANDX-202610-CALL-01": {
+          "manifest": 494387242,
+          "sources": 494387252,
+          "economics": 494387260
+        },
+        "NANDX-202610-PUT-01": {
+          "manifest": 494387268,
+          "sources": 494387278,
+          "economics": 494387287
+        },
+        "RAMX-202609-CALL-01": {
+          "manifest": 494387056,
+          "sources": 494387064,
+          "economics": 494387073
+        },
+        "RAMX-202609-PUT-01": {
+          "manifest": 494387082,
+          "sources": 494387092,
+          "economics": 494387100
+        },
+        "RAMX-202610-CALL-01": {
+          "manifest": 494386777,
+          "sources": 494386786,
+          "economics": 494386796
+        },
+        "RAMX-202610-PUT-01": {
+          "manifest": 494386804,
+          "sources": 494386813,
+          "economics": 494386822
+        }
+      },
+      "pools": {
+        "NANDX-202609-CALL-01": 494387350,
+        "NANDX-202609-PUT-01": 494387423,
+        "NANDX-202610-CALL-01": 494387332,
+        "NANDX-202610-PUT-01": 494387405,
+        "RAMX-202609-CALL-01": 494387388,
+        "RAMX-202609-PUT-01": 494387321,
+        "RAMX-202610-CALL-01": 494387372,
+        "RAMX-202610-PUT-01": 494387441
+      },
+      "minimum": 494386396,
+      "maximum": 494387441
+    },
+    "counts": {
+      "markets": 13,
+      "gameMarkets": 8,
+      "sources": 400,
+      "sleeves": 6,
+      "pools": 8,
+      "finalizedReplayTransactions": 185,
+      "allocationObservations": 10,
+      "writerFinancialRecords": 24,
+      "dlmmVerifiedRecords": 88,
+      "baseLogicalOperations": 185,
+      "auxiliaryInstructions": 48,
+      "totalBusinessInstructions": 233,
+      "wrappedTransactions": 40
+    },
+    "expectedDifferences": [
+      "Fresh program, PDAs, option/Flat mints, oracle months and compressed addresses replace the old deployment identities; the old ledger is not migrated.",
+      "ELF source737b7cd/SHA6977f925... remains distinct from retained ProgramData capacity1241504/SHA106dd7e1...;3808 zero bytes are storage. Original oracle setup and31 initial writer steps used D739, proven through exact state-preserving upgrade receipts.",
+      "Governance uses current V3 controller and fresh Active epoch9; source and Opening clocks are rebased through the preserved cohort journal, while immutable option terms/expiry match retained old evidence.",
+      "RAMX September nonce1 is an intentional funded nonreveal timeout with two full refunds. Its cause differs from the old cap failure; the new auction remains Refundable after refunds, followed by successful nonce2.",
+      "Source identifiers and evidence hashes include new month identities and therefore differ; the user accepted the measured six SKU bond-setting differences, source bond differences, and399 identity-derived opening/current pairs under receipt280ee4b4.... Weights and all other checked economics remain exact; oracle economic or future payoff equality is not claimed. Any unlisted difference fails.",
+      "Fresh owner funding, issuance, trades and withdrawals have new transaction signatures, timestamps and balance histories. This audit verifies final economic state and recorded replay deltas, not identical historical transactions or wallet-wide balances.",
+      "Position0 remains empty and position1 holds bins19/21; one old typed position bitmap was inconsistent with its shares. Current bitmap10 is required by the canonical decoder. The replay uses48 auxiliary ordinary instructions inside40 atomic maintenance/trade batches; its temporary1-atom supporting bid is fully removed, preserving the185 base logical operations and final economic targets.",
+      "The old demo used a sidecar marker for pre-expiry writer activation. The fresh path uses an absent canonical future terminal-evidence address and zero group terminal digest; ordinary settlement binds actual evidence once after expiry. Terminal settlement parity is not claimed.",
+      "November oracle/market/mint state is compared byte-for-byte with the fresh pre-upgrade census; two new November writer sleeves are intentionally Draft with no financial activity."
+    ],
+    "historyEqualityClaim": false,
+    "walletWideBalanceEqualityClaim": false,
+    "auditReceipt": "docs/governance/evidence/v3-business-parity-20260907T032342Z/audit.json",
+    "metadataReceipt": "docs/governance/evidence/v3-business-parity-20260907T032342Z/metadata-receipt.json",
+    "tradeReady": false,
+    "qualificationComplete": false,
+    "applicationRolloutPerformed": false,
+    "pending": [
+      "explicit readiness review",
+      "final tools package and SDK qualification"
+    ],
+    "executionEra": {
+      "priorArtifactSha256": "0dd6a6def09a8fc690572bf5a430157644b9b1e5ebac60a2f07c481a3bf0d22d",
+      "priorOperationCount": 31,
+      "currentArtifactSha256": "6977f9258ceb6f818ba5dd4b7aaef114de44160cec34867a798b0f1867edda5b",
+      "upgradeSignature": "2ceUWBBKbM5FoBtviPRGa3DzoiJLUKM39mn9wiXegGarAL1xq4VM7eRRUkoVctSiTip5Y4CXpJjbCGq6TjXhJRnL",
+      "activationSignature": "2pP1pskQbwcqiurkaDBpWYzCjQ9eQW99BoQuLjfaWWouPQFCMqRW1jpCdAvPPnyHYnKJka5BXxKqrtfv1ZTnYCxS",
+      "preservationSha256": "584f8dc99e50b2b45fbbeb8c2b04a5dc6dd85fc90503a9422a1301479ffc38dd"
+    },
+    "approvedOracleDifferences": {
+      "receiptSha256": "280ee4b44a0e92ebe483179a263e23aabfc937d8e795595208744c607c42d998",
+      "decision": "retain-current-deployment-with-listed-oracle-differences",
+      "sourcePairs": 400,
+      "skuEconomicRecords": 400,
+      "changedOpeningAndCurrentPairs": 399,
+      "sourceWeightDifferences": 0,
+      "exactOracleEconomicEqualityClaimed": false,
+      "futurePayoffEqualityClaimed": false,
+      "receipt": "docs/governance/evidence/v3-business-parity-20260907T032342Z/approved-oracle-differences.json",
+      "profile": {
+        "sources": 400,
+        "skuEconomicRecords": 400,
+        "changedOpeningAndCurrentPairs": 399,
+        "sourceWeightDifferences": 0,
+        "sourceBonds": {
+          "listingBondLocked": {
+            "old": "1000000",
+            "current": "12000000"
+          },
+          "supportStakeTotal": {
+            "old": "1000000",
+            "current": "12000000"
+          }
+        },
+        "skuEconomics": {
+          "listingBond": {
+            "old": "1000000",
+            "current": "12000000"
+          },
+          "supportBond": {
+            "old": "1000000",
+            "current": "12000000"
+          },
+          "openingBond": {
+            "old": "100000",
+            "current": "1000000"
+          },
+          "updateMinBond": {
+            "old": "100000",
+            "current": "1000000"
+          },
+          "challengeMinBond": {
+            "old": "100000",
+            "current": "1000000"
+          },
+          "challengeMaxBond": {
+            "old": "1000000",
+            "current": "12000000"
+          }
+        },
+        "unchangedSkuEconomics": {
+          "challengeBondBps": "5000",
+          "proposerRewardBps": "5000",
+          "sourceRewardBudget": "0",
+          "openingRewardBudget": "0",
+          "updateRewardBudget": "0",
+          "remainingSourceRewardBudget": "0",
+          "remainingOpeningRewardBudget": "0",
+          "remainingUpdateRewardBudget": "0",
+          "registeredUpdateRewardUnits": "0"
+        },
+        "openingFormula": "100000000 + (sourceId[0] - 128) * 10000",
+        "baselineEqualsCurrentRequiredInBothSnapshots": true,
+        "changedOpeningPairsByMarket": {
+          "NANDX-202609-CALL-01": 48,
+          "NANDX-202609-PUT-01": 48,
+          "RAMX-202610-CALL-01": 52,
+          "RAMX-202610-PUT-01": 52,
+          "RAMX-202609-CALL-01": 52,
+          "RAMX-202609-PUT-01": 51,
+          "NANDX-202610-CALL-01": 48,
+          "NANDX-202610-PUT-01": 48
+        }
+      }
+    },
+    "exactOracleEconomicEqualityClaimed": false,
+    "futurePayoffEqualityClaimed": false,
+    "lifecyclePreservationReceipt": "docs/governance/evidence/v3-business-parity-20260907T032342Z/lifecycle-preservation.json"
+  },
+  "finalVerification": {
+    "status": "focused-release-checks-passed-broader-suite-incomplete",
+    "passed": false,
+    "checks": [
+      "cargo fmt -- --check: passed",
+      "cargo check --locked --all-targets: passed",
+      "current_release::tests: 3 passed",
+      "current governance release and packaging checks: passed",
+      "full unit suite: 659 passed, 65 failed, 3 ignored",
+      "SDK dependency source and provenance checks passed; binary parity was not run because packaged binaries are absent"
+    ],
+    "broadIntegrationReruns": false
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "3a5d80c6ebd7a7eb3182d295b7f4c3a537d257f2",
+  "sourceDirty": false,
+  "policySha256": "25f77ae86ebb0256c4c91099a45641311a1ad8ca6e599d1de178d4b7c5a07a8f",
+  "exportedFileCount": 218,
+  "exportedTreeSha256": "b5af332d30955c8c501359ad08bf9292a6204ce173db198f35d1adb2abeabde2",
+  "treeDigestIncludesExecutableModes": true,
+  "treeDigestExcludesThisProvenanceFile": true
+}

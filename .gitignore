@@ -1,0 +1,34 @@
+/target
+**/target/
+/dist
+target_spread_oracle_verify/
+/.idea
+.DS_Store
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.p12
+*.pfx
+
+# Secret-bearing and compiled program artifacts
+**/*keypair*.json
+**/*wallet*.json
+**/*.pem
+**/*.key
+**/*.so
+**/*.dylib
+**/*.dll
+**/*.rlib
+**/*.o
+
+# Generated output and local state
+/output/
+/logs/
+*.log
+*.bak
+*.orig
+*~
+__pycache__/
+*.py[cod]

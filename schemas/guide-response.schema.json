@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://amoeba.farm/schemas/petri-guide-response-v1.4.json",
+  "title": "Petri TUI Guide Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assistant_text",
+    "ui_command",
+    "highlight_target",
+    "suggested_actions",
+    "action_preview"
+  ],
+  "properties": {
+    "assistant_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 700
+    },
+    "ui_command": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "target_id", "target_ids", "fields", "action", "query"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "explain_current_screen",
+                "open_target",
+                "stage_trade",
+                "stage_oracle_form",
+                "stage_action_form",
+                "fill_active_form",
+                "focus_control",
+                "search_oracle",
+                "open_market_contracts",
+                "open_contract",
+                "go_to_bucket",
+                "highlight_source",
+                "compare_sources",
+                "open_source_detail",
+                "open_challenge_view",
+                "show_phase_timeline",
+                "show_next_action"
+              ]
+            },
+            "target_id": { "type": ["string", "null"], "maxLength": 192 },
+            "target_ids": {
+              "type": ["array", "null"],
+              "maxItems": 2,
+              "items": { "type": "string", "minLength": 1, "maxLength": 192 }
+            },
+            "fields": {
+              "type": ["array", "null"],
+              "maxItems": 12,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["field_id", "value"],
+                "properties": {
+                  "field_id": { "type": "string", "minLength": 1, "maxLength": 192 },
+                  "value": { "type": "string", "maxLength": 600 }
+                }
+              }
+            },
+            "action": { "type": ["string", "null"], "enum": ["buy", "sell", null] },
+            "query": { "type": ["string", "null"], "maxLength": 120 }
+          }
+        }
+      ]
+    },
+    "highlight_target": { "type": ["string", "null"], "maxLength": 192 },
+    "suggested_actions": {
+      "type": ["array", "null"],
+      "maxItems": 3,
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+    },
+    "action_preview": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "summary",
+            "requires_confirmation",
+            "permission_tier"
+          ],
+          "properties": {
+            "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "summary": { "type": "string", "minLength": 1, "maxLength": 400 },
+            "requires_confirmation": { "type": "boolean", "const": true },
+            "permission_tier": { "type": "string", "enum": ["preview"] }
+          }
+        }
+      ]
+    }
+  }
+}

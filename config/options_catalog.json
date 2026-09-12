@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 2,
+  "cluster": "devnet",
+  "programId": "2jVQSPny9eFoaG1ZWoJVAezQ5VgqJtF8rQCQXMktuBVw",
+  "networkIdentity": {
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG",
+    "lightAccounts": [
+      {
+        "role": "light_address_tree",
+        "address": "amt2kaJA14v3urZbZvnc5v2np8jqvc4Z8zDep5wbtzx",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_state_tree",
+        "address": "bmt1LryLZUMmF7ZtqESaw7wifBXLfXHQYoE4GAmrahU",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_output_queue",
+        "address": "oq1na8gojfdUhsfCpyjNt6h4JaDWtHf1yQj4koBWfto",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_cpi_context",
+        "address": "cpi15BoVPKgEPw5o8wc2T816GE7b378nMXnhH3Xbq4y",
+        "owner": "SySTEM1eSU2p4BGQfQpimFEWWSC1XDFeun3Nqzz3rT7",
+        "executable": false
+      },
+      {
+        "role": "light_state_tree",
+        "address": "bmt2UxoBxB9xWev4BkLvkGdapsz6sZGkzViPNph7VFi",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_output_queue",
+        "address": "oq2UkeMsJLfXt2QHzim242SUi3nvjJs8Pn7Eac9H9vg",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_cpi_context",
+        "address": "cpi2yGapXUR3As5SjnHBAVvmApNiLsbeZpF3euWnW6B",
+        "owner": "SySTEM1eSU2p4BGQfQpimFEWWSC1XDFeun3Nqzz3rT7",
+        "executable": false
+      },
+      {
+        "role": "light_state_tree",
+        "address": "bmt3ccLd4bqSVZVeCJnH1F6C8jNygAhaDfxDwePyyGb",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_output_queue",
+        "address": "oq3AxjekBWgo64gpauB6QtuZNesuv19xrhaC1ZM1THQ",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_cpi_context",
+        "address": "cpi3mbwMpSX8FAGMZVP85AwxqCaQMfEk9Em1v8QK9Rf",
+        "owner": "SySTEM1eSU2p4BGQfQpimFEWWSC1XDFeun3Nqzz3rT7",
+        "executable": false
+      },
+      {
+        "role": "light_state_tree",
+        "address": "bmt4d3p1a4YQgk9PeZv5s4DBUmbF5NxqYpk9HGjQsd8",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_output_queue",
+        "address": "oq4ypwvVGzCUMoiKKHWh4S1SgZJ9vCvKpcz6RT6A8dq",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_cpi_context",
+        "address": "cpi4yyPDc4bCgHAnsenunGA8Y77j3XEDyjgfyCKgcoc",
+        "owner": "SySTEM1eSU2p4BGQfQpimFEWWSC1XDFeun3Nqzz3rT7",
+        "executable": false
+      },
+      {
+        "role": "light_state_tree",
+        "address": "bmt5yU97jC88YXTuSukYHa8Z5Bi2ZDUtmzfkDTA2mG2",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_output_queue",
+        "address": "oq5oh5ZR3yGomuQgFduNDzjtGvVWfDRGLuDVjv9a96P",
+        "owner": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+        "executable": false
+      },
+      {
+        "role": "light_cpi_context",
+        "address": "cpi5ZTjdgYpZ1Xr7B1cMLLUE81oTtJbNNAyKary2nV6",
+        "owner": "SySTEM1eSU2p4BGQfQpimFEWWSC1XDFeun3Nqzz3rT7",
+        "executable": false
+      }
+    ]
+  },
+  "quoteAsset": {
+    "symbol": "USDC",
+    "mint": "21Ft8EZpugvFofW9713vLnYDRfSqyVUGUo9wvvUGhTsZ",
+    "decimals": 6
+  },
+  "rollingIssuancePolicy": {
+    "oracleMonthInitializerVersion": 5,
+    "oracleMonthInitializerTag": 181,
+    "productSkuManifestInitializerTag": 190,
+    "calendarScheduleVersion": 2,
+    "farMonthLeadCalendarMonths": 3,
+    "stateNamespaceSeedUtf8": "ameba-spread-v2",
+    "maturitySource": "exact_current_versioned_on_chain_state",
+    "bootstrapStatus": "pending_fresh_devnet_initialization",
+    "catalogIncludesTerminalSkuIds": false,
+    "terminalSkuIdentitySource": "governed_on_chain_product_sku_manifest"
+  },
+  "markets": [
+    {
+      "id": "ramx",
+      "name": "RAMx",
+      "symbol": "RAMX",
+      "title": "Oracle-Settled Monthly Options",
+      "subtitle": "Fully collateralized bounded-loss spreads on standardized RAM baskets",
+      "oracleSymbol": "RAMX",
+      "chartSymbol": "RAMX",
+      "underlyingId": "ram-standardized-baskets",
+      "collateralPolicy": "Fully funded bounded-loss monthlies with up-front collateral locks.",
+      "listingSummary": {
+        "moduleBuckets": 12,
+        "listedSkus": 52,
+        "governedIdentityManifest": {
+          "path": "governance/ramx_product_sku_manifest.v1.json",
+          "manifestVersion": 1,
+          "requiredSkuCount": 52,
+          "requiredSkuRootHex": "52a574e7fee12f9921b3b220b709be16c13a6f290abbdc2cc203ed1191ecf578",
+          "sourceSha256": "c89628e1656c82572b4f1b089388674aff0fae2aa3c3db1167da602a25b1cd3f",
+          "canonicalLabelEncoding": "printable-ascii-utf8-right-zero-padded-bytes32-v1",
+          "instructionTag": 190,
+          "chunkSkuCounts": [
+            16,
+            16,
+            16,
+            4
+          ]
+        },
+        "focusBuckets": [
+          "DDR4 client SODIMM/UDIMM",
+          "LPDDR4X mobile",
+          "LPDDR5 mobile",
+          "DDR4 server RDIMM/LRDIMM"
+        ],
+        "sourceCoveragePolicy": {
+          "mode": "exact_terminal_sku_merkle_manifest",
+          "requiredCountField": "listingSummary.listedSkus",
+          "terminalSkuIdsRequiredAtIssuance": true,
+          "uncoveredSkuBehavior": "extend_source_submission_and_block_later_phases"
+        }
+      },
+      "settlementModel": {
+        "style": "cash_settled_monthly",
+        "diagnostics": [
+          "binaryness_b",
+          "seller_yield_y",
+          "buyer_max_multiple_m"
+        ],
+        "gracePeriodHours": 2,
+        "gracePeriodSeconds": 7200,
+        "window": "Catalog expiry must match on-chain Market.instrument.expiry_ts exactly; the signed timestamp is that on-chain expiry and settlement becomes eligible when the on-chain Clock reaches expiry plus 7,200 seconds."
+      },
+      "liquidityEngine": {
+        "type": "in_program_ameba_dlmm",
+        "version": 1,
+        "programId": "2jVQSPny9eFoaG1ZWoJVAezQ5VgqJtF8rQCQXMktuBVw",
+        "quoteAsset": "canonical_usdc",
+        "liquidityPolicy": "managed_only",
+        "poolIdentity": "expiry_strike_side",
+        "launchPolicy": "lazy_open",
+        "notes": [
+          "Each expiry/strike/side resolves to one program-owned additive-grid pool.",
+          "Each pool starts with manager-selected liquidity around the active bin and expands through new pages without changing its identity.",
+          "The canonical contract mint trades directly against canonical USDC; no wrapper or second supply ledger exists."
+        ]
+      },
+      "dlmmParams": {
+        "gridModel": "additive_quote_atomic",
+        "strategyShape": "capped_call_and_capped_put",
+        "seriesGranularity": "per_expiry_per_strike_per_side",
+        "sides": [
+          "call",
+          "put"
+        ],
+        "tokenModel": "canonical_contract_mint_vs_canonical_usdc",
+        "contractUnit": {
+          "description": "one underlying index unit per contract",
+          "contractSizeScale": 6,
+          "contractSizeAtomic": 1000000,
+          "lotSizeContracts": 1,
+          "minimumOrderQuantityContracts": 1,
+          "frontendDefaultLotContracts": 10,
+          "frontendDefaultLotIsUiOnly": true
+        },
+        "neutralPairGeometry": {
+          "anchorPriceAtomic": 100000000,
+          "participationBps": 10000,
+          "widthFractionBps": 1200,
+          "widthRounding": "nearest-shared-quote-bin-step-half-up",
+          "sharedRoundedWidthAtomic": 12000000,
+          "callStrikePriceAtomic": 100000000,
+          "callCapPriceAtomic": 112000000,
+          "putStrikePriceAtomic": 100000000,
+          "putFloorPriceAtomic": 88000000,
+          "maxPayoutPerContractAtomic": 12000000
+        },
+        "lazyOpen": {
+          "rowsAroundAnchor": 2,
+          "maxInitialRowsPerExpiry": 5,
+          "initialExpiriesOpen": 2,
+          "openStrategy": "anchor_series_then_expand",
+          "expansionTrigger": "demand_and_edge_proximity",
+          "openBothSides": true,
+          "initialSeriesAroundAnchor": 2,
+          "maxInitialSeriesPerExpiry": 5
+        },
+        "pricing": {
+          "maxPayoutFractionBps": 10000,
+          "tickSizeQuoteAtomic": 50000,
+          "maximumPriceQuoteAtomic": 12000000,
+          "maximumBinId": 240,
+          "maximumBinCount": 240,
+          "binsPerPage": 32,
+          "theoreticalPageCount": 8,
+          "finalPageIndex": 7,
+          "finalPageFirstBinId": 225,
+          "finalPageLastBinId": 240,
+          "finalBinLocalIndex": 15,
+          "pageCreationPolicy": "lazy_active_liquidity_only",
+          "maximumBinsPerSwap": 8,
+          "terminalBinPolicy": "clamp_at_market_maximum_payout",
+          "defaultSwapSlippageBps": 100,
+          "launchBinCount": 21,
+          "binsBelowActive": 10,
+          "binsAboveActive": 10,
+          "activeCentered": true
+        },
+        "initialLiquidityManagerReference": {
+          "protocolInvariant": false,
+          "assumptions": "90-day ATM launch at a 100 USDC anchor with a 12-point cap",
+          "fairMid": {
+            "callPriceQuoteAtomic": 3900000,
+            "callActiveBinId": 78,
+            "putPriceQuoteAtomic": 4100000,
+            "putActiveBinId": 82
+          },
+          "illustrativeOneBinBuyerSideAsk": {
+            "callPriceQuoteAtomic": 3950000,
+            "callBinId": 79,
+            "putPriceQuoteAtomic": 4150000,
+            "putBinId": 83
+          },
+          "takerFeeBps": 20,
+          "takerFeeIncludedInBinPremium": false,
+          "activePriceMayMoveWithMarket": true
+        },
+        "walletEdge": {
+          "userBalanceMode": "light_ata_same_classic_spl_mint",
+          "poolCustodyMode": "same_mint_program_owned_light_token_vaults",
+          "returnMode": "same_mint_light_custody_after_exit"
+        }
+      },
+      "storageModel": {
+        "hotState": "light_decompressed_on_demand",
+        "hotPathSurfaces": [
+          "pool_root",
+          "reserve_pages",
+          "share_pages",
+          "manager_positions",
+          "canonical_option_and_usdc_vaults"
+        ],
+        "primaryLiquidity": "in_program_ameba_dlmm",
+        "longTailCompressed": [
+          "inactive_pool_roots",
+          "inactive_reserve_pages",
+          "inactive_share_pages",
+          "inactive_manager_positions",
+          "settlement_receipts",
+          "user_side_claim_balances"
+        ],
+        "longTailState": "light_compressed_accounts",
+        "currentArchitecture": "The program owns pricing, custody, accounting, settlement, and the Light hot/cold lifecycle."
+      },
+      "expiries": []
+    },
+    {
+      "id": "nandx",
+      "name": "NANDx",
+      "symbol": "NANDX",
+      "title": "Oracle-Settled Monthly Storage Options",
+      "subtitle": "Fully collateralized bounded-loss spreads on standardized NAND baskets",
+      "oracleSymbol": "NANDX",
+      "chartSymbol": "NANDX",
+      "underlyingId": "nand-standardized-baskets",
+      "collateralPolicy": "Fully funded bounded-loss monthlies with up-front collateral locks.",
+      "listingSummary": {
+        "moduleBuckets": 6,
+        "listedSkus": 48,
+        "governedIdentityManifest": {
+          "path": "governance/nandx_product_sku_manifest.v1.json",
+          "manifestVersion": 1,
+          "requiredSkuCount": 48,
+          "requiredSkuRootHex": "41bb5dc79bacabb3e0876b55e647b01084c7fe8b39846fd707ee0fd973d28c3d",
+          "sourceSha256": "14e31bd83e0c92c5b3894df5d68aec1091373c0ae48b53775d12640b92cb1be7",
+          "canonicalLabelEncoding": "printable-ascii-utf8-right-zero-padded-bytes32-v1",
+          "instructionTag": 190,
+          "chunkSkuCounts": [
+            16,
+            16,
+            16
+          ]
+        },
+        "benchmarkBasket": {
+          "path": "governance/nandx_benchmark_basket.v1.json",
+          "basketVersion": 1,
+          "benchmarkRows": 22,
+          "itemAddressableRows": 18,
+          "assessmentOnlyRows": 4,
+          "terminalMpnCount": 48,
+          "weightUnit": "percent",
+          "weightDecimalPlaces": 2,
+          "weightTotal": "100.00",
+          "terminalIdentityWeightPct": null,
+          "rowAggregation": "within-parent-row-before-basket-weight",
+          "monthlySourceWeights": "separate-governed-oracle-recipe",
+          "sourceSha256": "14e31bd83e0c92c5b3894df5d68aec1091373c0ae48b53775d12640b92cb1be7",
+          "layoutSha256": "fea5a56a2ed2d470a797639056e4a6b1aebe1f0174984683aeac26bf8d620fa7"
+        },
+        "focusBuckets": [
+          "Client NAND modules",
+          "Embedded storage",
+          "Data-center flash"
+        ],
+        "sourceCoveragePolicy": {
+          "mode": "exact_terminal_sku_merkle_manifest",
+          "requiredCountField": "listingSummary.listedSkus",
+          "terminalSkuIdsRequiredAtIssuance": true,
+          "uncoveredSkuBehavior": "extend_source_submission_and_block_later_phases"
+        }
+      },
+      "settlementModel": {
+        "style": "cash_settled_monthly",
+        "diagnostics": [
+          "binaryness_b",
+          "seller_yield_y",
+          "buyer_max_multiple_m"
+        ],
+        "gracePeriodHours": 2,
+        "gracePeriodSeconds": 7200,
+        "window": "Catalog expiry must match on-chain Market.instrument.expiry_ts exactly; the signed timestamp is that on-chain expiry and settlement becomes eligible when the on-chain Clock reaches expiry plus 7,200 seconds."
+      },
+      "liquidityEngine": {
+        "type": "in_program_ameba_dlmm",
+        "version": 1,
+        "programId": "2jVQSPny9eFoaG1ZWoJVAezQ5VgqJtF8rQCQXMktuBVw",
+        "quoteAsset": "canonical_usdc",
+        "liquidityPolicy": "managed_only",
+        "poolIdentity": "expiry_strike_side",
+        "launchPolicy": "lazy_open",
+        "notes": [
+          "Each expiry/strike/side resolves to one program-owned additive-grid pool.",
+          "Each pool starts with manager-selected liquidity around the active bin and expands through new pages without changing its identity.",
+          "The canonical contract mint trades directly against canonical USDC; no wrapper or second supply ledger exists."
+        ]
+      },
+      "dlmmParams": {
+        "gridModel": "additive_quote_atomic",
+        "strategyShape": "capped_call_and_capped_put",
+        "seriesGranularity": "per_expiry_per_strike_per_side",
+        "sides": [
+          "call",
+          "put"
+        ],
+        "tokenModel": "canonical_contract_mint_vs_canonical_usdc",
+        "contractUnit": {
+          "description": "one underlying index unit per contract",
+          "contractSizeScale": 6,
+          "contractSizeAtomic": 1000000,
+          "lotSizeContracts": 1,
+          "minimumOrderQuantityContracts": 1,
+          "frontendDefaultLotContracts": 10,
+          "frontendDefaultLotIsUiOnly": true
+        },
+        "neutralPairGeometry": {
+          "anchorPriceAtomic": 100000000,
+          "participationBps": 10000,
+          "widthFractionBps": 1200,
+          "widthRounding": "nearest-shared-quote-bin-step-half-up",
+          "sharedRoundedWidthAtomic": 12000000,
+          "callStrikePriceAtomic": 100000000,
+          "callCapPriceAtomic": 112000000,
+          "putStrikePriceAtomic": 100000000,
+          "putFloorPriceAtomic": 88000000,
+          "maxPayoutPerContractAtomic": 12000000
+        },
+        "lazyOpen": {
+          "rowsAroundAnchor": 2,
+          "maxInitialRowsPerExpiry": 5,
+          "initialExpiriesOpen": 2,
+          "openStrategy": "anchor_series_then_expand",
+          "expansionTrigger": "demand_and_edge_proximity",
+          "openBothSides": true,
+          "initialSeriesAroundAnchor": 2,
+          "maxInitialSeriesPerExpiry": 5
+        },
+        "pricing": {
+          "maxPayoutFractionBps": 10000,
+          "tickSizeQuoteAtomic": 50000,
+          "maximumPriceQuoteAtomic": 12000000,
+          "maximumBinId": 240,
+          "maximumBinCount": 240,
+          "binsPerPage": 32,
+          "theoreticalPageCount": 8,
+          "finalPageIndex": 7,
+          "finalPageFirstBinId": 225,
+          "finalPageLastBinId": 240,
+          "finalBinLocalIndex": 15,
+          "pageCreationPolicy": "lazy_active_liquidity_only",
+          "maximumBinsPerSwap": 8,
+          "terminalBinPolicy": "clamp_at_market_maximum_payout",
+          "defaultSwapSlippageBps": 100,
+          "launchBinCount": 21,
+          "binsBelowActive": 10,
+          "binsAboveActive": 10,
+          "activeCentered": true
+        },
+        "initialLiquidityManagerReference": {
+          "protocolInvariant": false,
+          "assumptions": "90-day ATM launch at a 100 USDC anchor with a 12-point cap",
+          "fairMid": {
+            "callPriceQuoteAtomic": 4050000,
+            "callActiveBinId": 81,
+            "putPriceQuoteAtomic": 4350000,
+            "putActiveBinId": 87
+          },
+          "illustrativeOneBinBuyerSideAsk": {
+            "callPriceQuoteAtomic": 4100000,
+            "callBinId": 82,
+            "putPriceQuoteAtomic": 4400000,
+            "putBinId": 88
+          },
+          "takerFeeBps": 20,
+          "takerFeeIncludedInBinPremium": false,
+          "activePriceMayMoveWithMarket": true
+        },
+        "walletEdge": {
+          "userBalanceMode": "light_ata_same_classic_spl_mint",
+          "poolCustodyMode": "same_mint_program_owned_light_token_vaults",
+          "returnMode": "same_mint_light_custody_after_exit"
+        }
+      },
+      "storageModel": {
+        "hotState": "light_decompressed_on_demand",
+        "hotPathSurfaces": [
+          "pool_root",
+          "reserve_pages",
+          "share_pages",
+          "manager_positions",
+          "canonical_option_and_usdc_vaults"
+        ],
+        "primaryLiquidity": "in_program_ameba_dlmm",
+        "longTailCompressed": [
+          "inactive_pool_roots",
+          "inactive_reserve_pages",
+          "inactive_share_pages",
+          "inactive_manager_positions",
+          "settlement_receipts",
+          "user_side_claim_balances"
+        ],
+        "longTailState": "light_compressed_accounts",
+        "currentArchitecture": "The program owns pricing, custody, accounting, settlement, and the Light hot/cold lifecycle."
+      },
+      "expiries": []
+    }
+  ],
+  "deploymentReferences": {
+    "sdkCommit": "a21b324a7a64da87046c7650355b80ea20c47540",
+    "artifactSourceCommit": "b1931fecff5229da232f06e9c5c43b1d6328806d",
+    "nativeSourceCommit": "397bd8403c7803574597a7ff3650a303b92f96c0",
+    "programDataAccountSha256": "df5e426d74dadcca84c42e999489ad3089421fe99c4ad5fc718e4b18eee5e610"
+  }
+}

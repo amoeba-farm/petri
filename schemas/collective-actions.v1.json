@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "semanticAbiVersion": "collective-operations-v1",
+  "leanCommit": "0c69f9e33bb7c1fce2840ca074e5a8ea21a4db52",
+  "sdkCommit": "a21b324a7a64da87046c7650355b80ea20c47540",
+  "vocabularySha256": "1c1ec47b4d4e12eb6ab20f3ca01637ba77f4d8e3fddf769ae88f37cda1684d1e",
+  "actions": [
+    "trade_buy",
+    "trade_sell",
+    "auction_bid",
+    "auction_refund",
+    "writer_deposit",
+    "writer_withdraw",
+    "writer_close_begin",
+    "writer_close_continue",
+    "writer_close_finalize",
+    "claim_long",
+    "claim_flat",
+    "flat_transfer",
+    "stake_queue",
+    "stake_activate",
+    "unstake_request",
+    "unstake_complete",
+    "dispute_commit",
+    "dispute_reveal",
+    "writer_liquidity_initialize",
+    "writer_liquidity_add",
+    "writer_liquidity_remove",
+    "writer_liquidity_sweep"
+  ]
+}

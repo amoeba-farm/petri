@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/amoeba-farm/petri-sdk.git",
+  "commit": "e600d19e64154a90f331171de32c2946956a74a5",
+  "upstreamCommit": "a21b324a7a64da87046c7650355b80ea20c47540",
+  "spreadUpstreamCommit": "397bd8403c7803574597a7ff3650a303b92f96c0"
+}

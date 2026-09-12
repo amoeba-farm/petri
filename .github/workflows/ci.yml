@@ -1,0 +1,23 @@
+name: Public source preflight
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Check release script syntax
+        run: |
+          node --check scripts/build-sdk-runtime.mjs
+          node --check scripts/package-petri-preview.mjs
+          node --check scripts/petri-mcp-server.mjs
+          bash -n scripts/install-preview.sh
+      - name: Check public Cargo manifest
+        run: cargo metadata --locked --no-deps --format-version 1 > /dev/null
+# Platform release compilation and startup checks run once in Preview binaries.
