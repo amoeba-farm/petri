@@ -26,7 +26,8 @@ Download and extract the package for your computer:
 | macOS 14+ Apple silicon | [Petri for Mac](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-arm64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-arm64.zip.sha256) |
 | macOS 14+ Intel | [Petri for Intel Mac](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-x86_64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-x86_64.zip.sha256) |
 
-Open `petri.exe` on Windows or `Petri.app` on macOS. Petri opens in a terminal.
+Open `Petri.cmd` on Windows or `Petri.app` on macOS. Petri opens in a terminal.
+From an existing terminal, use `petri tui` for the interface or `petri --help` for commands.
 The downloads include the SDK runtime; Rust and Node.js are not required to launch.
 
 This first Devnet preview is **not publisher-signed or Apple-notarized**. Verify

@@ -27,11 +27,14 @@ const exe=platform==='windows'?'petri.exe':'petri';
 fs.copyFileSync(path.join('target/release',exe),path.join(binDir,exe));
 fs.chmodSync(path.join(binDir,exe),0o755);
 for(const file of ['LICENSE','THIRD_PARTY_NOTICES.md','THIRD_PARTY_LICENSES.md']) fs.copyFileSync(file,path.join(binDir,file));
-if(platform==='windows') fs.copyFileSync('assets/Petri.ico',path.join(stage,'Petri.ico'));
+if(platform==='windows') {
+  fs.copyFileSync('assets/Petri.ico',path.join(stage,'Petri.ico'));
+  write(path.join(stage,'Petri.cmd'),'@echo off\r\n"%~dp0petri.exe" tui\r\nif errorlevel 1 pause\r\n');
+}
 const installer=platform==='windows'?'install-preview.ps1':'install-preview.sh';
 fs.copyFileSync(path.join('scripts',installer),path.join(stage,installer));
 fs.chmodSync(path.join(stage,installer),0o755);
-write(path.join(stage,'README.txt'),`Petri ${version} — Devnet preview\n\nThis preview is not publisher-signed or notarized. Verify the release SHA-256 before opening it.\nWindows: double-click petri.exe, or run powershell -ExecutionPolicy Bypass -File .\\install-preview.ps1\nmacOS: open Petri.app (opens Terminal), or run bash ./install-preview.sh\nmacOS may require Privacy & Security > Open Anyway for this specific app. Do not disable system security globally.\nLinux: run bash ./install-preview.sh\nThe installer adds the petri terminal command; restart your terminal afterward.\nUpdates: rerun the preview installer. The signed automatic updater does not accept unsigned preview packages.\nSource and install instructions: https://github.com/amoeba-farm/petri\n`);
+write(path.join(stage,'README.txt'),`Petri ${version} — Devnet preview\n\nThis preview is not publisher-signed or notarized. Verify the release SHA-256 before opening it.\nWindows: double-click Petri.cmd, or run powershell -ExecutionPolicy Bypass -File .\\install-preview.ps1\nmacOS: open Petri.app (opens Terminal), or run bash ./install-preview.sh\nmacOS may require Privacy & Security > Open Anyway for this specific app. Do not disable system security globally.\nLinux: run bash ./install-preview.sh\nThe installer adds the petri terminal command; restart your terminal afterward.\nUpdates: rerun the preview installer. The signed automatic updater does not accept unsigned preview packages.\nSource and install instructions: https://github.com/amoeba-farm/petri\n`);
 if(platform==='macos') {
   run('codesign',['--force','--deep','--sign','-',path.join(stage,'Petri.app')]);
   run('codesign',['--verify','--deep','--strict',path.join(stage,'Petri.app')]);

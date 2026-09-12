@@ -23,7 +23,7 @@ foreach ($Line in Get-Content -LiteralPath (Join-Path $Package 'SHA256SUMS')) {
 }
 $InstallRoot = [IO.Path]::GetFullPath($InstallRoot)
 New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
-foreach ($Name in @('petri.exe','Petri.ico','LICENSE','THIRD_PARTY_NOTICES.md','THIRD_PARTY_LICENSES.md','README.txt')) {
+foreach ($Name in @('petri.exe','Petri.cmd','Petri.ico','LICENSE','THIRD_PARTY_NOTICES.md','THIRD_PARTY_LICENSES.md','README.txt')) {
   Copy-Item -LiteralPath (Join-Path $Package $Name) -Destination (Join-Path $InstallRoot $Name) -Force
 }
 $UserPath = [string][Environment]::GetEnvironmentVariable('Path','User')
@@ -32,6 +32,7 @@ if (-not $NoShortcut) {
   $Shell = New-Object -ComObject WScript.Shell
   $Shortcut = $Shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Programs')) 'Petri.lnk'))
   $Shortcut.TargetPath = Join-Path $InstallRoot 'petri.exe'
+  $Shortcut.Arguments = 'tui'
   $Shortcut.WorkingDirectory = $InstallRoot
   $Shortcut.IconLocation = Join-Path $InstallRoot 'Petri.ico'
   $Shortcut.Save()

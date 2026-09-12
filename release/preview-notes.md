@@ -4,7 +4,7 @@ Download the Windows x64, macOS Apple silicon, or macOS Intel ZIP below and its 
 
 These preview packages are **not publisher-signed or Apple-notarized**. macOS bundles have a local ad-hoc signature only. Verify the SHA-256 before opening; macOS may require Privacy & Security → Open Anyway for this particular app. Do not disable system security globally.
 
-Windows: extract the ZIP and open `petri.exe`, or run `powershell -ExecutionPolicy Bypass -File .\install-preview.ps1` in the extracted folder.
+Windows: extract the ZIP and open `Petri.cmd`, or run `powershell -ExecutionPolicy Bypass -File .\install-preview.ps1` in the extracted folder. The Start-menu shortcut opens the TUI. From an existing terminal, run `petri tui` or `petri --help`.
 
 macOS: extract the ZIP and open `Petri.app` to launch Terminal, or run `bash ./install-preview.sh` in the extracted folder. The installer adds `~/.local/bin/petri` and `~/Applications/Petri Preview.app`.
 
