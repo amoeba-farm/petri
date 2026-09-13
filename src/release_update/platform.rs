@@ -473,16 +473,47 @@ pub(super) fn process_alive(pid: u32) -> bool {
 
 pub(super) fn restart(root: &Path, platform: Platform) -> Result<()> {
     if platform == Platform::WindowsX64 {
-        let mut command = Command::new(root.join(platform.executable()));
-        command.arg("tui").current_dir(root);
         #[cfg(windows)]
         {
-            use std::os::windows::process::CommandExt;
-            command.creation_flags(0x0000_0010); // User-requested interactive restart in a new console.
+            use std::{ffi::OsStr, os::windows::ffi::OsStrExt};
+            use windows_sys::Win32::{
+                Foundation::CloseHandle,
+                UI::{
+                    Shell::{
+                        SEE_MASK_FLAG_NO_UI, SEE_MASK_NOASYNC, SEE_MASK_NOCLOSEPROCESS,
+                        SHELLEXECUTEINFOW, ShellExecuteExW,
+                    },
+                    WindowsAndMessaging::SW_SHOWNORMAL,
+                },
+            };
+
+            fn wide(value: &OsStr) -> Vec<u16> {
+                value.encode_wide().chain([0]).collect()
+            }
+
+            let executable = wide(root.join(platform.executable()).as_os_str());
+            let parameters = wide(OsStr::new("tui"));
+            let directory = wide(root.as_os_str());
+            let mut request = SHELLEXECUTEINFOW {
+                cbSize: std::mem::size_of::<SHELLEXECUTEINFOW>() as u32,
+                fMask: SEE_MASK_FLAG_NO_UI | SEE_MASK_NOASYNC | SEE_MASK_NOCLOSEPROCESS,
+                lpFile: executable.as_ptr(),
+                lpParameters: parameters.as_ptr(),
+                lpDirectory: directory.as_ptr(),
+                nShow: SW_SHOWNORMAL,
+                ..Default::default()
+            };
+            // The updater helper deliberately has NUL standard handles. A
+            // normal Command child inherits them and Petri immediately decides
+            // it has no terminal. Shell activation gives a console executable
+            // a fresh interactive console, as if the user opened the app.
+            if unsafe { ShellExecuteExW(&mut request) } == 0 || request.hProcess.is_null() {
+                return Err("Update installed; open Petri to start the new version.".into());
+            }
+            unsafe { CloseHandle(request.hProcess) };
         }
-        command
-            .spawn()
-            .map_err(|_| "Update installed; open Petri to start the new version.")?;
+        #[cfg(not(windows))]
+        return Err("Update installed; open Petri to start the new version.".into());
     } else {
         Command::new("/usr/bin/open")
             .args(["-a", "Terminal"])

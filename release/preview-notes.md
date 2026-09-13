@@ -1,5 +1,9 @@
 Petri Devnet preview, including standalone release updates for Windows and macOS.
 
+## Fixed in v0.1.9
+
+- Windows updates requested with `--restart`, including the TUI's `U` flow, now reopen Petri in a fresh interactive console instead of inheriting the hidden updater's non-terminal handles and immediately closing.
+
 ## Updated in v0.1.8
 
 - Smaller bundled SDK runtime: include the files used by the three workers, required native libraries, resources, and licenses; omit unused dependencies and installation archives.
@@ -7,7 +11,7 @@ Petri Devnet preview, including standalone release updates for Windows and macOS
 - Shared internal TUI cache and modularized feature state, preserving the existing user-facing content and commands.
 - Retains the v0.1.5 chart-volume, Oracle reward selection, and writer-action visibility fixes below.
 
-Focused offline worker/native-runtime checks and four critical Rust regressions passed for these source changes. Platform builds also run startup, configuration, runtime, and package checks. This is not a new full-suite or live-trading qualification. Existing v0.1.4 and v0.1.5 users can install this release with `petri update`.
+Focused offline worker/native-runtime checks and four critical Rust regressions passed for these source changes. Platform builds also run startup, configuration, runtime, and package checks. This is not a new full-suite or live-trading qualification. Existing v0.1.4 and later users can install this release with `petri update --restart`.
 
 ## Retained fixes from v0.1.5
 
