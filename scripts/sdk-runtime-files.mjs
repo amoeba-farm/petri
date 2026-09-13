@@ -73,6 +73,9 @@ export async function selectRuntimeFiles(stage, files, { nodeFileTrace, resolve 
     base: stage, processCwd: stage, exportsOnly: true, conditions: ['node'],
     // Trace both current Node module-sync exports and their fallback branches.
     moduleSyncCatchall: true,
+    // The extensionless macOS verifier is a native executable, not JS. The
+    // builder includes it explicitly and the runtime smoke verifies its digest.
+    ignore: ['compressed-verifier'],
     stat: name => isolatedRead(name, fs.promises.stat),
     readFile: name => isolatedRead(name, file => fs.promises.readFile(file, 'utf8')),
     readlink: name => isolatedRead(name, fs.promises.readlink),

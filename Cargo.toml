@@ -1,6 +1,6 @@
 [package]
 name = "amoeba"
-version = "0.1.7"
+version = "0.1.8"
 edition = "2024"
 description = "Petri, the open-source Rust CLI and terminal interface for Amoeba markets"
 license = "Apache-2.0"

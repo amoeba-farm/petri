@@ -1,6 +1,6 @@
 Petri Devnet preview, including standalone release updates for Windows and macOS.
 
-## Updated in v0.1.7
+## Updated in v0.1.8
 
 - Smaller bundled SDK runtime: include the files used by the three workers, required native libraries, resources, and licenses; omit unused dependencies and installation archives.
 - Self-contained dependency tracing uses the workers' SDK resolution root and cannot borrow dependencies from the build host.
