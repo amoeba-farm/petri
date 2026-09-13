@@ -4,15 +4,14 @@
   <img src="assets/petri-icon.png" alt="Petri ghost logo" width="128" height="128">
 </p>
 
-Petri is Amoeba's open-source command-line and terminal interface for bounded
-hardware markets. It helps users discover markets, inspect fixed-risk option
-contracts, understand maximum loss and payout, inspect collective writer sleeves and settlements,
-follow oracle evidence, stake AMBA, and connect supported workflows to agents.
+Petri is Amoeba Farm's open-source CLI/TUI. It allows users discover markets, inspect the option
+chain, inspect collective writer sleeves and settlements, follow oracle evidence, stake AMBA,
+and connect supported workflows to agents.
 
 The executable is `petri`; Amoeba remains the company and product name.
 
 > [!IMPORTANT]
-> Petri v0.1 is a pre-production Devnet source preview. The final business audit
+> Petri v0.1 is a Devnet source preview. The final business audit
 > records completed replay with approved oracle differences. It does not claim
 > exact economic or future-payoff equivalence. Package capability does not grant runtime permission.
 
@@ -74,16 +73,6 @@ npm install https://github.com/amoeba-farm/petri-sdk/releases/download/v0.2.0/am
 Its package/import name remains `ameba-sdk`. See its README for TypeScript and Rust usage.
 
 ## Current capabilities
-
-The September 9 writer-liquidity revision includes local candidate package
-connections and build preparation. Tests, qualification, and deployment remain
-deferred; see [local build status](docs/local-candidate-build-20260909.md). The
-source exposes `writers liquidity`, `liquidity-initialize`, `liquidity-add`,
-`liquidity-remove`, and `liquidity-sweep`, together with `writers withdraw`,
-`refunds`, and `refund`. The Writers TUI uses the same operations. See
-[writer liquidity source interface](docs/writer-liquidity-source.md) for exact
-inputs and the limited buyback boundary. Existing installation pins below do
-not attest these new operations.
 
 The selected deployment is `spread-devnet-v3-writer-terminal-lifecycle-20260906`. Supported direct CLI/TUI
 operations use the pinned Rust SDK's governed bytes and finalized revalidation.
