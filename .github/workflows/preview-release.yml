@@ -6,7 +6,7 @@ on:
         description: Release tag on the current public main commit
         type: string
         required: true
-        default: v0.1.5
+        default: v0.1.6
       publish:
         description: Publish after building (disable to qualify artifacts first)
         type: boolean
