@@ -76,6 +76,54 @@ impl LabApp {
         }
         panel.mode = Mode::Edit;
     }
+    pub(super) fn open_oracle_reward_action(&mut self, claim: &SpreadOracleRewardClaim) -> bool {
+        // Translate read-projection labels only to current USDC reward kinds.
+        // Challenge rewards have no equivalent here and must not be guessed.
+        let reward_kind = match claim.kind.as_str() {
+            "proposer" | "source_proposer" => "proposer",
+            "support" | "source_support" => "support",
+            "opening" => "opening",
+            "update" | "game_update" => "update",
+            _ => {
+                self.status =
+                    "This reward type is not supported by the current claim action.".into();
+                return false;
+            }
+        };
+        let is_id =
+            |value: &&str| value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit());
+        let Some(source_id) = claim.source_id_hex.as_deref().filter(is_id) else {
+            self.status =
+                "The selected reward has no valid source ID. Refresh rewards before claiming."
+                    .into();
+            return false;
+        };
+        let claim_id = if reward_kind == "update" {
+            let Some(id) = claim.claim_id_hex.as_deref().filter(is_id) else {
+                self.status = "The selected update reward has no valid claim ID. Refresh rewards before claiming.".into();
+                return false;
+            };
+            id
+        } else {
+            ""
+        };
+        self.open_specific_action(Action::ClaimReward);
+        let panel = self.action_panel.as_mut().unwrap();
+        for ((name, _, _), value) in Action::ClaimReward
+            .fields()
+            .iter()
+            .zip(panel.values.iter_mut().skip(2))
+        {
+            *value = match *name {
+                "rewardKind" => reward_kind,
+                "sourceId" => source_id,
+                "claimId" => claim_id,
+                _ => continue,
+            }
+            .to_string();
+        }
+        true
+    }
     pub(super) fn handle_action_panel_key(
         &mut self,
         key: &KeyEvent,
@@ -303,14 +351,19 @@ pub(super) fn draw(frame: &mut Frame<'_>, cli: &Cli, root: Rect, app: &LabApp) {
             let action=ACTIONS[panel.selected];let mut labels=Vec::new();
             if matches!(action.family(),Family::Oracle){labels.extend(["Product","Exact series"]);}
             labels.extend(action.fields().iter().map(|(_,label,_)|*label));
-            format!("{} | Wallet: {}\nTab/Enter next | Esc cancel | PgUp/PgDn scroll\n\n{}\n{} Prepare review",action.label(),panel.owner,
-                labels.iter().zip(&panel.values).enumerate().map(|(i,(label,value))|format!("{} {label}: {value}",if i==panel.field{"›"}else{" "})).collect::<Vec<_>>().join("\n"),if panel.field==panel.values.len(){"›"}else{" "})
+            format!("{} | Wallet: {}\nTab/Enter next | Esc cancel | PgUp/PgDn scroll\n\n{}\n{} Prepare review",action.label(),crate::backend::terminal_safe_text(&panel.owner),
+                labels.iter().zip(&panel.values).enumerate().map(|(i,(label,value))|format!("{} {label}: {}",if i==panel.field{"›"}else{" "},crate::backend::terminal_safe_text(value))).collect::<Vec<_>>().join("\n"),if panel.field==panel.values.len(){"›"}else{" "})
         },
         Mode::Review(value)=>format!("{} | ←→ select | Enter confirm | PgUp/PgDn scroll\n\n{}",if panel.approve{"Cancel   [Approve exact action]"}else{"[Cancel]   Approve exact action"},portable_operation::render(value)),
         Mode::Busy=>"Checking the exact action… Wallet approval may be requested after confirmation.\nWait for the result; do not repeat this action.".into(),
         Mode::Result(result)=>format!("Esc close | Enter actions | PgUp/PgDn scroll\n\n{result}"),
     };
-    let text = crate::backend::terminal_safe_text(&content);
+    // Preserve layout newlines while sanitizing controls within each line.
+    // Editable values above are sanitized before they enter the layout.
+    let text = content
+        .lines()
+        .map(|line| Line::from(crate::backend::terminal_safe_text(line)))
+        .collect::<Vec<_>>();
     frame.render_widget(
         Paragraph::new(text)
             .wrap(Wrap { trim: false })

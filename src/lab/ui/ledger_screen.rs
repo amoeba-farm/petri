@@ -664,6 +664,8 @@ fn draw_writers_workspace(
             style(cli, Color::DarkGray),
         )));
         frame.render_widget(
+            // Scrolling and hit testing use one row per action. Wrapping labels
+            // breaks that correspondence and can hide the selected action.
             Paragraph::new(actions)
                 .scroll((writer_action_scroll_offset(actions_area, app) as u16, 0))
                 .block(panel_block(
@@ -671,8 +673,7 @@ fn draw_writers_workspace(
                     "Actions",
                     Color::Yellow,
                     app.ledger_pane == LedgerPane::Actions,
-                ))
-                .wrap(Wrap { trim: true }),
+                )),
             actions_area,
         );
     }

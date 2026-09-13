@@ -1,5 +1,15 @@
 Petri Devnet preview, including standalone release updates for Windows and macOS.
 
+## Fixed in v0.1.5
+
+- Missing chart volume displays as `n/a`, not zero.
+- Oracle reward forms retain the selected reward's source, claim ID, and reward type. Fields render on separate readable lines; incomplete or unsupported reward identities are rejected.
+- Writer actions remain visible in small terminals, with scrolling and mouse targets matching the displayed rows.
+
+The four reported regressions and five focused neighboring checks passed. This is not a new full-suite or live-trading qualification. Existing v0.1.4 users can install this release with `petri update`.
+
+## Download and update
+
 Download the Windows x64, macOS Apple silicon, or macOS Intel ZIP below and its `.sha256` checksum. Each package includes the Petri executable, its bundled SDK/Node/native-verifier runtime, app launcher or executable, installer, and licenses. Rust and Node.js are not required to launch Petri.
 
 These preview packages are **not publisher-signed or Apple-notarized**. macOS bundles have a local ad-hoc signature only. Verify the SHA-256 before opening; macOS may require Privacy & Security → Open Anyway for this particular app. Do not disable system security globally.

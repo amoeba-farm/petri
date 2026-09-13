@@ -857,7 +857,7 @@ fn point_detail_line(point: &ChartPoint) -> String {
         format_axis_timestamp(point),
         format_decimal(point.fair_price, 3),
         format_optional_decimal(point.base_oracle, 3),
-        format_optional_usd(Some(point.volume_24h_usd.unwrap_or(0.0))),
+        format_optional_usd(point.volume_24h_usd),
         format_optional_usd(point.total_liquidity_usd),
         format_optional_decimal(point.best_call_bid, 3),
         format_optional_decimal(point.best_call_ask, 3),

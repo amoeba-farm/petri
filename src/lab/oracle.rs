@@ -478,12 +478,15 @@ impl LabApp {
 
     pub(super) fn begin_oracle_form(&mut self, mode: OracleFormMode) {
         use crate::participation::Action;
+        if mode == OracleFormMode::RewardClaim {
+            self.begin_oracle_reward_claim_form();
+            return;
+        }
         let current_action = match mode {
             OracleFormMode::SourceProposal => Some(Action::ProposeSource),
             OracleFormMode::SourceSupport => Some(Action::SupportSource),
             OracleFormMode::OpeningPrint => Some(Action::SubmitOpening),
             OracleFormMode::UpdateClaim => Some(Action::CommitUpdate),
-            OracleFormMode::RewardClaim => Some(Action::ClaimReward),
             OracleFormMode::Challenge => Some(match self.oracle_phase() {
                 OraclePhase::OpeningPrint => Action::ChallengeOpening,
                 OraclePhase::GameMode => Action::ChallengeUpdate,
@@ -526,10 +529,11 @@ impl LabApp {
             self.clamp_oracle_selection();
             return;
         };
-        self.begin_oracle_form(OracleFormMode::RewardClaim);
-        if self.oracle_form.is_none() {
+        if !self.open_oracle_reward_action(&claim) {
             return;
         }
+        self.oracle_form = None;
+        self.oracle_search_editing = false;
         self.status = format!(
             "Claim reward form opened: {} {}.",
             claim.label, claim.amount_label
