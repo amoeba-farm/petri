@@ -540,6 +540,7 @@ The complete, lockfile-bound legal corpus shipped with Petri is in [THIRD_PARTY_
 | tracing-attributes | 0.1.31 | MIT | https://github.com/tokio-rs/tracing |
 | tracing-core | 0.1.36 | MIT | https://github.com/tokio-rs/tracing |
 | try-lock | 0.2.5 | MIT | https://github.com/seanmonstar/try-lock |
+| typed-path | 0.12.3 | MIT OR Apache-2.0 | https://github.com/chipsenkbeil/typed-path |
 | typenum | 1.19.0 | MIT OR Apache-2.0 | https://github.com/paholg/typenum |
 | unicode-ident | 1.0.24 | (MIT OR Apache-2.0) AND Unicode-3.0 | https://github.com/dtolnay/unicode-ident |
 | unicode-segmentation | 1.13.3 | MIT OR Apache-2.0 | https://github.com/unicode-rs/unicode-segmentation |
@@ -619,6 +620,7 @@ The complete, lockfile-bound legal corpus shipped with Petri is in [THIRD_PARTY_
 | zerotrie | 0.2.3 | Unicode-3.0 | https://github.com/unicode-org/icu4x |
 | zerovec | 0.11.5 | Unicode-3.0 | https://github.com/unicode-org/icu4x |
 | zerovec-derive | 0.11.2 | Unicode-3.0 | https://github.com/unicode-org/icu4x |
+| zip | 8.6.0 | MIT | https://github.com/zip-rs/zip2 |
 | zmij | 1.0.21 | MIT | https://github.com/dtolnay/zmij |
 | zstd | 0.13.3 | MIT | https://github.com/gyscos/zstd-rs |
 | zstd-safe | 7.2.4 | MIT OR Apache-2.0 | https://github.com/gyscos/zstd-rs |

@@ -6,7 +6,11 @@ on:
         description: Release tag on the current public main commit
         type: string
         required: true
-        default: v0.1.3
+        default: v0.1.4
+      publish:
+        description: Publish after building (disable to qualify artifacts first)
+        type: boolean
+        default: true
 permissions:
   contents: read
 concurrency:
@@ -23,6 +27,7 @@ jobs:
     env:
       CARGO_BUILD_JOBS: '3'
       PETRI_REQUIRE_SDK_RUNTIME: '1'
+      PETRI_UPDATE_CHANNEL: preview
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -83,6 +88,7 @@ jobs:
           if-no-files-found: error
           compression-level: 0
   publish:
+    if: inputs.publish
     needs: build
     runs-on: ubuntu-latest
     permissions:

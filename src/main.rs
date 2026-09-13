@@ -30,6 +30,7 @@ mod participation;
 mod petri_config;
 mod portable_operation;
 mod positions;
+mod release_update;
 mod sdk_worker;
 mod solana_config;
 mod solana_history;
@@ -39,6 +40,7 @@ mod staking;
 mod terminal_brand;
 mod terminal_keys;
 mod trade_service;
+mod update;
 mod wallet_balance;
 mod wallet_signer;
 mod wallet_terms;
@@ -81,6 +83,13 @@ use solana_program::hash::hashv;
 use solana_pubkey::Pubkey;
 
 fn main() {
+    if let Some(result) = release_update::helper_entry() {
+        if let Err(error) = result {
+            eprintln!("Petri update: {error}");
+            std::process::exit(1);
+        }
+        return;
+    }
     windows_app_identity::apply();
     if let Err(error) = run() {
         let arguments = env::args().collect::<Vec<_>>();
@@ -2192,7 +2201,48 @@ fn dispatch_cli(cli: Cli) -> Result<(), CliError> {
             command,
             no_fetch,
             skip_shim,
+            yes,
+            restart,
         } => {
+            if matches!(command, Some(UpdateCommand::Info)) {
+                let info = release_update::information();
+                emit_output(
+                    &cli,
+                    &info,
+                    format!(
+                        "Petri {} | {} updates",
+                        env!("CARGO_PKG_VERSION"),
+                        if release_update::enabled() {
+                            "preview release"
+                        } else {
+                            "source"
+                        }
+                    ),
+                )?;
+                return Ok(());
+            }
+            if release_update::enabled() {
+                if *no_fetch || *skip_shim {
+                    return Err(CliError::new(
+                        "--no-fetch and --skip-shim apply only to source-checkout updates.",
+                    ));
+                }
+                let report = run_release_update(
+                    command.as_ref(),
+                    *yes,
+                    *restart,
+                    cli.resolved_output() == OutputFormat::Json,
+                )?;
+                let payload = serde_json::to_value(&report)
+                    .map_err(|_| CliError::new("Could not encode update status."))?;
+                emit_output(&cli, &payload, report.message)?;
+                return Ok(());
+            }
+            if matches!(command, Some(UpdateCommand::Recover)) || *yes || *restart {
+                return Err(CliError::new(
+                    "Recovery, --yes, and --restart apply only to standalone preview installations.",
+                ));
+            }
             let check_only = matches!(command.as_ref(), Some(UpdateCommand::Check));
             let report = if check_only {
                 workspace_update::check_workspace_update(*no_fetch)?
@@ -2273,6 +2323,9 @@ fn dispatch_cli(cli: Cli) -> Result<(), CliError> {
 }
 
 fn handle_lab_exit_action(action: lab::LabExitAction) -> Result<(), CliError> {
+    if release_update::enabled() && matches!(action, lab::LabExitAction::RunUpdate) {
+        return run_petri_update_command();
+    }
     let launched_by_repo_launcher = env::var("PETRI_LAUNCHER").ok().as_deref() == Some("1");
     match lab_exit_route(action, launched_by_repo_launcher) {
         LabExitRoute::Quit => Ok(()),
@@ -2315,6 +2368,13 @@ fn lab_exit_route(action: lab::LabExitAction, launched_by_repo_launcher: bool) -
 }
 
 fn run_petri_update_command() -> Result<(), CliError> {
+    if release_update::enabled() {
+        // Stay in this process: a waiting parent executable would keep the
+        // Windows app locked while its update helper tries to replace it.
+        let report = run_release_update(None, false, true, false)?;
+        println!("{}", report.message);
+        return Ok(());
+    }
     let executable = env::current_exe()
         .map_err(|error| CliError::new(format!("failed to locate Petri: {error}")))?;
     println!("Running: petri update");
@@ -2333,6 +2393,65 @@ fn run_petri_update_command() -> Result<(), CliError> {
                 .unwrap_or_else(|| "unknown".to_string())
         )))
     }
+}
+
+fn confirm_app_update(message: &str, yes: bool, json: bool) -> Result<bool, CliError> {
+    if yes {
+        return Ok(true);
+    }
+    if json || !io::stdin().is_terminal() || !io::stdout().is_terminal() {
+        return Err(CliError::new(
+            "Check the release with petri update check, then use petri update --yes to approve it.",
+        ));
+    }
+    use std::io::Write;
+    println!("{message}");
+    print!("Continue? [y/N] ");
+    io::stdout()
+        .flush()
+        .map_err(|_| CliError::new("Could not display update confirmation."))?;
+    let mut answer = String::new();
+    io::stdin()
+        .read_line(&mut answer)
+        .map_err(|_| CliError::new("Could not read update confirmation."))?;
+    Ok(matches!(
+        answer.trim().to_ascii_lowercase().as_str(),
+        "y" | "yes"
+    ))
+}
+
+fn run_release_update(
+    command: Option<&UpdateCommand>,
+    yes: bool,
+    restart: bool,
+    json: bool,
+) -> Result<release_update::Report, CliError> {
+    if matches!(command, Some(UpdateCommand::Recover)) {
+        if !confirm_app_update(
+            "Restore the saved previous Petri app files? Wallets and settings will not be changed.",
+            yes,
+            json,
+        )? {
+            return Err(CliError::new("Recovery cancelled. No files were changed."));
+        }
+        return release_update::recover(restart).map_err(CliError::new);
+    }
+    let report = release_update::check().map_err(CliError::new)?;
+    if matches!(command, Some(UpdateCommand::Check)) || !report.update_available {
+        return Ok(report);
+    }
+    let release = report
+        .release
+        .as_ref()
+        .ok_or_else(|| CliError::new("Missing release information."))?;
+    let prompt = format!(
+        "Install Petri {} from {}?\nThis Devnet preview is not publisher-signed or Apple-notarized. Petri verifies the official GitHub download and SHA-256 before replacing app files. Wallets and settings will not be changed.",
+        release.version, release.release_url
+    );
+    if !confirm_app_update(&prompt, yes, json)? {
+        return Err(CliError::new("Update cancelled. No files were changed."));
+    }
+    release_update::prepare(release, restart).map_err(CliError::new)
 }
 
 fn mcp_setup_payload(

@@ -1698,6 +1698,18 @@ pub(in super::super) fn update_header_line(cli: &Cli, app: &LabApp) -> Option<Li
     let Some(report) = app.update_report.as_ref() else {
         return None;
     };
+    if report.action == "release_update_check" && report.blocked {
+        return Some(Line::from(vec![
+            Span::styled("Update: ", style(cli, Color::DarkGray)),
+            Span::styled(
+                report
+                    .blocked_reason
+                    .clone()
+                    .unwrap_or_else(|| "unavailable".into()),
+                style(cli, Color::Yellow),
+            ),
+        ]));
+    }
     if report.blocked && (report.update_available || report.rebuild_required) {
         let blocked_hint = if report.dirty {
             " | commit or stash local changes"

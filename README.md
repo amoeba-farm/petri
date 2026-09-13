@@ -66,6 +66,42 @@ Windows terminal after installation. Add the macOS PATH line to your shell profi
 to keep the command available. Update this preview by rerunning these instructions;
 the signed automatic updater does not accept unsigned preview packages.
 
+### Standalone updates
+
+Petri v0.1.4 adds release updates to Windows and Mac preview apps.
+**Older v0.1.3 downloads do not contain this feature.** Install v0.1.4 or later
+once using the instructions above to receive future updates through Petri.
+
+```bash
+petri update info
+petri update check
+petri update --restart
+```
+
+The TUI checks in the background and shows `U` when an update is available.
+Pressing `U` closes the TUI and asks before installing and reopening it. The CLI
+also asks before installing; `--yes` explicitly approves a non-interactive update.
+Close other Petri windows first. `petri tui --no-update-check` or
+`PETRI_UPDATE_CHECK=0` disables the background check.
+
+Preview updates trust only `amoeba-farm/petri` releases over HTTPS and require
+matching GitHub asset SHA-256 digests, package checksums, platform, version and
+update-channel metadata. They remain **unsigned/non-notarized previews**, not
+publisher-authenticated releases. Signed installers and source-checkout trust
+requirements are unchanged. No downloaded installer script is executed.
+
+Updates replace only owned application files, keep recovery copies, and leave
+wallets, configuration and agent registrations alone. If an update is interrupted,
+run `petri update recover` to restore the saved previous app files; use `--restart`
+to reopen the TUI afterward. This requires a writable, local, user-owned installation.
+Mac apps must retain the name `Petri.app` or `Petri Preview.app`; staging and recovery
+files are kept outside the app bundle. The most recent recovery copy is retained;
+an older verified copy is removed only after the next successful update.
+
+Source builds continue using the existing Git/Rust updater. Preview maintainers
+build with `PETRI_UPDATE_CHANNEL=preview`; this is a build-time setting, not a
+runtime trust override. `petri update info` reports the compiled channel.
+
 ## SDK
 
 The [Petri SDK](https://github.com/amoeba-farm/petri-sdk) is also open source:

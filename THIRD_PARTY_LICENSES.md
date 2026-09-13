@@ -4,13 +4,13 @@ This file is generated from the exact `Cargo.lock` package set and the legal fil
 
 An **SPDX-text fallback** is used only when an upstream `.crate` archive contains no `LICENSE`, `LICENCE`, `COPYING`, `NOTICE`, `COPYRIGHT`, or `UNLICENSE` file, or when a reviewed packaged file conflicts with the manifest's declared license expression. The fallback is explicitly labeled, preserves the package's declared authors and repository, and supplies pinned standard license text; it is not represented as an upstream-packaged file.
 
-- Cargo.lock SHA-256: `c91be32bb78cc2dcc5163f1575b790921127cdd03f2ba139b8a1d5dcd0cc7a6d`
-- Locked packages: 607
-- Registry packages: 600
+- Cargo.lock SHA-256: `0755ecd7066a32c81472983af1a3ba89721e5436b380f9a1e1bbd8b95c5ed6e9`
+- Locked packages: 609
+- Registry packages: 602
 - Git packages: 2
 - Workspace/path packages: 5
 - Packages requiring an SPDX-text fallback: 186
-- Discovered legal files: 816
+- Discovered legal files: 819
 - Unique normalized legal texts: 280
 
 ## Package-to-license mapping
@@ -27,8 +27,8 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 | alloc-no-stdlib | 2.0.4 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Daniel Reiter Horn &lt;danielrh@dropbox.com&gt; | https://github.com/dropbox/rust-alloc-no-stdlib | upstream-packaged legal file | <code>LICENSE</code> → <code>L0218</code> |
 | alloc-stdlib | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Daniel Reiter Horn &lt;danielrh@dropbox.com&gt; | https://github.com/dropbox/rust-alloc-no-stdlib | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: BSD-3-Clause</code> → <code>L0218</code> |
 | allocator-api2 | 0.2.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Zakarum &lt;zaq.dev@icloud.com&gt; | https://github.com/zakarumych/allocator-api2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0116</code><br><code>LICENSE-MIT</code> → <code>L0050</code> |
-| ameba-sdk | 0.2.0 | git+https://github.com/SPACE999978/ameba_sdk.git?rev=ac30e32bbd151d8819e4a06eafdf33570bab0eab#ac30e32bbd151d8819e4a06eafdf33570bab0eab | Apache-2.0 | — | — | upstream Git legal file | <code>LICENSE</code> → <code>L0158</code><br><code>NOTICE</code> → <code>L0261</code><br><code>scripts/license-policy.mjs</code> → <code>L0095</code><br><code>test/license-policy.test.mjs</code> → <code>L0035</code> |
-| amoeba | 0.1.0 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0158</code> |
+| ameba-sdk | 0.2.0 | git+https://github.com/SPACE999978/ameba_sdk.git?rev=a21b324a7a64da87046c7650355b80ea20c47540#a21b324a7a64da87046c7650355b80ea20c47540 | Apache-2.0 | — | — | upstream Git legal file | <code>LICENSE</code> → <code>L0158</code><br><code>NOTICE</code> → <code>L0261</code><br><code>scripts/license-policy.mjs</code> → <code>L0095</code><br><code>test/license-policy.test.mjs</code> → <code>L0035</code> |
+| amoeba | 0.1.4 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0158</code> |
 | android_system_properties | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Nicolas Silva &lt;nical@fastmail.com&gt; | https://github.com/nical/android_system_properties | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0046</code><br><code>LICENSE-MIT</code> → <code>L0148</code> |
 | anstream | 0.6.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0223</code><br><code>LICENSE-MIT</code> → <code>L0129</code> |
 | anstyle | 1.0.13 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0223</code><br><code>LICENSE-MIT</code> → <code>L0129</code> |
@@ -268,7 +268,7 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 | light-verifier | 10.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | — | https://github.com/Lightprotocol/light-protocol | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0199</code> |
 | light-zero-copy | 0.6.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | — | https://github.com/Lightprotocol/light-protocol | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0199</code> |
 | light-zero-copy-derive | 0.6.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | — | — | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0199</code> |
-| light_token_minter | 0.2.0 | git+https://github.com/SPACE999978/ameba_spread.git?rev=60d7a856f627f880a62fb93c951a1252615e1198#60d7a856f627f880a62fb93c951a1252615e1198 | Apache-2.0 | — | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0199</code> |
+| light_token_minter | 0.2.0 | git+https://github.com/SPACE999978/ameba_spread.git?rev=397bd8403c7803574597a7ff3650a303b92f96c0#397bd8403c7803574597a7ff3650a303b92f96c0 | Apache-2.0 | — | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0199</code> |
 | linux-raw-sys | 0.12.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/sunfishcode/linux-raw-sys | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0064</code><br><code>LICENSE-APACHE</code> → <code>L0192</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0050</code> |
 | linux-raw-sys | 0.4.15 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/sunfishcode/linux-raw-sys | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0064</code><br><code>LICENSE-APACHE</code> → <code>L0192</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0050</code> |
 | litemap | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0264</code> |
@@ -541,6 +541,7 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 | tracing-attributes | 0.1.31 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt;; Eliza Weisman &lt;eliza@buoyant.io&gt;; David Barsky &lt;dbarsky@amazon.com&gt; | https://github.com/tokio-rs/tracing | upstream-packaged legal file | <code>LICENSE</code> → <code>L0157</code> |
 | tracing-core | 0.1.36 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tracing | upstream-packaged legal file | <code>LICENSE</code> → <code>L0157</code><br><code>src/spin/LICENSE</code> → <code>L0108</code> |
 | try-lock | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/try-lock | upstream-packaged legal file | <code>LICENSE</code> → <code>L0226</code> |
+| typed-path | 0.12.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Chip Senkbeil &lt;chip@senkbeil.org&gt; | https://github.com/chipsenkbeil/typed-path | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0116</code><br><code>LICENSE-MIT</code> → <code>L0050</code> |
 | typenum | 1.19.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Paho Lurie-Gregg &lt;paho@paholg.com&gt;; Andre Bogus &lt;bogusandre@gmail.com&gt; | https://github.com/paholg/typenum | upstream-packaged legal file | <code>LICENSE</code> → <code>L0243</code><br><code>LICENSE-APACHE</code> → <code>L0103</code><br><code>LICENSE-MIT</code> → <code>L0196</code> |
 | unicode-ident | 1.0.24 | registry+https://github.com/rust-lang/crates.io-index | (MIT OR Apache-2.0) AND Unicode-3.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/unicode-ident | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0116</code><br><code>LICENSE-MIT</code> → <code>L0050</code><br><code>LICENSE-UNICODE</code> → <code>L0270</code> |
 | unicode-segmentation | 1.13.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-segmentation | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0049</code><br><code>LICENSE-APACHE</code> → <code>L0192</code><br><code>LICENSE-MIT</code> → <code>L0143</code> |
@@ -620,6 +621,7 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 | zerotrie | 0.2.3 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0264</code> |
 | zerovec | 0.11.5 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0264</code> |
 | zerovec-derive | 0.11.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0264</code> |
+| zip | 8.6.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Mathijs van de Nes &lt;git@mathijs.vd-nes.nl&gt;; Marli Frost &lt;marli@frost.red&gt;; Ryan Levick &lt;ryan.levick@gmail.com&gt;; Chris Hennick &lt;hennickc@amazon.com&gt; | https://github.com/zip-rs/zip2 | upstream-packaged legal file | <code>LICENSE</code> → <code>L0108</code> |
 | zmij | 1.0.21 | registry+https://github.com/rust-lang/crates.io-index | MIT | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/zmij | upstream-packaged legal file | <code>LICENSE-MIT</code> → <code>L0050</code> |
 | zstd | 0.13.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Alexandre Bury &lt;alexandre.bury@gmail.com&gt; | https://github.com/gyscos/zstd-rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0031</code> |
 | zstd-safe | 7.2.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alexandre Bury &lt;alexandre.bury@gmail.com&gt; | https://github.com/gyscos/zstd-rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0195</code><br><code>LICENSE.Apache-2.0</code> → <code>L0026</code><br><code>LICENSE.Mit</code> → <code>L0031</code> |
@@ -3847,7 +3849,7 @@ according to those terms.
 
 - SHA-256: `23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3`
 - Provenance class: spdx-fallback, upstream-package
-- Observed sources: <code>MIT standard text from locked wasi@0.9.0+wasi-snapshot-preview1/LICENSE-MIT</code>, <code>adler2@2.0.1/LICENSE-MIT</code>, <code>allocator-api2@0.2.21/LICENSE-MIT</code>, <code>anyhow@1.0.102/LICENSE-MIT</code>, <code>async-trait@0.1.89/LICENSE-MIT</code>, plus 47 more mapped package file(s)
+- Observed sources: <code>MIT standard text from locked wasi@0.9.0+wasi-snapshot-preview1/LICENSE-MIT</code>, <code>adler2@2.0.1/LICENSE-MIT</code>, <code>allocator-api2@0.2.21/LICENSE-MIT</code>, <code>anyhow@1.0.102/LICENSE-MIT</code>, <code>async-trait@0.1.89/LICENSE-MIT</code>, plus 48 more mapped package file(s)
 
 <!-- legal-text-begin sha256=23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3 -->
 ```text
@@ -7947,7 +7949,7 @@ DEALINGS IN THE SOFTWARE.
 
 - SHA-256: `58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79`
 - Provenance class: upstream-package
-- Observed source: <code>tracing-core@0.1.36/src/spin/LICENSE</code>
+- Observed sources: <code>tracing-core@0.1.36/src/spin/LICENSE</code>, <code>zip@8.6.0/LICENSE</code>
 
 <!-- legal-text-begin sha256=58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79 -->
 ```text
@@ -8236,7 +8238,7 @@ DEALINGS IN THE SOFTWARE.
 
 - SHA-256: `62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a`
 - Provenance class: upstream-package
-- Observed sources: <code>allocator-api2@0.2.21/LICENSE-APACHE</code>, <code>anyhow@1.0.102/LICENSE-APACHE</code>, <code>async-trait@0.1.89/LICENSE-APACHE</code>, <code>constant_time_eq@0.4.2/LICENSE-APACHE</code>, <code>indoc@2.0.7/LICENSE-APACHE</code>, plus 26 more mapped package file(s)
+- Observed sources: <code>allocator-api2@0.2.21/LICENSE-APACHE</code>, <code>anyhow@1.0.102/LICENSE-APACHE</code>, <code>async-trait@0.1.89/LICENSE-APACHE</code>, <code>constant_time_eq@0.4.2/LICENSE-APACHE</code>, <code>indoc@2.0.7/LICENSE-APACHE</code>, plus 27 more mapped package file(s)
 
 <!-- legal-text-begin sha256=62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a -->
 ```text
@@ -11521,7 +11523,7 @@ DEALINGS IN THE SOFTWARE.
 
 - SHA-256: `8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb`
 - Provenance class: local-package, upstream-git-package, upstream-package
-- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>ameba-sdk@0.2.0/LICENSE</code>, <code>amoeba@0.1.0/LICENSE</code>, <code>light-prover-client@8.0.0/vendor/LICENSE-APACHE-2.0</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, plus 4 more mapped package file(s)
+- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>ameba-sdk@0.2.0/LICENSE</code>, <code>amoeba@0.1.4/LICENSE</code>, <code>light-prover-client@8.0.0/vendor/LICENSE-APACHE-2.0</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, plus 4 more mapped package file(s)
 
 <!-- legal-text-begin sha256=8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb -->
 ```text

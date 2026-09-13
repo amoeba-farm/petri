@@ -380,6 +380,18 @@ pub enum Command {
             help = "Update Petri without reinstalling the Windows app"
         )]
         skip_shim: bool,
+        #[arg(
+            long,
+            global = true,
+            help = "Approve installing the reviewed preview release without an interactive prompt"
+        )]
+        yes: bool,
+        #[arg(
+            long,
+            global = true,
+            help = "Reopen the terminal interface after a standalone update or recovery"
+        )]
+        restart: bool,
     },
     #[command(about = "Open the interactive Lab Bench TUI")]
     Tui {
@@ -976,6 +988,10 @@ pub struct OptionsChainArgs {
 pub enum UpdateCommand {
     #[command(about = "Check whether Petri needs an update")]
     Check,
+    #[command(about = "Show this installation's update channel and version")]
+    Info,
+    #[command(about = "Restore the previous app files after a standalone update")]
+    Recover,
 }
 
 #[derive(Debug, Args, Clone)]

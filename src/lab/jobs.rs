@@ -949,7 +949,7 @@ pub(super) fn spawn_oracle_rewards_fetch(
 
 pub(super) fn spawn_update_check(fetch_tx: Sender<LabFetchResult>, request_id: u64) {
     thread::spawn(move || {
-        let result = workspace_update::check_workspace_update(false)
+        let result = crate::update::check_for_tui(false)
             .map_err(|error| user_facing_update_check_error(&error.to_string()));
         let _ = fetch_tx.send(LabFetchResult::UpdateCheck { request_id, result });
     });

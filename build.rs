@@ -2,6 +2,13 @@ use sha2::{Digest, Sha256};
 use std::process::Command;
 
 fn main() {
+    println!("cargo:rerun-if-env-changed=PETRI_UPDATE_CHANNEL");
+    let update_channel = std::env::var("PETRI_UPDATE_CHANNEL").unwrap_or_else(|_| "source".into());
+    assert!(
+        matches!(update_channel.as_str(), "source" | "preview"),
+        "unsupported Petri update channel"
+    );
+    println!("cargo:rustc-env=PETRI_UPDATE_CHANNEL={update_channel}");
     let runtime = std::path::Path::new("target/petri-sdk-runtime.bin");
     println!("cargo:rerun-if-changed=scripts/sdk-worker.mjs");
     println!("cargo:rerun-if-changed=scripts/sdk-oracle.mjs");
