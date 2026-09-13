@@ -13,6 +13,8 @@ use std::{
 const BUNDLE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/petri-sdk-runtime.bin"));
 include!(concat!(env!("OUT_DIR"), "/sdk-script-digests.rs"));
 const MAX_BYTES: usize = 8 * 1024 * 1024;
+#[path = "sdk_archive.rs"]
+mod archive;
 // Only immutable embedded bytes are memoized. Every use below still verifies
 // the files in the mutable extracted runtime under its private lock.
 static RUNTIME_ID: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| hash(BUNDLE));
@@ -28,16 +30,9 @@ fn runtime() -> Result<PathBuf, CliError> {
             "This source build needs its SDK runtime. Build scripts/build-sdk-runtime.mjs, then rebuild Petri. Existing native trading is unaffected.",
         ));
     }
-    let length = usize::try_from(u64::from_le_bytes(BUNDLE[..8].try_into().unwrap()))
-        .map_err(|_| unavailable("SDK archive length invalid"))?;
-    let end = 8usize
-        .checked_add(length)
-        .filter(|n| *n <= BUNDLE.len() && length <= 16 * 1024 * 1024)
-        .ok_or_else(|| unavailable("SDK archive header invalid"))?;
-    let manifest: Value = serde_json::from_slice(&BUNDLE[8..end])
-        .map_err(|_| unavailable("SDK archive manifest invalid"))?;
-    if manifest["schemaVersion"] != 1
-        || manifest["candidate"] == true
+    let archive = archive::Archive::parse(BUNDLE)?;
+    let manifest = &archive.manifest;
+    if manifest["candidate"] == true
         || manifest["sdkCommit"] != crate::current_release::SDK_PACKAGE_COMMIT
     {
         return Err(unavailable("SDK archive identity differs from Petri"));
@@ -79,13 +74,20 @@ fn runtime() -> Result<PathBuf, CliError> {
     let mut worker = false;
     let mut paths = std::collections::HashSet::new();
     let mut expanded_bytes = 0u64;
-    for entry in entries {
+    let mut decoded_block: Option<(usize, Vec<u8>)> = None;
+    for (block, member) in archive
+        .blocks
+        .iter()
+        .flat_map(|block| block.files.iter().map(move |member| (block, member)))
+    {
+        let entry = &entries[member.index];
         let name = entry["path"]
             .as_str()
             .ok_or_else(|| unavailable("SDK archive path invalid"))?;
         if !paths.insert(name)
             || name.contains('\\')
             || name.contains(':')
+            || name.contains('\0')
             || name
                 .split('/')
                 .any(|p| p.is_empty() || p == "." || p == "..")
@@ -140,32 +142,21 @@ fn runtime() -> Result<PathBuf, CliError> {
                 "SDK runtime cache differs from the packaged bytes. Clear only this SDK runtime cache version, then retry.",
             ));
         }
-        let offset = entry["offset"]
-            .as_u64()
-            .and_then(|v| usize::try_from(v).ok())
-            .and_then(|n| end.checked_add(n))
-            .ok_or_else(|| unavailable("SDK archive offset invalid"))?;
-        let length = entry["length"]
-            .as_u64()
-            .and_then(|v| usize::try_from(v).ok())
-            .ok_or_else(|| unavailable("SDK archive size invalid"))?;
-        let bytes = BUNDLE
-            .get(
-                offset
-                    ..offset
-                        .checked_add(length)
-                        .ok_or_else(|| unavailable("SDK archive overflow"))?,
-            )
-            .ok_or_else(|| unavailable("SDK archive truncated"))?;
-        let mut decoded = Vec::new();
-        flate2::read::ZlibDecoder::new(bytes)
-            .take(size + 1)
-            .read_to_end(&mut decoded)
-            .map_err(|_| unavailable("SDK archive decompression failed"))?;
-        if decoded.len() as u64 != size || hash(&decoded) != expected {
+        if decoded_block
+            .as_ref()
+            .is_none_or(|(offset, _)| *offset != block.offset)
+        {
+            // Release the previous block before allocating the next one. A
+            // verified mutable cache hit above never decompresses a block.
+            drop(decoded_block.take());
+            decoded_block = Some((block.offset, archive.decode(block)?));
+        }
+        let decoded =
+            &decoded_block.as_ref().unwrap().1[member.offset..member.offset + size as usize];
+        if decoded.len() as u64 != size || hash(decoded) != expected {
             return Err(unavailable("SDK archive content digest mismatch"));
         }
-        petri_config::write_private_file(&path, &decoded).map_err(CliError::new)?;
+        petri_config::write_private_file(&path, decoded).map_err(CliError::new)?;
         #[cfg(unix)]
         if name == "node" || name == "compressed-verifier" {
             use std::os::unix::fs::PermissionsExt;

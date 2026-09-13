@@ -9,82 +9,84 @@ impl LabApp {
         fetch_tx: &Sender<LabFetchResult>,
         range: ChartRangeValue,
     ) {
-        self.chart_range = range;
+        self.trading.chart_range = range;
         self.request_chart(backend_url, fetch_tx, false);
     }
 
     pub(super) fn select_prev_option(&mut self) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             return false;
         }
-        let Some(detail) = &self.detail else {
+        let Some(detail) = &self.trading.detail else {
             return false;
         };
-        let indices = quote_indices_by_kind(detail, self.active_option_kind);
+        let indices = quote_indices_by_kind(detail, self.trading.active_option_kind);
         if indices.is_empty() {
             return false;
         }
         let current = indices
             .iter()
-            .position(|index| *index == self.selected_option)
+            .position(|index| *index == self.trading.selected_option)
             .unwrap_or(0);
         if current == 0 {
             return false;
         }
-        self.selected_option = indices[current - 1];
+        self.trading.selected_option = indices[current - 1];
         self.panel_scrolls.insert(
-            option_kind_focus(self.active_option_kind),
+            option_kind_focus(self.trading.active_option_kind),
             current.saturating_sub(1),
         );
-        self.trade_ticket = None;
+        self.trading.ticket = None;
         true
     }
 
     pub(super) fn select_next_option(&mut self) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             return false;
         }
-        let Some(detail) = &self.detail else {
+        let Some(detail) = &self.trading.detail else {
             return false;
         };
-        let indices = quote_indices_by_kind(detail, self.active_option_kind);
+        let indices = quote_indices_by_kind(detail, self.trading.active_option_kind);
         if indices.is_empty() {
             return false;
         }
         let current = indices
             .iter()
-            .position(|index| *index == self.selected_option)
+            .position(|index| *index == self.trading.selected_option)
             .unwrap_or(0);
         if current + 1 >= indices.len() {
             return false;
         }
-        self.selected_option = indices[current + 1];
-        self.panel_scrolls
-            .insert(option_kind_focus(self.active_option_kind), current + 1);
-        self.trade_ticket = None;
+        self.trading.selected_option = indices[current + 1];
+        self.panel_scrolls.insert(
+            option_kind_focus(self.trading.active_option_kind),
+            current + 1,
+        );
+        self.trading.ticket = None;
         true
     }
 
     pub(super) fn focus_markets(&mut self) {
         self.focus = LabFocus::Markets;
-        self.chain_focus = ChainFocus::Markets;
+        self.trading.chain_focus = ChainFocus::Markets;
     }
 
     pub(super) fn focus_market_series(&mut self) {
-        self.market_series_open = true;
+        self.trading.market_series_open = true;
         self.focus = LabFocus::MarketSeries;
-        self.chain_focus = ChainFocus::Markets;
+        self.trading.chain_focus = ChainFocus::Markets;
     }
 
     pub(super) fn focus_option_side(&mut self, target: OptionKind) {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             return;
         }
         self.focus = match target {
             OptionKind::Call => LabFocus::Calls,
             OptionKind::Put => LabFocus::Puts,
         };
-        self.chain_focus = match target {
+        self.trading.chain_focus = match target {
             OptionKind::Call => ChainFocus::Calls,
             OptionKind::Put => ChainFocus::Puts,
         };
@@ -92,11 +94,11 @@ impl LabApp {
     }
 
     pub(super) fn select_option_side(&mut self, target: OptionKind) {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             return;
         }
-        self.active_option_kind = target;
-        let Some(detail) = &self.detail else {
+        self.trading.active_option_kind = target;
+        let Some(detail) = &self.trading.detail else {
             return;
         };
         let target_indices = quote_indices_by_kind(detail, target);
@@ -106,17 +108,18 @@ impl LabApp {
         let target_rank = self
             .focused_panel_scroll(option_kind_focus(target))
             .min(target_indices.len().saturating_sub(1));
-        self.selected_option = target_indices[target_rank];
-        self.trade_ticket = None;
+        self.trading.selected_option = target_indices[target_rank];
+        self.trading.ticket = None;
     }
 
     pub(super) fn select_option_index(&mut self, target: OptionKind, index: usize) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             self.status =
                 "Order submission is running. Wait before selecting another contract.".to_string();
             return false;
         }
         let label = self
+            .trading
             .detail
             .as_ref()
             .and_then(|detail| detail.option_quotes.get(index))
@@ -134,16 +137,17 @@ impl LabApp {
         };
 
         self.focus_option_side(target);
-        self.selected_option = index;
-        self.active_option_kind = target;
+        self.trading.selected_option = index;
+        self.trading.active_option_kind = target;
         if let Some(rank) = self
+            .trading
             .detail
             .as_ref()
             .and_then(|detail| quote_rank_by_kind(detail, index, target))
         {
             self.panel_scrolls.insert(option_kind_focus(target), rank);
         }
-        self.trade_ticket = None;
+        self.trading.ticket = None;
         self.status = format!("{label} selected. Press B to buy or S to sell.");
         true
     }
@@ -153,13 +157,13 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             return false;
         }
-        if self.dishes.is_empty() || self.selected == 0 {
+        if self.trading.dishes.is_empty() || self.trading.selected == 0 {
             return false;
         }
-        self.selected -= 1;
+        self.trading.selected -= 1;
         self.after_market_selection_changed(backend_url, fetch_tx);
         true
     }
@@ -169,13 +173,14 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             return false;
         }
-        if self.dishes.is_empty() || self.selected + 1 >= self.dishes.len() {
+        if self.trading.dishes.is_empty() || self.trading.selected + 1 >= self.trading.dishes.len()
+        {
             return false;
         }
-        self.selected += 1;
+        self.trading.selected += 1;
         self.after_market_selection_changed(backend_url, fetch_tx);
         true
     }
@@ -186,18 +191,18 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             self.status = "Order submission is running. Wait before changing markets.".to_string();
             return false;
         }
-        if index >= self.dishes.len() {
+        if index >= self.trading.dishes.len() {
             return false;
         }
         self.set_focus(LabFocus::Markets);
-        if self.selected == index {
+        if self.trading.selected == index {
             return true;
         }
-        self.selected = index;
+        self.trading.selected = index;
         self.after_market_selection_changed(backend_url, fetch_tx);
         true
     }
@@ -208,8 +213,9 @@ impl LabApp {
         fetch_tx: &Sender<LabFetchResult>,
     ) {
         let market_id = self.selected_id();
-        self.market_series_open = true;
+        self.trading.market_series_open = true;
         let has_loaded_series = self
+            .trading
             .detail
             .as_ref()
             .filter(|detail| detail.id.eq_ignore_ascii_case(&market_id))
@@ -247,8 +253,8 @@ impl LabApp {
             .selected_chart_expiry()
             .map(|expiry| expiry.label.clone())
             .unwrap_or_else(|| "selected month".to_string());
-        self.sync_selected_expiry();
-        self.clamp_selected_option();
+        self.trading.sync_selected_expiry();
+        self.trading.clamp_selected_option();
         if self.screen == LabScreen::Oracle {
             self.refresh_oracle_series_in_place(backend_url, fetch_tx, true);
             return;
@@ -302,12 +308,12 @@ impl LabApp {
         fetch_tx: &Sender<LabFetchResult>,
         force: bool,
     ) {
-        self.sync_selected_expiry();
-        self.clamp_selected_option();
+        self.trading.sync_selected_expiry();
+        self.trading.clamp_selected_option();
         self.clamp_oracle_selection();
-        self.oracle_form = None;
-        self.oracle_form_field_flash = None;
-        self.oracle_locked_flash = None;
+        self.oracle.form = None;
+        self.oracle.form_field_flash = None;
+        self.oracle.locked_flash = None;
         self.request_oracle_tree(backend_url, fetch_tx, false);
         self.request_oracle_live(backend_url, fetch_tx, force);
         self.request_oracle_rewards(backend_url, fetch_tx, force);
@@ -319,13 +325,13 @@ impl LabApp {
     }
 
     pub(super) fn select_market_series_by_offset(&mut self, offset: isize) -> bool {
-        let Some(detail) = &self.detail else {
+        let Some(detail) = &self.trading.detail else {
             return false;
         };
         if detail.expiries.is_empty() {
             return false;
         }
-        let next = self.chart_expiry as isize + offset;
+        let next = self.trading.chart_expiry as isize + offset;
         if next < 0 || next >= detail.expiries.len() as isize {
             return false;
         }
@@ -334,7 +340,8 @@ impl LabApp {
     }
 
     pub(super) fn market_series_count(&self) -> usize {
-        self.detail
+        self.trading
+            .detail
             .as_ref()
             .filter(|detail| detail.id.eq_ignore_ascii_case(&self.selected_id()))
             .map(|detail| detail.expiries.len())
@@ -352,37 +359,38 @@ impl LabApp {
     }
 
     pub(super) fn select_market_series_index(&mut self, index: usize) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             return false;
         }
         let count = self
+            .trading
             .detail
             .as_ref()
             .map(|detail| detail.expiries.len())
             .unwrap_or(0);
         if count == 0 {
-            self.chart_expiry = 0;
+            self.trading.chart_expiry = 0;
             return false;
         }
         let next = index.min(count - 1);
-        if self.chart_expiry == next {
-            self.sync_selected_expiry();
-            self.clamp_selected_option();
+        if self.trading.chart_expiry == next {
+            self.trading.sync_selected_expiry();
+            self.trading.clamp_selected_option();
             if self.screen == LabScreen::Oracle {
                 self.clamp_oracle_selection();
             }
             return true;
         }
-        self.chart_expiry = next;
+        self.trading.chart_expiry = next;
         self.clear_guide_context_actions();
-        self.chart = None;
-        self.settlement_bundle = None;
-        self.settlement_issue = None;
-        self.selected_option = 0;
-        self.active_option_kind = OptionKind::Call;
-        self.trade_ticket = None;
-        self.sync_selected_expiry();
-        self.clamp_selected_option();
+        self.trading.chart = None;
+        self.trading.settlement_bundle = None;
+        self.trading.settlement_issue = None;
+        self.trading.selected_option = 0;
+        self.trading.active_option_kind = OptionKind::Call;
+        self.trading.ticket = None;
+        self.trading.sync_selected_expiry();
+        self.trading.clamp_selected_option();
         if self.screen == LabScreen::Oracle {
             self.clamp_oracle_selection();
         }
@@ -400,101 +408,28 @@ impl LabApp {
         fetch_tx: &Sender<LabFetchResult>,
     ) {
         self.clear_guide_context_actions();
-        self.selected_option = 0;
-        self.active_option_kind = OptionKind::Call;
-        self.chart_expiry = 0;
-        self.chart = None;
-        self.settlement_bundle = None;
-        self.settlement_issue = None;
-        if !self.trade_submit_is_running() {
-            self.trade_ticket = None;
+        self.trading.selected_option = 0;
+        self.trading.active_option_kind = OptionKind::Call;
+        self.trading.chart_expiry = 0;
+        self.trading.chart = None;
+        self.trading.settlement_bundle = None;
+        self.trading.settlement_issue = None;
+        if !self.trading.submit_is_running() {
+            self.trading.ticket = None;
         }
-        self.market_series_open = false;
+        self.trading.market_series_open = false;
         self.ensure_read_cache_scope(backend_url);
         let market_id = self.selected_id();
-        if let Some(detail) = self.detail_cache.get(&market_id).cloned() {
-            self.detail = Some(detail);
-            self.sync_selected_expiry();
-            self.clamp_selected_option();
-            self.loading_detail = false;
+        if let Some(detail) = self.cache.details().get(&market_id).cloned() {
+            self.trading.detail = Some(detail);
+            self.trading.sync_selected_expiry();
+            self.trading.clamp_selected_option();
+            self.trading.loading_detail = false;
             self.status = format!("{} market ready", market_id.to_uppercase());
         } else {
-            self.detail = None;
+            self.trading.detail = None;
             self.status = format!("Loading {} market...", market_id.to_uppercase());
         }
         self.request_selected_detail(backend_url, fetch_tx, false);
-    }
-
-    pub(super) fn sync_selected_expiry(&mut self) {
-        let count = self
-            .detail
-            .as_ref()
-            .map(|detail| detail.expiries.len())
-            .unwrap_or(0);
-        if count == 0 {
-            self.chart_expiry = 0;
-            return;
-        }
-        if self.chart_expiry >= count {
-            self.chart_expiry = count - 1;
-        }
-        self.apply_selected_expiry_to_detail();
-    }
-
-    pub(super) fn apply_selected_expiry_to_detail(&mut self) {
-        let index = self.chart_expiry;
-        let Some(detail) = &mut self.detail else {
-            return;
-        };
-        let Some(expiry) = detail.expiries.get(index).cloned() else {
-            return;
-        };
-        detail.expiry_id = expiry.id;
-        detail.expiry_label = expiry.label;
-        detail.settlement = expiry.settlement;
-        detail.days = expiry.days;
-        detail.current_print = expiry.current_print;
-        detail.base = expiry.base;
-        detail.cap_width = expiry.cap_width;
-        detail.listed_notional = expiry.listed_notional;
-        detail.rows = expiry.rows;
-        detail.option_quotes = expiry.option_quotes;
-    }
-
-    pub(super) fn clamp_selected_option(&mut self) {
-        let count = self
-            .detail
-            .as_ref()
-            .map(|detail| detail.option_quotes.len())
-            .unwrap_or(0);
-        if count == 0 {
-            self.selected_option = 0;
-        } else if self.selected_option >= count {
-            self.selected_option = count - 1;
-        }
-        if let Some(detail) = &self.detail {
-            let selected_matches_active = detail
-                .option_quotes
-                .get(self.selected_option)
-                .map(|quote| quote.kind == self.active_option_kind)
-                .unwrap_or(false);
-            if let Some(index) = first_quote_index_by_kind(detail, self.active_option_kind)
-                .filter(|_| !selected_matches_active)
-                .or_else(|| (!detail.option_quotes.is_empty()).then_some(self.selected_option))
-            {
-                self.selected_option = index;
-                self.active_option_kind = detail.option_quotes[index].kind;
-            }
-        }
-        let expiry_count = self
-            .detail
-            .as_ref()
-            .map(|detail| detail.expiries.len())
-            .unwrap_or(0);
-        if expiry_count == 0 {
-            self.chart_expiry = 0;
-        } else if self.chart_expiry >= expiry_count {
-            self.chart_expiry = expiry_count - 1;
-        }
     }
 }

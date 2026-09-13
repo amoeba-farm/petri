@@ -47,7 +47,7 @@ jobs:
             target/release
             target/sdk-compressed-verifier
             target/petri-sdk-runtime.bin
-          key: petri-preview-${{ matrix.os }}-${{ hashFiles('Cargo.lock', 'release/public-sdk-source.json', 'scripts/sdk-*.mjs') }}
+          key: petri-preview-${{ matrix.os }}-${{ hashFiles('Cargo.lock', 'release/public-sdk-source.json', 'scripts/sdk-*.mjs', 'scripts/build-sdk-runtime.mjs', 'scripts/runtime-tools/package*.json') }}
           restore-keys: petri-preview-${{ matrix.os }}-
       - name: Build bundled SDK runtime
         shell: bash

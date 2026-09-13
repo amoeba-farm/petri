@@ -75,10 +75,10 @@ pub(in super::super) fn draw_home_screen(
 }
 
 pub(in super::super) fn home_summary_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    let Some(detail) = &app.detail else {
+    let Some(detail) = &app.trading.detail else {
         return vec![
             Line::from(Span::styled(
-                if app.loading_detail {
+                if app.trading.loading_detail {
                     format!("{} Loading selected market...", app.spinner())
                 } else {
                     "Select a market from the left.".to_string()
@@ -402,7 +402,8 @@ pub(in super::super) fn home_preview_body(
 }
 
 pub(in super::super) fn selected_market_context(app: &LabApp) -> String {
-    app.detail
+    app.trading
+        .detail
         .as_ref()
         .map(|detail| {
             if detail.expiry_label.trim().is_empty() || detail.expiry_label == "-" {
@@ -411,28 +412,46 @@ pub(in super::super) fn selected_market_context(app: &LabApp) -> String {
                 format!("{} {}", detail.symbol, detail.expiry_label)
             }
         })
-        .or_else(|| app.dishes.get(app.selected).map(|dish| dish.symbol.clone()))
+        .or_else(|| {
+            app.trading
+                .dishes
+                .get(app.trading.selected)
+                .map(|dish| dish.symbol.clone())
+        })
         .unwrap_or_else(|| "the selected market".to_string())
 }
 
 pub(in super::super) fn selected_oracle_market_id(app: &LabApp) -> String {
-    app.detail
+    app.trading
+        .detail
         .as_ref()
         .map(|detail| detail.id.clone())
-        .or_else(|| app.dishes.get(app.selected).map(|dish| dish.id.clone()))
+        .or_else(|| {
+            app.trading
+                .dishes
+                .get(app.trading.selected)
+                .map(|dish| dish.id.clone())
+        })
         .unwrap_or_else(|| app.selected_id())
 }
 
 pub(in super::super) fn selected_oracle_market_symbol(app: &LabApp) -> String {
-    app.detail
+    app.trading
+        .detail
         .as_ref()
         .map(|detail| detail.symbol.clone())
-        .or_else(|| app.dishes.get(app.selected).map(|dish| dish.symbol.clone()))
+        .or_else(|| {
+            app.trading
+                .dishes
+                .get(app.trading.selected)
+                .map(|dish| dish.symbol.clone())
+        })
         .unwrap_or_else(|| selected_oracle_market_id(app).to_uppercase())
 }
 
 pub(in super::super) fn selected_oracle_month_label(app: &LabApp) -> String {
-    app.detail
+    app.trading
+        .detail
         .as_ref()
         .map(|detail| detail.expiry_label.trim())
         .filter(|label| !label.is_empty() && *label != "-")
@@ -441,7 +460,8 @@ pub(in super::super) fn selected_oracle_month_label(app: &LabApp) -> String {
 }
 
 pub(in super::super) fn selected_oracle_settlement_label(app: &LabApp) -> String {
-    app.detail
+    app.trading
+        .detail
         .as_ref()
         .map(|detail| detail.settlement.trim())
         .filter(|settlement| !settlement.is_empty() && *settlement != "-")

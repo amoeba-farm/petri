@@ -1,6 +1,113 @@
 //! Bounded in-TUI Guide projection, target validation, and staged command application.
 
 use super::*;
+use std::collections::VecDeque;
+
+#[derive(Clone, Debug)]
+pub(super) struct GuidePendingContinuation {
+    pub(super) expected_screen: LabScreen,
+    pub(super) market_id: Option<String>,
+    pub(super) tool_result: guide::GuideToolResult,
+}
+
+#[derive(Clone, Debug)]
+pub(super) struct GuidePanelState {
+    pub(super) config: guide::GuideConfig,
+    pub(super) provider_status: guide::GuideProviderStatus,
+    pub(super) selected_provider: usize,
+    pub(super) input: String,
+    pub(super) composing: bool,
+    pub(super) context_focus: Option<LabFocus>,
+    pub(super) messages: VecDeque<guide::GuideConversationTurn>,
+    pub(super) scroll: usize,
+    pub(super) request_id: u64,
+    pub(super) loading: bool,
+    pub(super) progress: Option<String>,
+    pub(super) suggested_actions: Vec<String>,
+    pub(super) selected_suggestion: Option<usize>,
+    pub(super) action_preview: Option<guide::GuideActionPreview>,
+    pub(super) highlighted_targets: Vec<String>,
+    pub(super) comparison_targets: Vec<String>,
+    pub(super) focused_control: Option<String>,
+    pub(super) request_target_ids: HashSet<String>,
+    pub(super) request_ui_target_ids: HashSet<String>,
+    pub(super) request_challenge_ids: HashSet<String>,
+    pub(super) active_question: Option<String>,
+    pub(super) allow_continuation: bool,
+    pub(super) tool_step: u8,
+    pub(super) pending_continuation: Option<GuidePendingContinuation>,
+}
+
+impl GuidePanelState {
+    pub(super) fn new(config: guide::GuideConfig) -> Self {
+        let provider_status = if let Some(issue) = config.issue.clone() {
+            guide::GuideProviderStatus::SetupRequired { message: issue }
+        } else if config.provider == guide::GuideProviderPreference::Off {
+            guide::GuideProviderStatus::Off
+        } else {
+            guide::GuideProviderStatus::Checking
+        };
+        Self {
+            config,
+            provider_status,
+            selected_provider: 0,
+            input: String::new(),
+            composing: false,
+            context_focus: None,
+            messages: VecDeque::new(),
+            scroll: 0,
+            request_id: 0,
+            loading: false,
+            progress: None,
+            suggested_actions: Vec::new(),
+            selected_suggestion: None,
+            action_preview: None,
+            highlighted_targets: Vec::new(),
+            comparison_targets: Vec::new(),
+            focused_control: None,
+            request_target_ids: HashSet::new(),
+            request_ui_target_ids: HashSet::new(),
+            request_challenge_ids: HashSet::new(),
+            active_question: None,
+            allow_continuation: false,
+            tool_step: 0,
+            pending_continuation: None,
+        }
+    }
+
+    pub(super) fn push_message(
+        &mut self,
+        role: guide::GuideConversationRole,
+        text: impl Into<String>,
+    ) {
+        let text = text.into();
+        if text.trim().is_empty() {
+            return;
+        }
+        self.messages
+            .push_back(guide::GuideConversationTurn { role, text });
+        while self.messages.len() > 16 {
+            self.messages.pop_front();
+        }
+        self.scroll = 0;
+    }
+
+    pub(super) fn conversation_context(&self) -> Vec<guide::GuideConversationTurn> {
+        self.messages
+            .iter()
+            .rev()
+            .take(4)
+            .cloned()
+            .map(|mut turn| {
+                turn.text = turn.text.chars().take(600).collect();
+                turn
+            })
+            .collect::<Vec<_>>()
+            .into_iter()
+            .rev()
+            .collect()
+    }
+}
 
 impl LabApp {
     pub(super) fn request_guide_probe(&mut self, fetch_tx: &Sender<LabFetchResult>) {
@@ -46,7 +153,7 @@ impl LabApp {
         );
         if self.screen == LabScreen::Oracle
             && self.oracle_tree().is_none()
-            && !self.loading_oracle_tree
+            && !self.oracle.loading_tree
         {
             self.request_oracle_tree(backend_url, fetch_tx, false);
         }
@@ -228,6 +335,7 @@ impl LabApp {
         if let Some(market_id) = pending.market_id.as_deref()
             && (!self.selected_id().eq_ignore_ascii_case(market_id)
                 || self
+                    .trading
                     .detail
                     .as_ref()
                     .is_some_and(|detail| !detail.id.eq_ignore_ascii_case(market_id)))
@@ -239,15 +347,16 @@ impl LabApp {
 
     pub(super) fn guide_destination_is_loading(&self) -> bool {
         match self.screen {
-            LabScreen::Chain | LabScreen::Activity => self.loading_detail,
+            LabScreen::Chain | LabScreen::Activity => self.trading.loading_detail,
             LabScreen::Detail => {
-                self.loading_detail
-                    || (self.detail_view == DetailView::Settlement && self.loading_settlement)
+                self.trading.loading_detail
+                    || (self.trading.detail_view == DetailView::Settlement
+                        && self.trading.loading_settlement)
             }
-            LabScreen::Chart => self.loading_detail || self.loading_chart,
-            LabScreen::Oracle => self.loading_detail || self.loading_oracle_tree,
+            LabScreen::Chart => self.trading.loading_detail || self.trading.loading_chart,
+            LabScreen::Oracle => self.trading.loading_detail || self.oracle.loading_tree,
             LabScreen::Help if self.home_help_topic == HomeHelpTopic::Overview => {
-                self.loading_help_index || self.loading_help_page
+                self.help.loading_index || self.help.loading_page
             }
             LabScreen::Ledger => self.loading_ledger,
             LabScreen::Staking => self.loading_staking || self.staking_action_is_running(),
@@ -453,11 +562,12 @@ impl LabApp {
     }
 
     pub(super) fn guide_snapshot(&self) -> guide::TuiStateSnapshot {
-        let tree = (self.screen == LabScreen::Oracle && self.oracle_view == OracleView::Advanced)
+        let tree = (self.screen == LabScreen::Oracle && self.oracle.view == OracleView::Advanced)
             .then(|| self.oracle_tree())
             .flatten();
         let selected_index = tree.map(|tree| {
-            self.oracle_node_selected
+            self.oracle
+                .node_selected
                 .min(tree.nodes.len().saturating_sub(1))
         });
         let breadcrumb_path = tree
@@ -484,7 +594,8 @@ impl LabApp {
         let mut navigation_targets = if self.screen == LabScreen::Terms {
             Vec::new()
         } else {
-            self.dishes
+            self.trading
+                .dishes
                 .iter()
                 .map(|dish| guide::GuideNodeSnapshot {
                     node_id: guide_market_target_id(&dish.id),
@@ -529,7 +640,7 @@ impl LabApp {
                 guide_oracle_context_indices(
                     tree,
                     selected_index.unwrap_or_default(),
-                    &self.oracle_search_input,
+                    &self.oracle.search_input,
                 )
                 .into_iter()
                 .filter_map(|index| guide_node_snapshot(tree, index))
@@ -542,7 +653,7 @@ impl LabApp {
             .iter()
             .position(|candidate| *candidate == phase);
         let visible_phase_timeline =
-            if self.screen == LabScreen::Oracle && self.oracle_view == OracleView::Advanced {
+            if self.screen == LabScreen::Oracle && self.oracle.view == OracleView::Advanced {
                 OraclePhase::ALL
                     .iter()
                     .enumerate()
@@ -562,7 +673,7 @@ impl LabApp {
                 Vec::new()
             };
         let active_challenges =
-            if self.screen == LabScreen::Oracle && self.oracle_view == OracleView::Advanced {
+            if self.screen == LabScreen::Oracle && self.oracle.view == OracleView::Advanced {
                 self.guide_active_challenges()
             } else {
                 Vec::new()
@@ -576,7 +687,7 @@ impl LabApp {
             guide_safe_action("show_phase_timeline", "Show the market phase", "navigate"),
             guide_safe_action("show_next_action", "Explain the next safe step", "read"),
         ];
-        if !self.dishes.is_empty() {
+        if !self.trading.dishes.is_empty() {
             available_safe_actions.push(guide_safe_action(
                 "open_market_contracts",
                 "Open a market and load its contracts",
@@ -622,7 +733,7 @@ impl LabApp {
                 "stage",
             ));
         }
-        if self.screen == LabScreen::Oracle && self.oracle_view == OracleView::Advanced {
+        if self.screen == LabScreen::Oracle && self.oracle.view == OracleView::Advanced {
             available_safe_actions.push(guide_safe_action(
                 "stage_oracle_form",
                 "Open and fill a reviewable evidence form",
@@ -636,9 +747,9 @@ impl LabApp {
         }
         let writer_form_available = self.screen == LabScreen::Ledger
             && self.ledger_view == LedgerView::Writers
-            && self.writer_form.is_none()
-            && self.writer_confirmation.is_none()
-            && !self.writer_interaction_is_locked()
+            && self.writers.form.is_none()
+            && self.writers.confirmation.is_none()
+            && !self.writers.interaction_is_locked()
             && self.selected_writer_sleeve_address().is_some();
         let liquidity_form_available = self.screen == LabScreen::Ledger
             && self.ledger_view == LedgerView::Positions
@@ -676,8 +787,9 @@ impl LabApp {
         }
         available_safe_actions.truncate(16);
 
-        let selected_market = self.dishes.get(self.selected).map(|dish| {
+        let selected_market = self.trading.dishes.get(self.trading.selected).map(|dish| {
             let detail = self
+                .trading
                 .detail
                 .as_ref()
                 .filter(|detail| detail.id.eq_ignore_ascii_case(&dish.id));
@@ -697,17 +809,17 @@ impl LabApp {
                 freshness: detail.map(|detail| detail.freshness.clone()),
             }
         });
-        let selected_contract = matches!(self.screen, LabScreen::Chain | LabScreen::Activity)
-            .then(|| {
-                self.detail
-                    .as_ref()
-                    .zip(self.selected_quote())
-                    .map(|(detail, quote)| {
-                        guide_contract_snapshot(detail, quote, phase == OraclePhase::GameMode)
-                    })
-            })
-            .flatten();
-        let open_trade_ticket = self.trade_ticket.as_ref().map(|ticket| {
+        let selected_contract =
+            matches!(self.screen, LabScreen::Chain | LabScreen::Activity)
+                .then(|| {
+                    self.trading.detail.as_ref().zip(self.selected_quote()).map(
+                        |(detail, quote)| {
+                            guide_contract_snapshot(detail, quote, phase == OraclePhase::GameMode)
+                        },
+                    )
+                })
+                .flatten();
+        let open_trade_ticket = self.trading.ticket.as_ref().map(|ticket| {
             let price = ticket.premium_input.trim().parse::<f64>().ok();
             let contracts = ticket
                 .quantity_input
@@ -754,7 +866,7 @@ impl LabApp {
             }
             .to_string(),
             chart_range: (self.screen == LabScreen::Chart)
-                .then(|| self.chart_range.label().to_string()),
+                .then(|| self.trading.chart_range.label().to_string()),
             selected_market,
             selected_contract,
             visible_contracts,
@@ -782,36 +894,39 @@ impl LabApp {
                 format!("wallet_ledger_{}", guide_ledger_view_id(self.ledger_view))
             }
             (LabScreen::Detail, _) => {
-                format!("market_detail_{}", guide_detail_view_id(self.detail_view))
+                format!(
+                    "market_detail_{}",
+                    guide_detail_view_id(self.trading.detail_view)
+                )
             }
             _ => screen_title(self.screen).replace(' ', "_"),
         }
     }
 
     pub(super) fn guide_overlay(&self) -> Option<String> {
-        let label = if self.writer_confirmation.is_some() {
+        let label = if self.writers.confirmation.is_some() {
             "writer_confirmation"
-        } else if self.writer_form.is_some() {
+        } else if self.writers.form.is_some() {
             "writer_action_form"
         } else if self.staking_confirmation.is_some() {
             "staking_confirmation"
         } else if self.staking_form.is_some() {
             "staking_amount_form"
-        } else if self.trade_confirmation_is_open() {
+        } else if self.trading.confirmation_is_open() {
             "trade_confirmation"
-        } else if self.trade_result_modal_is_open() {
+        } else if self.trading.result_modal_is_open() {
             "trade_result"
-        } else if self.trade_ticket.is_some() {
+        } else if self.trading.ticket.is_some() {
             "trade_ticket"
-        } else if self.oracle_form.is_some() {
+        } else if self.oracle.form.is_some() {
             "oracle_form"
         } else if self.wallet_switch_editing {
             "wallet_switch"
-        } else if self.oracle_search_editing {
+        } else if self.oracle.search_editing {
             "oracle_search"
-        } else if self.help_glossary_hover.is_some() {
+        } else if self.help.glossary_hover.is_some() {
             "glossary_definition"
-        } else if self.help_preview.is_some() {
+        } else if self.help.preview.is_some() {
             "help_preview"
         } else {
             return None;
@@ -953,6 +1068,7 @@ impl LabApp {
 
         if self.screen != LabScreen::Terms
             && let Some(detail) = self
+                .trading
                 .detail
                 .as_ref()
                 .filter(|detail| detail.id.eq_ignore_ascii_case(&self.selected_id()))
@@ -989,7 +1105,7 @@ impl LabApp {
         }
 
         if self.screen == LabScreen::Oracle
-            && self.oracle_view == OracleView::Advanced
+            && self.oracle.view == OracleView::Advanced
             && let Some(node) = self.selected_oracle_node()
             && let Some(context) = self.selected_oracle_action_context()
         {
@@ -1018,7 +1134,8 @@ impl LabApp {
 
         if self.screen == LabScreen::Help && self.home_help_topic == HomeHelpTopic::Overview {
             for page in self
-                .help_index
+                .help
+                .index
                 .categories
                 .iter()
                 .flat_map(|category| category.pages.iter())
@@ -1063,8 +1180,8 @@ impl LabApp {
                 ),
             ]);
         }
-        if self.trade_ticket.is_some() {
-            let control = if self.trade_confirmation_is_open() {
+        if self.trading.ticket.is_some() {
+            let control = if self.trading.confirmation_is_open() {
                 ("control:trade:confirm", "Confirm order")
             } else {
                 ("control:trade:review", "Review / export ticket")
@@ -1078,7 +1195,7 @@ impl LabApp {
                 true,
             ));
         }
-        if self.oracle_form.is_some() {
+        if self.oracle.form.is_some() {
             targets.push(guide_ui_target(
                 "control:oracle:queue-draft",
                 "Queue local draft",
@@ -1088,8 +1205,8 @@ impl LabApp {
                 true,
             ));
         }
-        if let Some(form) = self.writer_form.as_ref() {
-            let (target_id, label, description) = if self.writer_confirmation.is_some() {
+        if let Some(form) = self.writers.form.as_ref() {
+            let (target_id, label, description) = if self.writers.confirmation.is_some() {
                 (
                     "control:writer:confirm",
                     "Unavailable writer action",
@@ -1137,9 +1254,7 @@ impl LabApp {
                 true,
             ));
         }
-        if self.screen != LabScreen::Terms
-            && (self.update_report.is_some() || self.update_issue.is_some())
-        {
+        if self.screen != LabScreen::Terms && self.updates.has_result() {
             targets.push(guide_ui_target(
                 "control:update",
                 "Update Petri",
@@ -1156,8 +1271,8 @@ impl LabApp {
     pub(super) fn guide_available_form_actions(&self) -> Vec<guide::GuideFormActionSnapshot> {
         let mut actions = Vec::new();
         if self.screen == LabScreen::Chain
-            && self.trade_ticket.is_none()
-            && let Some(detail) = self.detail.as_ref()
+            && self.trading.ticket.is_none()
+            && let Some(detail) = self.trading.detail.as_ref()
             && let Some(quote) = self.selected_quote()
             && self.oracle_phase() == OraclePhase::GameMode
             && quote.prepare_eligible
@@ -1186,8 +1301,8 @@ impl LabApp {
         }
 
         if self.screen == LabScreen::Oracle
-            && self.oracle_view == OracleView::Advanced
-            && self.oracle_form.is_none()
+            && self.oracle.view == OracleView::Advanced
+            && self.oracle.form.is_none()
             && self.oracle_tree().is_some()
             && let Some(node) = self.selected_oracle_node()
             && let Some(context) = self.selected_oracle_action_context()
@@ -1217,9 +1332,9 @@ impl LabApp {
         }
         if self.screen == LabScreen::Ledger
             && self.ledger_view == LedgerView::Writers
-            && self.writer_form.is_none()
-            && self.writer_confirmation.is_none()
-            && !self.writer_interaction_is_locked()
+            && self.writers.form.is_none()
+            && self.writers.confirmation.is_none()
+            && !self.writers.interaction_is_locked()
             && let Some(sleeve) = self.selected_writer_sleeve()
             && let Some(sleeve_address) = self.selected_writer_sleeve_address()
         {
@@ -1288,7 +1403,7 @@ impl LabApp {
     }
 
     pub(super) fn guide_active_form(&self) -> Option<guide::GuideFormSnapshot> {
-        if let Some(ticket) = self.trade_ticket.as_ref() {
+        if let Some(ticket) = self.trading.ticket.as_ref() {
             return Some(guide::GuideFormSnapshot {
                 form_id: "form:trade-ticket".to_string(),
                 title: format!("{} order ticket", ticket.action.label()),
@@ -1315,7 +1430,7 @@ impl LabApp {
                 user_must_activate_final_control: true,
             });
         }
-        if let Some(form) = self.oracle_form.as_ref() {
+        if let Some(form) = self.oracle.form.as_ref() {
             return Some(guide::GuideFormSnapshot {
                 form_id: guide_oracle_form_id(form),
                 title: form.mode.title().to_string(),
@@ -1330,9 +1445,9 @@ impl LabApp {
                 user_must_activate_final_control: true,
             });
         }
-        if let Some(form) = self.writer_form.as_ref() {
-            let in_confirmation = self.writer_confirmation.is_some();
-            let editable = !in_confirmation && !self.writer_interaction_is_locked();
+        if let Some(form) = self.writers.form.as_ref() {
+            let in_confirmation = self.writers.confirmation.is_some();
+            let editable = !in_confirmation && !self.writers.interaction_is_locked();
             let (final_control_id, final_control_label) = if in_confirmation {
                 ("control:writer:confirm", "Wallet change unavailable")
             } else if form.action.signs_and_submits() {
@@ -1398,6 +1513,7 @@ impl LabApp {
             return Vec::new();
         }
         let Some(detail) = self
+            .trading
             .detail
             .as_ref()
             .filter(|detail| detail.id.eq_ignore_ascii_case(&self.selected_id()))
@@ -1416,6 +1532,7 @@ impl LabApp {
 
     pub(super) fn guide_state_revision(&self) -> String {
         let expiry = self
+            .trading
             .detail
             .as_ref()
             .map(|detail| detail.expiry_id.as_str())
@@ -1434,7 +1551,7 @@ impl LabApp {
         )
         .hash(&mut interaction);
         self.home_selected.hash(&mut interaction);
-        guide_detail_view_id(self.detail_view).hash(&mut interaction);
+        guide_detail_view_id(self.trading.detail_view).hash(&mut interaction);
         guide_ledger_view_id(self.ledger_view).hash(&mut interaction);
         match self.ledger_pane {
             LedgerPane::Tabs => "ledger_tabs",
@@ -1445,25 +1562,28 @@ impl LabApp {
         .hash(&mut interaction);
         self.ledger_position_selected.hash(&mut interaction);
         self.ledger_writer_selected.hash(&mut interaction);
-        self.writer_action_selected.hash(&mut interaction);
+        self.writers.action_selected.hash(&mut interaction);
         self.ledger_history_selected.hash(&mut interaction);
-        self.chart_range.label().hash(&mut interaction);
-        self.active_option_kind.label().hash(&mut interaction);
-        self.selected_option.hash(&mut interaction);
-        self.help_selected_page_id.hash(&mut interaction);
+        self.trading.chart_range.label().hash(&mut interaction);
+        self.trading
+            .active_option_kind
+            .label()
+            .hash(&mut interaction);
+        self.trading.selected_option.hash(&mut interaction);
+        self.help.selected_page_id.hash(&mut interaction);
         match self.home_help_topic {
             HomeHelpTopic::Overview => "help_overview",
             HomeHelpTopic::Agents => "help_agents",
         }
         .hash(&mut interaction);
-        match self.help_pane {
+        match self.help.pane {
             HelpPane::Navigation => "help_navigation",
             HelpPane::Article => "help_article",
         }
         .hash(&mut interaction);
         self.guide_overlay().hash(&mut interaction);
         self.wallet.is_attached().hash(&mut interaction);
-        if let Some(ticket) = self.trade_ticket.as_ref() {
+        if let Some(ticket) = self.trading.ticket.as_ref() {
             ticket.premium_input.hash(&mut interaction);
             ticket.quantity_input.hash(&mut interaction);
             ticket.action.label().hash(&mut interaction);
@@ -1477,7 +1597,7 @@ impl LabApp {
                 })
                 .hash(&mut interaction);
         }
-        if let Some(form) = self.oracle_form.as_ref() {
+        if let Some(form) = self.oracle.form.as_ref() {
             guide_oracle_form_mode_id(form.mode).hash(&mut interaction);
             form.node_index.hash(&mut interaction);
             form.field_selected.hash(&mut interaction);
@@ -1486,7 +1606,7 @@ impl LabApp {
                 field.value.hash(&mut interaction);
             }
         }
-        if let Some(form) = self.writer_form.as_ref() {
+        if let Some(form) = self.writers.form.as_ref() {
             guide_writer_action_id(form.action).hash(&mut interaction);
             form.selected_field.hash(&mut interaction);
             for field in &form.fields {
@@ -1503,7 +1623,7 @@ impl LabApp {
             form.selected_field.hash(&mut interaction);
         }
         self.liquidity_preview_inflight.hash(&mut interaction);
-        if let Some(confirmation) = self.writer_confirmation.as_ref() {
+        if let Some(confirmation) = self.writers.confirmation.as_ref() {
             guide_writer_action_id(confirmation.action).hash(&mut interaction);
             match confirmation.choice {
                 UserActionConfirmationChoice::Cancel => "writer_cancel",
@@ -1511,15 +1631,15 @@ impl LabApp {
             }
             .hash(&mut interaction);
         }
-        self.writer_action_inflight.hash(&mut interaction);
-        if let Some(bundle) = self.settlement_bundle.as_ref() {
+        self.writers.action_inflight.hash(&mut interaction);
+        if let Some(bundle) = self.trading.settlement_bundle.as_ref() {
             bundle.market_id.hash(&mut interaction);
             bundle.expiry_id.hash(&mut interaction);
             bundle.available_endpoint_count().hash(&mut interaction);
             bundle.issue_count().hash(&mut interaction);
         }
-        self.loading_settlement.hash(&mut interaction);
-        if let Some(detail) = self.detail.as_ref() {
+        self.trading.loading_settlement.hash(&mut interaction);
+        if let Some(detail) = self.trading.detail.as_ref() {
             detail.id.hash(&mut interaction);
             detail.expiry_id.hash(&mut interaction);
             detail.current_print.hash(&mut interaction);
@@ -1548,22 +1668,22 @@ impl LabApp {
             node_id,
             oracle_phase_id(self.oracle_phase()),
             usize::from(self.guide_navigation_locked()),
-            self.selected_option,
-            self.detail_request,
+            self.trading.selected_option,
+            self.trading.detail_request,
             interaction.finish(),
         )
     }
 
     pub(super) fn guide_navigation_locked(&self) -> bool {
-        self.oracle_form.is_some()
-            || self.trade_ticket.is_some()
-            || self.trade_confirmation_is_open()
-            || self.trade_submit_is_running()
-            || self.trade_result_modal_is_open()
+        self.oracle.form.is_some()
+            || self.trading.ticket.is_some()
+            || self.trading.confirmation_is_open()
+            || self.trading.submit_is_running()
+            || self.trading.result_modal_is_open()
             || self.wallet_switch_editing
-            || self.writer_form.is_some()
-            || self.writer_confirmation.is_some()
-            || self.writer_interaction_is_locked()
+            || self.writers.form.is_some()
+            || self.writers.confirmation.is_some()
+            || self.writers.interaction_is_locked()
             || self.liquidity_preview_form.is_some()
             || self.liquidity_preview_is_running()
             || self.staking_form.is_some()
@@ -1574,7 +1694,8 @@ impl LabApp {
     pub(super) fn guide_active_challenges(&self) -> Vec<guide::GuideChallengeSnapshot> {
         let mut challenges = Vec::new();
         if let Some(live) = self
-            .oracle_live
+            .oracle
+            .live
             .as_ref()
             .filter(|live| live.market_id.eq_ignore_ascii_case(&self.selected_id()))
         {
@@ -1612,7 +1733,7 @@ impl LabApp {
                 });
             }
         }
-        for record in self.oracle_submissions.iter().filter(|record| {
+        for record in self.oracle.submissions.iter().filter(|record| {
             record.title == "Challenge"
                 && record.update_state == Some(OracleUpdateState::Challenged)
         }) {
@@ -1662,7 +1783,7 @@ impl LabApp {
                 );
             }
             LabScreen::Home => {
-                if let Some(detail) = self.detail.as_ref() {
+                if let Some(detail) = self.trading.detail.as_ref() {
                     cues.push(format!(
                         "{} {} | month {} | settles {} | fixed max loss, no liquidation.",
                         detail.symbol,
@@ -1738,7 +1859,7 @@ impl LabApp {
                     "Chart sampling: {refresh}; show at most {} points. R requests a refresh now.",
                     args.points
                 ));
-                if let Some(chart) = self.chart.as_ref() {
+                if let Some(chart) = self.trading.chart.as_ref() {
                     cues.push(format!(
                         "{} | range {} | {} visible of {} stored points.",
                         chart.title(),
@@ -1755,7 +1876,7 @@ impl LabApp {
                 }
             }
             LabScreen::OracleIntro => {
-                let action = self.selected_oracle_intro_action();
+                let action = self.oracle.selected_intro_action();
                 cues.push(format!(
                     "Selected Oracle entry action: {} — {}",
                     action.label(),
@@ -1767,7 +1888,7 @@ impl LabApp {
                 );
             }
             LabScreen::Oracle => {
-                if self.oracle_view == OracleView::Earn {
+                if self.oracle.view == OracleView::Earn {
                     cues.push(
                         "Earn is the simple Oracle view: a funded-reward list for only the selected market and month, with exact reward amounts and claim status."
                             .to_string(),
@@ -1784,24 +1905,25 @@ impl LabApp {
                         );
                     }
                 } else {
-                    if self.oracle_search_editing {
+                    if self.oracle.search_editing {
                         cues.push(format!(
                             "Oracle search popup: local query is {}. The Guide may safely apply a source-tree search; it never submits evidence.",
-                            if self.oracle_search_input.trim().is_empty() {
+                            if self.oracle.search_input.trim().is_empty() {
                                 "empty".to_string()
                             } else {
-                                format!("\"{}\"", self.oracle_search_input.trim())
+                                format!("\"{}\"", self.oracle.search_input.trim())
                             }
                         ));
                     }
-                    if self.oracle_locked_flash.is_some_and(|flash| flash.visible) {
+                    if self.oracle.locked_flash.is_some_and(|flash| flash.visible) {
                         cues.push(
                             "A red flash means the selected action is unavailable in this phase."
                                 .to_string(),
                         );
                     }
                     if self
-                        .oracle_live
+                        .oracle
+                        .live
                         .as_ref()
                         .is_some_and(|live| live.active_emergency_count() > 0)
                     {
@@ -1844,16 +1966,16 @@ impl LabApp {
             }
             LabScreen::Help => match self.home_help_topic {
                 HomeHelpTopic::Overview => {
-                    if let Some(link) = self.current_help_link() {
+                    if let Some(link) = self.help.current_link() {
                         cues.push(format!(
                             "Help article: {} | source {}.",
                             link.title,
-                            self.help_index.source.label()
+                            self.help.index.source.label()
                         ));
                     }
-                    if let Some(preview) = self.help_preview.as_ref() {
+                    if let Some(preview) = self.help.preview.as_ref() {
                         let rows =
-                            gitbook::nav_rows(&self.help_index, &self.help_expanded_categories);
+                            gitbook::nav_rows(&self.help.index, &self.help.expanded_categories);
                         let row = rows.get(preview.nav_index);
                         let label = row
                             .map(|row| row.label.clone())
@@ -1867,7 +1989,8 @@ impl LabApp {
                                 let GitbookNavTarget::Page { category, page } = row?.target else {
                                     return None;
                                 };
-                                self.help_index
+                                self.help
+                                    .index
                                     .categories
                                     .get(category)?
                                     .pages
@@ -1880,7 +2003,7 @@ impl LabApp {
                             None => format!("Help preview open for {label}."),
                         });
                     }
-                    if let Some(glossary) = self.help_glossary_hover.as_ref() {
+                    if let Some(glossary) = self.help.glossary_hover.as_ref() {
                         cues.push(format!(
                             "Glossary popup: {} — {}",
                             glossary.term, glossary.definition
@@ -1895,13 +2018,13 @@ impl LabApp {
                 }
             },
             LabScreen::Detail => {
-                if self.detail_view == DetailView::Settlement {
-                    if self.loading_settlement {
+                if self.trading.detail_view == DetailView::Settlement {
+                    if self.trading.loading_settlement {
                         cues.push(
                             "The exact-month settlement record, readiness, and Oracle evidence are loading independently."
                                 .to_string(),
                         );
-                    } else if let Some(bundle) = self.settlement_bundle.as_ref() {
+                    } else if let Some(bundle) = self.trading.settlement_bundle.as_ref() {
                         cues.push(format!(
                             "Settlement evidence for {}/{}: {} of 3 independent reads available.",
                             bundle.market_id.to_uppercase(),
@@ -1916,7 +2039,7 @@ impl LabApp {
                         );
                     } else {
                         cues.push(
-                            self.settlement_issue
+                            self.trading.settlement_issue
                                 .as_deref()
                                 .map(crate::backend::terminal_safe_text)
                                 .unwrap_or_else(|| {
@@ -1925,7 +2048,7 @@ impl LabApp {
                                 }),
                         );
                     }
-                } else if let Some(detail) = self.detail.as_ref() {
+                } else if let Some(detail) = self.trading.detail.as_ref() {
                     cues.push(format!(
                         "{} market detail: {} | {} settles {} | cap width {}.",
                         detail.symbol,
@@ -1937,18 +2060,15 @@ impl LabApp {
                 }
             }
             LabScreen::Activity => {
-                if let Some(contract) =
-                    self.detail
-                        .as_ref()
-                        .zip(self.selected_quote())
-                        .map(|(detail, quote)| {
-                            guide_contract_snapshot(
-                                detail,
-                                quote,
-                                self.oracle_phase() == OraclePhase::GameMode,
-                            )
-                        })
-                {
+                if let Some(contract) = self.trading.detail.as_ref().zip(self.selected_quote()).map(
+                    |(detail, quote)| {
+                        guide_contract_snapshot(
+                            detail,
+                            quote,
+                            self.oracle_phase() == OraclePhase::GameMode,
+                        )
+                    },
+                ) {
                     cues.push(format!(
                         "Selected {} {} {} | bid {:?} | ask {:?} | depth {:?} | volume {:?}.",
                         contract.month,
@@ -2003,11 +2123,11 @@ impl LabApp {
                         );
                         cues.push(format!(
                             "Selected writer action: {} — {}",
-                            self.selected_writer_action().label(),
-                            self.selected_writer_action().detail()
+                            self.writers.selected_action().label(),
+                            self.writers.selected_action().detail()
                         ));
                         cues.push(self.writer_close_capability_cue());
-                        if let Some(form) = self.writer_form.as_ref() {
+                        if let Some(form) = self.writers.form.as_ref() {
                             cues.push(format!(
                                 "Writer form open: {}. The Guide may stage non-secret fields only; the user must {}.",
                                 form.action.label(),
@@ -2026,7 +2146,7 @@ impl LabApp {
                 }
             }
         }
-        if let Some(confirmation) = self.writer_confirmation.as_ref() {
+        if let Some(confirmation) = self.writers.confirmation.as_ref() {
             cues.push(format!(
                 "Writer confirmation open for {} with {} selected. Only the user may change the choice or activate it; the Guide cannot review, confirm, sign, or send.",
                 confirmation.action.label(),
@@ -2036,7 +2156,7 @@ impl LabApp {
                 }
             ));
         }
-        if let Some(result) = self.writer_action_result.as_ref() {
+        if let Some(result) = self.writers.action_result.as_ref() {
             if result.action == WriterAction::CloseStatus {
                 if result.ok {
                     if let Some(payload) = result.payload.as_ref() {
@@ -2069,7 +2189,8 @@ impl LabApp {
             }
         }
         if let Some(confirmation) = self
-            .trade_ticket
+            .trading
+            .ticket
             .as_ref()
             .and_then(|ticket| ticket.confirmation.as_ref())
         {
@@ -2083,7 +2204,7 @@ impl LabApp {
                 format_usd(summary.total_max_payout)
             ));
         }
-        if let Some(result) = self.trade_result_modal.as_ref() {
+        if let Some(result) = self.trading.result_modal.as_ref() {
             if result.waiting {
                 cues.push(
                     "Order result popup: waiting for current finalized state; no transaction target was prepared. The Guide cannot retry or send."
@@ -2154,7 +2275,8 @@ impl LabApp {
         if !self.guide.request_target_ids.contains(target_id) {
             return None;
         }
-        self.dishes
+        self.trading
+            .dishes
             .iter()
             .position(|dish| guide_market_target_id(&dish.id) == target_id)
     }
@@ -2179,6 +2301,7 @@ impl LabApp {
             guide::GuideTradeAction::Sell => TradeAction::Sell,
         };
         let detail = self
+            .trading
             .detail
             .as_ref()
             .filter(|detail| detail.id.eq_ignore_ascii_case(&self.selected_id()))?;
@@ -2201,9 +2324,9 @@ impl LabApp {
         if !self.guide_ui_target_was_offered(target_id)
             || self.screen != LabScreen::Ledger
             || self.ledger_view != LedgerView::Writers
-            || self.writer_form.is_some()
-            || self.writer_confirmation.is_some()
-            || self.writer_interaction_is_locked()
+            || self.writers.form.is_some()
+            || self.writers.confirmation.is_some()
+            || self.writers.interaction_is_locked()
         {
             return None;
         }
@@ -2272,6 +2395,7 @@ impl LabApp {
             return None;
         }
         let detail = self
+            .trading
             .detail
             .as_ref()
             .filter(|detail| detail.id.eq_ignore_ascii_case(&self.selected_id()))?;
@@ -2301,7 +2425,7 @@ impl LabApp {
                 .iter()
                 .position(|candidate| *candidate == action)
             {
-                self.oracle_selected = index;
+                self.oracle.selected = index;
             }
             self.set_focus(LabFocus::OracleActions);
             self.guide.focused_control = None;
@@ -2352,6 +2476,7 @@ impl LabApp {
             "surface:connect-agents" => self.open_home_help(HomeHelpTopic::Agents, fetch_tx),
             _ if target_id.starts_with("month:") => {
                 let index = self
+                    .trading
                     .detail
                     .as_ref()
                     .filter(|detail| detail.id.eq_ignore_ascii_case(&self.selected_id()))
@@ -2385,7 +2510,8 @@ impl LabApp {
             }
             _ if target_id.starts_with("help-page:") => {
                 let link = self
-                    .help_index
+                    .help
+                    .index
                     .categories
                     .iter()
                     .flat_map(|category| category.pages.iter())
@@ -2395,15 +2521,15 @@ impl LabApp {
                         "That help topic is no longer available. Nothing changed.".to_string()
                     })?;
                 self.open_home_help(HomeHelpTopic::Overview, fetch_tx);
-                self.help_selected_page_id = link.id.clone();
-                if !self.help_pages.contains_key(&link.id)
+                self.help.selected_page_id = link.id.clone();
+                if !self.cache.help_pages().contains_key(&link.id)
                     && let Some(page) = gitbook::bundled_page(&link)
                 {
                     self.cache_help_page(link.id.clone(), page);
                 }
-                self.sync_help_nav_selection();
-                self.help_pane = HelpPane::Article;
-                self.help_article_scroll = 0;
+                self.help.sync_nav_selection();
+                self.help.pane = HelpPane::Article;
+                self.help.article_scroll = 0;
                 self.request_current_help_page(fetch_tx, true);
             }
             _ => {
@@ -2433,7 +2559,7 @@ impl LabApp {
             return Err("That contract could not be selected. Nothing changed.".to_string());
         }
         self.select_trade_action(action);
-        let Some(ticket) = self.trade_ticket.as_mut() else {
+        let Some(ticket) = self.trading.ticket.as_mut() else {
             return Err(
                 "Petri could not open that reviewable ticket. Nothing changed.".to_string(),
             );
@@ -2446,7 +2572,7 @@ impl LabApp {
         }
         ticket.field = TradeTicketField::Quantity;
         ticket.clear_review();
-        self.trade_ticket_field_flash = None;
+        self.trading.ticket_field_flash = None;
         self.guide.focused_control = Some("control:trade:review".to_string());
         self.status = "Ticket staged. Check price and contracts; press Enter yourself to prepare the exact trade. Review its gross input, net minimum output, and costs before approving."
             .to_string();
@@ -2473,11 +2599,11 @@ impl LabApp {
             .iter()
             .position(|candidate| *candidate == action)
         {
-            self.oracle_selected = index;
+            self.oracle.selected = index;
         }
         self.set_focus(LabFocus::OracleActions);
-        self.oracle_form = Some(form);
-        self.oracle_form_field_flash = None;
+        self.oracle.form = Some(form);
+        self.oracle.form_field_flash = None;
         self.guide.focused_control = Some("control:oracle:queue-draft".to_string());
         self.status =
             "Evidence form staged. Check every source and archive field; press Enter to queue the local draft yourself."
@@ -2507,13 +2633,13 @@ impl LabApp {
                     .to_string()
             })?;
         apply_guide_writer_fields(&mut form, fields)?;
-        self.writer_action_selected = WriterAction::ALL
+        self.writers.action_selected = WriterAction::ALL
             .iter()
             .position(|candidate| *candidate == action)
-            .unwrap_or(self.writer_action_selected);
+            .unwrap_or(self.writers.action_selected);
         self.ledger_pane = LedgerPane::Detail;
-        self.writer_form = Some(form);
-        self.writer_action_result = None;
+        self.writers.form = Some(form);
+        self.writers.action_result = None;
         let (control, instruction) = if action.signs_and_submits() {
             (
                 "control:writer:review",
@@ -2546,7 +2672,8 @@ impl LabApp {
         if target_id == "form:trade-ticket" {
             let (price, quantity) = validate_guide_trade_fields(fields)?;
             let mut ticket = self
-                .trade_ticket
+                .trading
+                .ticket
                 .clone()
                 .filter(|ticket| ticket.confirmation.is_none() && !ticket.submitting)
                 .ok_or_else(|| {
@@ -2561,37 +2688,38 @@ impl LabApp {
             }
             ticket.field = TradeTicketField::Quantity;
             ticket.clear_review();
-            self.trade_ticket = Some(ticket);
+            self.trading.ticket = Some(ticket);
             self.guide.focused_control = Some("control:trade:review".to_string());
             self.status = "Ticket fields staged. Press Enter yourself to prepare the exact trade; signing requires your separate confirmation."
                 .to_string();
             return Ok(());
         }
-        let current_form_id = self.oracle_form.as_ref().map(guide_oracle_form_id);
+        let current_form_id = self.oracle.form.as_ref().map(guide_oracle_form_id);
         if current_form_id.as_deref() == Some(target_id) {
-            let mut form = self.oracle_form.clone().expect("form id requires form");
+            let mut form = self.oracle.form.clone().expect("form id requires form");
             apply_guide_oracle_fields(&mut form, fields)?;
-            self.oracle_form = Some(form);
+            self.oracle.form = Some(form);
             self.guide.focused_control = Some("control:oracle:queue-draft".to_string());
             self.status = "Evidence fields staged. Press Enter to queue the local draft yourself."
                 .to_string();
             return Ok(());
         }
-        let current_writer_form_id = self.writer_form.as_ref().map(guide_writer_form_id);
+        let current_writer_form_id = self.writers.form.as_ref().map(guide_writer_form_id);
         if current_writer_form_id.as_deref() == Some(target_id) {
-            if self.writer_confirmation.is_some() || self.writer_interaction_is_locked() {
+            if self.writers.confirmation.is_some() || self.writers.interaction_is_locked() {
                 return Err(
                     "The writer action is already in final review or running, so its fields were not changed."
                         .to_string(),
                 );
             }
             let mut form = self
-                .writer_form
+                .writers
+                .form
                 .clone()
                 .expect("form id requires writer form");
             apply_guide_writer_fields(&mut form, fields)?;
             let action = form.action;
-            self.writer_form = Some(form);
+            self.writers.form = Some(form);
             let (control, instruction) = if action.signs_and_submits() {
                 (
                     "control:writer:review",
@@ -2635,19 +2763,19 @@ impl LabApp {
         }
         match target_id {
             "control:trade:review" => {
-                let Some(ticket) = self.trade_ticket.as_mut() else {
+                let Some(ticket) = self.trading.ticket.as_mut() else {
                     return Err("The trade ticket is no longer open. Nothing changed.".to_string());
                 };
                 if ticket.confirmation.is_some() || ticket.submitting {
                     return Err("The ticket is already past review. Nothing changed.".to_string());
                 }
                 ticket.field = TradeTicketField::Quantity;
-                self.flash_trade_ticket_field(TradeTicketField::Quantity);
+                self.trading.flash_ticket_field(TradeTicketField::Quantity);
                 self.status = "Review is highlighted. Press Enter yourself to prepare the exact trade, then review and explicitly approve its amounts."
                     .to_string();
             }
             "control:trade:confirm" => {
-                if !self.trade_confirmation_is_open() {
+                if !self.trading.confirmation_is_open() {
                     return Err(
                         "Order confirmation is no longer open. Nothing changed.".to_string()
                     );
@@ -2656,22 +2784,23 @@ impl LabApp {
             }
             "control:oracle:queue-draft" => {
                 let last_editable = self
-                    .oracle_form
+                    .oracle
+                    .form
                     .as_ref()
                     .and_then(|form| form.fields.iter().rposition(|field| field.editable));
                 if let Some(index) = last_editable {
                     self.select_oracle_form_field_index(index);
-                } else if self.oracle_form.is_none() {
+                } else if self.oracle.form.is_none() {
                     return Err("The Oracle form is no longer open. Nothing changed.".to_string());
                 }
                 self.status = "Queue local draft is highlighted. Press Enter yourself after checking the evidence."
                     .to_string();
             }
             "control:writer:review" | "control:writer:run" => {
-                let Some(form) = self.writer_form.as_mut() else {
+                let Some(form) = self.writers.form.as_mut() else {
                     return Err("The writer form is no longer open. Nothing changed.".to_string());
                 };
-                if self.writer_confirmation.is_some() || self.writer_action_inflight.is_some() {
+                if self.writers.confirmation.is_some() || self.writers.action_inflight.is_some() {
                     return Err(
                         "The writer action is already past field review. Nothing changed."
                             .to_string(),
@@ -2701,7 +2830,7 @@ impl LabApp {
                 };
             }
             "control:writer:confirm" => {
-                let Some(confirmation) = self.writer_confirmation.as_ref() else {
+                let Some(confirmation) = self.writers.confirmation.as_ref() else {
                     return Err(
                         "The writer confirmation is no longer open. Nothing changed.".to_string(),
                     );
@@ -2897,7 +3026,7 @@ impl LabApp {
             }
             guide::GuideCommand::SearchOracle { query } => {
                 if self.screen != LabScreen::Oracle
-                    || self.oracle_view != OracleView::Advanced
+                    || self.oracle.view != OracleView::Advanced
                     || self.oracle_tree().is_none()
                 {
                     return Err(
@@ -2905,8 +3034,8 @@ impl LabApp {
                             .to_string(),
                     );
                 }
-                self.oracle_search_input = query.clone();
-                self.oracle_search_editing = false;
+                self.oracle.search_input = query.clone();
+                self.oracle.search_editing = false;
                 self.apply_oracle_search();
                 Ok(())
             }
@@ -2915,16 +3044,17 @@ impl LabApp {
                     "That market was not offered for this Guide request. Nothing changed."
                         .to_string()
                 })?;
-                let market_id = self.dishes[index].id.clone();
+                let market_id = self.trading.dishes[index].id.clone();
                 if !self.select_market_index(index, backend_url, fetch_tx) {
                     return Err("That market is no longer available. Nothing changed.".to_string());
                 }
                 self.open_chain();
                 let detail_is_ready = self
+                    .trading
                     .detail
                     .as_ref()
                     .is_some_and(|detail| detail.id.eq_ignore_ascii_case(&market_id));
-                if !detail_is_ready && !self.loading_detail {
+                if !detail_is_ready && !self.trading.loading_detail {
                     self.request_selected_detail(backend_url, fetch_tx, false);
                 }
                 self.status = if detail_is_ready {
@@ -3106,8 +3236,8 @@ impl LabApp {
         fetch_tx: &Sender<LabFetchResult>,
         focus: LabFocus,
     ) {
-        self.oracle_search_input.clear();
-        self.oracle_search_editing = false;
+        self.oracle.search_input.clear();
+        self.oracle.search_editing = false;
         self.open_oracle(backend_url, fetch_tx);
         self.select_oracle_node(index);
         self.set_focus(focus);

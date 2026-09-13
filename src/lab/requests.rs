@@ -9,19 +9,20 @@ impl LabApp {
         fetch_tx: &Sender<LabFetchResult>,
     ) {
         if self.screen != LabScreen::Oracle
-            || self.loading_oracle_tree
-            || self.oracle_tree_issue.is_none()
+            || self.oracle.loading_tree
+            || self.oracle.tree_issue.is_none()
         {
             return;
         }
         if !self
-            .oracle_tree_issue
+            .oracle
+            .tree_issue
             .as_deref()
             .is_some_and(oracle_tree_issue_is_retryable)
         {
             return;
         }
-        let Some(retry_after_tick) = self.oracle_tree_retry_after_tick else {
+        let Some(retry_after_tick) = self.oracle.tree_retry_after_tick else {
             return;
         };
         if self.spinner_tick < retry_after_tick {
@@ -35,10 +36,14 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        self.list_request = self.list_request.wrapping_add(1);
-        self.loading_list = true;
+        self.trading.list_request = self.trading.list_request.wrapping_add(1);
+        self.trading.loading_list = true;
         self.status = "Loading live markets...".to_string();
-        spawn_market_list_fetch(backend_url.to_string(), fetch_tx.clone(), self.list_request);
+        spawn_market_list_fetch(
+            backend_url.to_string(),
+            fetch_tx.clone(),
+            self.trading.list_request,
+        );
     }
 
     pub(super) fn request_market_refresh(
@@ -50,10 +55,10 @@ impl LabApp {
         self.invalidate_market_caches();
         if self.screen == LabScreen::Home {
             self.request_market_list(backend_url, fetch_tx);
-            if !self.dishes.is_empty() {
+            if !self.trading.dishes.is_empty() {
                 self.request_selected_detail(backend_url, fetch_tx, true);
             }
-        } else if self.dishes.is_empty() {
+        } else if self.trading.dishes.is_empty() {
             self.request_market_list(backend_url, fetch_tx);
         } else {
             self.request_selected_detail(backend_url, fetch_tx, true);
@@ -69,17 +74,17 @@ impl LabApp {
         self.ensure_read_cache_scope(backend_url);
         let market_id = self.selected_id();
         if force {
-            self.detail_cache.remove(&market_id);
+            self.cache.details_mut().remove(&market_id);
         }
         if !force {
-            if let Some(detail) = self.detail_cache.get(&market_id).cloned() {
-                self.detail = Some(detail);
+            if let Some(detail) = self.cache.details().get(&market_id).cloned() {
+                self.trading.detail = Some(detail);
                 if self.screen == LabScreen::Chart {
                     self.apply_initial_chart_expiry();
                 }
-                self.sync_selected_expiry();
-                self.clamp_selected_option();
-                self.loading_detail = false;
+                self.trading.sync_selected_expiry();
+                self.trading.clamp_selected_option();
+                self.trading.loading_detail = false;
                 self.status = format!("{} market ready", market_id.to_uppercase());
                 match self.screen {
                     LabScreen::Chart => self.request_chart(backend_url, fetch_tx, false),
@@ -96,9 +101,11 @@ impl LabApp {
         }
 
         if !read_cache::begin_cached_read(
-            self.detail_cache.begin_fetch(market_id.clone(), force),
-            &mut self.detail_request,
-            &mut self.loading_detail,
+            self.cache
+                .details_mut()
+                .begin_fetch(market_id.clone(), force),
+            &mut self.trading.detail_request,
+            &mut self.trading.loading_detail,
         ) {
             return;
         }
@@ -110,7 +117,7 @@ impl LabApp {
         spawn_detail_fetch(
             backend_url.to_string(),
             fetch_tx.clone(),
-            self.detail_request,
+            self.trading.detail_request,
             market_id,
         );
     }
@@ -125,7 +132,7 @@ impl LabApp {
         let args = self.chart_args();
         let key = chart_cache_key(&args);
         if force {
-            self.chart_cache.remove(&key);
+            self.cache.charts_mut().remove(&key);
         }
         let month_label = self
             .selected_chart_expiry()
@@ -133,11 +140,11 @@ impl LabApp {
             .unwrap_or_else(|| "selected month".to_string());
 
         if !force {
-            if let Some(chart) = self.chart_cache.get(&key).cloned() {
+            if let Some(chart) = self.cache.charts().get(&key).cloned() {
                 let points = chart.point_count();
-                self.chart = Some(chart);
-                self.loading_chart = false;
-                self.chart_last_refresh_at = Some(Instant::now());
+                self.trading.chart = Some(chart);
+                self.trading.loading_chart = false;
+                self.trading.chart_last_refresh_at = Some(Instant::now());
                 self.status = format!(
                     "{} {} chart ready ({points} points)",
                     args.market.to_uppercase(),
@@ -147,13 +154,13 @@ impl LabApp {
             }
         }
 
-        if !self.chart_cache.contains_key(&key) {
-            self.chart = None;
+        if !self.cache.charts().contains_key(&key) {
+            self.trading.chart = None;
         }
         if !read_cache::begin_cached_read(
-            self.chart_cache.begin_fetch(key.clone(), force),
-            &mut self.chart_request,
-            &mut self.loading_chart,
+            self.cache.charts_mut().begin_fetch(key.clone(), force),
+            &mut self.trading.chart_request,
+            &mut self.trading.loading_chart,
         ) {
             return;
         }
@@ -173,7 +180,7 @@ impl LabApp {
         spawn_chart_fetch(
             backend_url.to_string(),
             fetch_tx.clone(),
-            self.chart_request,
+            self.trading.chart_request,
             key,
             args.market.clone(),
             month_label,
@@ -189,37 +196,37 @@ impl LabApp {
     ) {
         self.ensure_read_cache_scope(backend_url);
         let Some((market_id, expiry_id)) = self.selected_settlement_identity() else {
-            self.loading_settlement = false;
-            self.settlement_bundle = None;
-            self.settlement_issue =
+            self.trading.loading_settlement = false;
+            self.trading.settlement_bundle = None;
+            self.trading.settlement_issue =
                 Some("Select a listed month before opening settlement evidence.".to_string());
             self.status = "Select a listed month before opening settlement evidence.".to_string();
             return;
         };
         let key = (market_id.clone(), expiry_id.clone());
         if refresh {
-            self.settlement_cache.remove(&key);
+            self.cache.settlements_mut().remove(&key);
         }
-        if !refresh && let Some(bundle) = self.settlement_cache.get(&key).cloned() {
-            self.settlement_bundle = Some(bundle);
-            self.settlement_issue = None;
-            self.loading_settlement = false;
+        if !refresh && let Some(bundle) = self.cache.settlements().get(&key).cloned() {
+            self.trading.settlement_bundle = Some(bundle);
+            self.trading.settlement_issue = None;
+            self.trading.loading_settlement = false;
             self.status = "Settlement evidence ready.".to_string();
             return;
         }
         if !read_cache::begin_cached_read(
-            self.settlement_cache.begin_fetch(key, refresh),
-            &mut self.settlement_request,
-            &mut self.loading_settlement,
+            self.cache.settlements_mut().begin_fetch(key, refresh),
+            &mut self.trading.settlement_request,
+            &mut self.trading.loading_settlement,
         ) {
             return;
         }
-        self.settlement_issue = None;
+        self.trading.settlement_issue = None;
         self.status = format!("Loading settlement evidence for {expiry_id}...");
         spawn_settlement_fetch(
             backend_url.to_string(),
             fetch_tx.clone(),
-            self.settlement_request,
+            self.trading.settlement_request,
             market_id,
             expiry_id,
         );
@@ -234,7 +241,8 @@ impl LabApp {
             .selected_chart_expiry()
             .map(|expiry| expiry.id.clone())
             .or_else(|| {
-                self.detail
+                self.trading
+                    .detail
                     .as_ref()
                     .map(|detail| detail.expiry_id.clone())
                     .filter(|expiry| !expiry.is_empty() && expiry != "-")
@@ -277,15 +285,15 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.writer_interaction_is_locked() {
+        if self.writers.interaction_is_locked() {
             return;
         }
-        self.writer_action_request = self.writer_action_request.wrapping_add(1);
+        self.writers.action_request = self.writers.action_request.wrapping_add(1);
         self.clear_writer_close_capability();
         spawn_writer_capabilities_fetch(
             backend_url.to_string(),
             fetch_tx.clone(),
-            self.writer_action_request,
+            self.writers.action_request,
         );
     }
 
@@ -336,27 +344,29 @@ impl LabApp {
         let market_id = self.selected_id();
         if !force
             && self
-                .oracle_tree
+                .oracle
+                .tree
                 .as_ref()
                 .map(|tree| tree.market_id.eq_ignore_ascii_case(&market_id))
                 .unwrap_or(false)
         {
-            self.loading_oracle_tree = false;
+            self.oracle.loading_tree = false;
             return;
         }
 
         if self
-            .oracle_tree
+            .oracle
+            .tree
             .as_ref()
             .is_some_and(|tree| !tree.market_id.eq_ignore_ascii_case(&market_id))
         {
-            self.oracle_tree = None;
-            self.oracle_node_selected = DEFAULT_ORACLE_NODE_INDEX;
+            self.oracle.tree = None;
+            self.oracle.node_selected = DEFAULT_ORACLE_NODE_INDEX;
         }
-        self.oracle_tree_request = self.oracle_tree_request.wrapping_add(1);
-        self.loading_oracle_tree = true;
-        self.oracle_tree_issue = None;
-        self.oracle_tree_retry_after_tick = None;
+        self.oracle.tree_request = self.oracle.tree_request.wrapping_add(1);
+        self.oracle.loading_tree = true;
+        self.oracle.tree_issue = None;
+        self.oracle.tree_retry_after_tick = None;
         self.status = format!(
             "Loading {} oracle source recipe...",
             market_id.to_uppercase()
@@ -364,7 +374,7 @@ impl LabApp {
         spawn_oracle_tree_fetch(
             backend_url.to_string(),
             fetch_tx.clone(),
-            self.oracle_tree_request,
+            self.oracle.tree_request,
             market_id,
         );
     }
@@ -377,36 +387,36 @@ impl LabApp {
     ) {
         let market_id = self.selected_id();
         let Some(expiry_id) = self.selected_chart_expiry().map(|expiry| expiry.id.clone()) else {
-            self.oracle_live = None;
-            self.oracle_live_issue =
+            self.oracle.live = None;
+            self.oracle.live_issue =
                 Some("Select a monthly series to load oracle evidence.".into());
-            self.loading_oracle_live = false;
+            self.oracle.loading_live = false;
             return;
         };
         if !force
-            && self.oracle_live.as_ref().is_some_and(|state| {
+            && self.oracle.live.as_ref().is_some_and(|state| {
                 state.market_id.eq_ignore_ascii_case(&market_id)
                     && state.expiry_id.eq_ignore_ascii_case(&expiry_id)
             })
         {
-            self.loading_oracle_live = false;
+            self.oracle.loading_live = false;
             return;
         }
 
-        if self.oracle_live.as_ref().is_some_and(|state| {
+        if self.oracle.live.as_ref().is_some_and(|state| {
             !state.market_id.eq_ignore_ascii_case(&market_id)
                 || !state.expiry_id.eq_ignore_ascii_case(&expiry_id)
         }) {
-            self.oracle_live = None;
-            self.oracle_live_issue = None;
+            self.oracle.live = None;
+            self.oracle.live_issue = None;
         }
-        self.oracle_live_request = self.oracle_live_request.wrapping_add(1);
-        self.loading_oracle_live = true;
-        self.oracle_live_issue = None;
+        self.oracle.live_request = self.oracle.live_request.wrapping_add(1);
+        self.oracle.loading_live = true;
+        self.oracle.live_issue = None;
         spawn_oracle_live_fetch(
             backend_url.to_string(),
             fetch_tx.clone(),
-            self.oracle_live_request,
+            self.oracle.live_request,
             market_id,
             expiry_id,
         );
@@ -420,46 +430,46 @@ impl LabApp {
     ) {
         let market_id = self.selected_id();
         let Some(expiry_id) = self.selected_chart_expiry().map(|expiry| expiry.id.clone()) else {
-            self.oracle_rewards = None;
-            self.oracle_reward_issue = None;
-            self.loading_oracle_rewards = false;
+            self.oracle.rewards = None;
+            self.oracle.reward_issue = None;
+            self.oracle.loading_rewards = false;
             self.clamp_oracle_selection();
             return;
         };
         let Some(owner_pubkey) = self.wallet.pubkey.clone() else {
-            self.oracle_rewards = None;
-            self.oracle_reward_issue = None;
-            self.loading_oracle_rewards = false;
+            self.oracle.rewards = None;
+            self.oracle.reward_issue = None;
+            self.oracle.loading_rewards = false;
             self.clamp_oracle_selection();
             return;
         };
         if !force
-            && self.oracle_rewards.as_ref().is_some_and(|state| {
+            && self.oracle.rewards.as_ref().is_some_and(|state| {
                 state.market_id.eq_ignore_ascii_case(&market_id)
                     && state.expiry_id.eq_ignore_ascii_case(&expiry_id)
                     && state.owner_pubkey == owner_pubkey
             })
         {
-            self.loading_oracle_rewards = false;
+            self.oracle.loading_rewards = false;
             return;
         }
 
-        if self.oracle_rewards.as_ref().is_some_and(|state| {
+        if self.oracle.rewards.as_ref().is_some_and(|state| {
             !state.market_id.eq_ignore_ascii_case(&market_id)
                 || !state.expiry_id.eq_ignore_ascii_case(&expiry_id)
                 || state.owner_pubkey != owner_pubkey
         }) {
-            self.oracle_rewards = None;
-            self.oracle_reward_issue = None;
+            self.oracle.rewards = None;
+            self.oracle.reward_issue = None;
             self.clamp_oracle_selection();
         }
-        self.oracle_reward_request = self.oracle_reward_request.wrapping_add(1);
-        self.loading_oracle_rewards = true;
-        self.oracle_reward_issue = None;
+        self.oracle.reward_request = self.oracle.reward_request.wrapping_add(1);
+        self.oracle.loading_rewards = true;
+        self.oracle.reward_issue = None;
         spawn_oracle_rewards_fetch(
             backend_url.to_string(),
             fetch_tx.clone(),
-            self.oracle_reward_request,
+            self.oracle.reward_request,
             market_id,
             expiry_id,
             owner_pubkey,
@@ -564,14 +574,15 @@ impl LabApp {
                     mut submit,
                     result,
                 } => {
-                    if self.trade_submit_inflight != Some(request_id) {
+                    if self.trading.submit_inflight != Some(request_id) {
                         continue;
                     }
-                    self.trade_submit_inflight = None;
+                    self.trading.submit_inflight = None;
                     let scope_matches = self.wallet.pubkey.as_deref() == Some(owner.as_str())
                         && self.selected_chart_expiry().is_some_and(|e| e.id == expiry);
                     if let Some(ticket) = self
-                        .trade_ticket
+                        .trading
+                        .ticket
                         .as_mut()
                         .filter(|t| t.submit_request_id == Some(request_id))
                     {
@@ -603,7 +614,7 @@ impl LabApp {
                                                 &payload,
                                             ),
                                         });
-                                        self.trade_review_scroll = 0;
+                                        self.trading.review_scroll = 0;
                                         ticket.confirmation = Some(TradeConfirmation {
                                             prepared: submit,
                                             choice: TradeConfirmationChoice::Cancel,
@@ -632,7 +643,7 @@ impl LabApp {
                     result,
                 } => {
                     let confirmed =
-                        result.is_ok() && self.trade_submit_inflight == Some(request_id);
+                        result.is_ok() && self.trading.submit_inflight == Some(request_id);
                     self.apply_trade_submit_result_at(
                         request_id,
                         action,
@@ -792,31 +803,9 @@ impl LabApp {
         request_id: u64,
         result: Result<WorkspaceUpdateReport, String>,
     ) {
-        if request_id != self.update_check_request {
-            return;
+        if let Some(status) = self.updates.apply(request_id, result) {
+            self.status = status;
         }
-        self.loading_update_check = false;
-        match result {
-            Ok(report) => {
-                let announce = self.update_check_forced
-                    || report.update_available
-                    || report.rebuild_required
-                    || report.blocked;
-                self.update_report = Some(report);
-                self.update_issue = None;
-                if announce {
-                    self.status = tui_update_status_text(self);
-                }
-            }
-            Err(error) => {
-                if self.update_check_forced {
-                    self.status = error.clone();
-                }
-                self.update_report = None;
-                self.update_issue = Some(error);
-            }
-        }
-        self.update_check_forced = false;
     }
 
     pub(super) fn apply_market_list_result(
@@ -826,39 +815,42 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if request_id != self.list_request {
+        if request_id != self.trading.list_request {
             return;
         }
-        self.loading_list = false;
+        self.trading.loading_list = false;
         match result {
             Ok(payload) => {
                 let next_dishes = extract_dish_summaries(&payload, "payload");
                 self.issues = string_array(&payload, &["issues"]);
                 if !next_dishes.is_empty() {
-                    let preferred = self
-                        .pending_initial_dish
-                        .take()
-                        .or_else(|| self.dishes.get(self.selected).map(|dish| dish.id.clone()));
-                    self.dishes = next_dishes;
-                    self.selected = preferred
+                    let preferred = self.trading.pending_initial_dish.take().or_else(|| {
+                        self.trading
+                            .dishes
+                            .get(self.trading.selected)
+                            .map(|dish| dish.id.clone())
+                    });
+                    self.trading.dishes = next_dishes;
+                    self.trading.selected = preferred
                         .as_deref()
                         .and_then(|market_id| {
-                            self.dishes
+                            self.trading
+                                .dishes
                                 .iter()
                                 .position(|dish| dish.id.eq_ignore_ascii_case(market_id))
                         })
                         .unwrap_or(0);
                 }
-                if self.detail.is_none() && !self.loading_detail {
+                if self.trading.detail.is_none() && !self.trading.loading_detail {
                     self.request_selected_detail(backend_url, fetch_tx, false);
-                } else if !self.loading_detail && !self.loading_chart {
+                } else if !self.trading.loading_detail && !self.trading.loading_chart {
                     self.status = "Markets ready".to_string();
                 }
             }
             Err(error) => {
                 self.issues.push(format!("market list: {error}"));
-                if !self.loading_detail && !self.loading_chart {
-                    self.status = if self.dishes.is_empty() {
+                if !self.trading.loading_detail && !self.trading.loading_chart {
+                    self.status = if self.trading.dishes.is_empty() {
                         "Market list could not load. Press r to retry.".to_string()
                     } else {
                         "Market refresh failed; showing last loaded markets.".to_string()
@@ -876,23 +868,25 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if request_id != self.detail_request {
+        if request_id != self.trading.detail_request {
             return;
         }
-        self.detail_cache.finish_fetch(&market_id);
+        self.cache.details_mut().finish_fetch(&market_id);
         let is_current = self.selected_id().eq_ignore_ascii_case(&market_id);
         match result {
             Ok(detail) => {
-                if request_id == self.detail_request && is_current {
-                    self.loading_detail = false;
-                    self.detail_cache.insert(market_id.clone(), detail.clone());
-                    self.detail = Some(detail);
+                if request_id == self.trading.detail_request && is_current {
+                    self.trading.loading_detail = false;
+                    self.cache
+                        .details_mut()
+                        .insert(market_id.clone(), detail.clone());
+                    self.trading.detail = Some(detail);
                     if self.screen == LabScreen::Chart {
                         self.apply_initial_chart_expiry();
                     }
-                    self.sync_selected_expiry();
-                    self.clamp_selected_option();
-                    self.status = current_detail_status(&market_id, self.detail.as_ref());
+                    self.trading.sync_selected_expiry();
+                    self.trading.clamp_selected_option();
+                    self.status = current_detail_status(&market_id, self.trading.detail.as_ref());
                     match self.screen {
                         LabScreen::Chart => self.request_chart(backend_url, fetch_tx, false),
                         LabScreen::Chain | LabScreen::Oracle => {
@@ -907,13 +901,13 @@ impl LabApp {
                 }
             }
             Err(_error) => {
-                if request_id == self.detail_request && is_current {
-                    self.loading_detail = false;
-                    if self.detail.is_none() {
-                        self.selected_option = 0;
-                        self.active_option_kind = OptionKind::Call;
-                        self.chart_expiry = 0;
-                        self.chart = None;
+                if request_id == self.trading.detail_request && is_current {
+                    self.trading.loading_detail = false;
+                    if self.trading.detail.is_none() {
+                        self.trading.selected_option = 0;
+                        self.trading.active_option_kind = OptionKind::Call;
+                        self.trading.chart_expiry = 0;
+                        self.trading.chart = None;
                     }
                     self.status = format!("{} market could not load", market_id.to_uppercase());
                     let pending_matches = self
@@ -950,28 +944,28 @@ impl LabApp {
         result: Result<chart::EmbeddedChart, String>,
     ) {
         // Invalidation/refresh fences older jobs before they can refill storage.
-        if request_id != self.chart_request {
+        if request_id != self.trading.chart_request {
             return;
         }
-        self.chart_cache.finish_fetch(&key);
+        self.cache.charts_mut().finish_fetch(&key);
         let current_key = chart_cache_key(&self.chart_args());
-        let is_current = request_id == self.chart_request
+        let is_current = request_id == self.trading.chart_request
             && key == current_key
             && self.screen == LabScreen::Chart;
         if is_current {
-            self.chart_last_refresh_at = Some(Instant::now());
+            self.trading.chart_last_refresh_at = Some(Instant::now());
         }
         match result {
             Ok(chart) => {
                 let points = chart.point_count();
                 if points == 0 {
-                    self.chart_cache.remove(&key);
+                    self.cache.charts_mut().remove(&key);
                 } else {
-                    self.chart_cache.insert(key, chart.clone());
+                    self.cache.charts_mut().insert(key, chart.clone());
                 }
                 if is_current {
-                    self.loading_chart = false;
-                    self.chart = Some(chart);
+                    self.trading.loading_chart = false;
+                    self.trading.chart = Some(chart);
                     self.status = if points == 0 {
                         format!(
                             "No {} {} chart history yet. Try a wider range or another listed month.",
@@ -989,8 +983,8 @@ impl LabApp {
             }
             Err(_error) => {
                 if is_current {
-                    self.loading_chart = false;
-                    self.chart = None;
+                    self.trading.loading_chart = false;
+                    self.trading.chart = None;
                     self.status = format!(
                         "{} {} chart could not load",
                         market_id.to_uppercase(),
@@ -1028,7 +1022,7 @@ impl LabApp {
         request_id: u64,
         result: Result<WriterCloseCapabilityProjection, String>,
     ) {
-        if request_id != self.writer_action_request || self.writer_action_inflight.is_some() {
+        if request_id != self.writers.action_request || self.writers.action_inflight.is_some() {
             return;
         }
         self.store_writer_close_capability(result);
@@ -1042,15 +1036,15 @@ impl LabApp {
         sleeve: String,
         result: Result<WriterActionMask, String>,
     ) {
-        if self.writer_action_mask_inflight != Some(request_id) {
+        if self.writers.action_mask_inflight != Some(request_id) {
             return;
         }
-        self.writer_action_mask_inflight = None;
-        let Some(mut pending) = self.pending_writer_review.take() else {
+        self.writers.action_mask_inflight = None;
+        let Some(mut pending) = self.writers.pending_review.take() else {
             return;
         };
         if let Err(error) = crate::current_release::require_current_write_release() {
-            self.writer_confirmation = None;
+            self.writers.confirmation = None;
             self.status = error.to_string();
             return;
         }
@@ -1059,7 +1053,7 @@ impl LabApp {
             && pending.sleeve == sleeve
             && self.wallet.pubkey.as_deref() == Some(owner.as_str())
             && self.selected_writer_sleeve_address().as_deref() == Some(sleeve.as_str())
-            && self.writer_form.as_ref() == Some(&pending.form);
+            && self.writers.form.as_ref() == Some(&pending.form);
         if !still_bound {
             self.status = "Wallet, sleeve, or writer form changed while availability was checked. Review again; nothing was signed or sent."
                 .to_string();
@@ -1092,7 +1086,7 @@ impl LabApp {
             mask.observed_slot,
             mask.observed_at.to_rfc3339(),
         ));
-        self.writer_confirmation = Some(pending.confirmation);
+        self.writers.confirmation = Some(pending.confirmation);
         self.status = "Wallet-specific availability was verified. Review the values; execution rechecks finalized runtime permission. Nothing was signed or sent."
             .to_string();
     }
@@ -1104,12 +1098,13 @@ impl LabApp {
         expiry_id: String,
         bundle: settlement_data::SettlementBundle,
     ) {
-        if request_id != self.settlement_request {
+        if request_id != self.trading.settlement_request {
             return;
         }
-        self.settlement_cache
+        self.cache
+            .settlements_mut()
             .finish_fetch(&(market_id.clone(), expiry_id.clone()));
-        self.loading_settlement = false;
+        self.trading.loading_settlement = false;
         let selection_matches = self
             .selected_settlement_identity()
             .is_some_and(|selection| selection == (market_id.clone(), expiry_id.clone()));
@@ -1120,8 +1115,8 @@ impl LabApp {
             return;
         }
         if bundle.cache_key() != (market_id.as_str(), expiry_id.as_str()) {
-            self.settlement_bundle = None;
-            self.settlement_issue = Some(
+            self.trading.settlement_bundle = None;
+            self.trading.settlement_issue = Some(
                 "Settlement evidence did not match the exact selected market and month."
                     .to_string(),
             );
@@ -1131,12 +1126,13 @@ impl LabApp {
         let available = bundle.available_endpoint_count();
         let issues = bundle.issue_count();
         if issues == 0 {
-            self.settlement_cache
+            self.cache
+                .settlements_mut()
                 .insert((market_id, expiry_id), bundle.clone());
         }
-        self.settlement_issue = (available == 0)
+        self.trading.settlement_issue = (available == 0)
             .then(|| "Settlement evidence is currently unavailable for this month.".to_string());
-        self.settlement_bundle = Some(bundle);
+        self.trading.settlement_bundle = Some(bundle);
         self.status = if issues == 0 {
             "Settlement record, readiness, and oracle evidence are ready.".to_string()
         } else {
@@ -1152,11 +1148,11 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.writer_action_inflight != Some(request_id) {
+        if self.writers.action_inflight != Some(request_id) {
             return;
         }
-        self.writer_action_inflight = None;
-        self.writer_confirmation = None;
+        self.writers.action_inflight = None;
+        self.writers.confirmation = None;
         match result {
             Ok(payload) => {
                 let message = if action.signs_and_submits() {
@@ -1164,7 +1160,7 @@ impl LabApp {
                 } else {
                     format!("{} ready.", action.label())
                 };
-                self.writer_action_result = Some(WriterActionResult {
+                self.writers.action_result = Some(WriterActionResult {
                     action,
                     ok: true,
                     payload: Some(payload),
@@ -1178,7 +1174,7 @@ impl LabApp {
                 }
             }
             Err(error) => {
-                self.writer_action_result = Some(WriterActionResult {
+                self.writers.action_result = Some(WriterActionResult {
                     action,
                     ok: false,
                     payload: None,
@@ -1262,10 +1258,10 @@ impl LabApp {
         result: Result<String, String>,
         now: Instant,
     ) {
-        if Some(request_id) != self.trade_submit_inflight {
+        if Some(request_id) != self.trading.submit_inflight {
             return;
         }
-        self.trade_submit_inflight = None;
+        self.trading.submit_inflight = None;
         // Even an uncertain submission may have changed on-chain display data.
         self.invalidate_market_caches();
         let (ok, message) = match result {
@@ -1277,7 +1273,8 @@ impl LabApp {
                 || message.contains("operations resume"));
         let mut details_in_ticket = false;
         if let Some(ticket) = self
-            .trade_ticket
+            .trading
+            .ticket
             .as_mut()
             .filter(|ticket| ticket.submit_request_id == Some(request_id))
         {
@@ -1317,7 +1314,7 @@ impl LabApp {
             result_modal.failure_reason =
                 Some(user_safe_trade_failure_reason(&message).to_string());
         }
-        self.trade_result_modal = Some(result_modal);
+        self.trading.result_modal = Some(result_modal);
     }
 
     pub(super) fn apply_oracle_tree_result(
@@ -1326,21 +1323,21 @@ impl LabApp {
         market_id: String,
         result: Result<OracleTreeFetch, String>,
     ) {
-        if request_id != self.oracle_tree_request
+        if request_id != self.oracle.tree_request
             || !self.selected_id().eq_ignore_ascii_case(&market_id)
         {
             return;
         }
-        self.loading_oracle_tree = false;
+        self.oracle.loading_tree = false;
         match result {
             Ok(fetch) => {
                 let OracleTreeFetch { tree, notice } = fetch;
-                self.oracle_node_selected = tree.root_index();
-                self.oracle_tree = Some(tree);
-                self.oracle_tree_issue = None;
-                self.oracle_tree_retry_after_tick = None;
+                self.oracle.node_selected = tree.root_index();
+                self.oracle.tree = Some(tree);
+                self.oracle.tree_issue = None;
+                self.oracle.tree_retry_after_tick = None;
                 if self.screen == LabScreen::Oracle {
-                    self.status = if self.oracle_view == OracleView::Earn {
+                    self.status = if self.oracle.view == OracleView::Earn {
                         "Task details loaded. Checking current eligibility and rewards.".to_string()
                     } else {
                         notice.unwrap_or_else(|| {
@@ -1351,11 +1348,12 @@ impl LabApp {
             }
             Err(error) => {
                 let has_current_tree = self
-                    .oracle_tree
+                    .oracle
+                    .tree
                     .as_ref()
                     .is_some_and(|tree| tree.market_id.eq_ignore_ascii_case(&market_id));
                 if !has_current_tree {
-                    self.oracle_tree = None;
+                    self.oracle.tree = None;
                 }
                 let retryable = oracle_tree_issue_is_retryable(&error);
                 let status_message = if retryable {
@@ -1366,11 +1364,11 @@ impl LabApp {
                 } else {
                     error.clone()
                 };
-                self.oracle_tree_issue = Some(error);
-                self.oracle_tree_retry_after_tick =
+                self.oracle.tree_issue = Some(error);
+                self.oracle.tree_retry_after_tick =
                     retryable.then(|| self.spinner_tick.wrapping_add(ORACLE_TREE_RETRY_TICKS));
                 if self.screen == LabScreen::Oracle {
-                    self.status = if self.oracle_view == OracleView::Earn {
+                    self.status = if self.oracle.view == OracleView::Earn {
                         "Petri could not load the details required to match work.".to_string()
                     } else {
                         status_message
@@ -1387,7 +1385,7 @@ impl LabApp {
         expiry_id: String,
         result: Result<SpreadOracleLiveState, String>,
     ) {
-        if request_id != self.oracle_live_request
+        if request_id != self.oracle.live_request
             || !self.selected_id().eq_ignore_ascii_case(&market_id)
             || self
                 .selected_chart_expiry()
@@ -1395,15 +1393,15 @@ impl LabApp {
         {
             return;
         }
-        self.loading_oracle_live = false;
+        self.oracle.loading_live = false;
         match result {
             Ok(state) => {
                 let observation_count = state.observations.len();
                 let emergency_count = state.active_emergency_count();
-                self.oracle_live = Some(state);
-                self.oracle_live_issue = None;
-                if self.screen == LabScreen::Oracle && !self.loading_oracle_tree {
-                    self.status = if self.oracle_view == OracleView::Earn {
+                self.oracle.live = Some(state);
+                self.oracle.live_issue = None;
+                if self.screen == LabScreen::Oracle && !self.oracle.loading_tree {
+                    self.status = if self.oracle.view == OracleView::Earn {
                         "Current Oracle work status checked.".to_string()
                     } else if emergency_count > 0 {
                         format!(
@@ -1415,15 +1413,15 @@ impl LabApp {
                 }
             }
             Err(error) => {
-                self.oracle_live_issue = Some(error);
-                if self.oracle_live.as_ref().is_some_and(|state| {
+                self.oracle.live_issue = Some(error);
+                if self.oracle.live.as_ref().is_some_and(|state| {
                     !state.market_id.eq_ignore_ascii_case(&market_id)
                         || !state.expiry_id.eq_ignore_ascii_case(&expiry_id)
                 }) {
-                    self.oracle_live = None;
+                    self.oracle.live = None;
                 }
-                if self.screen == LabScreen::Oracle && !self.loading_oracle_tree {
-                    self.status = if self.oracle_view == OracleView::Earn {
+                if self.screen == LabScreen::Oracle && !self.oracle.loading_tree {
+                    self.status = if self.oracle.view == OracleView::Earn {
                         "Petri could not verify current task availability.".to_string()
                     } else {
                         "Live oracle observations are temporarily unavailable.".to_string()
@@ -1441,7 +1439,7 @@ impl LabApp {
         owner_pubkey: String,
         result: Result<SpreadOracleRewardState, String>,
     ) {
-        if request_id != self.oracle_reward_request
+        if request_id != self.oracle.reward_request
             || !self.selected_id().eq_ignore_ascii_case(&market_id)
             || !self
                 .selected_chart_expiry()
@@ -1450,15 +1448,15 @@ impl LabApp {
         {
             return;
         }
-        self.loading_oracle_rewards = false;
+        self.oracle.loading_rewards = false;
         match result {
             Ok(state) => {
                 let claim_count = state.claims.len();
-                self.oracle_rewards = Some(state);
-                self.oracle_reward_issue = None;
+                self.oracle.rewards = Some(state);
+                self.oracle.reward_issue = None;
                 self.clamp_oracle_selection();
-                if self.screen == LabScreen::Oracle && !self.loading_oracle_tree {
-                    self.status = if self.oracle_view == OracleView::Earn {
+                if self.screen == LabScreen::Oracle && !self.oracle.loading_tree {
+                    self.status = if self.oracle.view == OracleView::Earn {
                         if claim_count > 0 {
                             format!(
                                 "{claim_count} completed Oracle reward {} ready to review.",
@@ -1482,10 +1480,10 @@ impl LabApp {
                 }
             }
             Err(error) => {
-                self.oracle_reward_issue = Some(error);
-                self.oracle_rewards = None;
+                self.oracle.reward_issue = Some(error);
+                self.oracle.rewards = None;
                 self.clamp_oracle_selection();
-                if self.screen == LabScreen::Oracle && self.oracle_view == OracleView::Earn {
+                if self.screen == LabScreen::Oracle && self.oracle.view == OracleView::Earn {
                     self.status =
                         "Petri could not verify wallet-specific rewards. Nothing changed."
                             .to_string();

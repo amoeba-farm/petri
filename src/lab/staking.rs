@@ -4,7 +4,7 @@ use super::*;
 
 impl LabApp {
     pub(super) fn open_detail(&mut self) {
-        self.detail_view = DetailView::Overview;
+        self.trading.detail_view = DetailView::Overview;
         self.set_screen(LabScreen::Detail);
         self.status = "market details".to_string();
     }
@@ -15,7 +15,7 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        self.detail_view = view;
+        self.trading.detail_view = view;
         self.reset_panel_scroll(LabFocus::Detail);
         if view == DetailView::Settlement {
             self.request_settlement(backend_url, fetch_tx, false);
@@ -32,7 +32,7 @@ impl LabApp {
     ) {
         let current = DetailView::ALL
             .iter()
-            .position(|view| *view == self.detail_view)
+            .position(|view| *view == self.trading.detail_view)
             .unwrap_or(0) as isize;
         let next = (current + offset).rem_euclid(DetailView::ALL.len() as isize) as usize;
         self.select_detail_view(DetailView::ALL[next], backend_url, fetch_tx);

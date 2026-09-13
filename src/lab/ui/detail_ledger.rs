@@ -43,14 +43,14 @@ pub(in super::super) fn draw_detail_screen(
                 } else {
                     Color::Magenta
                 },
-                view == app.detail_view,
+                view == app.trading.detail_view,
                 tabs[index].width,
                 tabs[index].height,
             )),
             tabs[index],
         );
     }
-    let lines = match app.detail_view {
+    let lines = match app.trading.detail_view {
         DetailView::Overview => detail_lines(app),
         DetailView::Settlement => settlement_detail_lines(cli, app),
     };
@@ -64,8 +64,8 @@ pub(in super::super) fn draw_detail_screen(
         )
         .block(panel_block(
             cli,
-            app.detail_view.label(),
-            if app.detail_view == DetailView::Settlement {
+            app.trading.detail_view.label(),
+            if app.trading.detail_view == DetailView::Settlement {
                 Color::Magenta
             } else {
                 Color::Cyan
@@ -92,7 +92,7 @@ pub(in super::super) fn detail_tab_hit_at(area: Rect, column: u16, row: u16) -> 
 }
 
 pub(in super::super) fn settlement_detail_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    if app.loading_settlement {
+    if app.trading.loading_settlement {
         return vec![
             Line::from(format!("{} Loading settlement evidence...", app.spinner())),
             Line::from(Span::styled(
@@ -101,7 +101,7 @@ pub(in super::super) fn settlement_detail_lines(cli: &Cli, app: &LabApp) -> Vec<
             )),
         ];
     }
-    if let Some(bundle) = app.settlement_bundle.as_ref() {
+    if let Some(bundle) = app.trading.settlement_bundle.as_ref() {
         return settlement_data::settlement_bundle_lines(bundle)
             .into_iter()
             .map(|line| {
@@ -118,7 +118,8 @@ pub(in super::super) fn settlement_detail_lines(cli: &Cli, app: &LabApp) -> Vec<
     }
     vec![
         Line::from(
-            app.settlement_issue
+            app.trading
+                .settlement_issue
                 .as_deref()
                 .map(ledger_display_text)
                 .unwrap_or_else(|| {
@@ -133,9 +134,9 @@ pub(in super::super) fn settlement_detail_lines(cli: &Cli, app: &LabApp) -> Vec<
 }
 
 pub(in super::super) fn detail_lines(app: &LabApp) -> Vec<Line<'static>> {
-    let Some(detail) = &app.detail else {
+    let Some(detail) = &app.trading.detail else {
         return vec![
-            Line::from(if app.loading_detail {
+            Line::from(if app.trading.loading_detail {
                 format!("{} Loading market details...", app.spinner())
             } else {
                 "Market details are not available right now.".to_string()
@@ -173,8 +174,8 @@ pub(in super::super) fn detail_lines(app: &LabApp) -> Vec<Line<'static>> {
 }
 
 pub(in super::super) fn activity_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    let (Some(detail), Some(quote)) = (&app.detail, app.selected_quote()) else {
-        return vec![Line::from(if app.loading_detail {
+    let (Some(detail), Some(quote)) = (&app.trading.detail, app.selected_quote()) else {
+        return vec![Line::from(if app.trading.loading_detail {
             format!("{} Loading selected contract...", app.spinner())
         } else {
             "Select a contract from Options to see recent trades.".to_string()

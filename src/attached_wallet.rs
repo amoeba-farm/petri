@@ -1,4 +1,15 @@
-use crate::{cli::Cli, solana_config, wallet_signer};
+use crate::{backend::CliError, cli::Cli, solana_config, wallet_signer};
+
+pub(crate) fn attached_wallet_pubkey(cli: &Cli) -> Result<String, CliError> {
+    let wallet = inspect_attached_wallet(cli);
+    wallet.pubkey.ok_or_else(|| {
+        CliError::new(
+            wallet
+                .issue
+                .unwrap_or_else(|| "an attached wallet is required for this command".to_string()),
+        )
+    })
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum WalletPathSource {

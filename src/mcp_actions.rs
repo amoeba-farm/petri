@@ -435,7 +435,7 @@ fn invoke(cli: &Cli, backend: &BackendClient, name: &str, raw: &str) -> Result<(
     }
     let owner = args["ownerPubkey"]
         .as_str()
-        .map(|s| crate::canonical_pubkey_string(s, "ownerPubkey"))
+        .map(|s| crate::request_validation::canonical_pubkey_string(s, "ownerPubkey"))
         .transpose()?;
     let c = Context {
         mode: t.mode,
@@ -465,7 +465,7 @@ fn invoke(cli: &Cli, backend: &BackendClient, name: &str, raw: &str) -> Result<(
                 "trade" => crate::trade_service::execute_reviewed(cli, backend, id)?,
                 "writer" => execute_writer(cli, backend, &record)?,
                 "collateral" | "oracle" | "liquidity" => crate::portable_operation::execute(
-                    &crate::build_onchain_config(cli)?,
+                    &crate::app_context::build_onchain_config(cli)?,
                     backend,
                     id,
                     true,
@@ -552,7 +552,7 @@ fn execute_writer(
 ) -> Result<Value, CliError> {
     use ameba_sdk::WriterOperationKind as W;
     crate::current_release::require_current_write_release()?;
-    let config = crate::build_onchain_config(cli)?;
+    let config = crate::app_context::build_onchain_config(cli)?;
     let context = crate::current_operation::observe_current_write_context(&config)?;
     let owner = crate::wallet_signer::signer_pubkey(&config)?;
     record.require_scope(backend, &owner)?;

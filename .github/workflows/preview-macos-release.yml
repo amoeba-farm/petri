@@ -37,7 +37,7 @@ jobs:
             target/release
             target/sdk-compressed-verifier
             target/petri-sdk-runtime.bin
-          key: petri-preview-${{ matrix.os }}-no-lto-${{ hashFiles('Cargo.lock', 'release/public-sdk-source.json', 'scripts/sdk-*.mjs') }}
+          key: petri-preview-${{ matrix.os }}-no-lto-${{ hashFiles('Cargo.lock', 'release/public-sdk-source.json', 'scripts/sdk-*.mjs', 'scripts/build-sdk-runtime.mjs', 'scripts/runtime-tools/package*.json') }}
           restore-keys: petri-preview-${{ matrix.os }}-
       - name: Build bundled SDK runtime
         shell: bash
@@ -115,5 +115,3 @@ jobs:
           test "$(find artifacts -maxdepth 1 -type f | wc -l)" -eq 6
           (cd artifacts; sha256sum -c ./*.sha256)
           gh release create "$RELEASE_TAG" artifacts/* --verify-tag --latest --title "Petri $RELEASE_TAG — Devnet preview" --notes-file release/preview-notes.md
-
-

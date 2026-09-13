@@ -560,11 +560,11 @@ pub(in super::super) fn draw_lab_modal_overlays(
         read_panel::draw(frame, cli, root, app);
         return;
     }
-    if app.trade_result_modal_is_open() {
+    if app.trading.result_modal_is_open() {
         draw_trade_result_modal(frame, cli, root, app);
-    } else if app.trade_confirmation_is_open() {
+    } else if app.trading.confirmation_is_open() {
         draw_trade_confirmation_modal(frame, cli, root, app);
-    } else if app.writer_confirmation.is_some() {
+    } else if app.writers.confirmation.is_some() {
         draw_writer_confirmation_modal(frame, cli, root, app);
     }
 }
@@ -599,7 +599,7 @@ pub(in super::super) fn draw_trade_result_modal(
     root: Rect,
     app: &LabApp,
 ) {
-    let Some(result) = app.trade_result_modal.as_ref() else {
+    let Some(result) = app.trading.result_modal.as_ref() else {
         return;
     };
     dim_tui_for_modal(frame, cli, root);
@@ -828,7 +828,8 @@ pub(in super::super) fn draw_trade_confirmation_modal(
     app: &LabApp,
 ) {
     let Some(confirmation) = app
-        .trade_ticket
+        .trading
+        .ticket
         .as_ref()
         .and_then(|ticket| ticket.confirmation.as_ref())
     else {
@@ -870,7 +871,7 @@ pub(in super::super) fn draw_trade_confirmation_modal(
     let content_height = inner.height.saturating_sub(4);
     if content_height > 0 {
         let mut reviewed_lines = Vec::new();
-        if let Some(result) = app.trade_ticket.as_ref().and_then(|t| t.result.as_ref()) {
+        if let Some(result) = app.trading.ticket.as_ref().and_then(|t| t.result.as_ref()) {
             reviewed_lines.extend(
                 result
                     .message
@@ -885,7 +886,7 @@ pub(in super::super) fn draw_trade_confirmation_modal(
         }
         let content = Paragraph::new(reviewed_lines)
             .style(tui_alt_panel_style(cli))
-            .scroll((app.trade_review_scroll, 0))
+            .scroll((app.trading.review_scroll, 0))
             .wrap(Wrap { trim: true });
         frame.render_widget(
             content,
@@ -1177,7 +1178,7 @@ pub(in super::super) fn lab_frame_layout(root: Rect, cli: &Cli, app: &LabApp) ->
     let account_line_count = wallet_header_lines(cli, app).len() as u16;
     let footer_height = root.height.min(3);
     let chart_mode = app.screen == LabScreen::Chart;
-    let chain_ticket_open = app.screen == LabScreen::Chain && app.trade_ticket.is_some();
+    let chain_ticket_open = app.screen == LabScreen::Chain && app.trading.ticket.is_some();
     let full_header_preferred =
         ascii_lines.len() as u16 + account_line_count + HEADER_TICKER_LINES + 2;
     let compact_header_preferred = account_line_count
@@ -1559,7 +1560,7 @@ pub(in super::super) fn ticker_tape_text(app: &LabApp) -> String {
 pub(in super::super) fn ticker_tape_items(app: &LabApp) -> Vec<String> {
     let mut items = Vec::new();
 
-    if let Some(detail) = &app.detail {
+    if let Some(detail) = &app.trading.detail {
         let symbol = ticker_symbol(&detail.symbol, &detail.id);
         if is_known_value(&detail.current_print) {
             items.push(format!("{symbol} print {}", detail.current_print));
@@ -1596,10 +1597,10 @@ pub(in super::super) fn ticker_tape_items(app: &LabApp) -> Vec<String> {
         return items;
     }
 
-    if app.loading_list {
+    if app.trading.loading_list {
         items.push("loading live markets".to_string());
     }
-    for dish in app.dishes.iter().take(4) {
+    for dish in app.trading.dishes.iter().take(4) {
         let symbol = ticker_symbol(&dish.symbol, &dish.id);
         if is_known_value(&dish.expiry_count) {
             items.push(format!("{symbol} {} monthly contracts", dish.expiry_count));
@@ -1688,14 +1689,14 @@ pub(in super::super) fn wallet_header_lines(cli: &Cli, app: &LabApp) -> Vec<Line
 }
 
 pub(in super::super) fn update_header_line(cli: &Cli, app: &LabApp) -> Option<Line<'static>> {
-    if app.loading_update_check {
+    if app.updates.is_loading() {
         return Some(Line::from(vec![
             Span::styled("Update: ", style(cli, Color::DarkGray)),
             Span::styled("checking", style(cli, Color::Yellow)),
         ]));
     }
 
-    let Some(report) = app.update_report.as_ref() else {
+    let Some(report) = app.updates.report() else {
         return None;
     };
     if report.action == "release_update_check" && report.blocked {
@@ -1749,8 +1750,8 @@ pub(in super::super) fn update_header_line(cli: &Cli, app: &LabApp) -> Option<Li
 }
 
 pub(in super::super) fn header_update_rect(cli: &Cli, area: Rect, app: &LabApp) -> Option<Rect> {
-    let report = app.update_report.as_ref()?;
-    if app.loading_update_check
+    let report = app.updates.report()?;
+    if app.updates.is_loading()
         || report.blocked
         || (!report.update_available && !report.rebuild_required)
     {
@@ -1789,26 +1790,6 @@ pub(in super::super) fn header_update_hit_at(
     row: u16,
 ) -> bool {
     header_update_rect(cli, area, app).is_some_and(|rect| rect_contains(rect, column, row))
-}
-
-pub(in super::super) fn tui_update_status_text(app: &LabApp) -> String {
-    let Some(report) = app.update_report.as_ref() else {
-        return "Press U to check for Petri updates.".to_string();
-    };
-    if report.blocked {
-        return report
-            .blocked_reason
-            .as_deref()
-            .map(|reason| format!("Petri update available, but blocked: {reason}."))
-            .unwrap_or_else(|| "Petri update available, but blocked.".to_string());
-    }
-    if report.update_available {
-        return "Petri update available. Press U to exit and run `petri update`.".to_string();
-    }
-    if report.rebuild_required {
-        return "Petri rebuild available. Press U to exit and rebuild.".to_string();
-    }
-    "Petri is up to date.".to_string()
 }
 
 pub(in super::super) fn header_nav_visible(app: &LabApp) -> bool {

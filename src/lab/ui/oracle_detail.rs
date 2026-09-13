@@ -3,9 +3,9 @@
 use super::super::*;
 
 pub(in super::super) fn oracle_recipe_load_panel_message(app: &LabApp) -> String {
-    if app.loading_oracle_tree {
+    if app.oracle.loading_tree {
         format!("{} Loading oracle source recipe...", app.spinner())
-    } else if let Some(issue) = app.oracle_tree_issue.as_deref() {
+    } else if let Some(issue) = app.oracle.tree_issue.as_deref() {
         if oracle_tree_issue_is_retryable(issue) {
             format!(
                 "{} Could not load oracle source recipe. Retrying...",
@@ -26,12 +26,12 @@ pub(in super::super) fn oracle_tree_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'
             format!("Oracle evidence / {symbol}"),
             style(cli, Color::Magenta).add_modifier(Modifier::BOLD),
         ))];
-        if app.loading_oracle_tree {
+        if app.oracle.loading_tree {
             lines.push(Line::from(Span::styled(
                 oracle_recipe_load_panel_message(app),
                 style(cli, Color::Yellow),
             )));
-        } else if app.oracle_tree_issue.is_some() {
+        } else if app.oracle.tree_issue.is_some() {
             lines.push(Line::from(Span::styled(
                 oracle_recipe_load_panel_message(app),
                 style(cli, Color::Yellow),
@@ -60,15 +60,15 @@ pub(in super::super) fn oracle_tree_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'
         ),
         style(cli, Color::DarkGray),
     )));
-    if let Some(issue) = app.oracle_tree_issue.as_deref() {
+    if let Some(issue) = app.oracle.tree_issue.as_deref() {
         lines.push(Line::from(Span::styled(
             format!("Refresh issue: {issue}"),
             style(cli, Color::DarkGray),
         )));
     }
 
-    if app.detail.is_none() {
-        let message = if app.loading_detail {
+    if app.trading.detail.is_none() {
+        let message = if app.trading.loading_detail {
             format!(
                 "{} Loading live market detail; source recipe is ready.",
                 app.spinner()
@@ -85,18 +85,18 @@ pub(in super::super) fn oracle_tree_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'
     lines.push(Line::from(vec![
         Span::styled("/ ", style(cli, Color::Yellow)),
         Span::styled(
-            if app.oracle_search_editing {
-                format!("search: {}_", app.oracle_search_input)
-            } else if app.oracle_search_input.is_empty() {
+            if app.oracle.search_editing {
+                format!("search: {}_", app.oracle.search_input)
+            } else if app.oracle.search_input.is_empty() {
                 "search SKU/source/spec".to_string()
             } else {
-                format!("search: {}", app.oracle_search_input)
+                format!("search: {}", app.oracle.search_input)
             },
             style(cli, Color::Gray),
         ),
     ]));
 
-    let matches = tree.search_nodes(&app.oracle_search_input);
+    let matches = tree.search_nodes(&app.oracle.search_input);
     if !matches.is_empty() {
         lines.push(Line::from(Span::styled(
             format!("{} matches", matches.len()),
@@ -347,7 +347,7 @@ pub(in super::super) fn oracle_current_path_lines(cli: &Cli, app: &LabApp) -> Ve
 
 pub(in super::super) fn current_spread_oracle_live(app: &LabApp) -> Option<&SpreadOracleLiveState> {
     let market_id = app.selected_id();
-    app.oracle_live.as_ref().filter(|state| {
+    app.oracle.live.as_ref().filter(|state| {
         state.market_id.eq_ignore_ascii_case(&market_id)
             && app
                 .selected_chart_expiry()
@@ -406,7 +406,7 @@ pub(in super::super) fn oracle_live_observation_lines(
         style(cli, Color::Cyan).add_modifier(Modifier::BOLD),
     ))];
 
-    if app.loading_oracle_live {
+    if app.oracle.loading_live {
         lines.push(Line::from(Span::styled(
             format!("{} Loading source observations...", app.spinner()),
             style(cli, Color::Yellow),
@@ -415,7 +415,7 @@ pub(in super::super) fn oracle_live_observation_lines(
     }
 
     let Some(live) = current_spread_oracle_live(app) else {
-        let message = if app.oracle_live_issue.is_some() {
+        let message = if app.oracle.live_issue.is_some() {
             "Live source observations are temporarily unavailable."
         } else {
             "No live source observations are loaded yet."
@@ -1260,12 +1260,12 @@ pub(in super::super) fn oracle_overview_lines(cli: &Cli, app: &LabApp) -> Vec<Li
                 },
             ),
         ]));
-    } else if app.loading_oracle_live {
+    } else if app.oracle.loading_live {
         lines.push(Line::from(Span::styled(
             format!("{} Loading live observations...", app.spinner()),
             style(cli, Color::Yellow),
         )));
-    } else if app.oracle_live_issue.is_some() {
+    } else if app.oracle.live_issue.is_some() {
         lines.push(Line::from(Span::styled(
             "Live observations are temporarily unavailable.",
             style(cli, Color::Yellow),
@@ -1284,22 +1284,6 @@ pub(in super::super) fn oracle_weight_label(node: &RamxOracleNode) -> String {
     } else {
         format!("basket weight {}", format_percent(node.weight_pct))
     }
-}
-
-pub(in super::super) fn is_allowed_v1_source_category(category: &str) -> bool {
-    let normalized = category.trim().to_ascii_lowercase();
-    [
-        "retailer product page",
-        "distributor catalog page",
-        "manufacturer product or store page",
-        "manufacturer page",
-        "benchmark / assessment",
-        "market price assessment",
-        "public api",
-        "public api endpoint",
-    ]
-    .iter()
-    .any(|allowed| normalized.contains(allowed))
 }
 
 pub(in super::super) fn oracle_source_state_label(phase: OraclePhase) -> &'static str {
@@ -1358,7 +1342,7 @@ pub(in super::super) fn oracle_delta_label(phase: OraclePhase) -> &'static str {
 }
 
 pub(in super::super) fn oracle_output_preview_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    let preview = oracle_accumulator_preview(&app.oracle_submissions, app.oracle_tree());
+    let preview = oracle_accumulator_preview(&app.oracle.submissions, app.oracle_tree());
     let mut lines = vec![
         Line::from(""),
         Line::from(Span::styled(
@@ -1502,7 +1486,7 @@ pub(in super::super) fn oracle_active_timeline_badge(tick: usize) -> &'static st
 }
 
 pub(in super::super) fn oracle_action_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    if let Some(form) = &app.oracle_form {
+    if let Some(form) = &app.oracle.form {
         return oracle_form_lines(cli, app, form);
     }
 
@@ -1517,11 +1501,11 @@ pub(in super::super) fn oracle_action_lines(cli: &Cli, app: &LabApp) -> Vec<Line
     let mut locked_flashing = false;
     let mut lines = Vec::new();
     for (index, action) in app.visible_oracle_actions().iter().copied().enumerate() {
-        let selected = app.focus == LabFocus::OracleActions && index == app.oracle_selected;
+        let selected = app.focus == LabFocus::OracleActions && index == app.oracle.selected;
         if action.availability(context) == OracleActionAvailability::Locked {
             locked_actions.push(action);
             locked_selected |= selected;
-            locked_flashing |= app.oracle_action_flash_visible(action);
+            locked_flashing |= app.oracle.action_flash_visible(action);
             continue;
         }
         lines.push(oracle_task_line(
@@ -1529,7 +1513,7 @@ pub(in super::super) fn oracle_action_lines(cli: &Cli, app: &LabApp) -> Vec<Line
             action,
             context,
             selected,
-            app.oracle_action_flash_visible(action),
+            app.oracle.action_flash_visible(action),
         ));
     }
     if !locked_actions.is_empty() {
@@ -1549,7 +1533,7 @@ pub(in super::super) fn oracle_action_lines(cli: &Cli, app: &LabApp) -> Vec<Line
     )));
     if app.selected_oracle_action() == OracleAction::ReviewQueue {
         lines.extend(oracle_submission_review_lines(cli, app));
-    } else if app.oracle_submission_issue.is_some() || !app.oracle_submissions.is_empty() {
+    } else if app.oracle.submission_issue.is_some() || !app.oracle.submissions.is_empty() {
         lines.extend(oracle_submission_lines(cli, app));
     }
     lines
@@ -1562,7 +1546,7 @@ pub(in super::super) fn oracle_action_lines_for_panel(
     scroll: usize,
     focused: bool,
 ) -> Vec<Line<'static>> {
-    if let Some(form) = &app.oracle_form {
+    if let Some(form) = &app.oracle.form {
         return oracle_form_lines_for_height(cli, app, form, panel_inner_height(area), focused);
     }
     scroll_lines_to_panel(oracle_action_lines(cli, app), area, cli, scroll, focused)
@@ -1608,7 +1592,7 @@ pub(in super::super) fn oracle_form_lines(
 
     for (index, field) in form.fields.iter().enumerate() {
         let selected = index == form.field_selected;
-        let flashing = app.oracle_form_field_flash_visible(index);
+        let flashing = app.oracle.form_field_flash_visible(index);
         if selected {
             lines.push(Line::from(""));
         }
@@ -1734,13 +1718,13 @@ pub(in super::super) fn oracle_form_mode_color(mode: OracleFormMode) -> Color {
 
 pub(in super::super) fn oracle_submission_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
     let mut lines = vec![Line::from("")];
-    if let Some(issue) = app.oracle_submission_issue.as_deref() {
+    if let Some(issue) = app.oracle.submission_issue.as_deref() {
         lines.push(Line::from(Span::styled(
             format!("Oracle draft store issue: {issue}"),
             style(cli, Color::Yellow),
         )));
     }
-    if app.oracle_submissions.is_empty() {
+    if app.oracle.submissions.is_empty() {
         lines.push(Line::from(Span::styled(
             "No oracle submissions queued from this TUI session.",
             style(cli, Color::DarkGray),
@@ -1752,7 +1736,7 @@ pub(in super::super) fn oracle_submission_lines(cli: &Cli, app: &LabApp) -> Vec<
         "Queued oracle submissions",
         style(cli, Color::Magenta).add_modifier(Modifier::BOLD),
     )));
-    for record in app.oracle_submissions.iter().rev().take(4) {
+    for record in app.oracle.submissions.iter().rev().take(4) {
         let update_state = record
             .update_state
             .map(|state| format!(" | {}", state.display_label()))
@@ -1809,7 +1793,7 @@ pub(in super::super) fn oracle_submission_review_lines(
             style(cli, Color::Yellow),
         )),
     ];
-    if let Some(issue) = app.oracle_submission_issue.as_deref() {
+    if let Some(issue) = app.oracle.submission_issue.as_deref() {
         lines.push(Line::from(Span::styled(
             format!(
                 "Draft store issue: {}",
@@ -1818,7 +1802,7 @@ pub(in super::super) fn oracle_submission_review_lines(
             style(cli, Color::Yellow),
         )));
     }
-    if app.oracle_submissions.is_empty() {
+    if app.oracle.submissions.is_empty() {
         lines.push(Line::from(Span::styled(
             "No local Oracle drafts are queued.",
             style(cli, Color::DarkGray),
@@ -1826,7 +1810,7 @@ pub(in super::super) fn oracle_submission_review_lines(
         return lines;
     }
 
-    for (offset, record) in app.oracle_submissions.iter().rev().take(8).enumerate() {
+    for (offset, record) in app.oracle.submissions.iter().rev().take(8).enumerate() {
         if offset > 0 {
             lines.push(Line::from(""));
         }

@@ -224,7 +224,7 @@ impl LabApp {
         &mut self,
         replacement: Option<Value>,
     ) {
-        self.clear_writer_action_mask_check();
+        self.writers.clear_action_mask_check();
         let stored = self
             .ledger
             .as_ref()
@@ -378,7 +378,7 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.writer_interaction_is_locked() || self.writer_confirmation.is_some() {
+        if self.writers.interaction_is_locked() || self.writers.confirmation.is_some() {
             self.status =
                 "Finish the open writer review before changing wallet sections.".to_string();
             return;
@@ -389,7 +389,7 @@ impl LabApp {
                     .to_string();
             return;
         }
-        self.writer_form = None;
+        self.writers.form = None;
         self.liquidity_preview_form = None;
         self.ledger_view = view;
         self.ledger_pane = LedgerPane::Tabs;
@@ -432,7 +432,7 @@ impl LabApp {
     }
 
     pub(super) fn move_ledger_pane(&mut self, offset: isize) {
-        if offset == 0 || self.writer_form.is_some() || self.liquidity_preview_form.is_some() {
+        if offset == 0 || self.writers.form.is_some() || self.liquidity_preview_form.is_some() {
             return;
         }
         let available: &[LedgerPane] = match self.ledger_view {
@@ -459,7 +459,7 @@ impl LabApp {
         if offset == 0 {
             return;
         }
-        if self.ledger_view == LedgerView::Writers && self.writer_interaction_is_locked() {
+        if self.ledger_view == LedgerView::Writers && self.writers.interaction_is_locked() {
             self.status = "The selected writer sleeve is locked until the current action or availability check finishes."
                 .to_string();
             return;
@@ -488,22 +488,22 @@ impl LabApp {
                 self.status = "Manager-liquidity position selected.".to_string();
             }
             (LedgerView::Writers, LedgerPane::List) => {
-                self.clear_writer_action_mask_check();
+                self.writers.clear_action_mask_check();
                 self.ledger_writer_selected = offset_clamped_index(
                     self.ledger_writer_selected,
                     self.writer_sleeve_rows().len(),
                     offset,
                 );
-                self.writer_action_result = None;
+                self.writers.action_result = None;
                 self.status = "Collective-writer sleeve selected.".to_string();
             }
             (LedgerView::Writers, LedgerPane::Actions) => {
-                self.writer_action_selected = offset_wrapped_index(
-                    self.writer_action_selected,
+                self.writers.action_selected = offset_wrapped_index(
+                    self.writers.action_selected,
                     WriterAction::ALL.len(),
                     offset,
                 );
-                let action = self.selected_writer_action();
+                let action = self.writers.selected_action();
                 let availability = self.writer_action_availability(action);
                 self.status = match availability.note() {
                     Some(note) => format!("{}: {} {note}", action.label(), action.detail()),
@@ -527,13 +527,6 @@ impl LabApp {
             .get(self.ledger_account_action_selected)
             .copied()
             .unwrap_or(AccountAction::SwitchWallet)
-    }
-
-    pub(super) fn selected_writer_action(&self) -> WriterAction {
-        WriterAction::ALL
-            .get(self.writer_action_selected)
-            .copied()
-            .unwrap_or(WriterAction::Show)
     }
 
     pub(super) fn writer_sleeve_rows(&self) -> &[Value] {
@@ -600,7 +593,7 @@ impl LabApp {
                 self.activate_writer_action(cli, backend_url, fetch_tx)
             }
             (LedgerView::Writers, LedgerPane::List) => {
-                self.writer_action_selected = WriterAction::ALL
+                self.writers.action_selected = WriterAction::ALL
                     .iter()
                     .position(|action| *action == WriterAction::Show)
                     .unwrap_or(0);
@@ -630,14 +623,14 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.writer_interaction_is_locked() {
+        if self.writers.interaction_is_locked() {
             self.status = "A writer action or availability check is still running.".to_string();
             return;
         }
-        let action = self.selected_writer_action();
-        self.writer_action_result = None;
+        let action = self.writers.selected_action();
+        self.writers.action_result = None;
         if action == WriterAction::Refresh {
-            self.clear_writer_action_mask_check();
+            self.writers.clear_action_mask_check();
             self.request_ledger(backend_url, fetch_tx, true);
             self.request_writer_close_capabilities(backend_url, fetch_tx);
             return;
@@ -656,7 +649,7 @@ impl LabApp {
             self.start_writer_command(cli, backend_url, fetch_tx, action, args);
             return;
         }
-        self.clear_writer_action_mask_check();
+        self.writers.clear_action_mask_check();
         let mut form = writer_form_for_action(action, self.selected_writer_sleeve());
         if let Some(owner) = self.wallet.pubkey.as_ref() {
             for field in &mut form.fields {
@@ -665,7 +658,7 @@ impl LabApp {
                 }
             }
         }
-        self.writer_form = Some(form);
+        self.writers.form = Some(form);
         self.status = format!(
             "{} form opened. Values are exact atoms unless stated otherwise.",
             action.label()
@@ -677,10 +670,10 @@ impl LabApp {
     }
 
     pub(super) fn move_writer_form_field(&mut self, offset: isize) {
-        if self.writer_action_mask_is_loading() {
+        if self.writers.action_mask_is_loading() {
             return;
         }
-        let Some(form) = self.writer_form.as_mut() else {
+        let Some(form) = self.writers.form.as_mut() else {
             return;
         };
         if form.fields.is_empty() || offset == 0 {
@@ -693,46 +686,9 @@ impl LabApp {
         }
     }
 
-    pub(super) fn push_writer_form_char(&mut self, character: char) {
-        if self.writer_action_mask_is_loading() {
-            return;
-        }
-        if character.is_control() {
-            return;
-        }
-        let Some(field) = self
-            .writer_form
-            .as_mut()
-            .and_then(WriterActionForm::selected_field_mut)
-        else {
-            return;
-        };
-        let maximum = match field.key {
-            "bins" => 512,
-            "cursor" => 768,
-            _ => 160,
-        };
-        if field.value.chars().count() < maximum {
-            field.value.push(character);
-        }
-    }
-
-    pub(super) fn backspace_writer_form_input(&mut self) {
-        if self.writer_action_mask_is_loading() {
-            return;
-        }
-        if let Some(field) = self
-            .writer_form
-            .as_mut()
-            .and_then(WriterActionForm::selected_field_mut)
-        {
-            field.value.pop();
-        }
-    }
-
     pub(super) fn cancel_writer_form(&mut self) {
-        self.clear_writer_action_mask_check();
-        self.writer_form = None;
+        self.writers.clear_action_mask_check();
+        self.writers.form = None;
         self.status = "Writer form cancelled. Nothing was signed or sent.".to_string();
     }
 
@@ -742,11 +698,11 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.writer_action_mask_is_loading() {
+        if self.writers.action_mask_is_loading() {
             self.status = "Wallet-specific availability is still being checked.".to_string();
             return;
         }
-        let Some(form) = self.writer_form.clone() else {
+        let Some(form) = self.writers.form.clone() else {
             return;
         };
         let availability = self.writer_action_availability(form.action);
@@ -789,22 +745,23 @@ impl LabApp {
                 ),
                 choice: UserActionConfirmationChoice::Cancel,
             };
-            self.writer_action_mask_request = self.writer_action_mask_request.wrapping_add(1);
-            self.writer_action_mask_inflight = Some(self.writer_action_mask_request);
-            self.pending_writer_review = Some(PendingWriterReview {
+            self.writers.action_mask_request = self.writers.action_mask_request.wrapping_add(1);
+            self.writers.action_mask_inflight = Some(self.writers.action_mask_request);
+            self.writers.pending_review = Some(PendingWriterReview {
                 owner: owner.clone(),
                 sleeve: sleeve.clone(),
                 form,
                 confirmation,
             });
-            self.writer_confirmation = None;
+            self.writers.confirmation = None;
             self.status = "Checking exact wallet-and-sleeve availability before opening review..."
                 .to_string();
             spawn_writer_action_mask_fetch(
                 backend_url.to_string(),
                 fetch_tx.clone(),
-                self.writer_action_mask_request,
-                self.pending_writer_review
+                self.writers.action_mask_request,
+                self.writers
+                    .pending_review
                     .as_ref()
                     .expect("pending review was just stored")
                     .confirmation
@@ -814,30 +771,17 @@ impl LabApp {
             );
         } else {
             let action = form.action;
-            self.writer_form = None;
+            self.writers.form = None;
             self.start_writer_command(cli, backend_url, fetch_tx, action, args);
         }
     }
 
-    pub(super) fn move_writer_confirmation_choice(&mut self, direction: isize) {
-        if self.writer_action_is_running() {
-            return;
-        }
-        if let Some(confirmation) = self.writer_confirmation.as_mut() {
-            confirmation.choice = if direction < 0 {
-                UserActionConfirmationChoice::Cancel
-            } else {
-                UserActionConfirmationChoice::Confirm
-            };
-        }
-    }
-
     pub(super) fn cancel_writer_confirmation(&mut self) {
-        if self.writer_action_is_running() {
+        if self.writers.action_is_running() {
             self.status = "The writer transaction is already running.".to_string();
             return;
         }
-        self.writer_confirmation = None;
+        self.writers.confirmation = None;
         self.status = "Writer review cancelled. Nothing was signed or sent.".to_string();
     }
 
@@ -847,7 +791,7 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        let Some(confirmation) = self.writer_confirmation.clone() else {
+        let Some(confirmation) = self.writers.confirmation.clone() else {
             return;
         };
         if confirmation.choice == UserActionConfirmationChoice::Cancel {
@@ -855,11 +799,11 @@ impl LabApp {
             return;
         }
         if let Err(error) = crate::current_release::require_current_write_release() {
-            self.writer_confirmation = None;
+            self.writers.confirmation = None;
             self.status = error.to_string();
             return;
         }
-        let same_form = self.writer_form.as_ref().is_some_and(|form| {
+        let same_form = self.writers.form.as_ref().is_some_and(|form| {
             let values = form
                 .fields
                 .iter()
@@ -873,11 +817,11 @@ impl LabApp {
                 .writer_action_availability(confirmation.action)
                 .is_actionable()
         {
-            self.writer_confirmation = None;
+            self.writers.confirmation = None;
             self.status = "Writer review changed or is unavailable. Review the current form again. Nothing was signed or sent.".to_string();
             return;
         }
-        self.writer_form = None;
+        self.writers.form = None;
         self.start_writer_command(
             cli,
             backend_url,
@@ -895,7 +839,7 @@ impl LabApp {
         action: WriterAction,
         command_args: Vec<String>,
     ) {
-        if self.writer_interaction_is_locked() {
+        if self.writers.interaction_is_locked() {
             self.status = "A writer action or availability check is already running.".to_string();
             return;
         }
@@ -930,9 +874,9 @@ impl LabApp {
             args.push("--yes".to_string());
         }
         args.extend(command_args);
-        self.writer_action_request = self.writer_action_request.wrapping_add(1);
-        self.writer_action_inflight = Some(self.writer_action_request);
-        self.writer_confirmation = None;
+        self.writers.action_request = self.writers.action_request.wrapping_add(1);
+        self.writers.action_inflight = Some(self.writers.action_request);
+        self.writers.confirmation = None;
         self.status = if action.signs_and_submits() {
             format!("{}: verifying, signing, and submitting...", action.label())
         } else {
@@ -942,28 +886,9 @@ impl LabApp {
             args,
             envs,
             fetch_tx.clone(),
-            self.writer_action_request,
+            self.writers.action_request,
             action,
         );
-    }
-
-    pub(super) fn writer_action_is_running(&self) -> bool {
-        self.writer_action_inflight.is_some()
-    }
-
-    pub(super) fn writer_action_mask_is_loading(&self) -> bool {
-        self.writer_action_mask_inflight.is_some()
-    }
-
-    pub(super) fn writer_interaction_is_locked(&self) -> bool {
-        self.writer_action_is_running() || self.writer_action_mask_is_loading()
-    }
-
-    pub(super) fn clear_writer_action_mask_check(&mut self) {
-        self.writer_action_mask_request = self.writer_action_mask_request.wrapping_add(1);
-        self.writer_action_mask_inflight = None;
-        self.pending_writer_review = None;
-        self.writer_confirmation = None;
     }
 }
 

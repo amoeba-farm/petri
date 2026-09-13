@@ -67,7 +67,7 @@ pub(in super::super) fn oracle_intro_lines(
         lines.push(oracle_intro_action_line(
             cli,
             action,
-            index == app.oracle_intro_selected,
+            index == app.oracle.intro_selected,
             focused,
         ));
     }

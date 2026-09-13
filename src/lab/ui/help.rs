@@ -64,8 +64,9 @@ pub(in super::super) fn gitbook_nav_scroll_start(area: Rect, app: &LabApp) -> us
     let visible_height = panel_inner_rect(area)
         .map(|inner| usize::from(inner.height))
         .unwrap_or_default();
-    let row_count = gitbook::nav_rows(&app.help_index, &app.help_expanded_categories).len();
-    app.help_nav_scroll
+    let row_count = gitbook::nav_rows(&app.help.index, &app.help.expanded_categories).len();
+    app.help
+        .nav_scroll
         .min(row_count.saturating_sub(visible_height))
 }
 
@@ -174,7 +175,7 @@ pub(in super::super) fn gitbook_help_preview_geometry(
     area: Rect,
     app: &LabApp,
 ) -> Option<GitbookHelpPreviewGeometry> {
-    let preview = app.help_preview.as_ref()?;
+    let preview = app.help.preview.as_ref()?;
     if preview.origin == HelpPreviewOrigin::Hover
         && !gitbook_reduced_motion()
         && app.spinner_tick < preview.reveal_tick
@@ -210,7 +211,7 @@ pub(in super::super) fn gitbook_help_preview_max_scroll(
     app: &LabApp,
 ) -> Option<usize> {
     let geometry = gitbook_help_preview_geometry(area, app)?;
-    let preview = app.help_preview.as_ref()?;
+    let preview = app.help.preview.as_ref()?;
     let inner = panel_inner_rect(geometry.popup)?;
     let content_height = usize::from(inner.height.saturating_sub(2));
     let text_width = usize::from(inner.width.saturating_sub(3));
@@ -247,7 +248,7 @@ pub(in super::super) fn gitbook_glossary_geometry(
     area: Rect,
     app: &LabApp,
 ) -> Option<GitbookGlossaryGeometry> {
-    let hover = app.help_glossary_hover.as_ref()?;
+    let hover = app.help.glossary_hover.as_ref()?;
     if area.width < GLOSSARY_PREVIEW_MIN_WIDTH || area.height < 5 {
         return None;
     }
@@ -292,7 +293,7 @@ pub(in super::super) fn draw_gitbook_help_screen(
     app: &LabApp,
 ) {
     let layout = gitbook_help_layout(area);
-    let navigation_focused = app.help_pane == HelpPane::Navigation;
+    let navigation_focused = app.help.pane == HelpPane::Navigation;
     let navigation_scroll = gitbook_nav_scroll_start(layout.navigation_area, app);
     let navigation = Paragraph::new(clip_lines_to_panel(
         gitbook_navigation_lines(cli, app),
@@ -308,7 +309,7 @@ pub(in super::super) fn draw_gitbook_help_screen(
     ));
     frame.render_widget(navigation, layout.navigation_area);
 
-    let article_focused = app.help_pane == HelpPane::Article;
+    let article_focused = app.help.pane == HelpPane::Article;
     let article_title = app
         .current_help_page()
         .map(|page| format!("guide: {}", short_path(&page.title, 42)))
@@ -319,7 +320,7 @@ pub(in super::super) fn draw_gitbook_help_screen(
         gitbook_article_lines(cli, app, article_inner.width as usize),
         layout.article_area,
         cli,
-        app.help_article_scroll,
+        app.help.article_scroll,
         article_focused,
     ))
     .block(article_block);
@@ -337,10 +338,10 @@ pub(in super::super) fn draw_gitbook_help_preview(
     let Some(geometry) = gitbook_help_preview_geometry(area, app) else {
         return;
     };
-    let Some(preview) = app.help_preview.as_ref() else {
+    let Some(preview) = app.help.preview.as_ref() else {
         return;
     };
-    let rows = gitbook::nav_rows(&app.help_index, &app.help_expanded_categories);
+    let rows = gitbook::nav_rows(&app.help.index, &app.help.expanded_categories);
     let Some(row) = rows.get(preview.nav_index) else {
         return;
     };
@@ -469,7 +470,7 @@ pub(in super::super) fn draw_gitbook_glossary_hover(
     area: Rect,
     app: &LabApp,
 ) {
-    let Some(hover) = app.help_glossary_hover.as_ref() else {
+    let Some(hover) = app.help.glossary_hover.as_ref() else {
         return;
     };
     let Some(geometry) = gitbook_glossary_geometry(area, app) else {
@@ -557,7 +558,7 @@ pub(in super::super) fn gitbook_help_preview_lines(
     width: usize,
 ) -> Vec<Line<'static>> {
     let width = width.max(8);
-    let rows = gitbook::nav_rows(&app.help_index, &app.help_expanded_categories);
+    let rows = gitbook::nav_rows(&app.help.index, &app.help.expanded_categories);
     let Some(row) = rows.get(preview.nav_index) else {
         return vec![Line::from(Span::styled(
             "This topic is no longer in the guide index.",
@@ -566,7 +567,7 @@ pub(in super::super) fn gitbook_help_preview_lines(
     };
     match row.target {
         GitbookNavTarget::Category(category_index) => {
-            let Some(category) = app.help_index.categories.get(category_index) else {
+            let Some(category) = app.help.index.categories.get(category_index) else {
                 return Vec::new();
             };
             let mut lines = vec![
@@ -605,7 +606,7 @@ pub(in super::super) fn gitbook_help_preview_lines(
             lines
         }
         GitbookNavTarget::Page { category, page } => {
-            let Some(category) = app.help_index.categories.get(category) else {
+            let Some(category) = app.help.index.categories.get(category) else {
                 return Vec::new();
             };
             let Some(link) = category.pages.get(page) else {
@@ -638,14 +639,14 @@ pub(in super::super) fn gitbook_help_preview_lines(
                     );
                     lines.push(Line::from(""));
                 }
-                let (message, color) = if app.loading_help_preview_page
-                    && app.help_preview_page_request_id.as_deref() == Some(link.id.as_str())
+                let (message, color) = if app.help.loading_preview_page
+                    && app.help.preview_page_request_id.as_deref() == Some(link.id.as_str())
                 {
                     (
                         format!("{} Loading the published topic preview...", app.spinner()),
                         Color::Cyan,
                     )
-                } else if app.help_preview_failed_page_id.as_deref() == Some(link.id.as_str()) {
+                } else if app.help.preview_failed_page_id.as_deref() == Some(link.id.as_str()) {
                     (
                         "The published topic preview is temporarily unavailable.".to_string(),
                         Color::Yellow,
@@ -745,7 +746,7 @@ pub(in super::super) fn append_gitbook_preview_blocks(
 }
 
 pub(in super::super) fn gitbook_navigation_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    let rows = gitbook::nav_rows(&app.help_index, &app.help_expanded_categories);
+    let rows = gitbook::nav_rows(&app.help.index, &app.help.expanded_categories);
     if rows.is_empty() {
         return vec![Line::from(Span::styled(
             "No guide topics are available.",
@@ -755,8 +756,8 @@ pub(in super::super) fn gitbook_navigation_lines(cli: &Cli, app: &LabApp) -> Vec
     rows.into_iter()
         .enumerate()
         .map(|(index, row)| {
-            let selected = index == app.help_selected_nav;
-            let active = selected && app.help_pane == HelpPane::Navigation;
+            let selected = index == app.help.selected_nav;
+            let active = selected && app.help.pane == HelpPane::Navigation;
             let marker = if selected { ">" } else { " " };
             let (prefix, color, bold) = match row.target {
                 GitbookNavTarget::Category(_) => (
@@ -794,7 +795,7 @@ pub(in super::super) fn gitbook_nav_hit_at(
     }
     let visible_row = usize::from(row.saturating_sub(inner.y));
     let index = gitbook_nav_scroll_start(area, app).saturating_add(visible_row);
-    (index < gitbook::nav_rows(&app.help_index, &app.help_expanded_categories).len())
+    (index < gitbook::nav_rows(&app.help.index, &app.help.expanded_categories).len())
         .then_some(index)
 }
 
@@ -905,7 +906,7 @@ pub(in super::super) fn gitbook_glossary_hit_at(
         cli,
         &article_title,
         Color::Yellow,
-        app.help_pane == HelpPane::Article,
+        app.help.pane == HelpPane::Article,
     )
     .inner(article_area);
     if !rect_contains(inner, column, row) {
@@ -915,8 +916,8 @@ pub(in super::super) fn gitbook_glossary_hit_at(
         gitbook_article_lines(cli, app, inner.width as usize),
         article_area,
         cli,
-        app.help_article_scroll,
-        app.help_pane == HelpPane::Article,
+        app.help.article_scroll,
+        app.help.pane == HelpPane::Article,
     );
     let line = visible.get(usize::from(row.saturating_sub(inner.y)))?;
     let mut x = inner.x;
@@ -945,16 +946,16 @@ pub(in super::super) fn gitbook_article_lines(
 ) -> Vec<Line<'static>> {
     let width = width.max(8);
     let motion_tick = gitbook_motion_tick(app);
-    let cacheable = !app.loading_help_index
-        && !app.loading_help_page
-        && app.help_issue.is_none()
+    let cacheable = !app.help.loading_index
+        && !app.help.loading_page
+        && app.help.issue.is_none()
         && motion_tick == 0;
     if cacheable
         && app.current_help_page().is_some()
-        && let Some(cache) = app.help_render_cache.borrow().as_ref()
-        && cache.page_id == app.help_selected_page_id
-        && cache.page_revision == app.help_page_revision
-        && cache.page_count == app.help_index.page_count()
+        && let Some(cache) = app.cache.help_render().as_ref()
+        && cache.page_id == app.help.selected_page_id
+        && cache.page_revision == app.cache.help_revision()
+        && cache.page_count == app.help.index.page_count()
         && cache.width == width
         && cache.no_color == cli.no_color
         && cache.motion_tick == motion_tick
@@ -965,7 +966,7 @@ pub(in super::super) fn gitbook_article_lines(
     let source = app
         .current_help_page()
         .map(|page| page.source)
-        .unwrap_or(app.help_index.source);
+        .unwrap_or(app.help.index.source);
     lines.push(Line::from(vec![
         Span::styled("Source ", style(cli, Color::DarkGray)),
         Span::styled(
@@ -982,10 +983,10 @@ pub(in super::super) fn gitbook_article_lines(
         ),
         Span::styled(" | ", style(cli, Color::DarkGray)),
         Span::styled(
-            if app.loading_help_index {
+            if app.help.loading_index {
                 format!("{} checking for updates", app.spinner())
             } else {
-                format!("{} pages", app.help_index.page_count())
+                format!("{} pages", app.help.index.page_count())
             },
             style(cli, Color::Gray),
         ),
@@ -1007,7 +1008,7 @@ pub(in super::super) fn gitbook_article_lines(
         ),
         style(cli, Color::Yellow).add_modifier(Modifier::UNDERLINED),
     )));
-    if let Some(issue) = app.help_issue.as_deref() {
+    if let Some(issue) = app.help.issue.as_deref() {
         lines.extend(
             wrap_gitbook_text(&format!("Live update unavailable: {issue}"), width, "", "")
                 .into_iter()
@@ -1016,7 +1017,7 @@ pub(in super::super) fn gitbook_article_lines(
     }
     lines.push(Line::from(""));
 
-    if app.loading_help_page {
+    if app.help.loading_page {
         for art in gitbook::loading_frame(gitbook_animation_tick(app)) {
             lines.push(Line::from(Span::styled(
                 art.to_string(),
@@ -1167,10 +1168,10 @@ pub(in super::super) fn gitbook_article_lines(
         }
     }
     if cacheable && app.current_help_page().is_some() {
-        *app.help_render_cache.borrow_mut() = Some(GitbookRenderCache {
-            page_id: app.help_selected_page_id.clone(),
-            page_revision: app.help_page_revision,
-            page_count: app.help_index.page_count(),
+        app.cache.store_help_render(GitbookRenderCache {
+            page_id: app.help.selected_page_id.clone(),
+            page_revision: app.cache.help_revision(),
+            page_count: app.help.index.page_count(),
             width,
             no_color: cli.no_color,
             motion_tick,
@@ -1184,7 +1185,8 @@ pub(in super::super) fn gitbook_motion_tick(app: &LabApp) -> usize {
     if gitbook_reduced_motion() {
         return 0;
     }
-    app.help_transition_tick
+    app.help
+        .transition_tick
         .filter(|started| app.spinner_tick.saturating_sub(*started) <= 8)
         .map(|_| app.spinner_tick)
         .unwrap_or(0)

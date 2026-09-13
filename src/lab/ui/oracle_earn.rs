@@ -84,7 +84,7 @@ pub(in super::super) fn draw_oracle_earn_screen(
             .add_modifier(Modifier::BOLD),
     )
     .highlight_symbol("> ");
-    let selected = (!claims.is_empty()).then_some(app.oracle_earn_selected.saturating_sub(start));
+    let selected = (!claims.is_empty()).then_some(app.oracle.earn_selected.saturating_sub(start));
     let mut table_state = TableState::default().with_selected(selected);
     frame.render_stateful_widget(table, layout.table_area, &mut table_state);
 
@@ -181,7 +181,7 @@ fn oracle_earn_table_rows(
             "CONNECT",
             Color::Yellow,
         )
-    } else if app.loading_oracle_rewards {
+    } else if app.oracle.loading_rewards {
         (
             "Checking funded rewards...",
             "Only the selected market and month are included",
@@ -189,7 +189,7 @@ fn oracle_earn_table_rows(
             "LOADING",
             Color::Cyan,
         )
-    } else if app.oracle_reward_issue.is_some() {
+    } else if app.oracle.reward_issue.is_some() {
         (
             "Rewards could not be verified",
             "Press R to try this market and month again",
@@ -251,7 +251,7 @@ fn oracle_earn_visible_claim_window(
         .checked_div(row_height)
         .unwrap_or_default()
         .max(1);
-    let selected = app.oracle_earn_selected.min(claim_count - 1);
+    let selected = app.oracle.earn_selected.min(claim_count - 1);
     let start = selected
         .saturating_sub(capacity.saturating_sub(1))
         .min(claim_count.saturating_sub(capacity));
@@ -268,14 +268,14 @@ pub(in super::super) fn oracle_earn_action_line(
             format!(" REVIEW {} ", claim.amount_label),
             format!(
                 "{} of {}  •  Enter to open",
-                app.oracle_earn_selected + 1,
+                app.oracle.earn_selected + 1,
                 app.current_oracle_rewards()
                     .map(|state| state.claims.len())
                     .unwrap_or_default()
             ),
             Color::Green,
         )
-    } else if app.loading_oracle_rewards {
+    } else if app.oracle.loading_rewards {
         (
             " CHECKING... ".to_string(),
             "Selected market + month".to_string(),

@@ -8,7 +8,7 @@ impl LabApp {
     }
 
     pub(super) fn can_quit_lab(&mut self) -> bool {
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             self.status =
                 "Order submission is still running. Wait for the result before quitting Petri."
                     .to_string();
@@ -18,7 +18,7 @@ impl LabApp {
                 "A staking transaction is still running. Wait for its result before quitting Petri."
                     .to_string();
             false
-        } else if self.writer_action_is_running() {
+        } else if self.writers.action_is_running() {
             self.status =
                 "A writer transaction is still running. Wait for its result before quitting Petri."
                     .to_string();
@@ -62,21 +62,21 @@ impl LabApp {
         }
         self.screen = screen;
         if screen != LabScreen::Help {
-            self.help_preview = None;
-            self.help_glossary_hover = None;
-            self.help_hover_grace_ticks = None;
+            self.help.preview = None;
+            self.help.glossary_hover = None;
+            self.help.hover_grace_ticks = None;
         }
-        if screen != LabScreen::Chain && !self.trade_submit_is_running() {
-            self.trade_ticket = None;
+        if screen != LabScreen::Chain && !self.trading.submit_is_running() {
+            self.trading.ticket = None;
         }
         if screen != LabScreen::Staking && !self.staking_action_is_running() {
             self.staking_form = None;
             self.staking_confirmation = None;
         }
-        if screen != LabScreen::Ledger && !self.writer_action_is_running() {
-            self.clear_writer_action_mask_check();
-            self.writer_form = None;
-            self.writer_confirmation = None;
+        if screen != LabScreen::Ledger && !self.writers.action_is_running() {
+            self.writers.clear_action_mask_check();
+            self.writers.form = None;
+            self.writers.confirmation = None;
             if !self.liquidity_preview_is_running() {
                 self.liquidity_preview_form = None;
             }
@@ -108,24 +108,24 @@ impl LabApp {
         if direction == 0 {
             return;
         }
-        if self.trade_submit_is_running() && self.screen == LabScreen::Chain {
+        if self.trading.submit_is_running() && self.screen == LabScreen::Chain {
             self.status = "Order submission is running. Contract controls are temporarily locked."
                 .to_string();
             return;
         }
         if self.screen == LabScreen::Help && self.home_help_topic == HomeHelpTopic::Overview {
-            match self.help_pane {
+            match self.help.pane {
                 HelpPane::Navigation => {
                     self.select_help_nav_offset(direction * PANEL_SCROLL_STEP as isize)
                 }
-                HelpPane::Article => self.scroll_help_article(direction, PANEL_SCROLL_STEP),
+                HelpPane::Article => self.help.scroll_article(direction, PANEL_SCROLL_STEP),
             }
             self.status = "Scroll through GitBook topics or the selected page.".to_string();
             return;
         }
         if self.screen == LabScreen::Oracle
             && self.focus == LabFocus::OracleActions
-            && self.oracle_form.is_some()
+            && self.oracle.form.is_some()
         {
             self.move_oracle_form_field(direction * PANEL_SCROLL_STEP as isize);
             return;
@@ -227,7 +227,8 @@ impl LabApp {
             && self.screen == LabScreen::Help
             && self.home_help_topic == HomeHelpTopic::Overview
             && self
-                .help_preview
+                .help
+                .preview
                 .as_ref()
                 .is_some_and(|preview| preview.origin == HelpPreviewOrigin::Hover)
         {
@@ -246,20 +247,20 @@ impl LabApp {
                     )
                     .is_some();
             if !keeps_hover_preview {
-                self.clear_help_hover_preview();
+                self.help.clear_hover_preview();
             }
         }
-        if self.trade_result_modal_is_open() {
+        if self.trading.result_modal_is_open() {
             let modal_root = lab_modal_root(root, cli, self);
             if activate_left_click
                 && trade_result_close_rect(modal_root)
                     .is_some_and(|area| rect_contains(area, mouse.column, mouse.row))
             {
-                self.dismiss_trade_result_modal();
+                self.trading.dismiss_result_modal();
             }
             return;
         }
-        if self.trade_confirmation_is_open() {
+        if self.trading.confirmation_is_open() {
             let modal_root = lab_modal_root(root, cli, self);
             match mouse.kind {
                 MouseEventKind::Down(MouseButton::Left) => {
@@ -267,7 +268,8 @@ impl LabApp {
                     self.confirmation_mouse_press = choice.map(ConfirmationMousePress::Trade);
                     if let Some(choice) = choice {
                         if let Some(confirmation) = self
-                            .trade_ticket
+                            .trading
+                            .ticket
                             .as_mut()
                             .and_then(|ticket| ticket.confirmation.as_mut())
                         {
@@ -302,14 +304,14 @@ impl LabApp {
             }
             return;
         }
-        if self.writer_confirmation.is_some() {
+        if self.writers.confirmation.is_some() {
             let modal_root = lab_modal_root(root, cli, self);
             match mouse.kind {
                 MouseEventKind::Down(MouseButton::Left) => {
                     let choice = writer_confirmation_button_at(modal_root, mouse.column, mouse.row);
                     self.confirmation_mouse_press = choice.map(ConfirmationMousePress::Writer);
                     if let Some(choice) = choice {
-                        if let Some(confirmation) = self.writer_confirmation.as_mut() {
+                        if let Some(confirmation) = self.writers.confirmation.as_mut() {
                             confirmation.choice = choice;
                         }
                         self.status =
@@ -411,7 +413,8 @@ impl LabApp {
                 1
             };
             let max_scroll = gitbook_help_preview_max_scroll_for_root(cli, root, self).unwrap_or(0);
-            self.scroll_help_preview(direction, PANEL_SCROLL_STEP, max_scroll);
+            self.help
+                .scroll_preview(direction, PANEL_SCROLL_STEP, max_scroll);
             self.status = "Scrolling the topic preview.".to_string();
             return;
         }
@@ -455,14 +458,14 @@ impl LabApp {
             return rect_contains(startup_intro_open_button_rect(root), column, row);
         }
         let modal_root = lab_modal_root(root, cli, self);
-        if self.trade_result_modal_is_open() {
+        if self.trading.result_modal_is_open() {
             return trade_result_close_rect(modal_root)
                 .is_some_and(|area| rect_contains(area, column, row));
         }
-        if self.trade_confirmation_is_open() {
+        if self.trading.confirmation_is_open() {
             return trade_confirmation_button_at(modal_root, column, row).is_some();
         }
-        if self.writer_confirmation.is_some() {
+        if self.writers.confirmation.is_some() {
             return writer_confirmation_button_at(modal_root, column, row).is_some();
         }
         if self.screen == LabScreen::Staking && self.staking_confirmation.is_some() {
@@ -536,7 +539,7 @@ impl LabApp {
 
         if self.screen == LabScreen::Chart {
             if let Some(hit) = chart_control_hit_at(body_layout.selected_area, column, row) {
-                return !matches!(hit, ChartControlHit::Refresh) || !self.loading_chart;
+                return !matches!(hit, ChartControlHit::Refresh) || !self.trading.loading_chart;
             }
             return chart_activity_area(body_layout.selected_area, self)
                 .is_some_and(|activity_area| rect_contains(activity_area, column, row));
@@ -547,7 +550,7 @@ impl LabApp {
         }
 
         if self.screen == LabScreen::Ledger
-            && self.writer_form.is_none()
+            && self.writers.form.is_none()
             && self.liquidity_preview_form.is_none()
             && !self.wallet_switch_editing
         {
@@ -568,7 +571,7 @@ impl LabApp {
             if oracle_view_tab_hit_at(body_layout.selected_area, column, row).is_some() {
                 return true;
             }
-            return match self.oracle_view {
+            return match self.oracle.view {
                 OracleView::Earn => {
                     oracle_earn_action_hit_at(body_layout.selected_area, column, row)
                 }
@@ -583,7 +586,7 @@ impl LabApp {
             return false;
         }
 
-        if self.trade_ticket.is_none()
+        if self.trading.ticket.is_none()
             && body_layout.activity_area.height > 0
             && let Some((buy_rect, sell_rect)) =
                 selected_contract_button_rects(body_layout.activity_area)
@@ -591,7 +594,7 @@ impl LabApp {
         {
             return true;
         }
-        if !self.trade_submit_is_running()
+        if !self.trading.submit_is_running()
             && let Some(order_area) = active_order_ticket_area(cli, body_layout.selected_area, self)
         {
             if trade_ticket_field_hit_at(cli, order_area, self, column, row).is_some() {
@@ -618,7 +621,8 @@ impl LabApp {
             return;
         };
         if let Some(confirmation) = self
-            .trade_ticket
+            .trading
+            .ticket
             .as_mut()
             .and_then(|ticket| ticket.confirmation.as_mut())
         {
@@ -636,7 +640,7 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.writer_action_is_running() {
+        if self.writers.action_is_running() {
             self.status = "The writer transaction is already running.".to_string();
             return;
         }
@@ -644,7 +648,7 @@ impl LabApp {
             self.status = "Choose Cancel or Confirm & Send.".to_string();
             return;
         };
-        if let Some(confirmation) = self.writer_confirmation.as_mut() {
+        if let Some(confirmation) = self.writers.confirmation.as_mut() {
             confirmation.choice = choice;
         }
         self.activate_writer_confirmation(cli, backend_url, fetch_tx);
@@ -711,7 +715,7 @@ impl LabApp {
         let body_layout = lab_page_layout(self.screen, frame_layout);
 
         if header_update_hit_at(cli, frame_layout.header_area, self, column, row) {
-            self.update_mouse_requested = true;
+            self.updates.request_mouse_exit();
             return;
         }
 
@@ -768,15 +772,15 @@ impl LabApp {
                 if gitbook_help_preview_close_rect(geometry.popup)
                     .is_some_and(|area| rect_contains(area, column, row))
                 {
-                    self.help_preview = None;
+                    self.help.preview = None;
                     self.status = "Topic preview closed.".to_string();
                     return;
                 }
                 if rect_contains(geometry.popup, column, row) {
                     if let Some(nav_index) =
-                        self.help_preview.as_ref().map(|preview| preview.nav_index)
+                        self.help.preview.as_ref().map(|preview| preview.nav_index)
                     {
-                        self.help_selected_nav = nav_index;
+                        self.help.selected_nav = nav_index;
                     }
                     self.activate_help_selection(fetch_tx);
                     return;
@@ -784,11 +788,11 @@ impl LabApp {
             }
             if let Some(index) = gitbook_nav_hit_at(cli, layout.navigation_area, self, column, row)
             {
-                self.help_pane = HelpPane::Navigation;
-                self.help_selected_nav = index;
+                self.help.pane = HelpPane::Navigation;
+                self.help.selected_nav = index;
                 self.activate_help_selection(fetch_tx);
             } else if rect_contains(layout.article_area, column, row) {
-                self.help_pane = HelpPane::Article;
+                self.help.pane = HelpPane::Article;
             }
             return;
         }
@@ -813,7 +817,7 @@ impl LabApp {
         {
             match hit {
                 MarketRailHit::Market(index) => {
-                    let was_selected = self.selected == index;
+                    let was_selected = self.trading.selected == index;
                     if self.select_market_index(index, backend_url, fetch_tx) && was_selected {
                         self.activate_market_row(backend_url, fetch_tx);
                     }
@@ -854,7 +858,7 @@ impl LabApp {
                     ChartControlHit::Range(range) => {
                         self.set_chart_range(backend_url, fetch_tx, range)
                     }
-                    ChartControlHit::Refresh if !self.loading_chart => {
+                    ChartControlHit::Refresh if !self.trading.loading_chart => {
                         self.request_chart(backend_url, fetch_tx, true)
                     }
                     ChartControlHit::Refresh => {
@@ -887,7 +891,7 @@ impl LabApp {
 
         if self.screen == LabScreen::Ledger {
             self.set_focus(LabFocus::Ledger);
-            if self.writer_form.is_some()
+            if self.writers.form.is_some()
                 || self.liquidity_preview_form.is_some()
                 || self.wallet_switch_editing
             {
@@ -901,7 +905,7 @@ impl LabApp {
                 ledger_writer_action_hit_at(body_layout.selected_area, self, column, row)
             {
                 self.ledger_pane = LedgerPane::Actions;
-                self.writer_action_selected = index;
+                self.writers.action_selected = index;
                 self.activate_writer_action(cli, backend_url, fetch_tx);
                 return;
             }
@@ -931,15 +935,15 @@ impl LabApp {
                         self.status = "Manager-liquidity position selected.".to_string();
                     }
                     LedgerView::Writers => {
-                        if self.writer_interaction_is_locked() {
+                        if self.writers.interaction_is_locked() {
                             self.status = "The selected writer sleeve is locked until the current action or availability check finishes."
                                 .to_string();
                             return;
                         }
-                        self.clear_writer_action_mask_check();
+                        self.writers.clear_action_mask_check();
                         self.ledger_writer_selected = index;
                         self.ledger_pane = LedgerPane::List;
-                        self.writer_action_result = None;
+                        self.writers.action_result = None;
                         self.status = "Collective-writer sleeve selected.".to_string();
                     }
                     LedgerView::History => {
@@ -961,7 +965,7 @@ impl LabApp {
             if let Some(index) =
                 oracle_intro_action_hit_at(cli, body_layout.selected_area, self, column, row)
             {
-                self.oracle_intro_selected = index;
+                self.oracle.intro_selected = index;
                 self.set_focus(LabFocus::OracleIntro);
                 self.activate_oracle_intro_action(backend_url, fetch_tx);
                 return;
@@ -977,7 +981,7 @@ impl LabApp {
                 self.open_oracle_view(view, backend_url, fetch_tx);
                 return;
             }
-            if self.oracle_view == OracleView::Earn {
+            if self.oracle.view == OracleView::Earn {
                 if let Some(index) =
                     oracle_earn_claim_hit_at(body_layout.selected_area, self, column, row)
                 {
@@ -1003,7 +1007,7 @@ impl LabApp {
             {
                 self.set_focus(LabFocus::OracleActions);
                 self.select_oracle_action(action);
-                self.oracle_locked_flash = None;
+                self.oracle.locked_flash = None;
                 self.activate_oracle_action();
                 return;
             }
@@ -1037,7 +1041,7 @@ impl LabApp {
             return;
         }
 
-        if self.trade_ticket.is_none()
+        if self.trading.ticket.is_none()
             && body_layout.activity_area.height > 0
             && let Some((buy_rect, sell_rect)) =
                 selected_contract_button_rects(body_layout.activity_area)
@@ -1052,7 +1056,7 @@ impl LabApp {
             }
         }
         if let Some(order_area) = active_order_ticket_area(cli, body_layout.selected_area, self) {
-            if self.trade_submit_is_running() && rect_contains(order_area, column, row) {
+            if self.trading.submit_is_running() && rect_contains(order_area, column, row) {
                 self.status =
                     "Order submission is running. The ticket will unlock when it finishes."
                         .to_string();
@@ -1061,7 +1065,7 @@ impl LabApp {
             if let Some(button_rect) = order_ticket_place_button_rect(order_area)
                 && rect_contains(button_rect, column, row)
             {
-                if self.trade_submit_is_running() {
+                if self.trading.submit_is_running() {
                     self.status = "Order submission is already running.".to_string();
                 } else {
                     self.review_or_submit_trade_ticket(cli, fetch_tx);
@@ -1080,13 +1084,13 @@ impl LabApp {
             }
         }
 
-        if self.trade_submit_is_running() {
+        if self.trading.submit_is_running() {
             self.status = "Order submission is running. Contract controls are temporarily locked."
                 .to_string();
             return;
         }
 
-        if let Some(detail) = &self.detail {
+        if let Some(detail) = &self.trading.detail {
             if let Some(index) = option_quote_hit_at(
                 cli,
                 body_layout.selected_area,
@@ -1126,10 +1130,6 @@ impl LabApp {
         }
     }
 
-    pub(super) fn take_update_mouse_request(&mut self) -> bool {
-        std::mem::take(&mut self.update_mouse_requested)
-    }
-
     pub(super) fn update_gitbook_help_hover(
         &mut self,
         cli: &Cli,
@@ -1139,18 +1139,20 @@ impl LabApp {
     ) {
         if self.screen != LabScreen::Help || self.home_help_topic != HomeHelpTopic::Overview {
             if self
-                .help_preview
+                .help
+                .preview
                 .as_ref()
                 .is_some_and(|preview| preview.origin == HelpPreviewOrigin::Hover)
             {
-                self.help_preview = None;
+                self.help.preview = None;
             }
-            self.help_glossary_hover = None;
-            self.help_hover_grace_ticks = None;
+            self.help.glossary_hover = None;
+            self.help.hover_grace_ticks = None;
             return;
         }
         if self
-            .help_preview
+            .help
+            .preview
             .as_ref()
             .is_some_and(|preview| preview.origin == HelpPreviewOrigin::Keyboard)
         {
@@ -1162,30 +1164,30 @@ impl LabApp {
         let layout = gitbook_help_layout(body_layout.selected_area);
         let glossary_geometry = gitbook_glossary_geometry(body_layout.selected_area, self);
         if glossary_geometry.is_some_and(|geometry| rect_contains(geometry.popup, column, row)) {
-            self.help_hover_grace_ticks = None;
+            self.help.hover_grace_ticks = None;
             return;
         }
         let preview_geometry = gitbook_help_preview_geometry(body_layout.selected_area, self);
         if preview_geometry.is_some_and(|geometry| rect_contains(geometry.popup, column, row)) {
-            self.help_hover_grace_ticks = None;
+            self.help.hover_grace_ticks = None;
             return;
         }
         if let Some(nav_index) = gitbook_nav_hit_at(cli, layout.navigation_area, self, column, row)
         {
-            self.help_glossary_hover = None;
-            self.help_hover_grace_ticks = None;
+            self.help.glossary_hover = None;
+            self.help.hover_grace_ticks = None;
             self.set_help_hover_preview(nav_index);
             return;
         }
         if let Some(hit) = gitbook_glossary_hit_at(cli, layout.article_area, self, column, row) {
-            self.clear_help_hover_preview();
-            self.help_hover_grace_ticks = None;
-            let unchanged = self
-                .help_glossary_hover
-                .as_ref()
-                .is_some_and(|hover| hover.term == hit.entry.term && hover.anchor == hit.anchor);
+            self.help.clear_hover_preview();
+            self.help.hover_grace_ticks = None;
+            let unchanged =
+                self.help.glossary_hover.as_ref().is_some_and(|hover| {
+                    hover.term == hit.entry.term && hover.anchor == hit.anchor
+                });
             if !unchanged {
-                self.help_glossary_hover = Some(GitbookGlossaryHover {
+                self.help.glossary_hover = Some(GitbookGlossaryHover {
                     term: hit.entry.term,
                     definition: hit.entry.definition,
                     anchor: hit.anchor,
@@ -1194,14 +1196,14 @@ impl LabApp {
             return;
         }
         if preview_geometry.is_some() || glossary_geometry.is_some() {
-            if self.help_hover_grace_ticks.is_none() {
-                self.help_hover_grace_ticks = Some(HELP_HOVER_EXIT_GRACE_TICKS);
+            if self.help.hover_grace_ticks.is_none() {
+                self.help.hover_grace_ticks = Some(HELP_HOVER_EXIT_GRACE_TICKS);
             }
             return;
         }
-        self.clear_help_hover_preview();
-        self.help_glossary_hover = None;
-        self.help_hover_grace_ticks = None;
+        self.help.clear_hover_preview();
+        self.help.glossary_hover = None;
+        self.help.hover_grace_ticks = None;
     }
 
     pub(super) fn focus_mouse_target(&mut self, cli: &Cli, root: Rect, column: u16, row: u16) {
@@ -1269,9 +1271,9 @@ impl LabApp {
                 if self.home_help_topic == HomeHelpTopic::Overview {
                     let layout = gitbook_help_layout(body_layout.selected_area);
                     if rect_contains(layout.navigation_area, column, row) {
-                        self.help_pane = HelpPane::Navigation;
+                        self.help.pane = HelpPane::Navigation;
                     } else if rect_contains(layout.article_area, column, row) {
-                        self.help_pane = HelpPane::Article;
+                        self.help.pane = HelpPane::Article;
                     }
                 }
                 if rect_contains(body_layout.selected_area, column, row) {
@@ -1279,7 +1281,7 @@ impl LabApp {
                 }
             }
             LabScreen::Oracle => {
-                if self.oracle_view == OracleView::Earn {
+                if self.oracle.view == OracleView::Earn {
                     if rect_contains(body_layout.selected_area, column, row) {
                         self.set_focus(LabFocus::OracleEarn);
                     }
@@ -1358,12 +1360,12 @@ impl LabApp {
     }
 
     pub(super) fn move_focus_in_cycle(&mut self, offset: isize) {
-        if self.trade_submit_is_running() && self.screen == LabScreen::Chain {
+        if self.trading.submit_is_running() && self.screen == LabScreen::Chain {
             self.status = "Order submission is running. Contract controls are temporarily locked."
                 .to_string();
             return;
         }
-        let order = if self.screen == LabScreen::Oracle && self.oracle_view == OracleView::Earn {
+        let order = if self.screen == LabScreen::Oracle && self.oracle.view == OracleView::Earn {
             &[LabFocus::Markets, LabFocus::OracleEarn][..]
         } else {
             focus_cycle_order(self.screen)
@@ -1391,7 +1393,7 @@ impl LabApp {
         backend_url: Option<&str>,
         fetch_tx: Option<&Sender<LabFetchResult>>,
     ) {
-        if self.trade_submit_is_running() && self.screen == LabScreen::Chain {
+        if self.trading.submit_is_running() && self.screen == LabScreen::Chain {
             self.status = "Order submission is running. Contract controls are temporarily locked."
                 .to_string();
             return;
@@ -1399,7 +1401,7 @@ impl LabApp {
         if self.handle_focused_list_navigation(direction, backend_url, fetch_tx) {
             return;
         }
-        if self.screen == LabScreen::Oracle && self.oracle_view == OracleView::Earn {
+        if self.screen == LabScreen::Oracle && self.oracle.view == OracleView::Earn {
             match (self.focus, direction) {
                 (LabFocus::Markets | LabFocus::MarketSeries, FocusDirection::Right) => {
                     self.set_focus(LabFocus::OracleEarn);
@@ -1442,7 +1444,7 @@ impl LabApp {
                 let (Some(backend_url), Some(fetch_tx)) = (backend_url, fetch_tx) else {
                     return false;
                 };
-                if self.market_series_open && self.market_series_count() > 0 {
+                if self.trading.market_series_open && self.market_series_count() > 0 {
                     self.set_focus(LabFocus::MarketSeries);
                 } else {
                     self.select_next(backend_url, fetch_tx);
@@ -1469,8 +1471,8 @@ impl LabApp {
             }
             (LabFocus::HomeActions, FocusDirection::Up) => self.select_prev_home_action(),
             (LabFocus::HomeActions, FocusDirection::Down) => self.select_next_home_action(),
-            (LabFocus::OracleIntro, FocusDirection::Up) => self.select_prev_oracle_intro_action(),
-            (LabFocus::OracleIntro, FocusDirection::Down) => self.select_next_oracle_intro_action(),
+            (LabFocus::OracleIntro, FocusDirection::Up) => self.oracle.select_prev_intro_action(),
+            (LabFocus::OracleIntro, FocusDirection::Down) => self.oracle.select_next_intro_action(),
             (LabFocus::OracleEarn, FocusDirection::Up) => {
                 self.select_prev_oracle_earn_reward();
                 true

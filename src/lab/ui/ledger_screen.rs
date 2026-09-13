@@ -628,13 +628,13 @@ fn draw_writers_workspace(
         )
         .block(panel_block(
             cli,
-            if app.writer_form.is_some() {
+            if app.writers.form.is_some() {
                 "Writer form"
             } else {
                 "Sleeve detail"
             },
             Color::Cyan,
-            app.ledger_pane == LedgerPane::Detail || app.writer_form.is_some(),
+            app.ledger_pane == LedgerPane::Detail || app.writers.form.is_some(),
         )),
         layout.detail,
     );
@@ -642,7 +642,7 @@ fn draw_writers_workspace(
     if let Some(actions_area) = layout.actions {
         let mut actions = Vec::new();
         for (index, action) in WriterAction::ALL.iter().copied().enumerate() {
-            let selected = index == app.writer_action_selected;
+            let selected = index == app.writers.action_selected;
             actions.push(selectable_line(
                 cli,
                 action.label(),
@@ -681,7 +681,7 @@ fn draw_writers_workspace(
 
 pub(in super::super) fn writer_detail_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
     let mut capability_lines = writer_capability_banner_lines(cli, app);
-    if let Some(form) = app.writer_form.as_ref() {
+    if let Some(form) = app.writers.form.as_ref() {
         capability_lines.push(Line::from(Span::styled(
             form.action.label(),
             style(cli, Color::Yellow).add_modifier(Modifier::BOLD),
@@ -735,7 +735,7 @@ pub(in super::super) fn writer_detail_lines(cli: &Cli, app: &LabApp) -> Vec<Line
         return lines;
     }
 
-    if let Some(result) = app.writer_action_result.as_ref() {
+    if let Some(result) = app.writers.action_result.as_ref() {
         capability_lines.extend([
             Line::from(Span::styled(
                 if result.ok { "READY" } else { "STOPPED" },
@@ -1068,7 +1068,8 @@ pub(in super::super) fn ledger_liquidity_action_hit_at(
 
 pub(in super::super) fn writer_action_scroll_offset(area: Rect, app: &LabApp) -> usize {
     let visible = panel_inner_height(area).max(1);
-    app.writer_action_selected
+    app.writers
+        .action_selected
         .saturating_sub(visible.saturating_sub(1))
 }
 
@@ -1131,7 +1132,7 @@ pub(in super::super) fn draw_writer_confirmation_modal(
     root: Rect,
     app: &LabApp,
 ) {
-    let Some(confirmation) = app.writer_confirmation.as_ref() else {
+    let Some(confirmation) = app.writers.confirmation.as_ref() else {
         return;
     };
     dim_tui_for_modal(frame, cli, root);

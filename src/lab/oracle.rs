@@ -10,18 +10,11 @@ impl LabApp {
             .unwrap_or(HomeAction::Trade)
     }
 
-    pub(super) fn selected_oracle_intro_action(&self) -> OracleIntroAction {
-        OracleIntroAction::ALL
-            .get(self.oracle_intro_selected)
-            .copied()
-            .unwrap_or(OracleIntroAction::Earn)
-    }
-
     pub(super) fn current_oracle_rewards(&self) -> Option<&SpreadOracleRewardState> {
         let selected_market = self.selected_id();
         let selected_expiry = self.selected_chart_expiry()?.id.as_str();
         let selected_owner = self.wallet.pubkey.as_deref()?;
-        self.oracle_rewards.as_ref().filter(|state| {
+        self.oracle.rewards.as_ref().filter(|state| {
             state.market_id.eq_ignore_ascii_case(&selected_market)
                 && state.expiry_id.eq_ignore_ascii_case(selected_expiry)
                 && state.owner_pubkey == selected_owner
@@ -31,7 +24,7 @@ impl LabApp {
     pub(super) fn selected_oracle_reward_claim(&self) -> Option<&SpreadOracleRewardClaim> {
         self.current_oracle_rewards()?
             .claims
-            .get(self.oracle_earn_selected)
+            .get(self.oracle.earn_selected)
     }
 
     pub(super) fn has_claimable_oracle_reward(&self) -> bool {
@@ -44,23 +37,23 @@ impl LabApp {
             .current_oracle_rewards()
             .map(|state| state.claims.len())
         else {
-            self.oracle_earn_selected = 0;
+            self.oracle.earn_selected = 0;
             return false;
         };
         if index >= claim_count {
             return false;
         }
-        self.oracle_earn_selected = index;
+        self.oracle.earn_selected = index;
         true
     }
 
     pub(super) fn select_prev_oracle_earn_reward(&mut self) -> bool {
-        let next = self.oracle_earn_selected.saturating_sub(1);
-        next != self.oracle_earn_selected && self.select_oracle_earn_reward(next)
+        let next = self.oracle.earn_selected.saturating_sub(1);
+        next != self.oracle.earn_selected && self.select_oracle_earn_reward(next)
     }
 
     pub(super) fn select_next_oracle_earn_reward(&mut self) -> bool {
-        self.select_oracle_earn_reward(self.oracle_earn_selected.saturating_add(1))
+        self.select_oracle_earn_reward(self.oracle.earn_selected.saturating_add(1))
     }
 
     pub(super) fn first_settlement_eligible_oracle_escrow(&self) -> Option<&SpreadOracleEscrow> {
@@ -88,7 +81,7 @@ impl LabApp {
 
     pub(super) fn selected_oracle_action(&self) -> OracleAction {
         self.visible_oracle_actions()
-            .get(self.oracle_selected)
+            .get(self.oracle.selected)
             .copied()
             .unwrap_or(OracleAction::ReviewQueue)
     }
@@ -101,7 +94,7 @@ impl LabApp {
         else {
             return false;
         };
-        self.oracle_selected = index;
+        self.oracle.selected = index;
         true
     }
 
@@ -133,22 +126,6 @@ impl LabApp {
         true
     }
 
-    pub(super) fn select_prev_oracle_intro_action(&mut self) -> bool {
-        if self.oracle_intro_selected == 0 {
-            return false;
-        }
-        self.oracle_intro_selected -= 1;
-        true
-    }
-
-    pub(super) fn select_next_oracle_intro_action(&mut self) -> bool {
-        if self.oracle_intro_selected + 1 >= OracleIntroAction::ALL.len() {
-            return false;
-        }
-        self.oracle_intro_selected += 1;
-        true
-    }
-
     pub(super) fn select_prev_oracle_action(&mut self) -> bool {
         self.select_oracle_action_by_offset(-1)
     }
@@ -159,44 +136,47 @@ impl LabApp {
 
     pub(super) fn select_oracle_action_by_offset(&mut self, offset: isize) -> bool {
         let len = self.visible_oracle_actions().len();
-        let start = self.oracle_selected.min(len.saturating_sub(1));
+        let start = self.oracle.selected.min(len.saturating_sub(1));
         let next = start as isize + offset;
         if next < 0 || next >= len as isize {
             return false;
         }
-        self.oracle_selected = next as usize;
-        self.oracle_locked_flash = None;
+        self.oracle.selected = next as usize;
+        self.oracle.locked_flash = None;
         self.reset_panel_scroll(LabFocus::OracleActions);
         true
     }
 
     pub(super) fn clamp_oracle_selection(&mut self) {
-        self.oracle_selected = self
-            .oracle_selected
+        self.oracle.selected = self
+            .oracle
+            .selected
             .min(self.visible_oracle_actions().len().saturating_sub(1));
         let claim_count = self
             .current_oracle_rewards()
             .map(|state| state.claims.len())
             .unwrap_or_default();
-        self.oracle_earn_selected = self.oracle_earn_selected.min(claim_count.saturating_sub(1));
+        self.oracle.earn_selected = self.oracle.earn_selected.min(claim_count.saturating_sub(1));
     }
 
     pub(super) fn oracle_tree(&self) -> Option<&OracleIndexTree> {
         let selected_market = self.selected_id();
-        self.oracle_tree
+        self.oracle
+            .tree
             .as_ref()
             .filter(|tree| tree.market_id.eq_ignore_ascii_case(&selected_market))
     }
 
     pub(super) fn selected_oracle_node(&self) -> Option<&RamxOracleNode> {
         self.oracle_tree()
-            .and_then(|tree| tree.node(self.oracle_node_selected))
+            .and_then(|tree| tree.node(self.oracle.node_selected))
     }
 
     pub(super) fn selected_oracle_node_index(&self) -> usize {
         self.oracle_tree()
             .map(|tree| {
-                self.oracle_node_selected
+                self.oracle
+                    .node_selected
                     .min(tree.nodes.len().saturating_sub(1))
             })
             .unwrap_or(DEFAULT_ORACLE_NODE_INDEX)
@@ -219,7 +199,8 @@ impl LabApp {
         let mut state = OracleSourceActionState::default();
 
         for record in self
-            .oracle_submissions
+            .oracle
+            .submissions
             .iter()
             .filter(|record| oracle_submission_matches_node(record, node))
         {
@@ -254,24 +235,14 @@ impl LabApp {
         state
     }
 
-    pub(super) fn oracle_tree_load_status(&self) -> String {
-        if self.loading_oracle_tree {
-            "Oracle source recipe is still loading.".to_string()
-        } else if self.oracle_tree_issue.is_some() {
-            "Could not load oracle source recipe.".to_string()
-        } else {
-            "Oracle source recipe is not loaded yet.".to_string()
-        }
-    }
-
     pub(super) fn select_oracle_node(&mut self, index: usize) {
         let Some(tree) = self.oracle_tree() else {
-            self.oracle_node_selected = DEFAULT_ORACLE_NODE_INDEX;
-            self.status = self.oracle_tree_load_status();
+            self.oracle.node_selected = DEFAULT_ORACLE_NODE_INDEX;
+            self.status = self.oracle.tree_load_status();
             return;
         };
-        self.oracle_node_selected = index.min(tree.nodes.len().saturating_sub(1));
-        self.oracle_locked_flash = None;
+        self.oracle.node_selected = index.min(tree.nodes.len().saturating_sub(1));
+        self.oracle.locked_flash = None;
         self.reset_panel_scroll(LabFocus::OracleTasks);
         self.clamp_oracle_selection();
         if let Some(node) = self.selected_oracle_node() {
@@ -308,7 +279,7 @@ impl LabApp {
         let Some(tree) = self.oracle_tree() else {
             return Vec::new();
         };
-        let matches = tree.search_nodes(&self.oracle_search_input);
+        let matches = tree.search_nodes(&self.oracle.search_input);
         if !matches.is_empty() {
             return matches;
         }
@@ -321,7 +292,7 @@ impl LabApp {
 
     pub(super) fn open_oracle_child(&mut self) -> bool {
         let Some(tree) = self.oracle_tree() else {
-            self.status = self.oracle_tree_load_status();
+            self.status = self.oracle.tree_load_status();
             return false;
         };
         let selected = self.selected_oracle_node_index();
@@ -383,12 +354,12 @@ impl LabApp {
     }
 
     pub(super) fn begin_oracle_search(&mut self) {
-        self.oracle_search_editing = true;
+        self.oracle.search_editing = true;
         self.status = "Search RAMX-MOD by SKU, row, source, or form factor.".to_string();
     }
 
     pub(super) fn cancel_oracle_search(&mut self) {
-        self.oracle_search_editing = false;
+        self.oracle.search_editing = false;
         self.status = "Oracle search closed.".to_string();
     }
 
@@ -396,26 +367,26 @@ impl LabApp {
         if character.is_control() {
             return;
         }
-        self.oracle_search_input.push(character);
-        self.status = format!("Searching RAMX-MOD for \"{}\"", self.oracle_search_input);
+        self.oracle.search_input.push(character);
+        self.status = format!("Searching RAMX-MOD for \"{}\"", self.oracle.search_input);
     }
 
     pub(super) fn backspace_oracle_search_input(&mut self) {
-        self.oracle_search_input.pop();
-        self.status = if self.oracle_search_input.is_empty() {
+        self.oracle.search_input.pop();
+        self.status = if self.oracle.search_input.is_empty() {
             "Search RAMX-MOD by SKU, row, source, or form factor.".to_string()
         } else {
-            format!("Searching RAMX-MOD for \"{}\"", self.oracle_search_input)
+            format!("Searching RAMX-MOD for \"{}\"", self.oracle.search_input)
         };
     }
 
     pub(super) fn apply_oracle_search(&mut self) {
-        self.oracle_search_editing = false;
+        self.oracle.search_editing = false;
         let Some(tree) = self.oracle_tree() else {
-            self.status = self.oracle_tree_load_status();
+            self.status = self.oracle.tree_load_status();
             return;
         };
-        let matches = tree.search_nodes(&self.oracle_search_input);
+        let matches = tree.search_nodes(&self.oracle.search_input);
         if let Some(index) = matches.first().copied() {
             self.select_oracle_node(index);
             let node_label = self
@@ -426,10 +397,10 @@ impl LabApp {
                 "Search matched {}. Enter drills; right opens phase actions.",
                 node_label
             );
-        } else if self.oracle_search_input.trim().is_empty() {
+        } else if self.oracle.search_input.trim().is_empty() {
             self.status = "Search cleared.".to_string();
         } else {
-            self.status = format!("No RAMX-MOD match for \"{}\".", self.oracle_search_input);
+            self.status = format!("No RAMX-MOD match for \"{}\".", self.oracle.search_input);
         }
     }
 
@@ -495,14 +466,14 @@ impl LabApp {
             _ => None,
         };
         if let Some(action) = current_action {
-            self.oracle_form = None;
-            self.oracle_search_editing = false;
+            self.oracle.form = None;
+            self.oracle.search_editing = false;
             self.open_specific_action(action);
             return;
         }
-        self.oracle_search_editing = false;
-        self.oracle_form_field_flash = None;
-        self.oracle_locked_flash = None;
+        self.oracle.search_editing = false;
+        self.oracle.form_field_flash = None;
+        self.oracle.locked_flash = None;
         let Some(form) = self.oracle_form_draft_for_selected(mode) else {
             self.status = "Selected oracle source is unavailable.".to_string();
             return;
@@ -513,8 +484,8 @@ impl LabApp {
             .unwrap_or("selected source")
             .to_string();
         let field_selected = form.field_selected;
-        self.oracle_form = Some(form);
-        self.flash_oracle_form_field(field_selected);
+        self.oracle.form = Some(form);
+        self.oracle.flash_form_field(field_selected);
         self.reset_panel_scroll(LabFocus::OracleActions);
         self.status = format!(
             "{} form opened for {}. This saves a local semantic draft only; it cannot prepare, sign, or send.",
@@ -532,8 +503,8 @@ impl LabApp {
         if !self.open_oracle_reward_action(&claim) {
             return;
         }
-        self.oracle_form = None;
-        self.oracle_search_editing = false;
+        self.oracle.form = None;
+        self.oracle.search_editing = false;
         self.status = format!(
             "Claim reward form opened: {} {}.",
             claim.label, claim.amount_label
@@ -547,7 +518,7 @@ impl LabApp {
             return;
         };
         self.begin_oracle_form(OracleFormMode::StakeSettlement);
-        if self.oracle_form.is_none() {
+        if self.oracle.form.is_none() {
             return;
         }
         self.status = format!(
@@ -559,14 +530,14 @@ impl LabApp {
     }
 
     pub(super) fn cancel_oracle_form(&mut self) {
-        self.oracle_form = None;
-        self.oracle_form_field_flash = None;
+        self.oracle.form = None;
+        self.oracle.form_field_flash = None;
         self.reset_panel_scroll(LabFocus::OracleActions);
         self.status = "Oracle form cancelled.".to_string();
     }
 
     pub(super) fn move_oracle_form_field(&mut self, offset: isize) {
-        let selected = if let Some(form) = self.oracle_form.as_mut() {
+        let selected = if let Some(form) = self.oracle.form.as_mut() {
             let previous = form.field_selected;
             form.move_field(offset);
             if let Some(field) = form.fields.get(form.field_selected) {
@@ -577,12 +548,12 @@ impl LabApp {
             None
         };
         if let Some(selected) = selected {
-            self.flash_oracle_form_field(selected);
+            self.oracle.flash_form_field(selected);
         }
     }
 
     pub(super) fn select_oracle_form_field_index(&mut self, index: usize) -> bool {
-        let Some(form) = self.oracle_form.as_mut() else {
+        let Some(form) = self.oracle.form.as_mut() else {
             return false;
         };
         if index >= form.fields.len() {
@@ -592,30 +563,15 @@ impl LabApp {
         if let Some(field) = form.fields.get(index) {
             self.status = format!("Editing {}", field.label);
         }
-        self.flash_oracle_form_field(index);
+        self.oracle.flash_form_field(index);
         true
-    }
-
-    pub(super) fn flash_oracle_form_field(&mut self, field_index: usize) {
-        self.oracle_form_field_flash = Some(OracleFormFieldFlash {
-            field_index,
-            ticks_remaining: ORACLE_FORM_FIELD_FLASH_TICKS,
-            visible: true,
-        });
-    }
-
-    pub(super) fn oracle_form_field_flash_visible(&self, field_index: usize) -> bool {
-        self.oracle_form_field_flash
-            .filter(|flash| flash.field_index == field_index)
-            .map(|flash| flash.visible)
-            .unwrap_or(false)
     }
 
     pub(super) fn push_oracle_form_char(&mut self, character: char) {
         if character.is_control() {
             return;
         }
-        let Some(form) = self.oracle_form.as_mut() else {
+        let Some(form) = self.oracle.form.as_mut() else {
             return;
         };
         let Some(field) = form.selected_field_mut() else {
@@ -630,7 +586,7 @@ impl LabApp {
     }
 
     pub(super) fn backspace_oracle_form_input(&mut self) {
-        let Some(form) = self.oracle_form.as_mut() else {
+        let Some(form) = self.oracle.form.as_mut() else {
             return;
         };
         let Some(field) = form.selected_field_mut() else {
@@ -645,7 +601,7 @@ impl LabApp {
     }
 
     pub(super) fn submit_oracle_form(&mut self) {
-        let Some(form) = self.oracle_form.clone() else {
+        let Some(form) = self.oracle.form.clone() else {
             return;
         };
         if let Err(message) = form.validate() {
@@ -653,13 +609,14 @@ impl LabApp {
             return;
         }
         let Some(tree) = self.oracle_tree().cloned() else {
-            self.status = self.oracle_tree_load_status();
+            self.status = self.oracle.tree_load_status();
             return;
         };
         let phase = self.oracle_phase();
         let mut record = OracleSubmissionRecord::from_draft(&form, phase, &tree);
         let market_id = self.selected_id();
         let (month_label, expiry_id) = self
+            .trading
             .detail
             .as_ref()
             .map(|detail| {
@@ -673,20 +630,20 @@ impl LabApp {
             match record.to_stored_draft(&form, &market_id, month_label, expiry_id, phase, &tree) {
                 Ok(draft) => draft,
                 Err(error) => {
-                    self.oracle_submission_issue = Some(error.clone());
+                    self.oracle.submission_issue = Some(error.clone());
                     self.status = error;
                     return;
                 }
             };
-        if let Some(path) = self.oracle_submission_store_path.as_ref() {
+        if let Some(path) = self.oracle.submission_store_path.as_ref() {
             match oracle_submissions::append_at_path(path, stored_draft) {
                 Ok(stored) => {
                     record.stored_id = Some(stored.id);
                     record.backend_status = stored.backend_status;
-                    self.oracle_submission_issue = None;
+                    self.oracle.submission_issue = None;
                 }
                 Err(error) => {
-                    self.oracle_submission_issue = Some(error.to_string());
+                    self.oracle.submission_issue = Some(error.to_string());
                 }
             }
         }
@@ -699,15 +656,15 @@ impl LabApp {
             "Saved local draft {} for {} ({storage_status}). No instruction was prepared, signed, or sent.",
             record.title, record.node_label
         );
-        self.oracle_submissions.push(record);
-        self.oracle_form = None;
-        self.oracle_form_field_flash = None;
+        self.oracle.submissions.push(record);
+        self.oracle.form = None;
+        self.oracle.form_field_flash = None;
     }
 
     pub(super) fn activate_oracle_action(&mut self) {
         let selected = self.selected_oracle_action();
         let Some(tree) = self.oracle_tree().cloned() else {
-            self.status = self.oracle_tree_load_status();
+            self.status = self.oracle.tree_load_status();
             return;
         };
         let Some((node_kind, node_label)) = self
@@ -736,7 +693,7 @@ impl LabApp {
                             return;
                         }
                         if selected.availability(pin_context) == OracleActionAvailability::Locked {
-                            self.flash_oracle_action_locked(selected);
+                            self.oracle.flash_action_locked(selected);
                             self.status = format!(
                                 "{} is locked here in {}. {}",
                                 selected.label(),
@@ -754,7 +711,7 @@ impl LabApp {
                 );
                 return;
             }
-            self.flash_oracle_action_locked(selected);
+            self.oracle.flash_action_locked(selected);
             self.status = format!(
                 "{} is locked here in {}. {}",
                 selected.label(),
@@ -764,7 +721,7 @@ impl LabApp {
             return;
         }
         if selected.availability(context) != OracleActionAvailability::Active {
-            self.flash_oracle_action_locked(selected);
+            self.oracle.flash_action_locked(selected);
             self.status = format!(
                 "{} is locked here in {}. {}",
                 selected.label(),
@@ -833,21 +790,6 @@ impl LabApp {
         };
     }
 
-    pub(super) fn flash_oracle_action_locked(&mut self, action: OracleAction) {
-        self.oracle_locked_flash = Some(OracleLockedFlash {
-            action,
-            ticks_remaining: ORACLE_LOCK_FLASH_TICKS,
-            visible: false,
-        });
-    }
-
-    pub(super) fn oracle_action_flash_visible(&self, action: OracleAction) -> bool {
-        self.oracle_locked_flash
-            .filter(|flash| flash.action == action)
-            .map(|flash| flash.visible)
-            .unwrap_or(false)
-    }
-
     pub(super) fn activate_home_action(
         &mut self,
         backend_url: &str,
@@ -871,7 +813,7 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        match self.selected_oracle_intro_action() {
+        match self.oracle.selected_intro_action() {
             OracleIntroAction::Earn => self.open_oracle_earn(backend_url, fetch_tx),
             OracleIntroAction::Advanced => self.open_oracle(backend_url, fetch_tx),
             OracleIntroAction::ReadMore => self.open_oracle_help(),
@@ -884,7 +826,7 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.loading_oracle_tree || self.loading_oracle_live || self.loading_oracle_rewards {
+        if self.oracle.loading_tree || self.oracle.loading_live || self.oracle.loading_rewards {
             self.status = "Petri is still checking current Oracle work.".to_string();
             return;
         }

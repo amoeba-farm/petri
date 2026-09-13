@@ -1,0 +1,9 @@
+{
+  "name": "petri-runtime-build-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build-only dependency tracing; never included in the Petri runtime",
+  "dependencies": {
+    "@vercel/nft": "1.11.0"
+  }
+}

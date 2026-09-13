@@ -12,6 +12,15 @@ use std::io::Read;
 use std::thread;
 use std::time::Duration;
 
+pub(crate) fn current_backend_payload(payload: Value) -> Result<Value, CliError> {
+    crate::chain_identity::validate_current_backend_envelope(&payload)?;
+    Ok(payload)
+}
+
+pub(crate) fn unwrap_data<'a>(payload: &'a Value) -> &'a Value {
+    value_at_key(payload, &["data"]).unwrap_or(payload)
+}
+
 const REQUEST_TIMEOUT_SECONDS: u64 = 15;
 const GET_ATTEMPTS: usize = 3;
 const GET_RETRY_BASE_DELAY_MS: u64 = 100;

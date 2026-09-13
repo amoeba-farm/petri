@@ -25,19 +25,15 @@ impl LabApp {
         let oracle_submission_store_path = oracle_submissions::default_path();
         let (oracle_submissions, oracle_submission_issue) =
             load_oracle_submission_records(oracle_submission_store_path.as_ref());
-        let oracle_tree = None;
-        let help_index = gitbook::bundled_index();
-        let help_selected_page_id = help_index
-            .first_page()
-            .map(|page| page.id.clone())
-            .unwrap_or_default();
-        let mut help_pages = crate::cache::DisplayCache::new(read_cache::HELP_PAGES);
-        if let Some(page) = help_index.first_page().and_then(gitbook::bundled_page) {
-            help_pages.insert(help_selected_page_id.clone(), page);
-        }
-        let read_cache_scope =
-            read_cache::ReadScope::new(&onchain_config.backend_url, &onchain_config.network);
-        let help_expanded_categories = vec![true; help_index.categories.len()];
+        let help = help_state::HelpState::new(gitbook::bundled_index());
+        let cache = read_cache::TuiCache::new(
+            &onchain_config.backend_url,
+            &onchain_config.network,
+            help.index
+                .first_page()
+                .and_then(gitbook::bundled_page)
+                .map(|page| (help.selected_page_id.clone(), page)),
+        );
         let update_check_enabled = update_check_requested && env_update_check_enabled();
         let guide = GuidePanelState::new(guide::GuideConfig::load());
         let screen = if terms_required {
@@ -51,96 +47,28 @@ impl LabApp {
             format!("Opening Petri. Loading live {selected_label} data...")
         };
         Self {
-            dishes,
-            selected,
-            pending_initial_dish,
+            trading: trade_state::TradeState::new(dishes, selected, pending_initial_dish),
             home_selected: 0,
             home_help_topic: HomeHelpTopic::Overview,
-            help_index,
-            help_pages,
-            help_page_revision: 1,
-            help_render_cache: RefCell::new(None),
-            help_selected_page_id,
-            help_selected_nav: 1,
-            help_expanded_categories,
-            help_pane: HelpPane::Navigation,
-            help_nav_scroll: 0,
-            help_article_scroll: 0,
-            help_preview: None,
-            help_glossary_hover: None,
-            help_hover_grace_ticks: None,
-            help_index_request: 0,
-            help_page_request: 0,
-            help_page_request_id: None,
-            help_preview_page_request: 0,
-            help_preview_page_request_id: None,
-            loading_help_index: false,
-            loading_help_page: false,
-            loading_help_preview_page: false,
-            help_preview_failed_page_id: None,
-            help_issue: None,
-            help_transition_tick: None,
-            help_last_checked_at: None,
+            help,
             mcp_connection_state: McpConnectionState::Disabled,
             mcp_managed_entry_enabled: false,
             mcp_connection_issue: None,
             mcp_repair_failed: false,
             guide,
-            oracle_intro_selected: 0,
-            oracle_view: OracleView::Advanced,
-            oracle_earn_selected: 0,
-            oracle_selected: 0,
-            oracle_node_selected: DEFAULT_ORACLE_NODE_INDEX,
-            oracle_search_input: String::new(),
-            oracle_search_editing: false,
-            oracle_form: None,
-            oracle_form_field_flash: None,
-            oracle_locked_flash: None,
-            oracle_tree,
-            oracle_tree_issue: None,
-            oracle_tree_retry_after_tick: None,
-            oracle_submissions,
-            oracle_submission_store_path,
-            oracle_submission_issue,
-            oracle_live: None,
-            oracle_live_issue: None,
-            oracle_rewards: None,
-            oracle_reward_issue: None,
-            update_check_enabled,
-            update_check_request: 0,
-            update_report: None,
-            update_issue: None,
-            update_check_forced: false,
-            loading_update_check: false,
-            update_mouse_requested: false,
-            selected_option: 0,
-            active_option_kind: OptionKind::Call,
-            chain_focus: ChainFocus::Markets,
+            oracle: oracle_state::OracleState::new(
+                oracle_submission_store_path,
+                oracle_submissions,
+                oracle_submission_issue,
+            ),
+            updates: updates::UpdateState::new(update_check_enabled),
             focus: default_focus_for_screen(screen),
-            market_series_open: false,
-            chart_expiry: 0,
-            initial_chart_expiry: None,
-            chart_range: ChartRangeValue::TwentyFourHours,
-            chart_launch_options: None,
-            chart_last_refresh_at: None,
-            pending_initial_chart: false,
-            trade_action: TradeAction::Buy,
-            trade_ticket: None,
             read_panel: None,
             read_panel_request: 0,
             action_panel: None,
             action_panel_request: 0,
-            trade_review_scroll: 0,
-            trade_ticket_field_flash: None,
-            trade_result_modal: None,
-            suppress_trade_result_escape_repeat: false,
             left_mouse_down: false,
             confirmation_mouse_press: None,
-            detail: None,
-            detail_view: DetailView::Overview,
-            settlement_bundle: None,
-            settlement_issue: None,
-            chart: None,
             ledger: None,
             ledger_view: LedgerView::Account,
             ledger_pane: LedgerPane::Tabs,
@@ -150,10 +78,7 @@ impl LabApp {
             ledger_history_selected: 0,
             liquidity_preview_form: None,
             liquidity_preview_result: None,
-            writer_action_selected: 0,
-            writer_form: None,
-            writer_confirmation: None,
-            writer_action_result: None,
+            writers: writer_state::WriterState::new(),
             staking_status: None,
             staking_issue: None,
             staking_selected: 0,
@@ -170,40 +95,16 @@ impl LabApp {
             screen_history: Vec::new(),
             status,
             issues,
-            read_cache_scope,
-            detail_cache: crate::cache::DisplayCache::new(read_cache::MARKET_DETAILS),
-            chart_cache: crate::cache::DisplayCache::new(read_cache::CHARTS),
-            settlement_cache: crate::cache::DisplayCache::new(read_cache::SETTLEMENTS),
+            cache,
             panel_scrolls: HashMap::new(),
-            list_request: 0,
-            detail_request: 0,
-            settlement_request: 0,
-            chart_request: 0,
             ledger_request: 0,
             liquidity_preview_request: 0,
             liquidity_preview_inflight: None,
-            writer_action_request: 0,
-            writer_action_inflight: None,
-            writer_action_mask_request: 0,
-            writer_action_mask_inflight: None,
-            pending_writer_review: None,
             staking_status_request: 0,
             staking_action_request: 0,
             staking_action_inflight: None,
-            trade_submit_request: 0,
-            trade_submit_inflight: None,
-            oracle_tree_request: 0,
-            oracle_live_request: 0,
-            oracle_reward_request: 0,
-            loading_list: false,
-            loading_detail: false,
-            loading_settlement: false,
-            loading_chart: false,
             loading_ledger: false,
             loading_staking: false,
-            loading_oracle_tree: false,
-            loading_oracle_live: false,
-            loading_oracle_rewards: false,
             spinner_tick: 0,
             terminal_size_warning_started_tick: None,
         }
@@ -236,8 +137,9 @@ impl LabApp {
     }
 
     pub(super) fn selected_id(&self) -> String {
-        self.dishes
-            .get(self.selected)
+        self.trading
+            .dishes
+            .get(self.trading.selected)
             .map(|dish| dish.id.clone())
             .unwrap_or_else(|| "ramx".to_string())
     }
@@ -299,7 +201,7 @@ impl LabApp {
     }
 
     pub(super) fn switch_wallet_from_input(&mut self) {
-        self.clear_writer_action_mask_check();
+        self.writers.clear_action_mask_check();
         let return_to_ledger = self.screen == LabScreen::Ledger;
         let keypair_path = normalize_keypair_path_input(&self.wallet_switch_input);
         if keypair_path.is_empty() {
@@ -318,14 +220,14 @@ impl LabApp {
         self.liquidity_preview_result = None;
         self.liquidity_preview_request = self.liquidity_preview_request.wrapping_add(1);
         self.liquidity_preview_inflight = None;
-        self.writer_action_result = None;
+        self.writers.action_result = None;
         self.staking_status = None;
         self.staking_issue = None;
         self.staking_form = None;
         self.staking_confirmation = None;
         self.staking_action_result = None;
-        self.oracle_rewards = None;
-        self.oracle_reward_issue = None;
+        self.oracle.rewards = None;
+        self.oracle.reward_issue = None;
         self.wallet_switch_editing = false;
         self.wallet_switch_input.clear();
 
@@ -357,26 +259,27 @@ impl LabApp {
     }
 
     pub(super) fn selected_quote(&self) -> Option<&OptionQuote> {
-        self.detail
+        self.trading
+            .detail
             .as_ref()
-            .and_then(|detail| detail.option_quotes.get(self.selected_option))
+            .and_then(|detail| detail.option_quotes.get(self.trading.selected_option))
     }
 
     pub(super) fn selected_chart_expiry(&self) -> Option<&ExpirySummary> {
-        self.detail.as_ref().and_then(|detail| {
+        self.trading.detail.as_ref().and_then(|detail| {
             detail
                 .expiries
-                .get(self.chart_expiry)
+                .get(self.trading.chart_expiry)
                 .or_else(|| detail.expiries.first())
         })
     }
 
     pub(super) fn chart_args(&self) -> ChartArgs {
-        let launch = self.chart_launch_options.as_ref();
+        let launch = self.trading.chart_launch_options.as_ref();
         ChartArgs {
             market: self.selected_id(),
             expiry: self.selected_chart_expiry().map(|expiry| expiry.id.clone()),
-            range: self.chart_range,
+            range: self.trading.chart_range,
             refresh_seconds: launch.map(|options| options.refresh_seconds).unwrap_or(0),
             static_view: true,
             points: launch.map(|options| options.points).unwrap_or(240),
@@ -388,11 +291,15 @@ impl LabApp {
         let refresh_seconds = self.chart_args().refresh_seconds;
         self.screen == LabScreen::Chart
             && refresh_seconds > 0
-            && self.detail.is_some()
-            && !self.loading_chart
-            && self.chart_last_refresh_at.is_some_and(|last_refresh| {
-                now.saturating_duration_since(last_refresh) >= Duration::from_secs(refresh_seconds)
-            })
+            && self.trading.detail.is_some()
+            && !self.trading.loading_chart
+            && self
+                .trading
+                .chart_last_refresh_at
+                .is_some_and(|last_refresh| {
+                    now.saturating_duration_since(last_refresh)
+                        >= Duration::from_secs(refresh_seconds)
+                })
     }
 
     pub(super) fn refresh_chart_if_due_at(
@@ -408,52 +315,22 @@ impl LabApp {
 
     pub(super) fn tick(&mut self) {
         self.spinner_tick = self.spinner_tick.wrapping_add(1);
-        if let Some(ticks_remaining) = self.help_hover_grace_ticks.take() {
+        if let Some(ticks_remaining) = self.help.hover_grace_ticks.take() {
             if ticks_remaining <= 1 {
-                self.clear_help_hover_preview();
-                self.help_glossary_hover = None;
+                self.help.clear_hover_preview();
+                self.help.glossary_hover = None;
             } else {
-                self.help_hover_grace_ticks = Some(ticks_remaining.saturating_sub(1));
+                self.help.hover_grace_ticks = Some(ticks_remaining.saturating_sub(1));
             }
         }
-        if let Some(flash) = self.trade_ticket_field_flash.as_mut() {
-            if flash.ticks_remaining == 0 {
-                self.trade_ticket_field_flash = None;
-            } else {
-                flash.visible = !flash.visible;
-                flash.ticks_remaining = flash.ticks_remaining.saturating_sub(1);
-                if flash.ticks_remaining == 0 {
-                    self.trade_ticket_field_flash = None;
-                }
-            }
-        }
-        if let Some(flash) = self.oracle_form_field_flash.as_mut() {
-            if flash.ticks_remaining == 0 {
-                self.oracle_form_field_flash = None;
-            } else {
-                flash.visible = !flash.visible;
-                flash.ticks_remaining = flash.ticks_remaining.saturating_sub(1);
-                if flash.ticks_remaining == 0 {
-                    self.oracle_form_field_flash = None;
-                }
-            }
-        }
-        if let Some(flash) = self.oracle_locked_flash.as_mut() {
-            if flash.ticks_remaining == 0 {
-                self.oracle_locked_flash = None;
-            } else {
-                flash.visible = !flash.visible;
-                flash.ticks_remaining = flash.ticks_remaining.saturating_sub(1);
-                if flash.ticks_remaining == 0 {
-                    self.oracle_locked_flash = None;
-                }
-            }
-        }
+        self.trading.tick_field_flash();
+        self.oracle.tick_flashes();
         if self
-            .help_transition_tick
+            .help
+            .transition_tick
             .is_some_and(|started| self.spinner_tick.saturating_sub(started) > 8)
         {
-            self.help_transition_tick = None;
+            self.help.transition_tick = None;
         }
     }
 
@@ -468,126 +345,36 @@ impl LabApp {
     }
 
     pub(super) fn is_loading(&self) -> bool {
-        self.loading_list
-            || self.loading_detail
-            || self.loading_settlement
-            || self.loading_chart
+        self.trading.loading_list
+            || self.trading.loading_detail
+            || self.trading.loading_settlement
+            || self.trading.loading_chart
             || self.loading_ledger
             || self.loading_staking
-            || self.loading_oracle_tree
-            || self.loading_oracle_live
-            || self.loading_help_index
-            || self.loading_help_page
-            || self.loading_help_preview_page
-            || self.loading_update_check
+            || self.oracle.loading_tree
+            || self.oracle.loading_live
+            || self.help.loading_index
+            || self.help.loading_page
+            || self.help.loading_preview_page
+            || self.updates.is_loading()
             || self.guide.loading
-            || self.trade_submit_is_running()
+            || self.trading.submit_is_running()
             || self.staking_action_is_running()
-            || self.writer_action_is_running()
-            || self.writer_action_mask_is_loading()
+            || self.writers.action_is_running()
+            || self.writers.action_mask_is_loading()
     }
 
     pub(super) fn spinner(&self) -> &'static str {
         loading_spinner(self.spinner_tick)
     }
 
-    pub(super) fn trade_submit_is_running(&self) -> bool {
-        self.trade_submit_inflight.is_some()
-    }
-
-    pub(super) fn trade_confirmation_is_open(&self) -> bool {
-        self.trade_ticket
-            .as_ref()
-            .is_some_and(|ticket| ticket.confirmation.is_some())
-    }
-
-    pub(super) fn trade_result_modal_is_open(&self) -> bool {
-        self.trade_result_modal.is_some()
-    }
-
-    pub(super) fn dismiss_trade_result_modal(&mut self) {
-        self.trade_result_modal = None;
-    }
-
-    pub(super) fn expire_trade_result_modal_at(&mut self, now: Instant) {
-        if self
-            .trade_result_modal
-            .as_ref()
-            .is_some_and(|modal| modal.is_expired_at(now))
-        {
-            self.trade_result_modal = None;
-        }
-    }
-
-    pub(super) fn handle_trade_result_modal_key(&mut self, key: &KeyEvent) -> bool {
-        if self.trade_result_modal_is_open() {
-            if key.code == KeyCode::Esc && key.kind != KeyEventKind::Release {
-                self.dismiss_trade_result_modal();
-                self.suppress_trade_result_escape_repeat = true;
-            }
-            return true;
-        }
-
-        if !self.suppress_trade_result_escape_repeat {
-            return false;
-        }
-        if key.code != KeyCode::Esc {
-            self.suppress_trade_result_escape_repeat = false;
-            return false;
-        }
-        match key.kind {
-            KeyEventKind::Repeat => true,
-            KeyEventKind::Release => {
-                self.suppress_trade_result_escape_repeat = false;
-                true
-            }
-            KeyEventKind::Press => {
-                self.suppress_trade_result_escape_repeat = false;
-                false
-            }
-        }
-    }
-
-    pub(super) fn update_exit_action(&self) -> Option<LabExitAction> {
-        let report = self.update_report.as_ref()?;
-        if report.blocked {
-            return None;
-        }
-        match report.status {
-            workspace_update::UpdateStatus::UpdateAvailable => Some(LabExitAction::RunUpdate),
-            workspace_update::UpdateStatus::RebuildAvailable => Some(LabExitAction::RunRebuild),
-            workspace_update::UpdateStatus::Current | workspace_update::UpdateStatus::Blocked => {
-                None
-            }
-        }
-    }
-
     pub(super) fn request_update_check(&mut self, fetch_tx: &Sender<LabFetchResult>, force: bool) {
-        if !self.update_check_enabled {
-            if force {
-                self.status = format!(
-                    "Petri update checks are off. Unset {PETRI_UPDATE_CHECK_ENV} or run `petri update check`."
-                );
-            }
-            return;
+        let request = self.updates.begin(force);
+        if let Some(status) = request.status {
+            self.status = status;
         }
-        if self.loading_update_check {
-            if force {
-                self.status = "Petri is already checking for updates...".to_string();
-            }
-            return;
+        if let Some(request_id) = request.request_id {
+            spawn_update_check(fetch_tx.clone(), request_id);
         }
-        if !force && (self.update_report.is_some() || self.update_issue.is_some()) {
-            return;
-        }
-
-        self.update_check_request = self.update_check_request.wrapping_add(1);
-        self.loading_update_check = true;
-        self.update_check_forced = force;
-        self.update_issue = None;
-        if force {
-            self.status = "Checking for Petri updates...".to_string();
-        }
-        spawn_update_check(fetch_tx.clone(), self.update_check_request);
     }
 }

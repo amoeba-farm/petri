@@ -71,16 +71,6 @@ pub(in super::super) fn quote_indices_by_kind(detail: &DishDetail, kind: OptionK
         .collect()
 }
 
-pub(in super::super) fn first_quote_index_by_kind(
-    detail: &DishDetail,
-    kind: OptionKind,
-) -> Option<usize> {
-    detail
-        .option_quotes
-        .iter()
-        .position(|quote| quote.kind == kind)
-}
-
 pub(in super::super) fn quote_rank_by_kind(
     detail: &DishDetail,
     selected: usize,
@@ -100,7 +90,7 @@ pub(in super::super) fn compact_depth_label(quote: &OptionQuote) -> String {
 }
 
 pub(in super::super) fn selected_contract_label(app: &LabApp) -> String {
-    match (&app.detail, app.selected_quote()) {
+    match (&app.trading.detail, app.selected_quote()) {
         (Some(detail), Some(quote)) => format!(
             "{} {} {}-{} / {}",
             detail.symbol,
@@ -468,7 +458,7 @@ pub(in super::super) fn focused_missing_lines_below(
             app.focused_panel_scroll(LabFocus::OracleIntro),
         ),
         LabScreen::Oracle => {
-            if app.oracle_view == OracleView::Earn {
+            if app.oracle.view == OracleView::Earn {
                 let layout = oracle_earn_layout(selected_area);
                 Some(usize::from(4u16.saturating_sub(layout.table_area.height)))
             } else {
@@ -495,7 +485,7 @@ pub(in super::super) fn focused_missing_lines_below(
                 )
             } else {
                 let layout = gitbook_help_layout(selected_area);
-                match app.help_pane {
+                match app.help.pane {
                     HelpPane::Navigation => {
                         let line_count = gitbook_navigation_lines(cli, app).len();
                         let hidden =
@@ -509,7 +499,7 @@ pub(in super::super) fn focused_missing_lines_below(
                         missing_lines_for_panel(
                             gitbook_article_lines(cli, app, article_width).len(),
                             layout.article_area,
-                            app.help_article_scroll,
+                            app.help.article_scroll,
                         )
                     }
                 }
@@ -571,7 +561,7 @@ pub(in super::super) fn chain_missing_lines_below(
     app: &LabApp,
     area: Rect,
 ) -> Option<usize> {
-    let Some(detail) = &app.detail else {
+    let Some(detail) = &app.trading.detail else {
         return missing_lines_for_panel(2, area, app.focused_panel_scroll(LabFocus::Detail));
     };
 
@@ -595,7 +585,7 @@ pub(in super::super) fn chain_missing_lines_below(
         LabFocus::Puts => (OptionKind::Put, chain_layout.puts),
         _ => return None,
     };
-    let side_layout = option_side_layout(column, app.trade_ticket.is_some());
+    let side_layout = option_side_layout(column, app.trading.ticket.is_some());
     let visible_rows = side_layout.table.height.saturating_sub(3).max(1) as usize;
     missing_lines_for_height(
         quote_indices_by_kind(detail, kind).len(),
@@ -605,7 +595,7 @@ pub(in super::super) fn chain_missing_lines_below(
 }
 
 pub(in super::super) fn chart_missing_lines_below(app: &LabApp, area: Rect) -> Option<usize> {
-    if app.chart.is_some() {
+    if app.trading.chart.is_some() {
         return None;
     }
     missing_lines_for_panel(5, area, app.focused_panel_scroll(LabFocus::Chart))
@@ -771,7 +761,7 @@ pub(in super::super) fn footer_lines_for_app(
             help_key(cli, "T"),
             help_text(cli, " wallet access"),
         ])]
-    } else if app.screen == LabScreen::Oracle && app.oracle_view == OracleView::Earn {
+    } else if app.screen == LabScreen::Oracle && app.oracle.view == OracleView::Earn {
         vec![Line::from(vec![
             help_key(cli, "q"),
             help_text(cli, " quit | "),

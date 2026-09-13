@@ -31,4 +31,5 @@ target_spread_oracle_verify/
 *.orig
 *~
 __pycache__/
+/scripts/runtime-tools/node_modules/
 *.py[cod]

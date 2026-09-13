@@ -77,7 +77,7 @@ fn draw_chart_controls(frame: &mut Frame<'_>, cli: &Cli, area: Rect, app: &LabAp
                 cli,
                 range.label(),
                 Color::Cyan,
-                app.chart_range == range,
+                app.trading.chart_range == range,
                 rects[index].width,
                 rects[index].height,
             )),
@@ -88,13 +88,13 @@ fn draw_chart_controls(frame: &mut Frame<'_>, cli: &Cli, area: Rect, app: &LabAp
     frame.render_widget(
         Paragraph::new(raised_button_lines(
             cli,
-            if app.loading_chart {
+            if app.trading.loading_chart {
                 "Loading"
             } else {
                 "Refresh"
             },
             Color::Yellow,
-            app.loading_chart,
+            app.trading.loading_chart,
             refresh.width,
             refresh.height,
         )),
@@ -110,7 +110,7 @@ pub(in super::super) fn draw_chart_screen(
 ) {
     draw_chart_controls(frame, cli, area, app);
     let area = chart_content_area(area);
-    if let Some(chart) = &app.chart {
+    if let Some(chart) = &app.trading.chart {
         if area.height >= 12 {
             let rows = Layout::default()
                 .direction(Direction::Vertical)
@@ -133,7 +133,7 @@ pub(in super::super) fn draw_chart_screen(
             )
         })
         .unwrap_or_else(|| "No month selected.".to_string());
-    let title = if app.loading_chart {
+    let title = if app.trading.loading_chart {
         format!("{} Loading chart...", app.spinner())
     } else {
         "Chart is not available right now.".to_string()

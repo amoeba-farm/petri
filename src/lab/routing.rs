@@ -9,56 +9,57 @@ impl LabApp {
     }
 
     pub(super) fn prepare_initial_chart(&mut self, options: &ChartArgs) {
-        self.chart_launch_options = Some(options.clone());
-        self.chart_range = options.range;
-        self.initial_chart_expiry = options.expiry.clone();
-        self.chart_last_refresh_at = None;
+        self.trading.chart_launch_options = Some(options.clone());
+        self.trading.chart_range = options.range;
+        self.trading.initial_chart_expiry = options.expiry.clone();
+        self.trading.chart_last_refresh_at = None;
         if self.screen == LabScreen::Terms {
-            self.pending_initial_chart = true;
+            self.trading.pending_initial_chart = true;
             return;
         }
-        self.pending_initial_chart = false;
+        self.trading.pending_initial_chart = false;
         self.enter_initial_chart();
     }
 
     pub(super) fn enter_initial_chart(&mut self) {
         let (market, range) = self
+            .trading
             .chart_launch_options
             .as_ref()
             .map(|options| (options.market.to_uppercase(), options.range))
-            .unwrap_or_else(|| (self.selected_id().to_uppercase(), self.chart_range));
+            .unwrap_or_else(|| (self.selected_id().to_uppercase(), self.trading.chart_range));
         self.set_screen(LabScreen::Chart);
         self.status = format!("Loading {} {} chart...", market, range.label());
     }
 
     pub(super) fn resume_pending_initial_chart(&mut self) -> bool {
-        if !self.pending_initial_chart || !self.wallet_terms.accepted {
+        if !self.trading.pending_initial_chart || !self.wallet_terms.accepted {
             return false;
         }
-        self.pending_initial_chart = false;
+        self.trading.pending_initial_chart = false;
         self.enter_initial_chart();
         true
     }
 
     pub(super) fn apply_initial_chart_expiry(&mut self) {
-        let Some(expiry_id) = self.initial_chart_expiry.take() else {
+        let Some(expiry_id) = self.trading.initial_chart_expiry.take() else {
             return;
         };
-        if let Some(index) = self.detail.as_ref().and_then(|detail| {
+        if let Some(index) = self.trading.detail.as_ref().and_then(|detail| {
             detail
                 .expiries
                 .iter()
                 .position(|expiry| expiry.id.eq_ignore_ascii_case(&expiry_id))
         }) {
-            self.chart_expiry = index;
+            self.trading.chart_expiry = index;
         }
     }
 
     pub(super) fn open_home(&mut self) {
-        self.oracle_search_editing = false;
-        self.oracle_form = None;
-        self.oracle_form_field_flash = None;
-        self.oracle_locked_flash = None;
+        self.oracle.search_editing = false;
+        self.oracle.form = None;
+        self.oracle.form_field_flash = None;
+        self.oracle.locked_flash = None;
         self.set_screen(LabScreen::Home);
         self.status = "Home".to_string();
     }
@@ -68,7 +69,7 @@ impl LabApp {
         topic: HomeHelpTopic,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        self.help_preview = None;
+        self.help.preview = None;
         self.home_help_topic = topic;
         if topic == HomeHelpTopic::Overview {
             self.prepare_gitbook_help();
@@ -182,19 +183,19 @@ impl LabApp {
     }
 
     pub(super) fn open_oracle_intro(&mut self) {
-        self.oracle_search_editing = false;
-        self.oracle_form = None;
-        self.oracle_form_field_flash = None;
-        self.oracle_locked_flash = None;
+        self.oracle.search_editing = false;
+        self.oracle.form = None;
+        self.oracle.form_field_flash = None;
+        self.oracle.locked_flash = None;
         self.set_screen(LabScreen::OracleIntro);
         self.status = "Oracle evidence entry".to_string();
     }
 
     pub(super) fn open_oracle_help(&mut self) {
-        self.oracle_search_editing = false;
-        self.oracle_form = None;
-        self.oracle_form_field_flash = None;
-        self.oracle_locked_flash = None;
+        self.oracle.search_editing = false;
+        self.oracle.form = None;
+        self.oracle.form_field_flash = None;
+        self.oracle.locked_flash = None;
         self.set_screen(LabScreen::OracleHelp);
         self.status = "Oracle help".to_string();
     }
@@ -217,15 +218,15 @@ impl LabApp {
         backend_url: &str,
         fetch_tx: &Sender<LabFetchResult>,
     ) {
-        if self.oracle_form.is_some() && self.oracle_view != view {
+        if self.oracle.form.is_some() && self.oracle.view != view {
             self.status =
                 "Finish or cancel the open Oracle form before switching views.".to_string();
             return;
         }
-        if self.oracle_view != view {
+        if self.oracle.view != view {
             self.clear_guide_context_actions();
         }
-        self.oracle_view = view;
+        self.oracle.view = view;
         self.set_screen(LabScreen::Oracle);
         self.set_focus(match view {
             OracleView::Earn => LabFocus::OracleEarn,
@@ -235,7 +236,7 @@ impl LabApp {
         self.request_oracle_tree(backend_url, fetch_tx, false);
         self.request_oracle_live(backend_url, fetch_tx, false);
         self.request_oracle_rewards(backend_url, fetch_tx, false);
-        if !self.loading_oracle_tree {
+        if !self.oracle.loading_tree {
             self.status = match view {
                 OracleView::Earn => {
                     "Earn shows funded rewards for the selected market and month.".to_string()

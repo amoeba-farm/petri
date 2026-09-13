@@ -9,10 +9,22 @@ remain in their existing dedicated modules.
 
 - `src/cache.rs`: generic `DisplayCache<K, V>`, expiry, LRU eviction, protected
   entries, and duplicate active-selection read suppression. No I/O or signing.
-- `src/lab/cache.rs`: feature capacities/lifetimes, backend/network/packaged
-  release scope, and invalidation of stored results and request generations.
+- `src/lab/cache.rs`: the app-owned `TuiCache` internal API, feature capacities/
+  lifetimes, backend/network/packaged release scope, and invalidation of stored
+  results and request generations. Storage is private to this module.
 - `src/lab/requests.rs`: fetch launch and validated completion admission.
-- `src/lab/help.rs`: help revision refresh and visible-article protection.
+- `src/lab/help.rs`: chooses the visible article and updates preview state;
+  `TuiCache::store_help_page` protects that article, advances the content revision
+  and invalidates the rendered article together.
+
+All TUI feature and rendering modules reach the same instance through
+`app.cache`: `details()`, `charts()`, `settlements()` and `help_pages()` expose
+typed read access. The corresponding market `_mut()` accessors share the same
+TTL/LRU and pending-fetch engine; completion admission stays in the reducers.
+Help writes use `store_help_page`, not an independently mutable page store.
+`help_render()` and `store_help_render()` also keep the existing single rendered
+article in this API, with the same width, color, motion and revision keys.
+Rendering only borrows data; it does not acquire transport or signing effects.
 
 ## Policies
 
@@ -36,7 +48,9 @@ reads of the active key share the pending job; explicit refresh supersedes it.
 
 ## Adding another cached view
 
-1. Use a typed read-only result and a bounded policy in `src/lab/cache.rs`.
+1. Add a typed read-only store, bounded policy and accessors to `TuiCache` in
+   `src/lab/cache.rs`. Do not add another cache field to `LabApp` or a global
+   response store.
 2. Include every selector in its key. Wallet-dependent displays must include
    the owner; never key private data solely by market or route.
 3. Check scope before reading, call `begin_fetch` on a miss, and admit only
@@ -50,3 +64,6 @@ packets, approvals and prepared plans are not moved into this engine. Some
 screens retain their last view independently; that is not a claim of freshness.
 Trading stays available through its existing live identity, admission and
 execution checks. Cache TTL never substitutes for backend freshness evidence.
+
+Immutable animation/projection memoization remains with its renderer, not in the
+market response cache. It has no backend identity, freshness or approval role.

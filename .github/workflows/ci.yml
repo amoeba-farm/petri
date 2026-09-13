@@ -15,6 +15,7 @@ jobs:
       - name: Check release script syntax
         run: |
           node --check scripts/build-sdk-runtime.mjs
+          node --check scripts/sdk-runtime-files.mjs
           node --check scripts/package-petri-preview.mjs
           node --check scripts/petri-mcp-server.mjs
           bash -n scripts/install-preview.sh

@@ -1,6 +1,7 @@
 #![recursion_limit = "256"]
 
 mod agent_protocol;
+mod app_context;
 mod attached_wallet;
 mod backend;
 mod cache;
@@ -31,6 +32,7 @@ mod petri_config;
 mod portable_operation;
 mod positions;
 mod release_update;
+mod request_validation;
 mod sdk_worker;
 mod solana_config;
 mod solana_history;
@@ -59,9 +61,10 @@ use std::{
     str::FromStr,
 };
 
+use app_context::build_onchain_config;
 use backend::{
-    BackendClient, CliError, array_at_key, json_string, string_at_key, terminal_safe_text,
-    value_at_key,
+    BackendClient, CliError, array_at_key, current_backend_payload, json_string, string_at_key,
+    terminal_safe_text, unwrap_data, value_at_key,
 };
 use clap::{CommandFactory, FromArgMatches};
 use cli::{
@@ -78,6 +81,7 @@ use cli::{
 };
 use onchain::OnchainConfig;
 use oracle_submissions::{OracleSubmissionDraft, OracleSubmissionField};
+use request_validation::{canonical_pubkey_string, canonical_u64_string};
 use serde_json::{Value, json};
 use solana_program::hash::hashv;
 use solana_pubkey::Pubkey;
@@ -112,143 +116,6 @@ fn main() {
         eprintln!("error: {error}");
         std::process::exit(error.exit_code());
     }
-}
-
-fn current_backend_payload(payload: Value) -> Result<Value, CliError> {
-    chain_identity::validate_current_backend_envelope(&payload)?;
-    Ok(payload)
-}
-
-fn attached_wallet_pubkey(cli: &Cli) -> Result<String, CliError> {
-    let wallet = attached_wallet::inspect_attached_wallet(cli);
-    wallet.pubkey.ok_or_else(|| {
-        CliError::new(
-            wallet
-                .issue
-                .unwrap_or_else(|| "an attached wallet is required for this command".to_string()),
-        )
-    })
-}
-
-fn canonical_u64_string(raw: &str, label: &str, allow_zero: bool) -> Result<String, CliError> {
-    if raw.is_empty()
-        || (raw.len() > 1 && raw.starts_with('0'))
-        || !raw.bytes().all(|byte| byte.is_ascii_digit())
-    {
-        return Err(CliError::new(format!(
-            "{label} must be a canonical unsigned decimal"
-        )));
-    }
-    let value = raw
-        .parse::<u64>()
-        .map_err(|_| CliError::new(format!("{label} is outside the u64 range")))?;
-    if !allow_zero && value == 0 {
-        return Err(CliError::new(format!("{label} must be greater than zero")));
-    }
-    Ok(value.to_string())
-}
-
-fn canonical_pubkey_string(raw: &str, label: &str) -> Result<String, CliError> {
-    let trimmed = raw.trim();
-    let pubkey = Pubkey::from_str(trimmed)
-        .map_err(|error| CliError::new(format!("invalid {label} public key: {error}")))?;
-    if pubkey.to_string() != trimmed {
-        return Err(CliError::new(format!(
-            "{label} public key is not canonical"
-        )));
-    }
-    Ok(trimmed.to_string())
-}
-
-fn collective_trade_request(cli: &Cli, trade: &CollectiveTradeArgs) -> Result<Value, CliError> {
-    Ok(json!({
-        "owner": attached_wallet_pubkey(cli)?,
-        "market": canonical_pubkey_string(&trade.market, "market")?,
-        "direction": trade.direction.as_request_value(),
-        "amountIn": canonical_u64_string(&trade.amount_in, "amount-in", false)?,
-        "minimumAmountOut": canonical_u64_string(
-            &trade.minimum_amount_out,
-            "minimum-amount-out",
-            false,
-        )?,
-        "limitBinId": trade.limit_bin_id,
-    }))
-}
-
-fn validate_collective_trade_response(
-    response: &Value,
-    request: &Value,
-    context: &ameba_sdk::CurrentGovernedWriteContextV1,
-) -> Result<ameba_sdk::CurrentGovernedOperationV1, CliError> {
-    let data = unwrap_data(response);
-    let plan = data
-        .get("operationPlan")
-        .or_else(|| data.get("plan"))
-        .ok_or_else(|| CliError::new("collective trade response is missing operationPlan"))?;
-    let encoded = serde_json::to_string(plan).map_err(|error| {
-        CliError::new(format!(
-            "collective trade operationPlan could not be encoded: {error}"
-        ))
-    })?;
-    let admitted =
-        ameba_sdk::parse_current_governed_collective_swap_operation_json_v1(context, &encoded)
-            .map_err(|error| {
-                CliError::new(format!(
-                    "collective trade operationPlan failed pinned SDK validation: {error}"
-                ))
-            })?;
-    let validated = admitted
-        .swap_operation()
-        .ok_or_else(|| CliError::new("The SDK did not admit a collective swap."))?;
-    let direction = match request.get("direction").and_then(Value::as_str) {
-        Some("QuoteForOption") => ameba_sdk::CollectiveSwapDirection::QuoteForOption,
-        Some("OptionForQuote") => ameba_sdk::CollectiveSwapDirection::OptionForQuote,
-        _ => return Err(CliError::new("collective trade direction is invalid")),
-    };
-    let expected = ameba_sdk::ExpectedCollectiveSwapRequest {
-        trader: Pubkey::from_str(
-            request
-                .get("owner")
-                .and_then(Value::as_str)
-                .ok_or_else(|| CliError::new("collective trade request is missing trader"))?,
-        )
-        .map_err(|error| CliError::new(format!("invalid trader public key: {error}")))?,
-        market: Pubkey::from_str(
-            request
-                .get("market")
-                .and_then(Value::as_str)
-                .ok_or_else(|| CliError::new("collective trade request is missing market"))?,
-        )
-        .map_err(|error| CliError::new(format!("invalid market public key: {error}")))?,
-        direction,
-        amount_in: request
-            .get("amountIn")
-            .and_then(Value::as_str)
-            .and_then(|raw| raw.parse().ok())
-            .ok_or_else(|| CliError::new("collective trade request has invalid amountIn"))?,
-        minimum_amount_out: request
-            .get("minimumAmountOut")
-            .and_then(Value::as_str)
-            .and_then(|raw| raw.parse().ok())
-            .ok_or_else(|| {
-                CliError::new("collective trade request has invalid minimumAmountOut")
-            })?,
-        limit_bin_id: u16::try_from(
-            request
-                .get("limitBinId")
-                .and_then(Value::as_u64)
-                .ok_or_else(|| CliError::new("collective trade request has invalid limitBinId"))?,
-        )
-        .map_err(|_| CliError::new("collective trade limitBinId exceeds u16"))?,
-    };
-    ameba_sdk::require_expected_collective_swap_request(&validated, &expected).map_err(
-        |error| {
-            CliError::new(format!(
-                "collective trade plan differs from the explicit request: {error}"
-            ))
-        },
-    )?;
-    Ok(admitted)
 }
 
 fn render_collective_trade_operation(label: &str, response: &Value) -> String {
@@ -5741,23 +5608,6 @@ fn authoritative_phase_is_game(phase: &str) -> bool {
     )
 }
 
-pub(crate) fn build_onchain_config(cli: &Cli) -> Result<OnchainConfig, CliError> {
-    let solana_cli_config = solana_config::load_solana_cli_config(cli.solana_config.as_deref())?;
-    Ok(OnchainConfig {
-        network: cli.cluster.clone(),
-        backend_url: cli.backend_url.clone(),
-        commitment: solana_config::resolve_commitment(
-            cli.commitment.as_deref(),
-            solana_cli_config.as_ref(),
-        ),
-        keypair_path: Some(solana_config::resolve_keypair_path(
-            cli.keypair.as_deref(),
-            solana_cli_config.as_ref(),
-        )),
-        allow_insecure_keypair: cli.allow_insecure_keypair,
-    })
-}
-
 fn load_keypair_pubkey(config: &OnchainConfig) -> Result<String, CliError> {
     wallet_signer::signer_pubkey(config)
 }
@@ -5861,10 +5711,6 @@ fn resolve_wallet_owner_pubkey(
     }
 
     load_keypair_pubkey(config)
-}
-
-fn unwrap_data<'a>(payload: &'a Value) -> &'a Value {
-    value_at_key(payload, &["data"]).unwrap_or(payload)
 }
 
 fn parse_policy_pubkey(value: &str, label: &str) -> Result<Pubkey, CliError> {

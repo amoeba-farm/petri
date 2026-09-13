@@ -158,12 +158,12 @@ pub(super) fn run_lab_bench_with_chart(
 
     loop {
         app.apply_completed_fetches(&backend_url, &fetch_tx, &fetch_rx);
-        if app.resume_pending_initial_chart() && !app.loading_detail {
+        if app.resume_pending_initial_chart() && !app.trading.loading_detail {
             app.request_selected_detail(&backend_url, &fetch_tx, false);
         }
         let now = Instant::now();
         app.refresh_chart_if_due_at(now, &backend_url, &fetch_tx);
-        app.expire_trade_result_modal_at(now);
+        app.trading.expire_result_modal_at(now);
         advance_visual_ticks(&mut app, &mut last_visual_tick, now);
         app.request_visible_help_preview_if_due(&fetch_tx);
         app.retry_oracle_tree_if_due(&backend_url, &fetch_tx);
@@ -275,9 +275,9 @@ pub(super) fn run_lab_bench_with_chart(
                 &event,
                 Event::FocusGained | Event::FocusLost | Event::Resize(_, _)
             ) {
-                app.clear_help_hover_preview();
-                app.help_glossary_hover = None;
-                app.help_hover_grace_ticks = None;
+                app.help.clear_hover_preview();
+                app.help.glossary_hover = None;
+                app.help.hover_grace_ticks = None;
             }
             if terminal_event_requires_full_redraw(&event) {
                 full_redraw_requested = !matches!(
@@ -309,7 +309,7 @@ pub(super) fn run_lab_bench_with_chart(
                     app.mouse_pointer_shape_at(cli, root, mouse.column, mouse.row),
                 );
                 app.handle_mouse_event(mouse, cli, root, &backend_url, &fetch_tx);
-                if app.take_update_mouse_request()
+                if app.updates.take_mouse_request()
                     && let Some(action) = handle_update_key(&mut app, &fetch_tx)
                 {
                     exit_action = action;
@@ -339,8 +339,8 @@ pub(super) fn run_lab_bench_with_chart(
             }
             if key.code == KeyCode::F(9)
                 && app.screen != LabScreen::Terms
-                && !app.trade_confirmation_is_open()
-                && app.writer_confirmation.is_none()
+                && !app.trading.confirmation_is_open()
+                && app.writers.confirmation.is_none()
                 && app.staking_confirmation.is_none()
                 && app.read_panel.is_none()
             {
@@ -360,8 +360,8 @@ pub(super) fn run_lab_bench_with_chart(
             }
             if key.code == KeyCode::F(8)
                 && app.screen != LabScreen::Terms
-                && !app.trade_confirmation_is_open()
-                && app.writer_confirmation.is_none()
+                && !app.trading.confirmation_is_open()
+                && app.writers.confirmation.is_none()
                 && app.staking_confirmation.is_none()
             {
                 app.open_operations_panel(&fetch_tx);
@@ -374,10 +374,10 @@ pub(super) fn run_lab_bench_with_chart(
             if app.handle_guide_input_key(&key, &fetch_tx) {
                 continue;
             }
-            if app.handle_trade_result_modal_key(&key) {
+            if app.trading.handle_result_modal_key(&key) {
                 continue;
             }
-            if app.screen == LabScreen::Ledger && app.writer_confirmation.is_some() {
+            if app.screen == LabScreen::Ledger && app.writers.confirmation.is_some() {
                 match key.code {
                     KeyCode::Char('q' | 'Q') => {
                         if app.can_quit_lab() {
@@ -386,10 +386,10 @@ pub(super) fn run_lab_bench_with_chart(
                     }
                     KeyCode::Esc => app.cancel_writer_confirmation(),
                     KeyCode::Left | KeyCode::Up | KeyCode::BackTab => {
-                        app.move_writer_confirmation_choice(-1)
+                        app.writers.move_confirmation_choice(-1)
                     }
                     KeyCode::Right | KeyCode::Down | KeyCode::Tab => {
-                        app.move_writer_confirmation_choice(1)
+                        app.writers.move_confirmation_choice(1)
                     }
                     KeyCode::Enter if key.kind == KeyEventKind::Press => {
                         app.activate_writer_confirmation(cli, &backend_url, &fetch_tx)
@@ -443,21 +443,22 @@ pub(super) fn run_lab_bench_with_chart(
                 }
                 continue;
             }
-            if app.trade_confirmation_is_open() {
+            if app.trading.confirmation_is_open() {
                 match key.code {
                     KeyCode::PageUp => {
-                        app.trade_review_scroll = app.trade_review_scroll.saturating_sub(5)
+                        app.trading.review_scroll = app.trading.review_scroll.saturating_sub(5)
                     }
                     KeyCode::PageDown => {
-                        app.trade_review_scroll = app.trade_review_scroll.saturating_add(5).min(24)
+                        app.trading.review_scroll =
+                            app.trading.review_scroll.saturating_add(5).min(24)
                     }
                     KeyCode::Char('q' | 'Q') => break,
                     KeyCode::Esc => app.cancel_trade_confirmation(),
                     KeyCode::Left | KeyCode::Up | KeyCode::BackTab => {
-                        app.move_trade_confirmation_choice(-1)
+                        app.trading.move_confirmation_choice(-1)
                     }
                     KeyCode::Right | KeyCode::Down | KeyCode::Tab => {
-                        app.move_trade_confirmation_choice(1)
+                        app.trading.move_confirmation_choice(1)
                     }
                     KeyCode::Enter if key.kind == KeyEventKind::Press => {
                         app.activate_trade_confirmation(cli, &fetch_tx)
@@ -487,14 +488,14 @@ pub(super) fn run_lab_bench_with_chart(
                 }
                 continue;
             }
-            if app.screen == LabScreen::Ledger && app.writer_form.is_some() {
+            if app.screen == LabScreen::Ledger && app.writers.form.is_some() {
                 match key.code {
                     KeyCode::Esc => app.cancel_writer_form(),
                     KeyCode::Enter => app.review_or_run_writer_form(cli, &backend_url, &fetch_tx),
                     KeyCode::Up | KeyCode::BackTab => app.move_writer_form_field(-1),
                     KeyCode::Down | KeyCode::Tab => app.move_writer_form_field(1),
-                    KeyCode::Backspace => app.backspace_writer_form_input(),
-                    KeyCode::Char(character) => app.push_writer_form_char(character),
+                    KeyCode::Backspace => app.writers.backspace_form_input(),
+                    KeyCode::Char(character) => app.writers.push_form_char(character),
                     _ => {}
                 }
                 continue;
@@ -514,13 +515,14 @@ pub(super) fn run_lab_bench_with_chart(
                 continue;
             }
             let oracle_text_editing = app.screen == LabScreen::Oracle
-                && (app.oracle_search_editing || app.oracle_form.is_some());
-            let trade_ticket_editing = app.screen == LabScreen::Chain && app.trade_ticket.is_some();
+                && (app.oracle.search_editing || app.oracle.form.is_some());
+            let trade_ticket_editing =
+                app.screen == LabScreen::Chain && app.trading.ticket.is_some();
             let staking_form_editing =
                 app.screen == LabScreen::Staking && app.staking_form.is_some();
             let ledger_form_editing = app.screen == LabScreen::Ledger
-                && (app.writer_form.is_some()
-                    || app.writer_confirmation.is_some()
+                && (app.writers.form.is_some()
+                    || app.writers.confirmation.is_some()
                     || app.liquidity_preview_form.is_some()
                     || app.wallet_switch_editing);
             if is_home_shortcut(
@@ -571,7 +573,7 @@ pub(super) fn run_lab_bench_with_chart(
                 app.open_home();
                 continue;
             }
-            if app.screen == LabScreen::Oracle && app.oracle_search_editing {
+            if app.screen == LabScreen::Oracle && app.oracle.search_editing {
                 match key.code {
                     KeyCode::Esc => app.cancel_oracle_search(),
                     KeyCode::Enter => app.apply_oracle_search(),
@@ -581,7 +583,7 @@ pub(super) fn run_lab_bench_with_chart(
                 }
                 continue;
             }
-            if app.screen == LabScreen::Oracle && app.oracle_form.is_some() {
+            if app.screen == LabScreen::Oracle && app.oracle.form.is_some() {
                 match key.code {
                     KeyCode::Esc => app.cancel_oracle_form(),
                     KeyCode::Enter => app.submit_oracle_form(),
@@ -593,15 +595,15 @@ pub(super) fn run_lab_bench_with_chart(
                 }
                 continue;
             }
-            if app.screen == LabScreen::Chain && app.trade_ticket.is_some() {
+            if app.screen == LabScreen::Chain && app.trading.ticket.is_some() {
                 match key.code {
                     KeyCode::Esc => app.cancel_trade_ticket(),
                     KeyCode::Enter => app.review_or_submit_trade_ticket(cli, &fetch_tx),
-                    KeyCode::Tab => app.move_trade_ticket_field(1),
-                    KeyCode::BackTab => app.move_trade_ticket_field(-1),
-                    KeyCode::Backspace => app.backspace_trade_ticket_input(),
+                    KeyCode::Tab => app.trading.move_ticket_field(1),
+                    KeyCode::BackTab => app.trading.move_ticket_field(-1),
+                    KeyCode::Backspace => app.trading.backspace_ticket_input(),
                     KeyCode::Char(character) if trade_ticket_input_character(character) => {
-                        app.push_trade_ticket_char(character)
+                        app.trading.push_ticket_char(character)
                     }
                     _ => {}
                 }
@@ -643,12 +645,12 @@ pub(super) fn run_lab_bench_with_chart(
                     }
                 }
                 KeyCode::Char('/') => {
-                    if app.screen == LabScreen::Oracle && app.oracle_view == OracleView::Advanced {
+                    if app.screen == LabScreen::Oracle && app.oracle.view == OracleView::Advanced {
                         app.begin_oracle_search();
                     }
                 }
                 KeyCode::Backspace => {
-                    if app.screen == LabScreen::Oracle && app.oracle_view == OracleView::Advanced {
+                    if app.screen == LabScreen::Oracle && app.oracle.view == OracleView::Advanced {
                         app.open_oracle_parent();
                     }
                 }
@@ -680,7 +682,7 @@ pub(super) fn run_lab_bench_with_chart(
                 }
                 KeyCode::Char('[') => {
                     if app.screen == LabScreen::Oracle
-                        && app.oracle_view == OracleView::Advanced
+                        && app.oracle.view == OracleView::Advanced
                         && app.focus == LabFocus::OracleTasks
                     {
                         app.select_prev_oracle_pin();
@@ -688,7 +690,7 @@ pub(super) fn run_lab_bench_with_chart(
                 }
                 KeyCode::Char(']') => {
                     if app.screen == LabScreen::Oracle
-                        && app.oracle_view == OracleView::Advanced
+                        && app.oracle.view == OracleView::Advanced
                         && app.focus == LabFocus::OracleTasks
                     {
                         app.select_next_oracle_pin();
@@ -734,7 +736,7 @@ pub(super) fn run_lab_bench_with_chart(
                     } else if app.screen == LabScreen::Ledger {
                         app.request_ledger(&backend_url, &fetch_tx, true);
                     } else if app.screen == LabScreen::Detail
-                        && app.detail_view == DetailView::Settlement
+                        && app.trading.detail_view == DetailView::Settlement
                     {
                         app.request_settlement(&backend_url, &fetch_tx, true);
                     } else if app.screen == LabScreen::Staking {
@@ -784,7 +786,7 @@ pub(super) fn run_lab_bench_with_chart(
                 KeyCode::Char('c') | KeyCode::Char('C') => {
                     app.open_chart(&backend_url, &fetch_tx);
                 }
-                KeyCode::Char('v') | KeyCode::Char('V') => match (app.screen, app.oracle_view) {
+                KeyCode::Char('v') | KeyCode::Char('V') => match (app.screen, app.oracle.view) {
                     (LabScreen::Oracle, OracleView::Earn) => {
                         app.open_oracle(&backend_url, &fetch_tx)
                     }
@@ -964,13 +966,13 @@ pub(super) fn handle_update_key(
     app: &mut LabApp,
     fetch_tx: &Sender<LabFetchResult>,
 ) -> Option<LabExitAction> {
-    if app.trade_submit_is_running() {
+    if app.trading.submit_is_running() {
         app.status =
             "Order submission is still running. Wait for the result before updating Petri."
                 .to_string();
         return None;
     }
-    if let Some(action) = app.update_exit_action() {
+    if let Some(action) = app.updates.exit_action() {
         return Some(action);
     }
     app.request_update_check(fetch_tx, true);
@@ -978,5 +980,5 @@ pub(super) fn handle_update_key(
 }
 
 pub(super) fn build_lab_onchain_config(cli: &Cli) -> Result<OnchainConfig, CliError> {
-    crate::build_onchain_config(cli)
+    crate::app_context::build_onchain_config(cli)
 }

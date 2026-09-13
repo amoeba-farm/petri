@@ -39,8 +39,8 @@ pub(in super::super) fn draw_dish_list(frame: &mut Frame<'_>, cli: &Cli, area: R
 }
 
 pub(in super::super) fn dish_list_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'static>> {
-    if app.dishes.is_empty() {
-        if app.loading_list {
+    if app.trading.dishes.is_empty() {
+        if app.trading.loading_list {
             return vec![Line::from(Span::styled(
                 format!("{} Loading markets...", app.spinner()),
                 style(cli, Color::Yellow).add_modifier(Modifier::BOLD),
@@ -50,8 +50,8 @@ pub(in super::super) fn dish_list_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'st
     }
 
     let mut lines = Vec::new();
-    for (index, dish) in app.dishes.iter().enumerate() {
-        let selected = index == app.selected;
+    for (index, dish) in app.trading.dishes.iter().enumerate() {
+        let selected = index == app.trading.selected;
         let active = selected && app.focus == LabFocus::Markets;
         let marker = if active {
             ">"
@@ -72,10 +72,10 @@ pub(in super::super) fn dish_list_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'st
                 cell_style(cli, Color::Gray, active),
             ),
         ]));
-        if selected && app.market_series_open {
+        if selected && app.trading.market_series_open {
             let series = market_series_labels(app, dish);
             if series.is_empty() {
-                let message = if app.loading_detail {
+                let message = if app.trading.loading_detail {
                     format!("  {} Loading open months...", app.spinner())
                 } else {
                     "  No open months loaded. Press r to refresh.".to_string()
@@ -86,7 +86,8 @@ pub(in super::super) fn dish_list_lines(cli: &Cli, app: &LabApp) -> Vec<Line<'st
                 )));
             } else {
                 let series_focused = app.focus == LabFocus::MarketSeries;
-                let selected_series_index = app.chart_expiry.min(series.len().saturating_sub(1));
+                let selected_series_index =
+                    app.trading.chart_expiry.min(series.len().saturating_sub(1));
                 lines.push(Line::from(Span::styled(
                     "  Monthly Series",
                     market_series_heading_style(cli),
@@ -147,6 +148,7 @@ pub(in super::super) fn market_button_label(dish: &DishSummary) -> String {
 
 pub(in super::super) fn market_series_labels(app: &LabApp, dish: &DishSummary) -> Vec<String> {
     let detail = app
+        .trading
         .detail
         .as_ref()
         .filter(|detail| detail.id.eq_ignore_ascii_case(&dish.id));
@@ -211,7 +213,7 @@ pub(in super::super) fn draw_selected_screen(
         return;
     }
     if app.screen == LabScreen::Oracle {
-        match app.oracle_view {
+        match app.oracle.view {
             OracleView::Earn => draw_oracle_earn_screen(frame, cli, area, app),
             OracleView::Advanced => draw_oracle_screen(frame, cli, area, app),
         }

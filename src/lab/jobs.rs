@@ -119,7 +119,7 @@ pub(super) fn spawn_ledger_fetch(
             .and_then(|backend| {
                 backend
                     .get(&endpoints::dlmm_positions(&owner))
-                    .and_then(crate::current_backend_payload)
+                    .and_then(crate::backend::current_backend_payload)
                     .and_then(|response| positions::project_liquidity_positions(&response, &owner))
             }) {
             Ok(payload) => Some(payload),

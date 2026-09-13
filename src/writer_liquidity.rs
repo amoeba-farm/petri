@@ -21,7 +21,7 @@ fn atoms(value: &Value, key: &str, nullable: bool) -> Result<(), String> {
     if nullable && value.get(key).is_some_and(Value::is_null) {
         return Ok(());
     }
-    crate::canonical_u64_string(text(value, key)?, key, true)
+    crate::request_validation::canonical_u64_string(text(value, key)?, key, true)
         .map(|_| ())
         .map_err(|error| error.to_string())
 }
@@ -30,7 +30,7 @@ fn address(value: &Value, key: &str, nullable: bool) -> Result<(), String> {
     if nullable && value.get(key).is_some_and(Value::is_null) {
         return Ok(());
     }
-    crate::canonical_pubkey_string(text(value, key)?, key)
+    crate::request_validation::canonical_pubkey_string(text(value, key)?, key)
         .map(|_| ())
         .map_err(|error| error.to_string())
 }
@@ -98,8 +98,8 @@ pub(crate) fn parse_bins(bins: &[String], adding: bool) -> Result<Vec<Value>, St
             return Err("bins must be canonical, strictly ascending, unique IDs from 1 through 2048".into());
         }
         prior = id;
-        let option = crate::canonical_u64_string(fields[1], "option atoms", true).map_err(|error| error.to_string())?;
-        let quote = crate::canonical_u64_string(fields[2], "quote atoms", true).map_err(|error| error.to_string())?;
+        let option = crate::request_validation::canonical_u64_string(fields[1], "option atoms", true).map_err(|error| error.to_string())?;
+        let quote = crate::request_validation::canonical_u64_string(fields[2], "quote atoms", true).map_err(|error| error.to_string())?;
         if option == "0" && quote == "0" { return Err("each bin needs a positive amount".into()); }
         Ok(if adding {
             json!({"binId":id,"maximumOptionAmountAtoms":option,"maximumQuoteAmountAtoms":quote})

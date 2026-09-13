@@ -1,11 +1,109 @@
 //! Human intent -> exact current Market -> SDK ticket -> shared governed executor.
 //! No local quote/reserve formula; presentation cards are never signing authority.
 use crate::{
+    attached_wallet::attached_wallet_pubkey,
+    backend::unwrap_data,
+    request_validation::{canonical_pubkey_string, canonical_u64_string},
+};
+use crate::{
     backend::{BackendClient, CliError},
     cli::{Cli, CollectiveSwapDirectionValue, CollectiveTradeArgs},
     current_operation, market_surface,
 };
 use serde_json::{Value, json};
+use solana_pubkey::Pubkey;
+use std::str::FromStr;
+
+fn collective_trade_request(cli: &Cli, trade: &CollectiveTradeArgs) -> Result<Value, CliError> {
+    Ok(json!({
+        "owner": attached_wallet_pubkey(cli)?,
+        "market": canonical_pubkey_string(&trade.market, "market")?,
+        "direction": trade.direction.as_request_value(),
+        "amountIn": canonical_u64_string(&trade.amount_in, "amount-in", false)?,
+        "minimumAmountOut": canonical_u64_string(
+            &trade.minimum_amount_out,
+            "minimum-amount-out",
+            false,
+        )?,
+        "limitBinId": trade.limit_bin_id,
+    }))
+}
+
+fn validate_collective_trade_response(
+    response: &Value,
+    request: &Value,
+    context: &ameba_sdk::CurrentGovernedWriteContextV1,
+) -> Result<ameba_sdk::CurrentGovernedOperationV1, CliError> {
+    let data = unwrap_data(response);
+    let plan = data
+        .get("operationPlan")
+        .or_else(|| data.get("plan"))
+        .ok_or_else(|| CliError::new("collective trade response is missing operationPlan"))?;
+    let encoded = serde_json::to_string(plan).map_err(|error| {
+        CliError::new(format!(
+            "collective trade operationPlan could not be encoded: {error}"
+        ))
+    })?;
+    let admitted =
+        ameba_sdk::parse_current_governed_collective_swap_operation_json_v1(context, &encoded)
+            .map_err(|error| {
+                CliError::new(format!(
+                    "collective trade operationPlan failed pinned SDK validation: {error}"
+                ))
+            })?;
+    let validated = admitted
+        .swap_operation()
+        .ok_or_else(|| CliError::new("The SDK did not admit a collective swap."))?;
+    let direction = match request.get("direction").and_then(Value::as_str) {
+        Some("QuoteForOption") => ameba_sdk::CollectiveSwapDirection::QuoteForOption,
+        Some("OptionForQuote") => ameba_sdk::CollectiveSwapDirection::OptionForQuote,
+        _ => return Err(CliError::new("collective trade direction is invalid")),
+    };
+    let expected = ameba_sdk::ExpectedCollectiveSwapRequest {
+        trader: Pubkey::from_str(
+            request
+                .get("owner")
+                .and_then(Value::as_str)
+                .ok_or_else(|| CliError::new("collective trade request is missing trader"))?,
+        )
+        .map_err(|error| CliError::new(format!("invalid trader public key: {error}")))?,
+        market: Pubkey::from_str(
+            request
+                .get("market")
+                .and_then(Value::as_str)
+                .ok_or_else(|| CliError::new("collective trade request is missing market"))?,
+        )
+        .map_err(|error| CliError::new(format!("invalid market public key: {error}")))?,
+        direction,
+        amount_in: request
+            .get("amountIn")
+            .and_then(Value::as_str)
+            .and_then(|raw| raw.parse().ok())
+            .ok_or_else(|| CliError::new("collective trade request has invalid amountIn"))?,
+        minimum_amount_out: request
+            .get("minimumAmountOut")
+            .and_then(Value::as_str)
+            .and_then(|raw| raw.parse().ok())
+            .ok_or_else(|| {
+                CliError::new("collective trade request has invalid minimumAmountOut")
+            })?,
+        limit_bin_id: u16::try_from(
+            request
+                .get("limitBinId")
+                .and_then(Value::as_u64)
+                .ok_or_else(|| CliError::new("collective trade request has invalid limitBinId"))?,
+        )
+        .map_err(|_| CliError::new("collective trade limitBinId exceeds u16"))?,
+    };
+    ameba_sdk::require_expected_collective_swap_request(&validated, &expected).map_err(
+        |error| {
+            CliError::new(format!(
+                "collective trade plan differs from the explicit request: {error}"
+            ))
+        },
+    )?;
+    Ok(admitted)
+}
 
 /// Shared preparation only. Each adapter retains its output, journal and
 /// approval policy; reviewed execution still re-observes its saved operation.
@@ -22,15 +120,15 @@ pub(crate) fn prepare_exact_input(
     trade: &CollectiveTradeArgs,
 ) -> Result<PreparedTrade, CliError> {
     crate::current_release::require_current_write_release()?;
-    let config = crate::build_onchain_config(cli)?;
+    let config = crate::app_context::build_onchain_config(cli)?;
     // Identity must precede hardware-wallet public-key access and preparation.
     let context = current_operation::observe_current_write_context(&config)?;
-    let request = crate::collective_trade_request(cli, trade)?;
-    let response = crate::current_backend_payload(
+    let request = collective_trade_request(cli, trade)?;
+    let response = crate::backend::current_backend_payload(
         backend
             .post_json_with_current_state_retry(crate::endpoints::dlmm_trade_prepare(), &request)?,
     )?;
-    let admitted = crate::validate_collective_trade_response(&response, &request, &context)?;
+    let admitted = validate_collective_trade_response(&response, &request, &context)?;
     Ok(PreparedTrade {
         config,
         request,
@@ -116,12 +214,16 @@ fn resolve(
             "This series is not open for trading. Inspect its settlement or position actions.",
         ));
     }
-    let config = crate::build_onchain_config(cli)?;
+    let config = crate::app_context::build_onchain_config(cli)?;
     let (address, market, block_time) =
         current_operation::read_trade_market(&config, &intent.expiry)?;
-    let quantity = crate::canonical_u64_string(&intent.quantity, "contract quantity", false)?
-        .parse::<u64>()
-        .unwrap();
+    let quantity = crate::request_validation::canonical_u64_string(
+        &intent.quantity,
+        "contract quantity",
+        false,
+    )?
+    .parse::<u64>()
+    .unwrap();
     let quantity_atoms = quantity
         .checked_mul(ameba_sdk::CANONICAL_CONTRACT_SIZE_ATOMIC)
         .ok_or_else(|| CliError::new("Contract quantity is too large."))?;
@@ -292,16 +394,18 @@ pub fn render_response(payload: &Value) -> String {
 pub fn execute_reviewed(cli: &Cli, backend: &BackendClient, id: &str) -> Result<Value, CliError> {
     crate::current_release::require_current_write_release()?;
     let record = crate::operation_journal::load(id)?;
-    record.require_scope(backend, &crate::attached_wallet_pubkey(cli)?)?;
+    record.require_scope(
+        backend,
+        &crate::attached_wallet::attached_wallet_pubkey(cli)?,
+    )?;
     if record.state != "prepared" {
         return Err(CliError::new(
             "This operation was already attempted. Use operations resume; it never resubmits.",
         ));
     }
-    let config = crate::build_onchain_config(cli)?;
+    let config = crate::app_context::build_onchain_config(cli)?;
     let context = current_operation::observe_current_write_context(&config)?;
-    let admitted =
-        crate::validate_collective_trade_response(&record.prepared, &record.request, &context)?;
+    let admitted = validate_collective_trade_response(&record.prepared, &record.request, &context)?;
     let deadline = admitted
         .swap_operation()
         .and_then(|s| s.plan.semantic.deadline_ts.parse::<u64>().ok())

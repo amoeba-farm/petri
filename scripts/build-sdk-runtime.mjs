@@ -8,8 +8,15 @@ import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
-import { packRuntime, readRuntime, sha256 } from './sdk-runtime-archive.mjs';
+import { packRuntime, readRuntime, sha256, MAX_GROUP_BYTES } from './sdk-runtime-archive.mjs';
+import { RUNTIME_LAYOUT, runtimeInputFiles, selectRuntimeFiles } from './sdk-runtime-files.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// Reject cached archives selected/encoded by older packaging code, even when
+// their worker source still matches. No worker execution is needed here.
+const runtimeBuildSha256 = sha256(JSON.stringify([
+  'build-sdk-runtime.mjs', 'sdk-runtime-files.mjs', 'sdk-runtime-archive.mjs', 'sdk-runtime-candidate.mjs',
+  'runtime-tools/package.json', 'runtime-tools/package-lock.json',
+].map(name => [name, sha256(fs.readFileSync(path.join(root, 'scripts', name)))])));
 const commit = 'a21b324a7a64da87046c7650355b80ea20c47540';
 // Distribution commits retain the pinned upstream runtime identity.
 const publicSourcePath = path.join(root, 'release/public-sdk-source.json');
@@ -19,14 +26,18 @@ const { values: options, positionals } = parseArgs({ allowPositionals: true, opt
   verify: { type: 'boolean' }, candidate: { type: 'boolean' },
   'omit-install-archives': { type: 'boolean' }, 'bundle-worker': { type: 'boolean' },
   'compression-level': { type: 'string', default: '9' }, 'no-deduplicate': { type: 'boolean' },
+  'group-bytes': { type: 'string', default: '0' }, 'compress-manifest': { type: 'boolean' },
   'verifier-opt-level': { type: 'string' }, 'verifier-lto': { type: 'string' },
 } });
 if (positionals.length > 1) throw new Error('Expected at most one SDK checkout');
 let sdkCheckout = positionals[0] || process.env.PETRI_SDK_CHECKOUT;
 const candidate = options.candidate === true;
 const level = Number(options['compression-level']);
+const groupBytes = Number(options['group-bytes']);
+const compressManifest = options['compress-manifest'] === true || groupBytes > 0;
+if (!Number.isInteger(groupBytes) || groupBytes < 0 || groupBytes > MAX_GROUP_BYTES) throw new Error('Group bytes must be 0-4194304');
 if (!Number.isInteger(level) || level < 0 || level > 9) throw new Error('Compression level must be 0-9');
-if (!candidate && (options['omit-install-archives'] || options['bundle-worker'] || options['verifier-opt-level'] || options['verifier-lto'])) {
+if (!candidate && (groupBytes || compressManifest || options['bundle-worker'] || options['verifier-opt-level'] || options['verifier-lto'])) {
   throw new Error('Unqualified payload/profile experiments require --candidate');
 }
 const verifierEnv = {};
@@ -46,7 +57,7 @@ if (options.verify) {
   if (candidate) throw new Error('Candidate runtime qualification is a separate test phase');
   const { manifest: header } = readRuntime(path.join(target,'petri-sdk-runtime.bin'));
   const worker=header.files.find(f=>f.path==='worker.mjs');
-  if(header.candidate===true||header.schemaVersion!==1||header.sdkCommit!==commit||header.platform!==process.platform||header.arch!==process.arch||!header.files.some(f=>f.path==='node-LICENSE.txt')||
+  if(header.candidate===true||header.runtimeLayout!==RUNTIME_LAYOUT||header.runtimeBuildSha256!==runtimeBuildSha256||![1,2].includes(header.schemaVersion)||header.sdkCommit!==commit||header.platform!==process.platform||header.arch!==process.arch||!header.files.some(f=>f.path==='node-LICENSE.txt')||
       worker?.sha256!==createHash('sha256').update(fs.readFileSync(path.join(root,'scripts/sdk-worker.mjs'))).digest('hex')||
       companions.some(name=>header.files.find(f=>f.path===name)?.sha256!==createHash('sha256').update(fs.readFileSync(path.join(root,'scripts',name))).digest('hex'))||
       !header.files.some(f=>f.path==='compressed-verifier.json')) {
@@ -83,6 +94,12 @@ if (options['bundle-worker']) {
   bundledInputs = await bundleWorkerSdk(root, stage, sdk);
 }
 run(process.execPath, [npm, 'prune', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund','--cache',path.join(target,'sdk-npm-cache')], sdk);
+// Install the locked build-only tracer outside the SDK/runtime payload.
+const tracingTools = path.join(stage, 'build-tools');
+fs.mkdirSync(tracingTools);
+for (const name of ['package.json', 'package-lock.json']) fs.copyFileSync(path.join(root, 'scripts/runtime-tools', name), path.join(tracingTools, name));
+run(process.execPath, [npm, 'ci', '--ignore-scripts', '--no-audit', '--no-fund', '--cache', path.join(target, 'sdk-npm-cache')], tracingTools);
+const { nodeFileTrace } = createRequire(path.join(tracingTools, 'package.json'))('@vercel/nft');
 // The pinned native package marks the source local-build-unqualified, whereas
 // the SDK source-locator helper still expects source-only-unqualified. Resolve
 // the package's explicit export without modifying either upstream artifact.
@@ -106,36 +123,26 @@ for await(const chunk of nodeLicense.body){licenseSize+=chunk.length;if(licenseS
 fs.writeFileSync(path.join(stage,'node-LICENSE.txt'),Buffer.concat(licenseParts));
 fs.copyFileSync(path.join(root,'scripts/sdk-worker.mjs'),path.join(stage,'worker.mjs'));
 for(const name of companions)fs.copyFileSync(path.join(root,'scripts',name),path.join(stage,name));
-const names=[];
-function add(name) {
-  names.push(name.split(path.sep).join('/'));
-}
-function walk(directory) {
-  for(const entry of fs.readdirSync(path.join(stage,directory),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))) {
-    if(entry.name==='.bin'||entry.name.endsWith('.map')||entry.name.endsWith('.d.ts'))continue;
-    const name=path.join(directory,entry.name);
-    if(entry.isSymbolicLink())throw new Error(`Unexpected SDK dependency symlink: ${name}`);
-    if(entry.isDirectory())walk(name);else if(entry.isFile())add(name);
-  }
-}
-add(process.platform==='win32'?'node.exe':'node');add('node-LICENSE.txt');add('worker.mjs');
-add(verifierName);add('compressed-verifier.json');for(const name of companions)add(name);
-for(const directory of ['sdk/dist','sdk/node_modules','sdk/release','sdk/vendor'])walk(directory);
-for(const name of fs.readdirSync(sdk).filter(name=>/^(LICENSE|NOTICE|COPYING)(\.|$)/i.test(name)))if(fs.statSync(path.join(sdk,name)).isFile())add(path.join('sdk',name));
-add('sdk/package.json');add('sdk/package-lock.json');
-const omitted = [];
-const included = names.filter(name => {
-  const reason = options['omit-install-archives'] && /^sdk\/vendor\/[^/]+\.tgz$/.test(name)
-    ? 'installation archive; four-family runtime qualification deferred'
-    : bundledInputs.includes(name) ? 'module included in candidate Node bundle; resource qualification deferred' : null;
+// Trace computed imports, require/exports branches, native loaders and assets.
+// Unknown inputs fail closed; there is no whole-tree fallback.
+const selection = await selectRuntimeFiles(stage, runtimeInputFiles(stage), { nodeFileTrace });
+const omitted = [...selection.omitted];
+const included = selection.included.filter(name => {
+  const reason = bundledInputs.includes(name) ? 'module included in candidate Node bundle; resource qualification deferred' : null;
   if (!reason) return true;
   const bytes = fs.readFileSync(path.join(stage, name));
   omitted.push({ path: name, bytes: bytes.length, sha256: sha256(bytes), reason });
   return false;
 });
+included.push(process.platform==='win32'?'node.exe':'node', 'node-LICENSE.txt',
+  'worker.mjs', verifierName, 'compressed-verifier.json', ...companions);
 const metadata = { sdkCommit:commit, platform:process.platform, arch:process.arch, nodeVersion:process.version,
-  candidate, compressionLevel:level, deduplicated:!options['no-deduplicate'] };
-const result = packRuntime(stage, included, metadata, { level, deduplicate:!options['no-deduplicate'] });
+  runtimeLayout:RUNTIME_LAYOUT, runtimeBuildSha256,
+  candidate, compressionLevel:level, deduplicated:!options['no-deduplicate'],
+  compressionGroupBytes:groupBytes, compressedManifest:compressManifest };
+const result = packRuntime(stage, included, metadata, {
+  level, deduplicate:!options['no-deduplicate'], groupBytes, compressManifest,
+});
 const basename = candidate ? 'petri-sdk-runtime-candidate' : 'petri-sdk-runtime';
 fs.writeFileSync(path.join(target, `${basename}.bin`), result.bundle);
 fs.writeFileSync(path.join(target, `${basename}.inventory.json`), JSON.stringify({
@@ -144,6 +151,6 @@ fs.writeFileSync(path.join(target, `${basename}.inventory.json`), JSON.stringify
   sdkLockSha256:sha256(fs.readFileSync(path.join(sdk,'package-lock.json'))),
   cliCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8',windowsHide:true}).trim(),
   rustc:execFileSync('rustc',['-Vv'],{encoding:'utf8',windowsHide:true}).trim(), verifierEnv,
-  omitted, ...result.inventory,
+  dependencyClosure:selection.dependencyClosure, omitted, ...result.inventory,
 }, null, 2)+'\n');
 console.log(`Built ${basename}: ${result.manifest.files.length} files, ${result.bundle.length} bytes, ${os.platform()}/${os.arch()}. No tests run.`);
