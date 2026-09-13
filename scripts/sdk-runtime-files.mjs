@@ -50,14 +50,48 @@ function packageDirectory(name) {
   return name.slice(0, start) + parts.slice(0, parts[0].startsWith('@') ? 2 : 1).join('/');
 }
 
-export async function selectRuntimeFiles(stage, files, { nodeFileTrace }) {
+export async function selectRuntimeFiles(stage, files, { nodeFileTrace, resolve }) {
   stage = path.resolve(stage);
   files ??= runtimeInputFiles(stage);
   const roots = WORKER_FILES.map(name => path.join(stage, name));
+  const insideStage = name => {
+    const relative = path.relative(stage, path.resolve(name));
+    return relative === '' || (!path.isAbsolute(relative) && relative !== '..' && !relative.startsWith(`..${path.sep}`));
+  };
+  // Never let an ancestor checkout's node_modules make a clean build appear
+  // complete. The three workers bind createRequire to sdk/package.json.
+  const isolatedRead = async (name, operation) => {
+    if (!insideStage(name)) return null;
+    try { return await operation(name); }
+    catch (error) {
+      if (['ENOENT', 'ENOTDIR', 'EISDIR', 'EINVAL', 'UNKNOWN'].includes(error.code)) return null;
+      throw error;
+    }
+  };
+  const optionalImports = [];
   const traced = await nodeFileTrace(roots, {
     base: stage, processCwd: stage, exportsOnly: true, conditions: ['node'],
     // Trace both current Node module-sync exports and their fallback branches.
     moduleSyncCatchall: true,
+    stat: name => isolatedRead(name, fs.promises.stat),
+    readFile: name => isolatedRead(name, file => fs.promises.readFile(file, 'utf8')),
+    readlink: name => isolatedRead(name, fs.promises.readlink),
+    resolve: async (id, parent, job, isCjs) => {
+      const workerRequire = roots.includes(path.resolve(parent)) && ['@solana/web3.js', '@lightprotocol/stateless.js'].includes(id);
+      const sdkParent = workerRequire ? path.join(stage, 'sdk/package.json') : parent;
+      try { return await resolve(id, sdkParent, job, workerRequire || isCjs); }
+      catch (error) {
+        // node-fetch 2.7.0 catches this absent optional peer. It is needed
+        // only by textConverted(), not its JSON/UTF-8 paths. Bind the exception
+        // to the exact reviewed bytes; every other unresolved import fails.
+        const relativeParent = normalized(path.relative(stage, parent));
+        if (error.code !== 'MODULE_NOT_FOUND' || id !== 'encoding' ||
+            relativeParent !== 'sdk/node_modules/node-fetch/lib/index.js' ||
+            sha256(fs.readFileSync(parent)) !== '79541f01338e70f4ff6f8a1d12f5c2914d4c6ab2ba96b7ddf48d2add01c13813') throw error;
+        optionalImports.push({ parent: relativeParent, id, reason: 'Pinned node-fetch catches its absent optional encoding peer' });
+        return [];
+      }
+    },
   });
   if (traced.warnings.size) {
     throw new Error(`Worker dependency trace needs review:\n${[...traced.warnings].map(w => w.message).join('\n')}`);
@@ -93,7 +127,7 @@ export async function selectRuntimeFiles(stage, files, { nodeFileTrace }) {
   return { included, omitted, dependencyClosure: {
     layout: RUNTIME_LAYOUT, tracer: '@vercel/nft@1.11.0', roots: WORKER_FILES,
     platform: process.platform, arch: process.arch, nodeVersion: process.version,
-    packages, resources, tracedFiles: [...tracedFiles].sort(), warnings: [],
+    packages, resources, optionalImports, tracedFiles: [...tracedFiles].sort(), warnings: [],
     reasons: [...traced.reasons].filter(([name]) => tracedFiles.has(normalized(name))).map(([name, reason]) => ({
       path: normalized(name), type: reason.type, parents: [...reason.parents].map(normalized).sort(),
     })).sort((a, b) => a.path.localeCompare(b.path)),

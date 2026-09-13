@@ -99,7 +99,7 @@ const tracingTools = path.join(stage, 'build-tools');
 fs.mkdirSync(tracingTools);
 for (const name of ['package.json', 'package-lock.json']) fs.copyFileSync(path.join(root, 'scripts/runtime-tools', name), path.join(tracingTools, name));
 run(process.execPath, [npm, 'ci', '--ignore-scripts', '--no-audit', '--no-fund', '--cache', path.join(target, 'sdk-npm-cache')], tracingTools);
-const { nodeFileTrace } = createRequire(path.join(tracingTools, 'package.json'))('@vercel/nft');
+const { nodeFileTrace, resolve } = createRequire(path.join(tracingTools, 'package.json'))('@vercel/nft');
 // The pinned native package marks the source local-build-unqualified, whereas
 // the SDK source-locator helper still expects source-only-unqualified. Resolve
 // the package's explicit export without modifying either upstream artifact.
@@ -125,7 +125,7 @@ fs.copyFileSync(path.join(root,'scripts/sdk-worker.mjs'),path.join(stage,'worker
 for(const name of companions)fs.copyFileSync(path.join(root,'scripts',name),path.join(stage,name));
 // Trace computed imports, require/exports branches, native loaders and assets.
 // Unknown inputs fail closed; there is no whole-tree fallback.
-const selection = await selectRuntimeFiles(stage, runtimeInputFiles(stage), { nodeFileTrace });
+const selection = await selectRuntimeFiles(stage, runtimeInputFiles(stage), { nodeFileTrace, resolve });
 const omitted = [...selection.omitted];
 const included = selection.included.filter(name => {
   const reason = bundledInputs.includes(name) ? 'module included in candidate Node bundle; resource qualification deferred' : null;

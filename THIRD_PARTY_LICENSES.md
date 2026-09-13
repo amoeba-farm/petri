@@ -4,7 +4,7 @@ This file is generated from the exact `Cargo.lock` package set and the legal fil
 
 An **SPDX-text fallback** is used only when an upstream `.crate` archive contains no `LICENSE`, `LICENCE`, `COPYING`, `NOTICE`, `COPYRIGHT`, or `UNLICENSE` file, or when a reviewed packaged file conflicts with the manifest's declared license expression. The fallback is explicitly labeled, preserves the package's declared authors and repository, and supplies pinned standard license text; it is not represented as an upstream-packaged file.
 
-- Cargo.lock SHA-256: `cf0b03d9aae54ae6116979332e20b2a783435aded2221400cdfed4f6d37c15ac`
+- Cargo.lock SHA-256: `830e01b679b41e7f5c184b7e42ce8b646b2f858cfd2adaf61755fc7778013e08`
 - Locked packages: 609
 - Registry packages: 602
 - Git packages: 2
@@ -28,7 +28,7 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 | alloc-stdlib | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Daniel Reiter Horn &lt;danielrh@dropbox.com&gt; | https://github.com/dropbox/rust-alloc-no-stdlib | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: BSD-3-Clause</code> → <code>L0218</code> |
 | allocator-api2 | 0.2.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Zakarum &lt;zaq.dev@icloud.com&gt; | https://github.com/zakarumych/allocator-api2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0116</code><br><code>LICENSE-MIT</code> → <code>L0050</code> |
 | ameba-sdk | 0.2.0 | git+https://github.com/SPACE999978/ameba_sdk.git?rev=a21b324a7a64da87046c7650355b80ea20c47540#a21b324a7a64da87046c7650355b80ea20c47540 | Apache-2.0 | — | — | upstream Git legal file | <code>LICENSE</code> → <code>L0158</code><br><code>NOTICE</code> → <code>L0261</code><br><code>scripts/license-policy.mjs</code> → <code>L0095</code><br><code>test/license-policy.test.mjs</code> → <code>L0035</code> |
-| amoeba | 0.1.6 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0158</code> |
+| amoeba | 0.1.7 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0158</code> |
 | android_system_properties | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Nicolas Silva &lt;nical@fastmail.com&gt; | https://github.com/nical/android_system_properties | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0046</code><br><code>LICENSE-MIT</code> → <code>L0148</code> |
 | anstream | 0.6.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0223</code><br><code>LICENSE-MIT</code> → <code>L0129</code> |
 | anstyle | 1.0.13 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0223</code><br><code>LICENSE-MIT</code> → <code>L0129</code> |
@@ -11523,7 +11523,7 @@ DEALINGS IN THE SOFTWARE.
 
 - SHA-256: `8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb`
 - Provenance class: local-package, upstream-git-package, upstream-package
-- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>ameba-sdk@0.2.0/LICENSE</code>, <code>amoeba@0.1.6/LICENSE</code>, <code>light-prover-client@8.0.0/vendor/LICENSE-APACHE-2.0</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, plus 4 more mapped package file(s)
+- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>ameba-sdk@0.2.0/LICENSE</code>, <code>amoeba@0.1.7/LICENSE</code>, <code>light-prover-client@8.0.0/vendor/LICENSE-APACHE-2.0</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, plus 4 more mapped package file(s)
 
 <!-- legal-text-begin sha256=8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb -->
 ```text
