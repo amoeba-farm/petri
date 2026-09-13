@@ -6,6 +6,8 @@ These preview packages are **not publisher-signed or Apple-notarized**. macOS bu
 
 Windows: extract the ZIP and open `Petri.cmd`, or run `powershell -ExecutionPolicy Bypass -File .\install-preview.ps1` in the extracted folder. The Start-menu shortcut opens the TUI. From an existing terminal, run `petri tui` or `petri --help`.
 
+Windows also requires Microsoft's [Visual C++ v14 x64 runtime](https://aka.ms/vc14/vc_redist.x64.exe). Install it first if absent or if Windows reports `VCRUNTIME140.dll` missing. This Microsoft prerequisite is not bundled in the ZIP.
+
 macOS: extract the ZIP and open `Petri.app` to launch Terminal, or run `bash ./install-preview.sh` in the extracted folder. The installer adds `~/.local/bin/petri` and `~/Applications/Petri Preview.app`.
 
 To update this unsigned preview, download again or rerun the preview installer. The signed automatic updater deliberately does not accept these unsigned packages.

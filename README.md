@@ -29,6 +29,10 @@ Open `Petri.cmd` on Windows or `Petri.app` on macOS. Petri opens in a terminal.
 From an existing terminal, use `petri tui` for the interface or `petri --help` for commands.
 The downloads include the SDK runtime; Rust and Node.js are not required to launch.
 
+Windows requires Microsoft's [Visual C++ v14 x64 runtime](https://aka.ms/vc14/vc_redist.x64.exe).
+Install it first if it is not already installed, especially if Windows reports
+`VCRUNTIME140.dll` missing. This prerequisite is supplied by Microsoft, not bundled in the ZIP.
+
 This first Devnet preview is **not publisher-signed or Apple-notarized**. Verify
 the ZIP's SHA-256 before opening it. macOS may require **System Settings → Privacy
 & Security → Open Anyway** for this specific app. Do not disable system security
