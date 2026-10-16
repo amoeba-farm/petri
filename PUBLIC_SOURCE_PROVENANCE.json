@@ -465,8 +465,10 @@
     },
     {
       "path": "cli/scripts/finish-petri-windows-update.ps1",
-      "sha256": "dc028e8a8eb707d3f5a621cb453e1dc10d6285606e6df9767641ac8697e184d2",
-      "executable": false
+      "sha256": "32aeea14af07e5b39bd7ec340dd16d8f80cd36fa35443fc5c2669cf09c81705a",
+      "executable": false,
+      "sourceSha256": "dc028e8a8eb707d3f5a621cb453e1dc10d6285606e6df9767641ac8697e184d2",
+      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
     },
     {
       "path": "cli/scripts/generate-third-party-licenses.mjs",
@@ -485,13 +487,17 @@
     },
     {
       "path": "cli/scripts/install-petri.ps1",
-      "sha256": "8c0e826186d750e5d1ba0c210c046f02bf55851653c11f225e833206caa0b7ab",
-      "executable": false
+      "sha256": "74fdb0abdd0c37270b234ff0210d6c1568399190599342e1ce89b8c33946068c",
+      "executable": false,
+      "sourceSha256": "8c0e826186d750e5d1ba0c210c046f02bf55851653c11f225e833206caa0b7ab",
+      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
     },
     {
       "path": "cli/scripts/install-preview.ps1",
-      "sha256": "f11ebc70d85381b5b793e1d4828e24ea286e48b55c464a96b24fda0a8c8cd2e7",
-      "executable": false
+      "sha256": "26ff18f17fc5d946f379302c5057e792c6eb557c958d6db44e351ff01b5d238a",
+      "executable": false,
+      "sourceSha256": "f11ebc70d85381b5b793e1d4828e24ea286e48b55c464a96b24fda0a8c8cd2e7",
+      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
     },
     {
       "path": "cli/scripts/install-preview.sh",
@@ -510,8 +516,10 @@
     },
     {
       "path": "cli/scripts/package-petri-windows.ps1",
-      "sha256": "ae7686612a233ecf866cc368ff2ba529c569bff9771c20796cf3bbebf001a6ea",
-      "executable": false
+      "sha256": "de912986a0367788dda964512a87acd23cb8d0d8262494f8baeef6e0dc305ec1",
+      "executable": false,
+      "sourceSha256": "ae7686612a233ecf866cc368ff2ba529c569bff9771c20796cf3bbebf001a6ea",
+      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
     },
     {
       "path": "cli/scripts/petri-action-bridge.mjs",
@@ -870,8 +878,10 @@
     },
     {
       "path": "cli/tools/petri-conpty-harness/run.ps1",
-      "sha256": "8fb5616ecdb7d3ecfd1a60fbcc652c54482cf019c3f7e812ee8f4437b0a6bcb5",
-      "executable": false
+      "sha256": "d86bded879cb44b2515a659e9f7f9596287b65c54b38a4aafd7972d217bd8893",
+      "executable": false,
+      "sourceSha256": "8fb5616ecdb7d3ecfd1a60fbcc652c54482cf019c3f7e812ee8f4437b0a6bcb5",
+      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
     },
     {
       "path": "cli/tools/petri-conpty-harness/src/lib.rs",
@@ -2813,5 +2823,6 @@
       "sha256": "ad500c03cf8473f548d3c62ef489ebbe9ec9ab918fdb4ed7d8a9f25f801a38bf",
       "executable": false
     }
-  ]
+  ],
+  "lineEndingQualification": "Five PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream."
 }
