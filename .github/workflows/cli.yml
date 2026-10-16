@@ -1,0 +1,91 @@
+name: CLI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'governance/**'
+      - 'cli/**'
+      - 'sdk/Cargo.toml'
+      - 'sdk/rust/**'
+      - 'futures/Cargo.toml'
+      - 'futures/crates/**'
+      - 'futures/programs/**'
+      - 'oracle/crates/**'
+      - 'oracle/programs/ameba_oracle/src/**'
+      - 'oracle/programs/ameba_oracle/Cargo.toml'
+      - 'oracle/governance/**'
+      - 'oracle/Cargo.toml'
+      - 'scripts/check.sh'
+      - '.github/workflows/cli.yml'
+  pull_request:
+    paths:
+      - 'governance/**'
+      - 'cli/**'
+      - 'sdk/Cargo.toml'
+      - 'sdk/rust/**'
+      - 'futures/Cargo.toml'
+      - 'futures/crates/**'
+      - 'futures/programs/**'
+      - 'oracle/crates/**'
+      - 'oracle/programs/ameba_oracle/src/**'
+      - 'oracle/programs/ameba_oracle/Cargo.toml'
+      - 'oracle/governance/**'
+      - 'oracle/Cargo.toml'
+      - 'scripts/check.sh'
+      - '.github/workflows/cli.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          # One commit, and only the blobs of what this check builds against: a
+          # sparse checkout makes it a partial clone (--filter=blob:none).
+          # Mirrors needs() in scripts/agent.sh.
+          sparse-checkout: |
+            governance
+            cli
+            sdk
+            futures
+            oracle
+            scripts
+      - name: Rust 1.93.1 (the default toolchain; folders with rust-toolchain.toml use theirs)
+        run: |
+          rustup toolchain install 1.93.1 --profile minimal --component rustfmt,clippy
+          rustup default 1.93.1
+      - name: Native build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libssl-dev libudev-dev pkg-config
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            cli
+      - name: Scan the CLI source for credentials
+        working-directory: cli
+        run: node scripts/check-release-secrets.mjs
+      - run: scripts/check.sh cli
+      - name: Launcher, packaging and bundled guide contracts
+        working-directory: cli
+        run: |
+          node scripts/check-petri-launcher.mjs
+          node scripts/check-petri-packaging.mjs
+          node scripts/check-bundled-gitbook.mjs
+      - name: Third-party license corpus matches Cargo.lock
+        working-directory: cli
+        run: |
+          cargo fetch --locked
+          node scripts/generate-third-party-licenses.mjs --check

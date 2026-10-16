@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Petri CLI Devloop</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b1416;
+        --panel: #102225;
+        --text: #e7f2ef;
+        --muted: #9fb5b1;
+        --line: #2b575b;
+        --accent: #d7b846;
+        --accent-2: #5fc4b8;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+
+      h1,
+      h2 {
+        line-height: 1.15;
+        margin: 0 0 12px;
+      }
+
+      h1 {
+        color: var(--accent);
+        font-size: 2rem;
+      }
+
+      h2 {
+        color: var(--accent-2);
+        font-size: 1.15rem;
+        margin-top: 28px;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      pre {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        overflow-x: auto;
+        padding: 14px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Petri CLI Devloop</h1>
+      <p class="muted">
+        Repeatable checks for agents, worktrees, and local development.
+      </p>
+
+      <h2>One Command</h2>
+      <pre><code>scripts/devloop.sh</code></pre>
+
+      <p>The script runs the same core checks expected in CI:</p>
+      <pre><code>cargo fmt -- --check
+CARGO_BUILD_JOBS=1 cargo check --locked --bin petri -j1
+CARGO_BUILD_JOBS=1 cargo test --locked -j1 -- --test-threads=1</code></pre>
+
+      <h2>Windows Command Shim</h2>
+      <pre><code>node scripts/check-petri-launcher.mjs</code></pre>
+      <p>
+        This validates the installation/update-only <code>Petri</code> launcher used before a
+        native Rust binary is available. Bare <code>Petri</code> should show the
+        CLI front door without backend noise; market commands require the Rust
+        binary, and the launcher never answers a market command itself.
+      </p>
+
+      <h2>Red Green Refactor</h2>
+      <p>
+        For parser, endpoint, math, chart, or signing changes, add the failing
+        test first when the behavior can be isolated. Keep TUI layout changes
+        small enough that a PTY smoke test can still catch obvious regressions.
+      </p>
+
+      <h2>Native Windows TUI Acceptance</h2>
+      <pre><code>tools/petri-conpty-harness/run.ps1</code></pre>
+      <p>
+        The standalone, development-only ConPTY harness runs the release binary
+        with isolated loopback data, provider access off, no wallet, current-screen
+        VT parsing, native keyboard/mouse/resize input, hard deadlines, and a
+        watchdog worker per scenario. It is not linked into or shipped with Petri.
+        Read <a href="../../tools/petri-conpty-harness/README.md">the harness isolation contract</a>
+        before extending it.
+      </p>
+
+      <h2>Unix PTY Smoke</h2>
+      <pre><code>script -q /tmp/petri-smoke.log petri</code></pre>
+      <p>
+        Exit with <code>q</code>, then inspect the log. Either PTY check supplements,
+        rather than replaces, browser-parity, backend, wallet, and on-chain checks.
+      </p>
+
+      <h2>CI Shape</h2>
+      <p>
+        The workflow template at <code>docs/ci/petri-cli-ci.yml</code> checks
+        out only this repository. <code>scripts/devloop.sh</code> runs the
+        research and MCP bridge checks, the locked format, check, test and
+        clippy gates, then the research binary smoke and the MCP server check.
+        After those pass, the active workflow runs the launcher, native
+        packaging, bundled-guide and dependency-license checks. The signed
+        release is the monorepo's <code>.github/workflows/cli-release.yml</code>,
+        run by hand on a <code>vX.Y.Z</code> tag: it builds the production
+        binaries (Linux, signed and notarized macOS, Authenticode-signed
+        Windows), checks they default to production without the dev faucet,
+        and opens a draft release.
+      </p>
+
+      <h2>Subagent Handoff</h2>
+      <p>Every parallel patch should report:</p>
+      <ul>
+        <li>worktree or branch path</li>
+        <li>files touched</li>
+        <li>commands run</li>
+        <li>test result or exact blocker</li>
+        <li>backend route assumptions</li>
+      </ul>
+
+      <p><a href="index.html">Back to index</a></p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+[package]
+name = "amoeba"
+version = "0.1.10"
+edition = "2024"
+description = "Petri, the open-source Rust CLI and terminal interface for Amoeba markets"
+license = "Apache-2.0"
+readme = "README.md"
+publish = false
+
+[[bin]]
+name = "petri"
+path = "src/main.rs"
+
+[dependencies]
+getrandom = "0.3.4"
+# The zlib backend for zip's deflate support (release updates).
+flate2 = "1.1.9"
+base64 = "0.22.1"
+bincode = "1.3.3"
+borsh = "0.10.4"
+chrono = { version = "0.4.40", default-features = false, features = ["std", "clock"] }
+clap = { version = "4.5.32", features = ["derive", "env"] }
+crossterm = "0.28.1"
+libc = "0.2.183"
+# The futures SDK of this monorepo (sdk/): `ameba_sdk_futures::futures`
+# re-exports the futures client crate (PDAs, instruction builders, account
+# and book decoders, take simulation).
+ameba_sdk_futures = { package = "ameba-sdk", path = "../sdk" }
+# The oracle program of this monorepo (oracle/), the source the dev chain
+# runs: instruction builders, PDAs and account layouts. Built without its
+# localnet dev profile, so its compiled-in program id is never used; every
+# builder takes the trusted deployment's oracle id.
+ameba_oracle = { path = "../oracle/programs/ameba_oracle", features = ["no-entrypoint"] }
+ratatui = "0.29.0"
+reqwest = { version = "0.12.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+solana-derivation-path = "2.2"
+solana-keypair = "2.2"
+solana-program = { version = "2.2", default-features = false }
+solana-remote-wallet = "2.3"
+solana-signature = { version = "2.3", features = ["verify"] }
+solana-signer = "2.2"
+solana-transaction = { version = "2.2", features = ["bincode", "verify"] }
+spl-token = { version = "7.0.0", features = ["no-entrypoint"] }
+toml_edit = "0.25.4"
+uriparse = "0.6.4"
+yaml-rust2 = "0.11.0"
+sha2 = "=0.10.9"
+zip = { version = "=8.6.0", default-features = false, features = ["deflate-flate2"] }
+
+[features]
+# DEV-ONLY: REMOVE FOR PROD. `petri faucet`: the dev chain's test USDC from the
+# futures API's dev faucet, and SOL from a local validator. The dev build of
+# /opt/ameba-dev/bin/petri (scripts/install-dev.sh) enables it; a release build
+# leaves it off (ship/releases/2026-10-15-preflight.md, decision 3).
+dev-faucet = []
+# The dev build's default profile. With no --profile, PETRI_PROFILE or saved
+# `profile`, this build talks to the dev chain (the futures API and validator
+# on loopback) instead of production (src/futures/settings.rs, `Profile`).
+# scripts/install-dev.sh enables it for /opt/ameba-dev/bin/petri; a release
+# build leaves it off and defaults to production. Any build reaches either
+# deployment with --profile.
+dev-chain = []
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_IO", "Win32_System_Registry", "Win32_System_SystemServices", "Win32_System_Threading", "Win32_System_WindowsProgramming", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
+
+[dev-dependencies]
+# RFC 8032 vectors for the patched signature crates (tests/dependency_crypto_compat.rs).
+solana-ed25519-program = "2.2.3"
+
+[build-dependencies]
+sha2 = "=0.10.9"
+winresource = "0.1.31"
+
+[patch.crates-io]
+solana-ed25519-program = { path = "vendor/solana-ed25519-program-2.2.3" }
+solana-keypair = { path = "vendor/solana-keypair-2.2.3" }
+solana-signature = { path = "vendor/solana-signature-2.3.0" }
+
+[workspace]
+default-members = ["."]
+exclude = ["tools/petri-conpty-harness"]
+resolver = "3"
+
+[profile.release]
+debug = 0
+strip = "symbols"
+lto = "thin"
+codegen-units = 1

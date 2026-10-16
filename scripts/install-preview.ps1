@@ -42,4 +42,4 @@ if (-not $NoShortcut) {
 }
 & (Join-Path $InstallRoot 'petri.exe') --version
 if ($LASTEXITCODE -ne 0) { throw 'Installed binary did not start' }
-Write-Host 'Petri installed. Open Petri from Start, or restart your terminal and run petri. This is an unsigned Devnet preview.'
+Write-Host 'Petri installed. Open Petri from Start, or restart your terminal and run petri. This is an unsigned preview.'

@@ -1,0 +1,24 @@
+[package]
+name = "ameba-sdk"
+version = "0.3.1"
+edition = "2024"
+description = "Ameba futures SDK: the futures client crate, re-exported"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "ameba_sdk"
+path = "rust/src/lib.rs"
+
+[dependencies]
+# The futures client crate of this monorepo (futures/crates/futures-client).
+ameba-futures-client = { path = "../futures/crates/futures-client" }
+solana-program = "=2.3.0"
+
+[dev-dependencies]
+serde_json = "1"
+base64 = "0.22"
+
+[[test]]
+name = "vectors"
+path = "rust/tests/vectors.rs"

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "scope": "Stored assets only. Whole-binary, installed, latency and memory budgets await complete comparable builds.",
+  "maxFileBytes": {
+    "assets/tui/intro/terminal-frames.bin.zlib": 62000,
+    "assets/tui/intro/frames.bin.zlib": 94000
+  }
+}

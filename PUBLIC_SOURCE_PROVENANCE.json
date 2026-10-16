@@ -1,11 +1,2817 @@
 {
-  "schemaVersion": 1,
-  "sourceCommit": "ac8e81311869de5a8d3f25a2a60c7785b8db629c",
-  "sourceDirty": false,
-  "policySha256": "0a04c54f19b18cb294d26ea94413113354c984ffa52c58048db26479c51ea680",
-  "exportedFileCount": 239,
-  "exportedTreeSha256": "27e20613711702fcd6875e5f8575d7c1dd402ec07a659b408fa4cf517d543a3e",
-  "treeDigestIncludesExecutableModes": true,
-  "treeDigestExcludesThisProvenanceFile": true,
-  "hashEncoding": "Canonical Git blob bytes and indexed executable modes; independent of checkout line endings"
+  "schemaVersion": 2,
+  "sourceRepository": "https://github.com/spacematter78/amoeba",
+  "sourceCommit": "37af722bb47ffa44a5f14dea9cba6bf25212cb49",
+  "component": "cli",
+  "cliVersion": "0.1.10",
+  "publicationType": "source only; no binary release",
+  "sourceLayout": "Original monorepo relative Cargo paths retained",
+  "deployedContractSourceCommit": "4caf83f080f7541b1f741e63871c8d701b398e9b",
+  "qualification": "CLI source and contract deployed artifact provenance are distinct; this source mirror makes no reproducible ELF or installed binary claim.",
+  "retainedPublicLegalFiles": [
+    ".gitattributes",
+    ".gitignore",
+    "LICENSE",
+    "SECURITY.md",
+    "THIRD_PARTY_LICENSES.md",
+    "THIRD_PARTY_NOTICES.md",
+    "TRADEMARKS.md"
+  ],
+  "mirroredFiles": [
+    {
+      "path": ".github/workflows/cli-release.yml",
+      "sha256": "f2c986f095e180ac7f87e9a05b0a7b86523462f29a0fa87fd638313e9cac0451",
+      "executable": false
+    },
+    {
+      "path": ".github/workflows/cli.yml",
+      "sha256": "a6aed2cd657410bf4bc78d5723864480ed5d9bfc69d9ce61f7070f2ac13e5c30",
+      "executable": false
+    },
+    {
+      "path": "cli/.gitattributes",
+      "sha256": "277237dcd718638ac0a10fca3d0c15ecc581fb09faf17d0861058995c3e6e055",
+      "executable": false
+    },
+    {
+      "path": "cli/.gitignore",
+      "sha256": "dcd8ea5dfd3c1676c59869c653ca6e550a5bed15358bf8c79aa00b1d1d40902f",
+      "executable": false
+    },
+    {
+      "path": "cli/AGENTS.md",
+      "sha256": "395ef105d32c50135135e91af045eb854a6faa56c0f4584eec5cb08881a9e144",
+      "executable": false
+    },
+    {
+      "path": "cli/Cargo.lock",
+      "sha256": "2b7aee794cb2956b064cefee8f07654f044b5db331a268de38eb862a1768810d",
+      "executable": false
+    },
+    {
+      "path": "cli/Cargo.toml",
+      "sha256": "e7580654f62bdb8f3ba4a05fe53f91fc04ff37a9e071493fa6c9ba4411a92717",
+      "executable": false
+    },
+    {
+      "path": "cli/LICENSE",
+      "sha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+      "executable": false
+    },
+    {
+      "path": "cli/METRICS.md",
+      "sha256": "1569fe93ab09045c3a6acce6d7460eec3b62bff53aff34255dffd4eea86db478",
+      "executable": false
+    },
+    {
+      "path": "cli/OPEN_SOURCE_SECURITY_REVIEW.md",
+      "sha256": "fe036b6a21bfa34b9b67a47f7862eb410cda360be05059fa15997c1ad53ad2b2",
+      "executable": false
+    },
+    {
+      "path": "cli/README.md",
+      "sha256": "e2e1691a7c9dd8f5dd5a9c1bfd44c7bdba4b60efaf147d0d0858ca01de762d94",
+      "executable": false
+    },
+    {
+      "path": "cli/RUNBOOK.md",
+      "sha256": "4889ea39fd412a729f2ea057648a28482a5a5ee2372c1ece81fd0b87f736c9b5",
+      "executable": false
+    },
+    {
+      "path": "cli/SECURITY.md",
+      "sha256": "5c72b6fc7188cd9861a3a56fb93ef613b176c0c4c0c59842cbb67df75955f5e0",
+      "executable": false
+    },
+    {
+      "path": "cli/SERVICE.md",
+      "sha256": "6340461d84829d1284cf56ff8f1a6fa7f9d12b959c544726b5657e3fc9fb920e",
+      "executable": false
+    },
+    {
+      "path": "cli/TESTING.md",
+      "sha256": "4f5227f60819d8329d20aafbdc478696327461cfa1e9e4175a5bb0a68665e58e",
+      "executable": false
+    },
+    {
+      "path": "cli/THIRD_PARTY_LICENSES.md",
+      "sha256": "069d7b615e638afb40f2581b9970b4d09ad86c8f3239d6e380b9334cdbbe7ae7",
+      "executable": false
+    },
+    {
+      "path": "cli/THIRD_PARTY_NOTICES.md",
+      "sha256": "c0438821e1155de455b950f8456500a5fb8e3cbc83f95c921a39e81a751e4692",
+      "executable": false
+    },
+    {
+      "path": "cli/TRADEMARKS.md",
+      "sha256": "b1bb4cf6c252d5c80f80f450fa8c705451c45758491c4bb1aff8715e51027a2c",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/Petri.icns",
+      "sha256": "e307ecd365f249e4091463722783b04201144c91ae1323e40135cbfe1a64c88d",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/Petri.ico",
+      "sha256": "6da5d9257d9e59622c4659a5a1902fd623ff69b22d986325363965f0b04a7756",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/README.md",
+      "sha256": "cd2ad7d9ddaf86a8e085dd72d768f588b89f14afddc9684233b43e6b0c37c4e4",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/SUMMARY.md",
+      "sha256": "c6198f2118d7a107f808032f9cb5aae9438a1e778ebfac504f6d02a1aa997c77",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/04-products-indexes-buckets.md",
+      "sha256": "c4a77a152646779ee927f609a0aa860fdc0890e6002bcb65816d2eef0e7e3067",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/contributors/02-evidence-rules.md",
+      "sha256": "26619aac90f8518d421dc085fc72fab7a27ae5389249d28956473b98e6629954",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/developer/01-api.md",
+      "sha256": "5517ca07349fcc53d06a2aad606b0ca2a5f59820f92b0f0eb5192e24f6c1ea36",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/getting-started/01-where-to-begin.md",
+      "sha256": "e5a5ead119479a454f12bdf9835aec5a1b28f0dd6cfb9b4329211fe5b12356e5",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/getting-started/02-cli.md",
+      "sha256": "db2510bc2cd633a5afb4abbb007b118cc4379d8036cf0ba71bc889654ca95ef1",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/getting-started/03-web-client.md",
+      "sha256": "58dd05cd1a728a0fa2ee3e5dffe001dd1f2ca1e82263031b4eb1352857ccea81",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/getting-started/04-claude-code-codex.md",
+      "sha256": "46b3b9cceb245b41565e0f849fcc7d46a5aaf3b5aeae7b1c15ed9b33b4dbffef",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/lifecycle/01-market-lifecycle.md",
+      "sha256": "d8bce59834d823542309ba38ca33a5b08b34ad4367cb2f75ae5339ee4fff76bc",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/markets/03-risk-disclosures.md",
+      "sha256": "22f29a67bad5315735801a7c1c1d77de6227975a7d0f4a07e920bff9ebc80d04",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/oracle/01-how-it-is-structured.md",
+      "sha256": "02cb1aafd7e89ee9af1f49977e01e5c0e8b0294ed16e2891cb8446eb5577b848",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/oracle/02-token-holders-and-contributors.md",
+      "sha256": "87425f16cac7d5cf1a08b2986c8c2c4ac25bc09efe2e38c990f25981fb8deec0",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/oracle/03-reward-collection.md",
+      "sha256": "cfe1ff7cf05a76bbb510155534fae5eef6fa59ec0a2c49ca54e31cb08a74b7ef",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/overview/01-why-amoeba-farm.md",
+      "sha256": "cb2248b5de4dc71d0820437086483ee6c55e205fbf9010ceeec7de1f8bb738a3",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/overview/02-markets-ramx-nandx-future.md",
+      "sha256": "b4f4071384019d60b6ab87aa37fefd7f4ee696e4f20f4717c7ab82f36b04a0fa",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/reference/glossary.md",
+      "sha256": "b55a9637379f13e531d706842c98015fd1ad33d93fa178165ae5132996d0651d",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/synthetics/01-about-synthetics.md",
+      "sha256": "a9ca17976685b7d27e4a54679b7f87445859d122a04e4e17ce0fa8450d65d08b",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/synthetics/02-what-synthetics-offer-individuals.md",
+      "sha256": "3bf7982f460b52631e8d56d17d3eee83394f4388b220661fdb982e1e9a66ff19",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/trading/01-about-capped-futures.md",
+      "sha256": "0789e79b026b337b20b57e06d7f8c763c9e69f4e29edcb77c4e132f834e98e3f",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/gitbook/docs/trading/02-fees.md",
+      "sha256": "2bd560e0678547addec0d4e7ff981b30184bea6ee64064a01f027737c7c9e838",
+      "executable": false
+    },
+    {
+      "path": "cli/assets/petri-icon.png",
+      "sha256": "00196111084e9b1000e7d322e9df0f74ed5255d867fa90703a12273381d8904f",
+      "executable": false
+    },
+    {
+      "path": "cli/build.rs",
+      "sha256": "e922f2098ad26ebe46f5b15b26c0557936937b5217a7a89e771748a1d3850a1b",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/amoeba-cli-command-guide.md",
+      "sha256": "f2487da6c6791ac60cdb42d79625a5c87ff6905a51c8f24967d4369161828b51",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/ci/petri-cli-ci.yml",
+      "sha256": "2824b8fa477b0834c4200557daf29f9dd39ee81c87aa690999055a6863f595c7",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/html/devloop.html",
+      "sha256": "b11606b17150c901a2cd9535af2f99561e53cb03ccb138f47b609eb5451da578",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/html/index.html",
+      "sha256": "cb81ef2f6a627b20ff133f3473bb70336531de88e587b174187eaeba833f5b73",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/html/source-map.html",
+      "sha256": "34acbb9f42fd559af3340cd54379a532f9bd1b8da3077fc1428d4a9c336c010d",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/localnet-dev.md",
+      "sha256": "00c57dd2e49ae55a6060f499e2b898f80528ed2604c5dfaa1ab932f99cfa06b3",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/mcp-agent-protocol.md",
+      "sha256": "175544afc9b7aaf645f476959ea655630e6a83300aa855507943ab9921096aa9",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/oracle-research.md",
+      "sha256": "9ef7e0f5eabd49c9ed5377a40fb5e889e112ccb785b9ea6577aa1548ed9eeb30",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/petri-production-agent-guide.md",
+      "sha256": "704af892abf5604cdc7e11dc5fb3e41e1ac9a1dfeaded431c664a237ae1cf504",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/petri-public-cli-user-theory-of-mind.md",
+      "sha256": "ded427c3495d19d6102f3b26d63530ebf59e41e9e27456deff275db5f8663989",
+      "executable": false
+    },
+    {
+      "path": "cli/release/petri-size-budget.json",
+      "sha256": "5312737a00da014c5f2215447cb442e7b4b2890a37e1e121ae4014b1e5ea5fc3",
+      "executable": false
+    },
+    {
+      "path": "cli/release/preview-notes.md",
+      "sha256": "6224cd4f8d22b877cc0eda46f7aabe824a4b6ccf65f39abb583a6b72f6519db3",
+      "executable": false
+    },
+    {
+      "path": "cli/research/ORIGIN.json",
+      "sha256": "234d18c4cd1c6790800d965da04e065b17d554a6c9a2d8f3c62d58bbfa1c31ce",
+      "executable": false
+    },
+    {
+      "path": "cli/research/bin/desktop.mjs",
+      "sha256": "119b2ec9701d3da28a00f91cacf76eca76bbcc53a0f0aafabc847c8255f6ddd6",
+      "executable": false
+    },
+    {
+      "path": "cli/research/bin/petri.mjs",
+      "sha256": "ed20b10231511eaabbfb809f6c2b3479c4b6adf850ebff757a5fc9ca86fa51cf",
+      "executable": false
+    },
+    {
+      "path": "cli/research/client/agent.mjs",
+      "sha256": "26dd8a68c60fa7fa812bc3941267fcefb9abe276afcd3e06c94af06394b8de70",
+      "executable": false
+    },
+    {
+      "path": "cli/research/client/http.mjs",
+      "sha256": "23b59793dbbc2526327ffc61f124e6225ad0068ec3b9539d58a141f60ff99a89",
+      "executable": false
+    },
+    {
+      "path": "cli/research/client/mcp.mjs",
+      "sha256": "2d0fd8ece9e5516f60883170171d0afaf66f1b766bf1340eca04b7444c9f21cc",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/application.mjs",
+      "sha256": "60212b190bdbb5a0ec51c7b8f87f7928a5e9d10f212429ae90b300a2687bbf84",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/auth-store.mjs",
+      "sha256": "4094ed16599a3ae1527b47ccb2ceecd901a983ae58266177fd7f60809cd090d7",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/coverage-policy.mjs",
+      "sha256": "93707b0b9b80d79d41d7d737539f92c1355dcf5e664198f3f2b2178334b3f7b1",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/database.mjs",
+      "sha256": "9dfac2cbd1de3325c5357eada96c5f06381607987f099e2cfbe97c84d6b2e748",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/directive-store.mjs",
+      "sha256": "828ee3051540d3cdd080de3720c2d29cd55c13cb356f701a5111802966fc0444",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/discovery.mjs",
+      "sha256": "1d079dfdbb60f1512db8fcf0be2d15c94be139889d6a564f41dcd44349bd1cb0",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/lifecycle.mjs",
+      "sha256": "cba1c868b30533ed51d2f045d9f8b1f2644425ed02c4f702a39f528cde3eafd6",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/security.mjs",
+      "sha256": "b540ea0818a505eaa450f1cfd6cdacc4aacd66e6e20e173046fd3e274a6269c4",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/server.mjs",
+      "sha256": "53af73cf0dfeca4bfbcb9566563fe04acc70994ab36da0c204529477c1fa1fdf",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/upstream.mjs",
+      "sha256": "078fda1b1f854fbd85488c9e2f858f41eb8b7c8237d4d59ff3cbfd94a24f62f7",
+      "executable": false
+    },
+    {
+      "path": "cli/research/service/work-store.mjs",
+      "sha256": "57f9702939546725bdf204b0381733772a0524b818e991f3fe7a0cb84a14533d",
+      "executable": false
+    },
+    {
+      "path": "cli/research/test/coverage-fixture.mjs",
+      "sha256": "d13be851788b6feb9f45079d0b6f70f5a47458879204d3847aa71c636a4fc2f6",
+      "executable": false
+    },
+    {
+      "path": "cli/research/test/discovery.test.mjs",
+      "sha256": "c40828fffdf906ce6752178b20131ecb761757b6198c15a1805df363e498be6d",
+      "executable": false
+    },
+    {
+      "path": "cli/research/test/lean-integration.test.mjs",
+      "sha256": "8a4f3998e09bf407473eb7ebcaabb321d44bc7c632bbfd41bb0e66bec4142c22",
+      "executable": false
+    },
+    {
+      "path": "cli/research/test/transport.test.mjs",
+      "sha256": "2d154c37e22302490af6b537b9b9d42f3d4bbfcc790c842ab21e1f3442c9ffff",
+      "executable": false
+    },
+    {
+      "path": "cli/research/test/workspace.test.mjs",
+      "sha256": "f77b8c55de3fc57889f875ad64aed8a8380ed6cf9a7ed36bcac2e06f1cb01f06",
+      "executable": false
+    },
+    {
+      "path": "cli/rust-toolchain.toml",
+      "sha256": "9bb2d67371447af2bf22dfe4a94d818b98bf8ea5d76c7b4534d62d9e44f31e1d",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-bundled-gitbook.mjs",
+      "sha256": "0639689fc9b1556fc84dae53681c965de8d8d3b54cfda66951b3f40b41e8f363",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-petri-action-bridge.mjs",
+      "sha256": "7a1dde3b962aca4743738a6f9532968b28a93d94d14dfaf1134d948f71e3675f",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-petri-defaults.mjs",
+      "sha256": "ea7794cd6557532af25a4a3cb3973dec5ee8769d2adda651275f5d2e756864a5",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-petri-launcher.mjs",
+      "sha256": "6eccd107c8ce04955632074b17394017175d6bb94b2e7eedff1b6ba291951463",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-petri-mcp-server.mjs",
+      "sha256": "2f5a9880381dd905a67b272591179a1bf68fe5ec8cc55f39620cbaa3e9414519",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-petri-packaging.mjs",
+      "sha256": "cad42e40bb4e11eec3fbf08e3a7a7ca093ed823cdff0473025b3ede74cf92bbf",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-petri-research.mjs",
+      "sha256": "1b9ea6477aa8811016322a9b7f1038ece264e190b6d1135eb9dc4d499b6eecf9",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-petri-windows-updater.mjs",
+      "sha256": "78958ff89dc32959431249b01dbec6bcd174ddb567586add28a7558a20254f75",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/check-release-secrets.mjs",
+      "sha256": "3e6672a5aa25ce5ba951bae9c7f4ec783067650ed082bce0a6f3f5bc503a3a90",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/credential-scan.mjs",
+      "sha256": "430171c6b72b723c8968c5787abdb47239a03d1b2b5e8b4fc2edf514067b7dc3",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/devloop.sh",
+      "sha256": "1c1e60623d46e204a2a538ccd78849e61c0f5d5b8141321a76cdf58c9cfc0238",
+      "executable": true
+    },
+    {
+      "path": "cli/scripts/finish-petri-windows-update.ps1",
+      "sha256": "dc028e8a8eb707d3f5a621cb453e1dc10d6285606e6df9767641ac8697e184d2",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/generate-third-party-licenses.mjs",
+      "sha256": "0c43c55f6d9c9679b9cbd320501e920da9166176e52d184956833e7330585f0d",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/install-dev.sh",
+      "sha256": "5b585728e7c84b89513be205074b125b50afc544be150bad4ab196959b38fc32",
+      "executable": true
+    },
+    {
+      "path": "cli/scripts/install-petri-macos.sh",
+      "sha256": "2acc591acaead4cc67791a5065c8ba513a7284294b3f36c2d8caf6cc84e60bdb",
+      "executable": true
+    },
+    {
+      "path": "cli/scripts/install-petri.ps1",
+      "sha256": "8c0e826186d750e5d1ba0c210c046f02bf55851653c11f225e833206caa0b7ab",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/install-preview.ps1",
+      "sha256": "f11ebc70d85381b5b793e1d4828e24ea286e48b55c464a96b24fda0a8c8cd2e7",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/install-preview.sh",
+      "sha256": "40c3713855263f96cae0cacf909de64ef0a179a0639a23a5eef379888f44c5c9",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/package-petri-macos.sh",
+      "sha256": "a4d0c1e8a7e68c7a9aaef950bb8be0a625b37eeaea0014365d9ea4e0ba1112d6",
+      "executable": true
+    },
+    {
+      "path": "cli/scripts/package-petri-preview.mjs",
+      "sha256": "183839e1c18e7e171c09075a6e5d7498596f6c45bf7a68c1ac16fe1ab0e40fbb",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/package-petri-windows.ps1",
+      "sha256": "ae7686612a233ecf866cc368ff2ba529c569bff9771c20796cf3bbebf001a6ea",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/petri-action-bridge.mjs",
+      "sha256": "f0b9ed0941ba0fd40ba3d70ebfa46b0459a53ad6b9a24a421599dc5e966bc763",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/petri-launcher.mjs",
+      "sha256": "900062c4aae6dc78711adc3f30047fc57fc1f0bce4ce37d2a71bdf9dc4dd8623",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/petri-macos-launcher.c",
+      "sha256": "543d0fa59f8a299767db24febc58faec281ec5648aba1033dada63b2ac49de34",
+      "executable": false
+    },
+    {
+      "path": "cli/scripts/petri-mcp-server.mjs",
+      "sha256": "37d1e7b574e6f9dc5992a1a0ad2ca108aaa105650c00694d7f1753320cd1245f",
+      "executable": false
+    },
+    {
+      "path": "cli/src/agent_protocol.rs",
+      "sha256": "b12e50684636f671014bfddfeec1ed4861252872c73d2ef8b33a0b89df5655e3",
+      "executable": false
+    },
+    {
+      "path": "cli/src/backend.rs",
+      "sha256": "e5f4765c786a473e890b8e54d1e37ab6621b8ba9bcc4096355af2557d50ef270",
+      "executable": false
+    },
+    {
+      "path": "cli/src/chain_identity.rs",
+      "sha256": "5cf2be978f5a9b8ada4ff107cf8adf3d8f990df32eadb2b8f16673c10519b23b",
+      "executable": false
+    },
+    {
+      "path": "cli/src/chart.rs",
+      "sha256": "e5a6e022030ae23ed8c0c7d27dbf87a5f0b1a5feba2f29f29b69677a0c3bb549",
+      "executable": false
+    },
+    {
+      "path": "cli/src/cli.rs",
+      "sha256": "564b8e97b517314aac999c64a38e2b879c13e01c35050962df3f77687cff9327",
+      "executable": false
+    },
+    {
+      "path": "cli/src/endpoints.rs",
+      "sha256": "724cc632d7ba6a162441b7d100e9886ccddf9888dd95775a05e2e80b289b17ff",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/api.rs",
+      "sha256": "194e9b0f6779e3b5ec6c8d13f50d0188be5823f0154c752bd342c2dc17da63b0",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/args.rs",
+      "sha256": "d348f2d97518e03f76077b8e35662341e2f43bfcdb7ff1e22e752897df5ebc88",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/check.rs",
+      "sha256": "c1b6f2089320089bdd4cab05bb60e2407145ebf972da6d1a4316298bacfd4629",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/ctx.rs",
+      "sha256": "2aa389951c789ea74bfce6ec33fa44df48de832680dc4c1e502e0f650c68e47e",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/error.rs",
+      "sha256": "9411dc6f296d05aef27cf333c60eaebaf9123d18b6dafee8dbead5b365495011",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/exec.rs",
+      "sha256": "73a3fb019433e32376f81ff164e346f6a5ba1c48603bab9715d033e139e10eb7",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/funds.rs",
+      "sha256": "9ecae64a6374e6e88b4c0bfa45c5015c2157b8a11fbee8bcd7c2413a82379bdd",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/governance.rs",
+      "sha256": "ac8d9b5b5ae1cb1fcdd05ee6a82e283d23620a7d7871cb1c38b5ec8f4b866de9",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/market.rs",
+      "sha256": "a8938c29afc5fc7ddb1c91b5e66ccaee1a4376695a5141454fde31a46e2207d3",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/mod.rs",
+      "sha256": "10330c122b94e4bb5a0136040d1ebba992abb21f3ec76e631c5cc2696fd58721",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/ops.rs",
+      "sha256": "6d4f80db9c0d6789144d1edb953de218b2dec5ad12d1c11f590b33783a1b731b",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/reads.rs",
+      "sha256": "56e63c1a6efdbd9303c1e4bb3bd209fe087bad428b64d642cc1a068333aa6144",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/rpc.rs",
+      "sha256": "598bbde13a224dbf0206e75c89c16dafb1110c321001dbe7aa5dd0eb7759f358",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/settings.rs",
+      "sha256": "d5a2525ba11012f8082db2a0982d5e1d6a37bdce66ab62121dfa1c744eb1e4f9",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/shape.rs",
+      "sha256": "23a8bf7275a7ad375508b55105dae5a725df714cf29c47de525db69481400de6",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/trade.rs",
+      "sha256": "38c1af66ab08b0a79f6f36270bdac9f27ceb74db253fb1680843b7ef1f825a63",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/txbuild.rs",
+      "sha256": "e540e0219a010547c1d6f60f695dede95bbc2b57e0f1c5a1ac6bf4a4ab26a97c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/units.rs",
+      "sha256": "c63b8ba4b531cec44a1f3b27dc8c842903a66f87d36e7d0150dd99e93b1360b2",
+      "executable": false
+    },
+    {
+      "path": "cli/src/futures/view.rs",
+      "sha256": "a848e2fe55439910aa5c9090f360ba63f4a02dc0e7bb3eeac644abd5c3595b78",
+      "executable": false
+    },
+    {
+      "path": "cli/src/gitbook.rs",
+      "sha256": "91ae6d2f1873ac361df508028c2e9ebb0a4002188f1b297e49b60513ee5ee833",
+      "executable": false
+    },
+    {
+      "path": "cli/src/main.rs",
+      "sha256": "22882bba3a1d062ce77dea65a59a74cb369f4a20e7d8d5bb9d812c966a23aeaf",
+      "executable": false
+    },
+    {
+      "path": "cli/src/mcp_action_bridge.rs",
+      "sha256": "c827a25b29764f0467aa9c3468372eb4a06a03d9e8dbae3a581ce64f45dfebc0",
+      "executable": false
+    },
+    {
+      "path": "cli/src/mcp_actions.rs",
+      "sha256": "d58b0de1b9601d46cf0a281994e1dc6aed0c724520e0b9caf4b4897ebce8bcce",
+      "executable": false
+    },
+    {
+      "path": "cli/src/mcp_setup.rs",
+      "sha256": "70e2e380dc5e5307b0ef814ffcc58ca3e41ee97825149036148e7efd4af12561",
+      "executable": false
+    },
+    {
+      "path": "cli/src/onchain.rs",
+      "sha256": "8b37932e50acdb02c404cd279610f49918f81575cc99f51e121375666108eb7a",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/args.rs",
+      "sha256": "80f618167e06cc24a78de068e448da80318fd05bad99821bf189a537578b7b55",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/chain.rs",
+      "sha256": "31f530652613c6c1535d5a52bc04726b1664506427bd063cfecae872b8d734eb",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/claims.rs",
+      "sha256": "5c294726d14b8d4e1f09f3c0a701b5be79236b01cc7ebd42ac6ae6c2986f62bf",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/council.rs",
+      "sha256": "aa3cfd1b383a951de06eb9f1385c66dfb4982f3927eb8c7dc67389ec2d922f16",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/errors.rs",
+      "sha256": "74c25c98228449dc30b9e067a5c8e26b7884e8bf50caf7aa8a5fa389e5efa0cc",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/mod.rs",
+      "sha256": "c01813884aacd9daf0421305cd7c120b5c1571dc186df66573095cb3dc59d94c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/reads.rs",
+      "sha256": "de8f657b6269fd0a43c5e2f39c9101ae02a13a34ae30587149a12f8bfb60d9bd",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/send.rs",
+      "sha256": "9b0355f61b1636b680f44fb5c05257544837e9ede9829f6daf1bd962bd0015aa",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/skus.rs",
+      "sha256": "95f2d85860a255b9f8605414bd7aabe34d95fd717adb0ef59daa3b511d3954a9",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/writes.rs",
+      "sha256": "0cde723dcf65640eeba9834448f81015d20dced0fe9b41f6a531842650dac118",
+      "executable": false
+    },
+    {
+      "path": "cli/src/petri_config.rs",
+      "sha256": "9e49df420e3c5f69bd0086efde2467290c9fe104c9fc73e383ab030e60596068",
+      "executable": false
+    },
+    {
+      "path": "cli/src/release_update/archive.rs",
+      "sha256": "e38054fe6b3b18459632bcf47680d345291e4a1e080ee1db6715605e746b25d3",
+      "executable": false
+    },
+    {
+      "path": "cli/src/release_update/install.rs",
+      "sha256": "a28599a10236339bbe105dca9942e7e4dd38f51911f5e24609db90871f8b089c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/release_update/mod.rs",
+      "sha256": "785be59a1cbe2a964b9a33e058df09510f239583c54a0d11626fe9d0e05ddedd",
+      "executable": false
+    },
+    {
+      "path": "cli/src/release_update/platform.rs",
+      "sha256": "d0708f024c97ae45f333580ab49045861f1b5b55d8eb1d8d4cdd41d0a09b5a59",
+      "executable": false
+    },
+    {
+      "path": "cli/src/release_update/tests.rs",
+      "sha256": "865de466cbe1c2412d133632ac9018fa304c7b9df80f40c6d0e708e61e6add52",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/http.rs",
+      "sha256": "56049af88df61731705d489421c2ef229ffa6d2e67a4682c499ffe17f803e98a",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/input.rs",
+      "sha256": "ec250e6c5815eb25ede178616ad5c1a1ecaafa91d2e2729739e365c1184eaaec",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/markets.rs",
+      "sha256": "0c864d8bfc2049645eb95cee78c4cc4ed98a86b304918988fdca645478fde7f2",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/mod.rs",
+      "sha256": "c6d0b7d495b1a61dadb0efce8a7f3b88ba3d6dd44af9d1b7248ddd8434acf902",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/model.rs",
+      "sha256": "ee3ace74964d9519a8e31f56fe4ba378c2a5aa3ddba79a7b6ea8178fefb4ef85",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/render.rs",
+      "sha256": "9ac1e8c94680c07ef608660497d15c1d1b1cc13a462f213d445d26303bd4d60c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/runtime.rs",
+      "sha256": "a3359f77cd60490a538ab085a3bd40e28174b995408b6f96ca2328f0bbb7e5ed",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/tests.rs",
+      "sha256": "7756115d9a042e290afe0f7cf24d24b31ef088b7f7510b00f7b3bbe095988892",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/updates.rs",
+      "sha256": "ad8a093b038f6fad2540f48a34c7943cbedfcc2d540cfc14b6a9f99608b947fc",
+      "executable": false
+    },
+    {
+      "path": "cli/src/solana_config.rs",
+      "sha256": "9ba8a4ecfb804884fd674cadee33aec948780508f48ebe6545ccb2bba215b9c4",
+      "executable": false
+    },
+    {
+      "path": "cli/src/terminal_brand.rs",
+      "sha256": "4de15a58936917ee572232af2845e8a96d5bbdc1e2c272f8d76426ed0e83c87f",
+      "executable": false
+    },
+    {
+      "path": "cli/src/wallet_signer.rs",
+      "sha256": "4e11a1199f9c43a82ab5268f112d2edd751750546f361109c373f0e6c750850a",
+      "executable": false
+    },
+    {
+      "path": "cli/src/wallet_terms.rs",
+      "sha256": "45b8fc20db75c980e1b576e4f1750d764a50f4a6882c7802a27dc4d40360a209",
+      "executable": false
+    },
+    {
+      "path": "cli/src/windows_app_identity.rs",
+      "sha256": "ae9311185a04a3cfde2effa9edc13213db48c28985a639319d324a3eecad630d",
+      "executable": false
+    },
+    {
+      "path": "cli/src/workspace_update.rs",
+      "sha256": "d3f3ff5ef5db8cbd91a01ba156f2cb5d4bfe3882dc4c9b4bb67821fa163a10cc",
+      "executable": false
+    },
+    {
+      "path": "cli/tests/dependency_crypto_compat.rs",
+      "sha256": "94061070b8171f90494bf17fad9b80c2f96bd4a7576a08389a318b55d0b4b180",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-conpty-harness/.gitignore",
+      "sha256": "3fcbd7c00890342ca0d97b8c52dfab5da85b1b3e7f01244ab33bf309515af1a8",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-conpty-harness/Cargo.lock",
+      "sha256": "b4e2d07aac801bae0c453add3bd50917d34431d24c657c161e1ff3c45593d7ca",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-conpty-harness/Cargo.toml",
+      "sha256": "4ee77f58851b01a5fc09b614fa608213d58eadbf7617de7f0527e8aada6369cb",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-conpty-harness/README.md",
+      "sha256": "d7b793d38dd1c0fb1e72a9b7a8a1619f34dcfed77475083b3c0757c1ca1c6a7b",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-conpty-harness/run.ps1",
+      "sha256": "8fb5616ecdb7d3ecfd1a60fbcc652c54482cf019c3f7e812ee8f4437b0a6bcb5",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-conpty-harness/src/lib.rs",
+      "sha256": "3eec1a1377b3134567d750bec04f0b56141f4d817665ef974f3d0c2d9b8148f2",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-conpty-harness/src/main.rs",
+      "sha256": "1ab5dccd1124a114f43831502df6ce99382b4bb740af2f77250549e7e071abd2",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/Cargo.lock",
+      "sha256": "ad9eb740656c21d9a31acd7e9dbc2be9d2e52aba51ef268b7ea353bcd8f3e72d",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/Cargo.toml",
+      "sha256": "16facbfcc8956ee9d85a273d896c312d47212be43a6ddbce780219bd1952343e",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/README.md",
+      "sha256": "7fc5d81a7772911d34358d2800503706ce6cbc6ae56ed19ea858e900fb49bb9a",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/build.rs",
+      "sha256": "8b787e97e328189e8494f94a7e147553485d1d919fb7f9222d9d6a1e7bcff063",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/check-macos-handoff.mjs",
+      "sha256": "c6586f540fc2cafc849f023102a0bf88e2c734bd63af707f90aa2cf41cf1a57d",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/check-windows-handoff.mjs",
+      "sha256": "810ca00d17dc1c385efe8125d6ca78edd3aa954d7fdd2c0cff3a05fae3b97dc4",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/fixtures/next-version.rs",
+      "sha256": "fc15808c0ef52ef62d182d2737b6f3ce2e4a2072038f06b46afec480046eb03e",
+      "executable": false
+    },
+    {
+      "path": "cli/tools/petri-update-harness/src/main.rs",
+      "sha256": "3a1e5279ecc9f3f1541d98025c1e188d8056cbb85daa994d3edcb35b5fdadb02",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/LICENSE-APACHE-2.0",
+      "sha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/PATCHES.md",
+      "sha256": "cde6313f6d76c2cfce9f56e34c42a4667821998b1341806babdb43a1389b006a",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-ed25519-program-2.2.3/Cargo.toml",
+      "sha256": "f513a4d96018fcbeb4bc8748bdd1d6cfd3441b1b7640a9c0c16f1ef3470206ea",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-ed25519-program-2.2.3/src/lib.rs",
+      "sha256": "0067220bfe7b23519433a755aac7e6a1a485a51ef531a759eebd9bf97146977f",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-keypair-2.2.3/Cargo.toml",
+      "sha256": "f4b8381e482f2caf7c69859d14dd25974a66f4daf7e2fcc5f7768d2c7609a902",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-keypair-2.2.3/src/lib.rs",
+      "sha256": "86ba4ba6ca93ea295a1e34f508409677043b33c8483f423d4b4475fb9d08384d",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-keypair-2.2.3/src/seed_derivable.rs",
+      "sha256": "3030315abfae7ae2a78cbc69a885770c98968401b5ef13b9e0aeb2673cd1dca9",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-keypair-2.2.3/src/signable.rs",
+      "sha256": "e1ee95e5c7138701f441353fce3c54cd6ce5acb936534ca6713ed69bbb3afa45",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-signature-2.3.0/Cargo.toml",
+      "sha256": "44d8e93c57060188ab902ca221b7fb60bdc4625e36c4d0ec97b6cef5aebd2604",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-signature-2.3.0/src/error.rs",
+      "sha256": "937d091baee8894e11bc7b75e73825dfa2f6589877e782d008b89985265e8d39",
+      "executable": false
+    },
+    {
+      "path": "cli/vendor/solana-signature-2.3.0/src/lib.rs",
+      "sha256": "3c333120ca48a76813064d978ea2690c3528813cccdef108c572d5d145ad3ba2",
+      "executable": false
+    },
+    {
+      "path": "futures/Cargo.lock",
+      "sha256": "55070a307c8ac95144abef56df2d93b016790ae145b60139967b6cc0b6767aae",
+      "executable": false
+    },
+    {
+      "path": "futures/Cargo.toml",
+      "sha256": "9ef071705f5ce52c1e21f73f5149f14c78268d1a77c1cc91ba4ad2db4770be9d",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-client/Cargo.toml",
+      "sha256": "50a86f34086f7697b230c7528b7ffcccdd7b9ca57ad991e6dca526d0cffc48e5",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-client/src/governance.rs",
+      "sha256": "1d6be27ba20b104b418b3de296f2db65c0d16415e8d5634bd0a3f2fa1f62b0f3",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-client/src/lib.rs",
+      "sha256": "29fc25c4e5f0e1e12338ffa31b72c555319b60a03415e0345ea62c68a9a9f22a",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/Cargo.toml",
+      "sha256": "2d9151d6ad80c93b691f4e6287df73368f017cd8bf71301d263ceb58da6e84f8",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/src/codec.rs",
+      "sha256": "d52df96d3b390def48e7838838a6c5c2dbbd86e0a3749ba21c4c3cefb2eccc24",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/src/lib.rs",
+      "sha256": "106e75ebed69577bf066e5ab7789ca8f91e98c91c076475e05255f2c528690f8",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/src/payoff.rs",
+      "sha256": "4616b53ceaf7ddbc7756c2e884b18647f2dfc4c94d2c47729ec9e6e02259dd91",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/src/solve.rs",
+      "sha256": "4b4d238a7336242dafcadec2b1f710d8abd10fc4a891407ef38733f048d33729",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/src/verify.rs",
+      "sha256": "2badc8bd86f18726b1caabdff9a7f33374d4015a4caaec76a8d45ff0a3f21ddf",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/tests/brute.rs",
+      "sha256": "66ca795d21760f27c351d9d98c7d2f353790e3c7428ee2cfd1e6460a220ceda9",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/signer/Cargo.toml",
+      "sha256": "d460e1a20128f50d009524491abe94c001902bc0af4575c19768e81bd76ed803",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/signer/src/blocking.rs",
+      "sha256": "6a4ea7954823a05b897cd854301ef3169e856d1b1b495d1036a88c53b0bc6b8f",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/signer/src/google.rs",
+      "sha256": "7405a3974b3f1be64fa52aba87a771d67d288a4bc08d30f72265673eba44d9c7",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/signer/src/kms.rs",
+      "sha256": "557d16f5cde4a35ca3296a413b2c71447e898c05339271b876cd804490cdb1d2",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/signer/src/lib.rs",
+      "sha256": "f5c5d5282c544c625cbcb84ebb998cb0f3b22300cb9b22423e4eafb65ba4fe4c",
+      "executable": false
+    },
+    {
+      "path": "futures/programs/futures/Cargo.toml",
+      "sha256": "99f0833cb7dceccb581e5c0ed723f85fd5f86cec5c33b56cb22c55f2b0fe6e64",
+      "executable": false
+    },
+    {
+      "path": "futures/programs/futures/src/heap.rs",
+      "sha256": "8aaa9b1f4f4c37e284aa638c48eb38509572e755720e9978095346b65c8d6a84",
+      "executable": false
+    },
+    {
+      "path": "futures/programs/futures/src/lib.rs",
+      "sha256": "9034b60a553d3cc35527201a63d84c9c1b7da3eb292146a3457d7051839a1fa0",
+      "executable": false
+    },
+    {
+      "path": "futures/programs/futures/src/processor.rs",
+      "sha256": "76bffd805f1507b92d29b2de175ae3c19dd14f74094f19a6134c06a7a48514bd",
+      "executable": false
+    },
+    {
+      "path": "futures/programs/futures/src/state.rs",
+      "sha256": "ea7b6b3802c2ec7c26443d5ca33cbb1e571fa4fe79911fcd4532d522ce514194",
+      "executable": false
+    },
+    {
+      "path": "governance/Cargo.lock",
+      "sha256": "949babb125c109e145517496dad3df4d9029bc34c2d48f3609b69da9f0742475",
+      "executable": false
+    },
+    {
+      "path": "governance/Cargo.toml",
+      "sha256": "5dbe98ea78a7e0a71153275995ce302241a3eff0215d0afdfbdb8a39172b0b69",
+      "executable": false
+    },
+    {
+      "path": "governance/crates/governance-interface/Cargo.toml",
+      "sha256": "1e03dee1d70daabb27199fff1651758dc0fbad3e4bc5f105b50f70bb17c0b82c",
+      "executable": false
+    },
+    {
+      "path": "governance/crates/governance-interface/build.rs",
+      "sha256": "3288dbd22349766a1db8cf9f74d86a0088cff1bd234d78af0f8a4346fcf145f2",
+      "executable": false
+    },
+    {
+      "path": "governance/crates/governance-interface/src/lib.rs",
+      "sha256": "38edc5dc063411797fbfe1ed1d27a1973b82e0ba0139bb4dbe95b13dc5086656",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/Cargo.toml",
+      "sha256": "ad24f6c695abd9050b5dee7265f8094f8c683e9c269168e453e20e48a2bb73dd",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/src/artifact.rs",
+      "sha256": "74816c2051a73efa2cae0cca69200d2177c01e1e44f2c1692db7e9c05eccd90d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/src/instruction.rs",
+      "sha256": "1a047cbed8176f5e7fe87adb77d8e9bf6f0071c0c78971cef0c7c801e1836bc3",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/src/lib.rs",
+      "sha256": "561f74b4c9d6cab3a31b66e2dd6ea56d7c556df0e2ee6c562b35b8cb6ca47f3a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/src/processor.rs",
+      "sha256": "59881152627fffd94f2038086e4bac8d5a47dfd010fa03ef3ec69e83d1324a00",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/src/processor/verification.rs",
+      "sha256": "a70f18c99ed1afd9f0dd6f7f5ff0f0719d497cafce417eff22b4a08061ddced1",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/src/state.rs",
+      "sha256": "a5e1b077a53ad58afb3cf04234bc8593c5882d94cc9df56124f36abf27682a0c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/src/verification.rs",
+      "sha256": "b819d940a9723ad2e56795e0c85d153f066c4dd1266f856bfaeb875a145ba2ed",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/artifact_cap.rs",
+      "sha256": "9a9c610d10202f3517e3dc3732e4f0d2df32b9dcd673d6898e5aeea887b37361",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/core.rs",
+      "sha256": "a716a3f6c46b746f3b6ad21b318d3cd9dcbcbe98dd471ef8bcd88b1a6f95883f",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/self_upgrade.rs",
+      "sha256": "73bf1782bbead8650601ce9743bf76d100114ffd5206397dd172592f4928497d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/spread_gate.rs",
+      "sha256": "bf70d33ba228cfe59cc77970f7e9d9d6863d7e63208be64e119734ef61e45253",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/spread_light_config.rs",
+      "sha256": "dcda2cabda870f1427abd32ec19450b06e090286ce21ab70c7f5bca913198255",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/target_upgrade.rs",
+      "sha256": "99a354a42a3b9893177b6a70debaccccdc8548115ac0dd77358261e3b253e2bf",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/two_mib_sbf.rs",
+      "sha256": "1da7b13927aeafee7cbeef60344bf1af24dbddae74f516bdb68a90db1f9b7c65",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/governance_controller_v3/tests/verification_metadata.rs",
+      "sha256": "4cff8aa76b07165dddbaf0748444603af77bb238ec7a96c7b3ad42982de71117",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/Cargo.toml",
+      "sha256": "9007e10b915bd3593644dbf7cd3a2df869e55dc905ce82bd5ed947c6339b2c61",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/artifact_merkle.rs",
+      "sha256": "92f684fe771bb0b2ebd3f0d8caf5328b6bdce7349817729ac2ed078646a10aad",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/authorization.rs",
+      "sha256": "9e00e6c2ebfae3ff1442fb6910094c330dcd7c4570a3cbcf94c2712de61cebcd",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/council.rs",
+      "sha256": "876ecdf9aea3922cd45aaf9d0c95c39eb3ab9eb3ebc7ed32986687acd49534dd",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/digest.rs",
+      "sha256": "c5b3535999f85a0f9bd2fa72d599be26209394114fffac6fe3be0de312db266e",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/entrypoint.rs",
+      "sha256": "deef87a24c3828eae4742be7a642597d72c76def41fec0c922998ee5ab332c01",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/error.rs",
+      "sha256": "9b83c2827834dba227243b031d8e4606bee9bde975d92aa27ae0480572dd6fc6",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/gate_abi.rs",
+      "sha256": "7f64707237153588871e41ea6696c4d9b81beb9cf3de045e4dda8d561cae3f0c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/instruction.rs",
+      "sha256": "dfe02a32edd8f93951d6392410a66850eca96c37486ce9fbdeb1e99f61ea3051",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/lib.rs",
+      "sha256": "0a4b32f54919e11b766353e8984ae64187330bee009365ff37f605d2127765cf",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/pda.rs",
+      "sha256": "bdcc8e44ac7b3da74c7d4c5d28bb30538652e5d91fe4f308725fd76b268d461f",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/policy.rs",
+      "sha256": "62c56b064d5808f755c094ec7949077c77da69cc2670694faea38dd3d18a44eb",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/processor.rs",
+      "sha256": "117fcfe25e64461b1d5dd78d9f19bf984e5ae9bef4c428b3a2121077d9ee892f",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/programdata_observation_merkle.rs",
+      "sha256": "3e0ed5b23fd3da0bfe0acf729c3f26665f4814a035735dacb604823a9d459681",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/proposal.rs",
+      "sha256": "5c94154c295a6088c3cae7a814fac32d2e6ff29f1d351c2294924d7ea3c19284",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_account_io.rs",
+      "sha256": "ad64920b45a57e73b0db245f994334003224ff6062ed7110cab098d5940930de",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_authority_instruction.rs",
+      "sha256": "627d3f8f436cc8f593afeca439ddfae4af853b9eea88265d7ace5400f3a9103d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_ceremony_digest.rs",
+      "sha256": "4a57ef8994e8aa42ce2fe6d824fdfdbe6c1267244e0cdbb35007fcb563e60843",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_ceremony_instruction.rs",
+      "sha256": "52844a43fd2b6eac31b60bc44ea261e8f0fdf04182079ca1e394a3239d56cead",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_ceremony_state.rs",
+      "sha256": "56b3cdbc70d4ba6f0dbd83ba6d92ff9e22159004e9e765cdb4f795df0aa7502e",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_digest.rs",
+      "sha256": "bb223ed087e930bcd5ea89abff61fed293b0012a8e910c18440eec2ed0b9ca77",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_governance_v2.rs",
+      "sha256": "2988b6b1984025ce5f841710c14f6af8daea709e370334252eb77a770955953d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_governance_v2_authority_processor.rs",
+      "sha256": "103408fa1fb2752ca846a7836cd1caf7b7db0c6072a624385a8944e1f833e1cd",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_governance_v2_processor.rs",
+      "sha256": "5e713f4427cf6231c64994cbfe70ff3945575b02b3208afca0100d20fcc770d2",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_loader_accounts.rs",
+      "sha256": "d5d8fcd6d925b70425c9cb0c59b050765a9a98f9ed5dadf702873b8557fa8d3d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_model.rs",
+      "sha256": "0aabd41519d0b67386c9a7f471a4d04ad1a136b79bc1449cd1ff66f7fecc1b82",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority.rs",
+      "sha256": "4e713c5c9cf879c1ec646c828b8089051d52daf9324e888da4fde4f54254656a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/account_context.rs",
+      "sha256": "85e14924a4956983d5242eeb5e0a511f5da55758f17e9fbc365b548e3edd56c4",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/activation.rs",
+      "sha256": "ddcb1a15289d945cf24b71c847995551029116cb6119ed4c1dadbed58971263a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/approval.rs",
+      "sha256": "e794cc23e1103437bb957de1cc3c7291b8c015f7ad444faeaa09357ab6c4dcec",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/evidence.rs",
+      "sha256": "063b9f8fabe956e34dfc50b9461534746ac9318064ced43d0b2e09b379b4e8d0",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/handoff.rs",
+      "sha256": "e882ff08756ca3f3bb04b96e1d876d65c68f24cce2c53cf24cb2228b2d775821",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/immutability.rs",
+      "sha256": "3972f9402964a0a83a6a966323aa5c994be408829b774332f20d9a075ffba25a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/loader_contract.rs",
+      "sha256": "6b361a463e766fca1c71505ef380609254d648ee8f79d5f07ea51f8c88b37ce5",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_authority/tests.rs",
+      "sha256": "27ce30464f3696162ea121bc20bfec532fc0fdd5abd8251419bc2ec02a6ff1c7",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_buffer.rs",
+      "sha256": "40ae363e2c1f7f4c1d0143a4d8eb6bdf379cca3333b7ce059f9835d9978bd1c7",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint.rs",
+      "sha256": "df85a7877b4f1eedb788e53829d0cdd460b881506eb4f59cd06ecd19863e561a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/account_context.rs",
+      "sha256": "d3c31f8780f8cd67ee1b08ae4712879650a1af0ba1bbfff287db60f5c9f17bea",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/approval.rs",
+      "sha256": "83ebacbbed29b3509f145efe4ef235b0272aece77852eebaf1e64c846f336512",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/attestations.rs",
+      "sha256": "e020120041b2cac540218b74a3f6855bcc7d7f93cb7b0a29396f1ab7667fd959",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/council.rs",
+      "sha256": "d52b5433eaf3d357443d9a35b65011b57c035c5830100fc3a243728bdddb5d12",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/emergency.rs",
+      "sha256": "aa041fdf73f22e4c0fbc063c94e843e440690bbbab8fe553cb2ebde2a913340c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/evidence.rs",
+      "sha256": "af3e69c27d40927c384a1e84ac326f150b0cd6d9a5049ced2e394de6183e10ec",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/finalization.rs",
+      "sha256": "274964e9b8be5e0801302e198d26e4d78f756a7ffdc3ce815fb6e0bd4102ee6e",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/rotation.rs",
+      "sha256": "162c043f87de2af66c2ad12ec02a80a141882fe3803e1acad9eab75d81636d77",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/rotation_context.rs",
+      "sha256": "4d7b84eb44526e3b389aaa04974f869e6160dcb916f52ba089389ba4752a6eb6",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/subject.rs",
+      "sha256": "0deb03070a98f76c816b9fab914a00a57c876f1c8ffd54ad6113368c99754122",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_checkpoint/tests.rs",
+      "sha256": "572400ac9d81d5ac2c4fbb2c32e58c1e9c2195a5c6522a7fef0fa7775d2f5e30",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_initialize.rs",
+      "sha256": "5070e50ecc2e883226c99770d728368cf0cb903e984b68c46c3a1a474bda3fb6",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_initialize_v2.rs",
+      "sha256": "4b73905ef7ca3816faa6918809e18b64add28bad18cc88c282f42bc50a883af3",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader.rs",
+      "sha256": "b25daf6045ec9f65460287cadd1db7bd178f6dafa33f3eae84b209b7147399b9",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/account_context.rs",
+      "sha256": "69372a330e51466c139b6820a42876328329e4ddd77f12a40d8976a04b0b7200",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/buffer.rs",
+      "sha256": "b14d81bf53bc99482845f7a191af9e127e2e53dc65b9d80910db625448a9663f",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/execution.rs",
+      "sha256": "24e4990801a3536a774a82cbc3fab8452b406084a68d207a9d2351cb69a5cfb6",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/loader_contract.rs",
+      "sha256": "64d56b29525fb7641491c1913518cfe714c4842d0cb4b78f5a7d47228afe9029",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/programdata.rs",
+      "sha256": "83ceda022a1d7311d49b0d6bb1f5d6eb017355fd34df8919dee46a21cfe2a6ed",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/rollback.rs",
+      "sha256": "d360e955e4440b2f131bb7bbe39b3850f0a85037e7b3bf15b683d55c6a84d937",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/tests.rs",
+      "sha256": "453177e929df9a73c283087a7b422ac3ad46cc14d8d6846689a1442634fffd4f",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/timing.rs",
+      "sha256": "a4e7de7e32aa945ef09706c21e3066f6e8402b09ac5f94e53d9fbece84fc59e9",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_loader/verification.rs",
+      "sha256": "9dae25eef786fd81c8a06f0443f6293e80131314e30518569499ebab6dcaeb5e",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_observation.rs",
+      "sha256": "07cbb3e80df2263a8f582603ef846427761de120a04eaa866e83446e4bd7aca3",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal.rs",
+      "sha256": "9a4252f5ba6e9371b180af9a3e9acff44fac8ff86d6fe66487bcf20a840fe87a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/account_context.rs",
+      "sha256": "d4c7ab58d75a1079bf2ea144e539b8bdb030b45fc23c373257ec3157b674537c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/emergency.rs",
+      "sha256": "48bc0ecae95ee16658c395325c77ae9551f0e4be8db28469d0367c79159ab5e0",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/emergency_guards.rs",
+      "sha256": "6cdc0597694e78cb32b4cc5ee1b97d1dae28e91d0bf264f6aa6ae61a11b951bc",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/lifecycle.rs",
+      "sha256": "2c369b7b353ea65df9175b1d7752411392ad180a2bf48343c1e8e902d2bedd5c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/observations.rs",
+      "sha256": "f4bb571b81263ea2c00ee721a8db50417a4f02bbd767f8ed799263ff32dad3bf",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/proposal_guards.rs",
+      "sha256": "1df0dd6d71aa429105a08732f35f9f59e78df90f98c6c17bc32e2ced9d682780",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/proposals.rs",
+      "sha256": "fc02395d4ed0822ea37cc0aed92287ffe85f4e9dd44a8863d14ce569e8ffc61c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_proposal/tests.rs",
+      "sha256": "5c822bf5ea52ed67aab6c95951187a45dd5e9ed5a36f836a41ee55a65ae2d66d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal.rs",
+      "sha256": "6cbc76c886b9c0b6815a7eccea853f8938c4b02388f2b045d6634d5ab0eb68b2",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/account_context.rs",
+      "sha256": "e8defeab1b139a6a11d8d8e8b6a1009656537bbd818be9bac751f15452a7328c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/buffer.rs",
+      "sha256": "af5f0165715558fda0592de4894db3d53b5d78d4ae02df7833238325eba1d350",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/failure.rs",
+      "sha256": "e68f18a1085a411cf62287bd474ab33caad45e4627d1f3f19e46258ecee839d2",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/loader_contract.rs",
+      "sha256": "14a0db29ce6d5cf3593d49a796b612de336039727c1eedbada4a1d055f7ce4ca",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/proofs.rs",
+      "sha256": "77f7b0c278e20f3b8100b602041f9d63f8e21dd3f11eb51523bcafd6d05610aa",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/rollback.rs",
+      "sha256": "f097375fecb0e22d16f73f9e5dd4b4119a247f653be110a9c7da9eaf36fc3b0b",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/tests.rs",
+      "sha256": "0390d0b96470a31053ec403a5995af4d085431151eed82404bdb7f94970bc4f2",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/timing.rs",
+      "sha256": "38cb7cc6c9b6de0615d7f68eb1fef7fdfead7ef5fac6613e63c59ff748733ced",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_terminal/unfreeze.rs",
+      "sha256": "0faf7f5898869280d89051a0059ac5c09507a6a81ac4b02afcab8daf6983d00e",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody.rs",
+      "sha256": "aaa793a599245cd1bdf53dfe6d3b4fbebf69c82537ecc2235eca474689af86d4",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/account_context.rs",
+      "sha256": "cf500d085abf2ad76b9c13dd3355da1dcb9f9bb4facd935422f0e975d12d1936",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/buffer.rs",
+      "sha256": "3cb3d49b93ace5c8f589d65e295f0ab384d8766adb3cdd04893f77fcab612b7f",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/execution.rs",
+      "sha256": "3a9bcc5611832aa334ca51e96470bd1cb61aff832cbbd5c862a781e9ea9f211d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/failure.rs",
+      "sha256": "81ee1b4c842595dfb2e13e04f4d7c051cbd848490ce078a5f3e64e8468e68b18",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/loader_contract.rs",
+      "sha256": "0cf30dfdac24aef81637dec24425dc344a1a62bdd1119d752cbd4a085c3e72ff",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/observations.rs",
+      "sha256": "666fe8eadba0ba924979d93608a3c801f5093075abae0a0a67be6a01f9b32d4a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/proofs.rs",
+      "sha256": "f851565110dc2054b6094c130b1cda95d7e10373b0cb69ea195628c68bfc3bfa",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/rollback.rs",
+      "sha256": "85ee522197ba29d9033615ce290d8fcc7f5a2d9610a0edb0943fbde778e6e140",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/tests.rs",
+      "sha256": "60e0af07579a7b332318132eb5eb00285bf988974780f0f303832d0550ff56ef",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_custody/verification.rs",
+      "sha256": "50fb0ed74c7cbbd48909186a141cb13de3f576303a3de91b8178260a80c845b0",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle.rs",
+      "sha256": "63da0a71ee913e106c51d22e5ec465e544d13527024ee67374a77ae025008a11",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/account_context.rs",
+      "sha256": "c908230ec6cde1443e6d92bca5366781b3e6611cfe42acfeb16b32677788f1bf",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/activation.rs",
+      "sha256": "c6441f0afa977863c76a405b9748c3857a703a463165d4c47153840cf14bfc54",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/checkpoint_evidence.rs",
+      "sha256": "524ccfbfe32d43e5cbfb4b8bd4d423e8d669fdebe78bd799208a9f77c279db32",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/checkpoints.rs",
+      "sha256": "91590b818eaeef6623beb06f9eef29fb8f3973af4c802f064017cc49f545c99b",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/emergency.rs",
+      "sha256": "cc38e46074d89e59245fd206b2713d5845a92452125ce3fd50f2f3060c7b8f6c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/emergency_evidence.rs",
+      "sha256": "783efc5ff31e33bc48a17614a0ca7ee36fa3080d1ad21c9553e18b503c6f0f81",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/envelope.rs",
+      "sha256": "e4e7749a9312c799b3e1456d818b9446fd8b94b1d1222fd19c5bcd21c61f4ed7",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/guardian.rs",
+      "sha256": "8a2a3e81294131407010f6e30f983cefb47c824786cdde1aa3a139835244e926",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/lifecycle.rs",
+      "sha256": "3fe00b2819342a7aa4f2dbe6e94ac5d2f0fc8ddee308e379b62a4c01fe2bcad0",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/observations.rs",
+      "sha256": "6f6d2c3bd99ef45a5c60a1153b93a2ff8c2b10a789c27f3dcbc643fa97a8092d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/proposal_guards.rs",
+      "sha256": "fae0625d5ffa39e72bb72e1148019fcb3724bf35c224495541a2aeeb2deea431",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/proposals.rs",
+      "sha256": "98b051e59a3e8c5a1b92746f8594b7d60fbe7bed889acc901cf74c898cc36fba",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/tests.rs",
+      "sha256": "a7df90bce71b0d9b7dd50b5d8f9249d399a514b9c1592047f197b349efc92980",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/unfreeze.rs",
+      "sha256": "4c524b6318d4e240867536837a35e00bf71d054a9fcbd779f14ee2fa59182917",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_processor_v3_lifecycle/unfreeze_evidence.rs",
+      "sha256": "2174a81fde6e6ac38de6b89f312e0634c2897e6e2091cbd118936b4e53cce953",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_state.rs",
+      "sha256": "5d97e7358350bedd5b74ea805d4d30fa981429e716edf185240fce66dec25e4b",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_v3_custody_instruction.rs",
+      "sha256": "5a299e314f6aad3cf2aef693d2754544d06a5c01ae2689c7f5340d866087a7bf",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_v3_digest.rs",
+      "sha256": "33293f3faa28a6d11d8f3b55afb64cf5fc605db9915a843f6ef01e19af812f5a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_v3_instruction.rs",
+      "sha256": "54dbdf824eb91579e9b409f941a3abc93781d06055f4cb4f096b7192ab872d3b",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/release1_v3_state.rs",
+      "sha256": "c19c35bb7be0d5727b631d8bc2b53a215344d078718f3daf740374e82be16e45",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/state.rs",
+      "sha256": "72b6f824d9616ab8fe5a51c9744aedca5bf6c90c85e97e397778660e5846a279",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/council_policy.rs",
+      "sha256": "c8f61f078efd529c60753696530570e64fb9d24cecebdfa1ac8fb88afacb2cc2",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/digest_vectors.rs",
+      "sha256": "4518427fe4a872e645590bc93a3d0ac9e4271f3645943941373578e126d88e4d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/gate_abi.rs",
+      "sha256": "ed02a87eabf07218eff7e2a4c42bbbf554846418877e554fea9bfc4f7874cf43",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/golden_vectors.rs",
+      "sha256": "f2310e67df20ecd8149b6f9a5065a84d6e03d4dd8b04eac5edf18890c1bf921a",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/layouts.rs",
+      "sha256": "6a6c8be21d10970cdf8559ea49308a9d0621ac4abc6ae1b83f74e46750eceb3d",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/mod.rs",
+      "sha256": "83d55b20b7af261481f1b597c4cf80e0e82be605d4b2db49cd2c53141884b228",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/release1_model.rs",
+      "sha256": "48e911cd054840e2a38be618c703ffdcc548228b1a9da2fc1d4b921e3c7afe50",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/release1_schema.rs",
+      "sha256": "eaacb3b0ff8068977d476dcc5769983fb64606bd925f9911bac83d5112dc015c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/support.rs",
+      "sha256": "c552699917087b0d683deb48e5eb356ea54d92b2f5dcf300c754e6572b0cb3c4",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/src/tests/transitions.rs",
+      "sha256": "6c8dcfe6a12880a28fe2f287e2dae960ca0812c458d21d7e1554b695f5e08a34",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/capacity_liveness_regression.rs",
+      "sha256": "da3188281c718cac59b7fc0236f2762fc75fb34b420bf028fc7d21800d16e802",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/ceremony_closure_program_test.rs",
+      "sha256": "a1ada1f0d5080d10772d91da32a2eaba42cc134d4d80ec4f29e649a87c000d5c",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/loader_deploy_bincode_vector.rs",
+      "sha256": "33735636d2c59b9cbe35e349817f6dd31ae586fd44431ca15d962a7729be1c2e",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/loader_program_test.rs",
+      "sha256": "d957ef76b3e492706b966a6b9f3e99ab86eefe974a76c2d32f01210940a39f2b",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/max_artifact_chunk_sbf.rs",
+      "sha256": "89b2ba76dc0b831f07768b62417c6208a26dc1aaff41c619248791d5b1ba7f1f",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/program_test.rs",
+      "sha256": "a557525f84da3862b5eaaa0f1af338ef76b3f4c26ca936509ec4c5b4f796dff5",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/programdata_observation_chunk_sbf.rs",
+      "sha256": "bb493f0d2bc1a876c0266e74b71a636a9350fa5db1cb63f888b9a7e94164b434",
+      "executable": false
+    },
+    {
+      "path": "governance/programs/upgrade_controller/tests/release1_ceremony_golden.rs",
+      "sha256": "183048a3eab5dbfb0004ad676fb8db54cc86bd974351b47f13f27be2209093e7",
+      "executable": false
+    },
+    {
+      "path": "oracle/Cargo.lock",
+      "sha256": "921a35a497613f7efd21007c594bdfb275f9269c8a69ac155404e058ae25a224",
+      "executable": false
+    },
+    {
+      "path": "oracle/Cargo.toml",
+      "sha256": "a463c15da704b3bbc30ab9dc50b9ba22972ab7a44650d1f053a2d4a69d82df7e",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/oracle-interface/Cargo.toml",
+      "sha256": "3ec50a92a4e9fd82e3dcdb0d669b90898abb707b572d250e95ed22a64eeaef0f",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/oracle-interface/src/lib.rs",
+      "sha256": "a8c990aa959990427cfe9f3327a6212587d23edb535aaa0e510d361ea6230332",
+      "executable": false
+    },
+    {
+      "path": "oracle/governance/cfm_parent_proxy_registry.v1.json",
+      "sha256": "a9ccce1a990fc93024a9ed989dec9638614928dea716add5df3bcbc31964ac4a",
+      "executable": false
+    },
+    {
+      "path": "oracle/governance/nandx_benchmark_basket.v1.json",
+      "sha256": "db7eeb9cd6e4086a05873ad3ed7490fcc9c7d93a51e079791fa43e39d39be95a",
+      "executable": false
+    },
+    {
+      "path": "oracle/governance/nandx_product_sku_manifest.v1.json",
+      "sha256": "d34f4f05e7025e66e651ae017503a223a71898d5567efd0f6dc70416408203e9",
+      "executable": false
+    },
+    {
+      "path": "oracle/governance/ramx_product_sku_manifest.v1.json",
+      "sha256": "a4382c10d8d45d45f222f30be8ff8dfc250dd0c67e55c8078777f65bc6369c7c",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/Cargo.toml",
+      "sha256": "d4b0d425cbdbce3b80e4e2bab546ecbd0ee5b690a3233f67c25ce5dde85ad6e3",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/associated_token.rs",
+      "sha256": "f0decc014e46b95a3a3ea96369e413e3bebb9b71c6df0f1909e91a4694acdb1f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/bounded_heap.rs",
+      "sha256": "5c22e238cb0a8dc9bb7f2c56f91a47f3280dfbee0ade4438f892e28edfe07099",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/cfm.rs",
+      "sha256": "8d42b56b557e7da46b3df4d099d36a8cae27983dc0272417b81c4dc2fbb4409c",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/compact_error.rs",
+      "sha256": "aac47975f327aae0170fc592746443af29ea16f098d50df326c92d7e45e0b029",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/compact_error/account_info.rs",
+      "sha256": "1ed4eff601787a70d6c617cb4f4d4afc61ff85cf1b2fc30e652577b78c1c40aa",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/compact_error/sysvars.rs",
+      "sha256": "0d2e35eb6245ef63e7bcf36e4a34308a69eb1317a382f718dd469a64e309e28a",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/constants.rs",
+      "sha256": "466211c4ccdc0e4ce04d72b40d74f27e0e15d925f9b3849508264efedabb726d",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/error.rs",
+      "sha256": "a3105b0ce4c4aefa4245ad67eaa4e871d92ded12f06a3605ead1b95a4badad65",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec.rs",
+      "sha256": "4c5a80d10d58c64b17a0bbff623c45d2a06b58f87e5bedd5e935119f9da877b5",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/accounts.rs",
+      "sha256": "6f5b0a2fdecc2336f3f0996c6cd030c9863e46879c0e55eb500c17fad56cd896",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/compact_borsh.rs",
+      "sha256": "540d5a60bcb0810b7ebc1ffc192372f91a155b05184b056c2a1bf0d4bab8b112",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/compact_flat_tests.rs",
+      "sha256": "cad1c9b9e618ee38dbd3db8ecd9e5385af69e8428e73a8d04a15c25838404ab6",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/copy_value_tests.rs",
+      "sha256": "1745e23276a8eaa2d7ea055471e83bdb175fc693031c15bf3dbefbdc87b7b69a",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/cursor.rs",
+      "sha256": "e2ae282d7230ef9e7916accdb1458f155a35acf735175604707d990c2401d3ca",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/fields.rs",
+      "sha256": "ec4275ca4015c7f1d263a9281a00fa8a34a75b08368bc84648c0adba3ddba33a",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/flat.rs",
+      "sha256": "5d5ac41c6fc3f9a39e8f023c1697eb387053b248db56cb2aea0739ab60e22cfd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/instruction_flat_tests.rs",
+      "sha256": "c807c6006ec3fa5b73fce398a9f577bbd51cdc07f6832c908b4ff21ce9190626",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/nested_leaf_tests.rs",
+      "sha256": "ac6af2513e22fa34c9de93b046919f382bfbcdf8bdb38195c7016bb0d80f296b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/oracle.rs",
+      "sha256": "e536ad6a19a0de176fb77c87d3f15e4e2f3f2d581d7f73523f4f257a77b6c295",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/oracle_flat_tests.rs",
+      "sha256": "44e4db4e767845111036cc383885ef3956a761d7385020b0b68d13b250593f3f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/payload_equivalence_tests.rs",
+      "sha256": "ae744a32c70f513528a66c770a021a9d92abb295537a9e7c6d82bebf9f81a642",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/state_codecs.rs",
+      "sha256": "226042cebbbfecd3ae62b40d1a921d8bb11c68172fa4413168fa4e436c3f8bca",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/state_macros.rs",
+      "sha256": "b4635be2fd2e8e119b985d09eff9a2599edec43c2e5d308e57552217aaf8c3d8",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/tests.rs",
+      "sha256": "87edb8f4efd5df33d036f925dd8d67d68ddc0d8645c4b8034399c1f823c0dd66",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/fixed_codec/variable.rs",
+      "sha256": "768c23d33bb91f9ad4c55c35fb194fff4402a1d39b75205f94378e05ced2daaa",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/governance_gate.rs",
+      "sha256": "3aae96e726dfe540fa49ff3e4c5ce8465930a55d60d75adc4d68191ce25ddbbe",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/governance_manifest.rs",
+      "sha256": "3bfef16c7424da0f876547afa945a7947903c99033cf1da9d610cc4cdd791c0a",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/builders.rs",
+      "sha256": "b6fd6bccce3f86d93031910750bb5255675a3dae79494f23fc73ddc590139fcb",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/carry.rs",
+      "sha256": "7a88ecd9d470ed81d1421bcb51dfe9d849928ddac349e3c9de8cf572ec83dad5",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/cash.rs",
+      "sha256": "5b7aef01536e9a9f8728d43e8af259421b3d4d3a0d6407ce902232f71d214364",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/cfm.rs",
+      "sha256": "090a3f67dc95c33000994f4dfb55b17a2745bf8d326149a804959a3fb2d987cd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/config.rs",
+      "sha256": "8550091dd7390f37c42c2430e23ff402ad8fa68906261a285c1dcbeff12eb55e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/deserialize.rs",
+      "sha256": "5f5d1e54275a6c19a4fd3a28592791074ddd7b37a607dbff8d4f5d56219ed6cd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/dev.rs",
+      "sha256": "0a6b274f71e3b7f8d3d4b38efe668c5812e797b3b5d1d91973f4b7e5d18e715e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/mod.rs",
+      "sha256": "c49344e382b7d5fb5410528af1338e486633b87437e898b422a866dd8bb0e1ad",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/model.rs",
+      "sha256": "c444a079846f9d1a57dd405e9e16bdba8afe2d9ecd27597dcbe9bf2df4d89b26",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/month.rs",
+      "sha256": "35b985fa78f4d20254684da66afab013e39a65ad9d61d9aa5b0091dace3d198c",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/payloads.rs",
+      "sha256": "70ec442ff097e5e90c9618da5c02e33805132119ac922cf151e01fc193d9c4bc",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/serialize.rs",
+      "sha256": "fe15f0dc1cf9e87791fb60e6a8a5a46b1f9b15b9c89d1d6a8e18b2f6abe21d55",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/settlement.rs",
+      "sha256": "e4677da26807e6d49a2c543e0bb3ae3a195c6136ba130c3127a8f6e258a040f1",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/tags.rs",
+      "sha256": "dcdfe190bb8373fc6145de55afbf8dd082071f9d5f049db377d23f5ff41866ec",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/work.rs",
+      "sha256": "a5a98d8a11c4410cf8837b65a719d2570c6b39e3bf998b20d5f40356a93643e2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/lib.rs",
+      "sha256": "9a16403d03f4b83383c05e84e437a18b9227815986fee683b82d7d9e668a88e3",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/live_index.rs",
+      "sha256": "3beb68c774ed89fe6061c921cd1b4576611b553041c8c7cb41bd814ca735f899",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/oracle_rank.rs",
+      "sha256": "513b3e145c8f01d6e33326c5f9399939de71a7203b1eff5952fe9c1a1b83bdbe",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/account_addresses.rs",
+      "sha256": "d345020c821a4b9d888494c39bc6ecb55dcc725af498a364becbe8fa7a5cd000",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/account_io.rs",
+      "sha256": "e3de0327c49a587cb92060af14222dc4fa2c18b9502aa4189aab8b75a7aa6ce4",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/account_io_tokens.rs",
+      "sha256": "186040ce63431d400319fc2e10205d4d82721fa969e139eedbc84d6065a8a6b7",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/active_weights.rs",
+      "sha256": "bf9194bb2b62999fad5b8089cd5404dfa2aa8b68a38e90198cf2c12d2a94d89b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/adapters.rs",
+      "sha256": "16dab6f465cabf3f5fe0c2d4a0ebb9d3341d319328960073f458761c7a50b9f5",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/bucket_medians.rs",
+      "sha256": "2c4a54ce89935520d3646136aaf458ec621c4de7515a8557b391e5df9e5c83fd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/bucket_rank.rs",
+      "sha256": "a7805f955d5a44d7351ecfd8ef08fa53a4ce30d4c5954dbb680c75a59daa9f2f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/checkpoints.rs",
+      "sha256": "49c33a567354b8b1faff6de11829a7526378ab7f01d55a5ce754bb43318870c0",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/critical_tests.rs",
+      "sha256": "cc98697a6c36609af6e4efa9ebecc680cc2e4ad90291a73e16b5e48f86ec13f7",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/history.rs",
+      "sha256": "7008afc1a0c21be065a28e10019be67a8a4b2a52520b8ebb812cfcdbc5945387",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/mod.rs",
+      "sha256": "2bdd573de46da726c6b1f4b52c165551ad3e3599c9fed57ca53b88f52881a3d0",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/openings.rs",
+      "sha256": "92de115003f8d199c376aae81b8aa2ef11136917a18827b48b231352e5d47038",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/periods.rs",
+      "sha256": "adf49891f362c495b8ae3b3ec60104785b04fb57034eda382d29f156db54b228",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/reads.rs",
+      "sha256": "12f97060ddefc1d940f37f621b6397750c3de8bc0f9eb1058a1b4fc689abd0bb",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/scan_transition.rs",
+      "sha256": "78b3555ec3f224b4e9eb380674c839172b5efb1c25dd88dc1a4acb2b2300e39e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/carry/state.rs",
+      "sha256": "4917cedc5439ce5ebb4f9d8ac59739e9b8f691660b1621df6ea8b9c69bb76732",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/cfm_launch.rs",
+      "sha256": "af33c622af19b7da75d5170b5a2f3d293faab30e43c01e94984e8316275e2538",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/collateral_accounts.rs",
+      "sha256": "c4cb0eca3ed7ef0e157846f00a5cb8a62295c67eed681f5f2ce5aaec77dfff2b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/config.rs",
+      "sha256": "2011d81df560d21250783987043a6388a961ae1fec753c9369a0caec4b00f43c",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/authority.rs",
+      "sha256": "11603ea3d7cef1280fea6406a6fff657570c09275ba91f1f3b7519ec96c283cd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/checkpoint_runtime_tests.rs",
+      "sha256": "a49f2c900b79d8d71a1c30bc5b1c2ec2c524cafdd9eb04d92af20a7f77fcb575",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/effects.rs",
+      "sha256": "ea5a69adabaabdcefd43cc1efce7c3ebadefd11a0cc7baf8835e0170c047f8ef",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/helpers.rs",
+      "sha256": "2db88013d498dbb109b36cb6f9be1b7ed11998433c92d1f28dca7a36611bde87",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/mod.rs",
+      "sha256": "def941fe861155bd7c06349816b032e188be92a14be45bb2124b56be91e7ec8a",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/state.rs",
+      "sha256": "5c011ea5cad6f303f372ff3fce7df56db9e4204119ccae6dcb8892cd30b8919f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/targets.rs",
+      "sha256": "e91ce55c5243b67887210236292e249aa1ab32a6410ba074da09f1b523af1c2e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/council/tests.rs",
+      "sha256": "536d4f768726d6493b0c29a43e3f21907696b690a5f7d0e16255f4ceb31d7abb",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/dev_bootstrap.rs",
+      "sha256": "e736ecde35e5b9532fdcea5e25b3ea3d2b609d41af508d899514aec3804d4c86",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/dev_formation.rs",
+      "sha256": "3b34061da5c87ed6b064857f4471bf1a628a9e5b4b1f8f373074059308d678c1",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/dispatch.rs",
+      "sha256": "712f3d06dbb103ae3f23edc327346ab404ba615df1aa2e9c71b5a052ec59da14",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/median.rs",
+      "sha256": "e6b38863e782b20e89aac879a2f7a677f6f5fad9e35d4a376ece918516a80401",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/mod.rs",
+      "sha256": "9b72ba09741e49fb31524309c370fc1b3061e4ac0f3f905d1bf067c7334f8f09",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/month_terminal.rs",
+      "sha256": "85673b5bc8e88903680cd144144ba78d60192a4ba13caa12dbc0113d99a213b1",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_core.rs",
+      "sha256": "583e9d15cc091c04a8cf939635fd3f6f3cae5c710fe35f5470022f6e7c1e768e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_economics.rs",
+      "sha256": "3922849709dfcce6d227511124d0185aa570588570486bdef03fd76fc6f1db8e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_evidence.rs",
+      "sha256": "697087f4ebc0e66396da9f3f8c31f6c3b1f9764b8b075bb0526b4a582a0e6cae",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_membership.rs",
+      "sha256": "1d6a04700f0f1707bd3973f270aec4f3cb49a04bd350de73d3883ab9c1386a22",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_rules.rs",
+      "sha256": "5128b0a037a3e13595ed6155cf6d0789fb81107413a61309c0f256fa50339b67",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_schedule_validation.rs",
+      "sha256": "e6b51ebc6d31e93c536b466c4ff0e07cfee86c20f0a9271f3cdbc06c68c8b1ba",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_state_validation.rs",
+      "sha256": "12b881e8b5dd3a5ba7ff8212558739aba70d70fcb6759aafca4554ba518987ad",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/oracle_validation.rs",
+      "sha256": "a1a1a5a73636f62004b376209028cff99cb6865fec10e213bd923d3d5816c04d",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/period.rs",
+      "sha256": "5a5062cee295ac99fda29a2f883a0d04dd83cd035ad3e33e24e791a68ea27131",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/recipe_weights.rs",
+      "sha256": "80ca3260ea418b8423d80d14f18981b0bb841d7cef8833d4e62fb955b6813551",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/rewards.rs",
+      "sha256": "d48c4cd353f9b8992bc54ec50e73fed952e32c7ad183bc80d95031f180c274c6",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/rewards/claims.rs",
+      "sha256": "cc736c93ad833a1a360755e72e13d5213f1e075cba8f84ebc3d0c027100c81e7",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/rewards/escrow.rs",
+      "sha256": "4bce4bc6b0f639e124a989b42671e42a7310f8b5924529696c5bfca5d7519cd8",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/rewards/registration.rs",
+      "sha256": "c521e13b0658199f873854da672239129e4e131a0e71d24f33cb798b34adf289",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/rewards/tests.rs",
+      "sha256": "70ef3365e63b1874cdb3aff482021a8e852b9c798ebec5c160d9386580f707e4",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/schedule.rs",
+      "sha256": "a6dd71bc1afa78e87cc4d5ddb02d1c75601be454f6b596e135bb996dec13c934",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/settlement.rs",
+      "sha256": "7ae434ab6a42e5e3a7e1e2d8526f6948789831eabb1fb2efb0c7d7c467ba9a7d",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/settlement_signers.rs",
+      "sha256": "3b7c08e2dfb18cf70d8868c173d6ee1960ab75317d4ac10625eb1e88a918751c",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/settlement_sources.rs",
+      "sha256": "ca2d42e3cb19859743d8d46e913f1de72eea8b2346080725181dee606b8285f2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/settlement_validation.rs",
+      "sha256": "4cbd46dfa200973977dfac9d2aeb3ab3045f443f5de08578af2710e63d329ed0",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/sku_coverage.rs",
+      "sha256": "2a3c76d9b84b46042b3a5685bb943d4108ee23f97237d78589fc983e9e966e14",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/sku_coverage_resolution.rs",
+      "sha256": "b65468e7e191233cb592cdb782ddf52d1ca77796fc0a019f9d6985df707475cf",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/sku_manifest.rs",
+      "sha256": "4d048812ada5c2ecbfe67017967c0d667a88b754d50e95c065408d94ee7d0dce",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/sponsorship/custody.rs",
+      "sha256": "482e1d210c3fb4d7b79327d6607c836b0afb6ff4713823a9dcb5daba3374c6a4",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/sponsorship/mod.rs",
+      "sha256": "0f5614d0c33415842375f5b162b7179318edcf1d5b7a7c6bac47b820a8c0032b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/sponsorship/settlement.rs",
+      "sha256": "60ec545d98bed5b6f89c107d7f46d34e09f46e4dec75523e352bb589489695f2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/terminal_cleanup.rs",
+      "sha256": "3005011e834fc3baf735afc541608bcb2913a1525bc890be33bb8f49d21c5d3b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/terminal_cleanup/targets.rs",
+      "sha256": "8a44bafd9043a786aa93b3cdf0ef6bbd9ba947658e568461e6e3d9bc1cd8eb0e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/account_loading.rs",
+      "sha256": "3720f278f60405b9359d67d1498833bbeff90ffe21e9f9654d6672cd78188e71",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/config_governance.rs",
+      "sha256": "6b88e07ca85fd5fbd43d8c1d5b604186d20c2a27cebf1af15e5be8684488c119",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/mod.rs",
+      "sha256": "4f116f4bceb99d43bfcf6fea6f555ff4cd665f2cad1a78bcddf2694a0d8309e8",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/opening_settlement.rs",
+      "sha256": "e73122e06778c6e1b8d8926130f9761aa857dbbff2f3525c9ed8cc74cabd0b6d",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/product_sku.rs",
+      "sha256": "8a769708765eec832421c87bc93ccd4f59ac7c2d6ead6f3d9b8683246dbbcb30",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/schedule.rs",
+      "sha256": "60fc3bf3322bfea1657e99124a93bfd82d755faf360ee9a3dae548f0634296a9",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/settlement.rs",
+      "sha256": "b8df895839638c43d5c547ffdd4d2766ca4875dac0003260d8acb30bf3caef56",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/sku_coverage.rs",
+      "sha256": "d2d168c7259ce6ffb1a67cc1ad744ac9429ab91cdacacfdd43756fe526f3da7f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/source_weights.rs",
+      "sha256": "09d63b170d035edd3da097028890a9585d7dd166d960605bad0eba3d1c9b873f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/tests/stale_cleanup.rs",
+      "sha256": "2ac003e80695e7e57c1e4a0d9383e6a94df5dfd3a5dd6ce9aea33d8f9748a792",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc.rs",
+      "sha256": "120267956e76d45f719f05f45652f436abb7be5ed0a36a2cbc99a102ebd9c489",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc/accounting.rs",
+      "sha256": "1262d15e1eab1fa39796c786c4fb90c13e6cabd7abb88c8cd2037705f118d207",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc/opening.rs",
+      "sha256": "fceaf1b005e33b3b3776accb3905dd7783aeaa66a08b04c4be1b02d35202a4b6",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc/schedule.rs",
+      "sha256": "c3d947ef803c0cc51cd4585bc2d3fe689fb256da6ac8925b65a8e9555c133cf2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc/sources.rs",
+      "sha256": "dba2b819893221bccd0853e984d28150f0bfe1906bf9511d92e45f28bdf110fd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc/tests.rs",
+      "sha256": "5fbfa168c334f181df643bc5fe57e510345bc46b918d86e52ba2893b53e46302",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc/update_claims.rs",
+      "sha256": "af8692196e3e3ddc9397471a1e6f637e6f42d6ecbe13bde9421be94439bebb61",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/usdc/update_settlement.rs",
+      "sha256": "188e883b3d5e8e6b567110e048f46c069172dcf36dc07b285b7309513afbedb3",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/sponsorship.rs",
+      "sha256": "95907dfb7833c59ec32474fe216e9317c05f43014970217bbe0744483e966904",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/config.rs",
+      "sha256": "9918606917558ec2397f3f5de185a68ce88f0efccc11c45bc28d78fe3cf19fec",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/custody.rs",
+      "sha256": "36bbf59a8c0684746fb3c7ee92ef2005f4cf7025de5318b7bf435e154bad1917",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/manifests.rs",
+      "sha256": "bf64a584adcb54af710011b531206da6a816ebfebc475c38e1b01ba595e368d5",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/median.rs",
+      "sha256": "5b823cc8ce90b3bc55cc3b0797f327e92a60d453a2cc8e0eaa35368877346e81",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/mod.rs",
+      "sha256": "04ea594124ea603c48b0c799fecffce8df2d32e3168b74f4f87f7ead1bb0bfd0",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/oracle_activity.rs",
+      "sha256": "3e6f7ca21b2a44e69afaa1cc6de341220939693ef7dd9bf29e2491a87fcf8fbc",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/oracle_common.rs",
+      "sha256": "3fb9b1e3fd91ce460af429d23255c524d6fe2732de4c69427be1d5ef5fbf1121",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/oracle_membership.rs",
+      "sha256": "bb008186040adde19d70c109281ab2bf5fb2ad01483549e4c8034fcb5655b091",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/rewards.rs",
+      "sha256": "29889d0b415fbc5ff7c85b24f3276c14d41e685afdc2775bb5450c0ca3dfbf5b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/settlement.rs",
+      "sha256": "d4df995b69b1803eadc6c89c60f472f295ee053c0f8e887b6d3e2f5f9141853e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/sku.rs",
+      "sha256": "5d89efe4367c038e2297f4f700135f2f044f33106cc1183e848ca84fc1c3f87e",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/tests.rs",
+      "sha256": "5d7120749592155ba4d8c430db37044aac74331f398b29372d2cae0f2005c918",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/system_instruction.rs",
+      "sha256": "76a4dc394bd18f225c67307f95364fd46a1413027d1063cc640535a15d00a72f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/token_instruction.rs",
+      "sha256": "e64bc377caef59df1211c4d3d65282c032a99b34e8417c1d2ae8d119385a49fa",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/token_state.rs",
+      "sha256": "ea4a5f748417cf492612027729d542efdd2d377fc174a4f74fb7fa4602148313",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/borsh_bounds_security.rs",
+      "sha256": "24e31a252b04b4570fd883a3e23e65985d3285afce921877ebe105add3ad0624",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/carry_forward.rs",
+      "sha256": "3d0abbf3e539b5d89b85ff5f86b530049268cb16c17575a0685c7beb1dd1db13",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/cfm_launch.rs",
+      "sha256": "fb5d56a6fcaed54613307c5e1042b9d7102f44e1327432919276528477eb66f4",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/common/cfm.rs",
+      "sha256": "980f62a7b2dbf6faec360077239557f9d394c045e26e7f2e9178c4c53d835cc9",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/common/cohort.rs",
+      "sha256": "85f1c1eb6a4dfeb097657f58121cbad818ead7acbad8d6b18046d419cbe7a3fa",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/common/mod.rs",
+      "sha256": "89565fa956da7fe46550080542a0323fd3a90fad41a2618700a0a2e490a947a3",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/common/settle.rs",
+      "sha256": "a662a5ff532ce51bf33ae9a5c577241f6853d4359594fbeab754a4b567e61620",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/common/updates.rs",
+      "sha256": "8d98930e23e77f8fa28fc3644fda9f3c173a10260cece62b70ef34f66e1adc4c",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/council_dev.rs",
+      "sha256": "6a893c6df1bfb71a92f63ecac995e9d6bf6cd0ec924d2a739d8c5242b77184b7",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/custody.rs",
+      "sha256": "192814a040f5b11da40f82e659178ecc7ad9500895801c3283a91418ad992913",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/dev_bootstrap.rs",
+      "sha256": "00d9b2418d24a614e51db1367db707687bb09b5ae1c1003d75b7f3766044c3a7",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/dev_completion.rs",
+      "sha256": "bb1a72884c5f47bdb65a4d4f86403eb69e65582f7843634dbd92f6a7b2fec34d",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/evidence.rs",
+      "sha256": "f506ef743597573dc2a528a351e4c3fcab5e0e0f69d6b64554fe05cf2276bdf7",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/fixtures/dev-oracle-sources.json",
+      "sha256": "c6edeb7e532653e8d35dec3f382a2c95de73a8447a923ab0d6ef30357fe5f127",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/full_cohort.rs",
+      "sha256": "36dbc0bcf06de622ffd9f483bc5476ee7f9991031c37d01d43b03265cc86e3cd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/governance.rs",
+      "sha256": "5da09500734c7bbff114b0985fe1eec56c676daefedfdb3e712aa7ad539549e2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/month_initialization.rs",
+      "sha256": "164a424207d442c373367cfd056d1afd74a3b3679883ad0bc9f97e903ef76b83",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/nandx_product_sku_manifest.rs",
+      "sha256": "0f934d92f56416df5cc51ecfa48d1700ccf5649de57986bc2d6fe9eb7129a82b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/oracle_active_weight_and_commitment_v2.rs",
+      "sha256": "5fd0376b32a82df37f8274c98e617aa0f7d1624265fd7cd198153990022278cd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/oracle_challenge_guard_security.rs",
+      "sha256": "94b7f127cce338a2127ef12e487285b9f24f753f67d8e8ccd8a6cad20435d722",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/oracle_economics_security.rs",
+      "sha256": "d50ea85e2fa98512d31184cc826134e9861ce67fef1ab0bec9205a4e8f1e984f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/oracle_escrow_security_contract.rs",
+      "sha256": "ee57af45eceb0754ae2f8d6385780c9fdee0811c35f78a96d7526635bf748515",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/oracle_opening_security_contract.rs",
+      "sha256": "0b2a59e94b2a75d7140a14aa7a2786ea472b7fabf61a967d0011dbd77f121cfd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/oracle_settlement_source_manifest.rs",
+      "sha256": "ccaf220a7aa03482b91cfa4a8279cd6c8db482f4a7ec2ff054a096a15407aa7b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/oracle_weight_security_contract.rs",
+      "sha256": "04690752916bf19c470deb585c0a22d6a10e7f25568307c2d7827ecd6258c0a5",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/period_live.rs",
+      "sha256": "40434486b3719015cf41c02b13ded5e25af869e18b3b7c08a53ec333c3a5e8c6",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/product_sku_registration.rs",
+      "sha256": "a6672d6f49dd95c148eb2a21ff7572f9a8e82b32af5e02481677111af6f482a0",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/program.rs",
+      "sha256": "6aa8e8a49ef9d54dc98a22630928a6ab5e653d7945fe3923ffac51e41762d010",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/ramx_product_sku_manifest.rs",
+      "sha256": "493a8403a50a37de67c99d23163cb281f78074564808d7ffecc540993a4984e5",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/rewards_cleanup.rs",
+      "sha256": "89f124c9d79a9e734cc479b12aa2e2294c79ba40637f267ba5c75f7042532b36",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/settlement.rs",
+      "sha256": "2623a6cdf64c76bd83cea07c9dccdc2efeef8c7d5d1a2bd34248738e28b8fc24",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/signer_governance.rs",
+      "sha256": "22593c1ba4a58077220d31a614b3850e57f67d9322f694e52edb5c7e06fa0dd1",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/sku_frontier_close.rs",
+      "sha256": "175a521d522e3c4326a945dc8569dfcefe5438a657a1b02540a0512fd2628b97",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/source_formation.rs",
+      "sha256": "4d387192a3ac3fe6e533145942de74d56de9e7c51b05077893e6f0523a9ccefe",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/sponsorship.rs",
+      "sha256": "6bf439639e41514e4b4b6cfedff91dc6ce050745755aeb8333b927c53f3e659a",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/update_lane.rs",
+      "sha256": "670746aad522141515cfca6f3093d9dbb75ad3518e28542471b56323def4fbac",
+      "executable": false
+    },
+    {
+      "path": "oracle/rust-toolchain.toml",
+      "sha256": "4a0a7590572c5859a0487da76cddeffd17d175e34b7338914d2915ce18bc0d3d",
+      "executable": false
+    },
+    {
+      "path": "scripts/check.sh",
+      "sha256": "7c398ee69e6b298977a9e7713bc741db8e3148e7b585fcd7ff7a369cb1fa48d0",
+      "executable": true
+    },
+    {
+      "path": "sdk/Cargo.lock",
+      "sha256": "1d49795b64e5920e1689312c91c1ece0711b901734d8c7e2130371c0b1d469e9",
+      "executable": false
+    },
+    {
+      "path": "sdk/Cargo.toml",
+      "sha256": "edff81a5c1ebf70917330580cd29d5378a1b753f1dc27f22236a22840e39a151",
+      "executable": false
+    },
+    {
+      "path": "sdk/rust/src/futures.rs",
+      "sha256": "54bf64ebb68f12b7e5ee5132a6510e23b3c2d11e538b93bd69c93f9605b6c087",
+      "executable": false
+    },
+    {
+      "path": "sdk/rust/src/lib.rs",
+      "sha256": "7f9d4675ff3952ef2ba796fd1d9a1cd8db129fac0b9aa874f9892803aadcb1d7",
+      "executable": false
+    },
+    {
+      "path": "sdk/rust/tests/vectors.rs",
+      "sha256": "ee39e1d3d25ae11fc12a28b3c3575cdb002f75cb209fb8e2fd2f10d4fecce6d9",
+      "executable": false
+    },
+    {
+      "path": "sdk/test/fixtures/futures/futures.json",
+      "sha256": "ad500c03cf8473f548d3c62ef489ebbe9ec9ab918fdb4ed7d8a9f25f801a38bf",
+      "executable": false
+    }
+  ]
 }

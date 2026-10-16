@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Petri CLI Agent Index</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b1416;
+        --panel: #102225;
+        --text: #e7f2ef;
+        --muted: #9fb5b1;
+        --line: #2b575b;
+        --accent: #d7b846;
+        --accent-2: #5fc4b8;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+
+      header {
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+      }
+
+      h1,
+      h2 {
+        line-height: 1.15;
+        margin: 0 0 12px;
+      }
+
+      h1 {
+        color: var(--accent);
+        font-size: 2rem;
+      }
+
+      h2 {
+        color: var(--accent-2);
+        font-size: 1.15rem;
+        margin-top: 28px;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      code {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        padding: 0.1rem 0.3rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 16px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      ul {
+        padding-left: 1.2rem;
+      }
+
+      li {
+        margin: 0.35rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Petri CLI Agent Index</h1>
+        <p class="muted">
+          Navigation layer for agents and developers working on the Amoeba
+          user-facing Rust CLI/TUI.
+        </p>
+      </header>
+
+      <section class="grid" aria-label="Primary docs">
+        <article class="card">
+          <h2>Start Here</h2>
+          <p>
+            Read the local repo instructions before changing behavior:
+            <a href="../../AGENTS.md">AGENTS.md</a>, then the public command guide:
+            <a href="../amoeba-cli-command-guide.md">amoeba-cli-command-guide.md</a>.
+            The dev chain setup is in <a href="../localnet-dev.md">localnet-dev.md</a>.
+          </p>
+          <p>
+            For CLI/TUI copy, command nouns, JSON schemas, and MCP manifests,
+            read
+            <a href="../petri-public-cli-user-theory-of-mind.md">petri-public-cli-user-theory-of-mind.md</a>.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Capped Futures</h2>
+          <p>
+            Petri trades the capped futures the website trades:
+            <code>markets</code>, <code>book</code>, <code>trades</code>,
+            <code>chart</code>, <code>quote</code>, <code>long</code>,
+            <code>short</code>, <code>positions</code>, <code>close</code>,
+            <code>cancel</code>, <code>deposit</code>, <code>withdraw</code>
+            and <code>history</code>. A position is a range of the index; what
+            it costs up front is the most it can lose.
+          </p>
+          <p>
+            Reads and quotes come from the futures API's
+            <code>/v1/markets</code>, <code>/v1/quote</code> and
+            <code>/v1/accounts</code> views. Orders are solved against the
+            market account read from chain (local route) or prepared by the
+            API's sponsor and checked before signing (sponsored route). See the
+            <a href="../amoeba-cli-command-guide.md">command guide</a>.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Source Map</h2>
+          <p>
+            Module ownership, API contracts, and validation expectations
+            live in <a href="source-map.html">source-map.html</a>.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Index Oracle</h2>
+          <p>
+            <code>petri oracle</code> reads the standalone oracle's months,
+            sources, catalog and research candidates from the futures API.
+            Writes (collateral, evidence, sources, opening prints, Game updates,
+            escrow settlement, council disputes) are built with the
+            <code>ameba_oracle</code> crate against the deployment's oracle
+            program and signed by the attached wallet; <code>--simulate</code>
+            runs them unsigned. See the
+            <a href="../amoeba-cli-command-guide.md#oracle">command guide</a>.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Devloop</h2>
+          <p>
+            Use <a href="devloop.html">devloop.html</a> and
+            <a href="../../scripts/devloop.sh">scripts/devloop.sh</a> for the
+            repeatable format, check, test and clippy loop.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>MCP</h2>
+          <p>
+            Users can run <code>petri mcp enable</code>, or connect from
+            <strong>Home &gt; Connect your AI agent</strong> and select
+            <strong>Enable Petri MCP</strong>. No manual server process or
+            operating-system startup service is required.
+          </p>
+          <p>
+            Petri MCP is read-only: futures markets, charts, books, trades,
+            quotes, positions, balances and history, and the oracle's
+            months, sources and candidates. Trades and
+            oracle writes run only in the user's terminal. Owner-scoped reads
+            require an explicit owner public key, and every wrapper child carries
+            a Rust-enforced read-only signer boundary.
+          </p>
+          <p>
+            Setup lifecycle, tool names and the signing boundary live in
+            <a href="../mcp-agent-protocol.md">mcp-agent-protocol.md</a>.
+          </p>
+        </article>
+      </section>
+
+      <h2>Runtime Shape</h2>
+      <p>Standalone preview updates: see the
+        <a href="../amoeba-cli-command-guide.md#update-commands">update command guide</a>
+        and <a href="source-map.html">source map</a>. Downloaded preview apps use
+        <code>src/release_update/</code>; source builds retain the Git/Rust updater.</p>
+      <ul>
+        <li><code>petri</code> prints the front door; <code>petri help</code> lists every command; <code>petri tui</code> opens the terminal interface.</li>
+        <li>Petri talks to one Solana RPC (<code>--rpc</code>) and one futures API (<code>--api</code>); program ids come from the API's <code>/v1/config</code> or a trusted manifest (<code>--deployment</code>).</li>
+        <li>Orders are solved with the futures client crate against the market account read from chain and sent through RPC with the wallet as fee payer, or prepared by the futures API's sponsor and checked by <code>src/futures/check.rs</code> before signing.</li>
+        <li>Oracle reads come from <code>/v1/oracle/public-snapshot</code>, <code>/v1/oracle/catalog</code> and <code>/oracle/source-candidates</code>; oracle accounts used for writes are read from the oracle program and checked before use.</li>
+        <li><code>src/chain_identity.rs</code> verifies the cluster (genesis), the deployed oracle and futures programs, and the oracle config's bond mint before anything is signed.</li>
+        <li><code>petri tui</code>'s Markets view lists the markets and trades, closes and cancels through the same prepare and send steps as <code>petri long</code>, <code>petri close</code> and <code>petri cancel</code>.</li>
+        <li>The research workspace stores candidates in the futures API's candidate store and reads the same oracle documents.</li>
+        <li><code>petri --json mcp manifest</code> publishes the MCP/tool wrapper contract.</li>
+        <li><code>scripts/petri-launcher.mjs</code> only delegates to Rust or performs installation/update work.</li>
+      </ul>
+
+      <h2>Core Rule</h2>
+      <p>
+        Keep the terminal user-facing and product-compatible with the website.
+        Read indexed data from the futures API and account state from the chain;
+        build every transaction with the program crates and check it before
+        signing.
+      </p>
+      <p>
+        Public command names, help text, JSON, and MCP tools should use product
+        nouns such as markets, book, trades, chart, quote, long, short,
+        positions, close, wallet, history, and oracle. Do not expose admin, operator, internal,
+        route, database, matcher, bootstrap, or payload grammar through the
+        public Petri surface.
+      </p>
+
+      <h2>Useful Source Links</h2>
+      <ul>
+        <li><a href="../../src/cli.rs">src/cli.rs</a> - command grammar and help text</li>
+        <li><a href="../../src/main.rs">src/main.rs</a> - dispatch and output wiring</li>
+        <li><a href="../../src/futures/mod.rs">src/futures/</a> - futures: market trust, reads, order shapes, quotes, orders and the sponsored-transaction check, with the shared context, settings, RPC and API clients, the send path, wallet creation, status and faucet</li>
+        <li><a href="../../src/oracle/mod.rs">src/oracle/</a> - oracle reads, account checks, SKU proofs, writes and the private claims file</li>
+        <li><a href="../../src/chain_identity.rs">src/chain_identity.rs</a> - deployment identity gate</li>
+        <li><a href="../../src/endpoints.rs">src/endpoints.rs</a> - futures API oracle routes</li>
+        <li><a href="../../src/workspace_update.rs">src/workspace_update.rs</a> - local workspace update planning and execution</li>
+        <li><a href="../../src/agent_protocol.rs">src/agent_protocol.rs</a> - MCP/agent manifest</li>
+        <li><a href="../../src/mcp_actions.rs">src/mcp_actions.rs</a> - resident <code>wallet.address</code> action and the MCP signer boundary</li>
+        <li><a href="../../src/mcp_setup.rs">src/mcp_setup.rs</a> - owned user-level MCP status, enable, repair, and disable logic</li>
+        <li><a href="../../src/research/mod.rs">src/research/</a> - terminal UI: Markets view, oracle research, and automatic installed-app updates</li>
+        <li><a href="../../src/research/markets.rs">src/research/markets.rs</a> - TUI Markets view (the futures markets)</li>
+        <li><a href="../oracle-research.md">Oracle research guide</a> - bundled local service and agent commands</li>
+        <li><a href="../../src/gitbook.rs">src/gitbook.rs</a> - GitBook Help catalog source (checked by <code>scripts/check-bundled-gitbook.mjs</code>)</li>
+        <li><a href="../../src/chart.rs">src/chart.rs</a> - terminal chart rendering</li>
+        <li><a href="../../scripts/petri-mcp-server.mjs">scripts/petri-mcp-server.mjs</a> - MCP stdio wrapper</li>
+        <li><a href="../../scripts/check-petri-mcp-server.mjs">scripts/check-petri-mcp-server.mjs</a> - stdio wrapper check</li>
+        <li><a href="../../scripts/petri-launcher.mjs">scripts/petri-launcher.mjs</a> - repo-local Rust delegation and installation/update shim</li>
+        <li><a href="../../scripts/package-petri-windows.ps1">scripts/package-petri-windows.ps1</a> - Windows release app package</li>
+        <li><a href="../../scripts/package-petri-macos.sh">scripts/package-petri-macos.sh</a> - macOS <code>.app</code> package</li>
+        <li><a href="../../README.md">README.md</a> - repo overview and user commands</li>
+      </ul>
+    </main>
+  </body>
+</html>

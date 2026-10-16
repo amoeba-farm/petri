@@ -1,0 +1,165 @@
+use crate::research::model::{Action, App, Modal, View};
+use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers, MouseButton, MouseEventKind};
+
+pub fn handle(app: &mut App, event: Event) -> Option<Action> {
+    if let Event::Mouse(mouse) = &event {
+        app.pointer = Some((mouse.column, mouse.row));
+    }
+    match event {
+        Event::Mouse(mouse) => match mouse.kind {
+            MouseEventKind::Down(MouseButton::Left) => return app.hit(mouse.column, mouse.row),
+            MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
+                let down = mouse.kind == MouseEventKind::ScrollDown;
+                if app.modal.is_none() && app.sidebar.contains((mouse.column, mouse.row).into()) {
+                    app.agent_scroll = if down {
+                        app.agent_scroll.saturating_add(1)
+                    } else {
+                        app.agent_scroll.saturating_sub(1)
+                    };
+                } else {
+                    app.scroll = if down {
+                        app.scroll.saturating_add(3)
+                    } else {
+                        app.scroll.saturating_sub(3)
+                    };
+                }
+            }
+            _ => {}
+        },
+        Event::Paste(value) => app.edit(&value, false),
+        Event::Key(key) if key.kind != KeyEventKind::Release => {
+            if key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c') {
+                return Some(Action::Quit);
+            }
+            if app.modal.is_some() {
+                if matches!(app.modal, Some(Modal::Revoke(_) | Modal::Assignment(_))) {
+                    match key.code {
+                        KeyCode::Esc => return Some(Action::Cancel),
+                        KeyCode::Tab | KeyCode::BackTab => {
+                            app.form_focus = (app.form_focus + 1) % 2
+                        }
+                        KeyCode::Enter => {
+                            return Some(match &app.modal {
+                                Some(Modal::Revoke(agent)) if app.form_focus == 0 => {
+                                    Action::ConfirmRevoke(agent.id.clone())
+                                }
+                                Some(Modal::Assignment(work))
+                                    if app.form_focus == 0 && !work.objective.is_null() =>
+                                {
+                                    Action::Refine(work.id.clone())
+                                }
+                                _ => Action::Cancel,
+                            });
+                        }
+                        _ => {}
+                    }
+                    return None;
+                }
+                let fields = app.form_fields();
+                match key.code {
+                    KeyCode::Esc => return Some(Action::Cancel),
+                    KeyCode::Tab => app.form_focus = (app.form_focus + 1) % (fields + 2),
+                    KeyCode::BackTab => {
+                        app.form_focus = (app.form_focus + fields + 1) % (fields + 2)
+                    }
+                    KeyCode::Enter if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                        return Some(Action::Save);
+                    }
+                    KeyCode::Enter => {
+                        if matches!(app.modal, Some(Modal::Assignment(_))) {
+                            return Some(Action::Cancel);
+                        }
+                        if let Some(Modal::Revoke(agent)) = &app.modal {
+                            return Some(if app.form_focus == 0 {
+                                Action::ConfirmRevoke(agent.id.clone())
+                            } else {
+                                Action::Cancel
+                            });
+                        }
+                        if app.form_focus == fields {
+                            return Some(Action::Save);
+                        }
+                        if app.form_focus == fields + 1 {
+                            return Some(Action::Cancel);
+                        }
+                        if matches!(app.modal, Some(Modal::Refine { .. })) {
+                            app.edit("\n", false);
+                        } else if fields == 1 {
+                            return Some(Action::Save);
+                        } else {
+                            app.form_focus += 1;
+                        }
+                    }
+                    KeyCode::Backspace => app.edit("", true),
+                    KeyCode::Char(c)
+                        if !key
+                            .modifiers
+                            .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT) =>
+                    {
+                        app.edit(&c.to_string(), false)
+                    }
+                    _ => {}
+                }
+                return None;
+            }
+            if app.view == View::Markets {
+                if app.markets.ticket.is_some() {
+                    if key.code == KeyCode::Char('q')
+                        && !matches!(
+                            app.markets.ticket.as_ref().map(|t| &t.stage),
+                            Some(crate::research::markets::Stage::Edit)
+                        )
+                    {
+                        return Some(Action::Quit);
+                    }
+                    app.markets.key(key);
+                    return None;
+                }
+                if app.markets.key(key) {
+                    return None;
+                }
+            }
+            match key.code {
+                KeyCode::Char('q') | KeyCode::Esc => return Some(Action::Quit),
+                KeyCode::Char('m') => return Some(Action::View(View::Markets)),
+                KeyCode::Char('c') => return Some(Action::View(View::Connect)),
+                KeyCode::Char('a') => return Some(Action::View(View::Activity)),
+                KeyCode::Char('e') => return Some(Action::View(View::Evidence)),
+                KeyCode::Char('r') => return Some(Action::View(View::Rewards)),
+                KeyCode::Char('n') => return Some(Action::NewDirective),
+                KeyCode::Char('R') => return Some(Action::Refresh),
+                KeyCode::Tab if !app.hits.is_empty() => {
+                    app.focus = (app.focus + 1) % app.hits.len()
+                }
+                KeyCode::BackTab if !app.hits.is_empty() => {
+                    app.focus = (app.focus + app.hits.len() - 1) % app.hits.len()
+                }
+                KeyCode::Enter => return app.hits.get(app.focus).map(|h| h.action.clone()),
+                KeyCode::Up | KeyCode::Down if !app.snapshot.agents.is_empty() => {
+                    let length = app.snapshot.agents.len();
+                    let current = app
+                        .snapshot
+                        .agents
+                        .iter()
+                        .position(|a| Some(&a.id) == app.selected_agent.as_ref())
+                        .unwrap_or(0);
+                    let next = if key.code == KeyCode::Down {
+                        (current + 1) % length
+                    } else {
+                        (current + length - 1) % length
+                    };
+                    if next < app.agent_scroll {
+                        app.agent_scroll = next;
+                    }
+                    return Some(Action::Agent(app.snapshot.agents[next].id.clone()));
+                }
+                KeyCode::PageDown => app.scroll = app.scroll.saturating_add(10),
+                KeyCode::PageUp => app.scroll = app.scroll.saturating_sub(10),
+                KeyCode::Home => app.scroll = 0,
+                _ => {}
+            }
+        }
+        _ => {}
+    }
+    None
+}

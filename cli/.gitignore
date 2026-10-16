@@ -1,0 +1,40 @@
+/target
+**/target/
+/dist
+/.idea
+.DS_Store
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.p12
+*.pfx
+
+# Local devnet wallet keypairs
+output/devnet_harness/*/wallets/*.json
+
+# Secret-bearing and compiled program artifacts
+**/*keypair*.json
+**/*wallet*.json
+**/*.pem
+**/*.key
+**/*.so
+**/*.dylib
+**/*.dll
+**/*.rlib
+**/*.o
+
+# Generated output and local state
+/output/
+/logs/
+*.log
+*.bak
+*.orig
+*~
+__pycache__/
+/scripts/runtime-tools/node_modules/
+*.py[cod]
+
+# Throwaway localnet keys and settings (never commit)
+/.localnet/

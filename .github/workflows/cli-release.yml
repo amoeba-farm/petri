@@ -1,0 +1,434 @@
+name: CLI release
+
+# The signed petri release, adapted from the old repository's release.yml
+# ("Signed Petri candidate release", removed in 9f14b63c): a production build
+# for Linux x86_64 (tar.gz and SHA-256), macOS Apple silicon (Developer ID
+# signed, notarized and stapled) and Windows x64 (Authenticode signed), then a
+# draft GitHub Release. Nothing is published: the user reviews and publishes
+# the draft.
+#
+# Run it by hand on a vX.Y.Z tag (Actions > CLI release > Run workflow, "Use
+# workflow from" the tag). The tag must equal cli/Cargo.toml's version and be
+# on main.
+#
+# What the user supplies (ship/targets.md, "cli"):
+# - The release repository: the `release_repository` input, else the
+#   PETRI_RELEASE_REPOSITORY repository variable, else amoeba-farm/petri. The
+#   binary's updater is built for it, and cli/README.md must link it.
+# - For a release repository other than this one: a PETRI_RELEASE_TOKEN secret
+#   that may write releases there, and the same vX.Y.Z tag already pushed there
+#   (the public source mirror).
+# - The signing secrets (repository secrets, or secrets of the
+#   `public-release` environment): PETRI_MACOS_CERTIFICATE_P12_BASE64,
+#   PETRI_MACOS_CERTIFICATE_PASSWORD, PETRI_MACOS_SIGNING_IDENTITY,
+#   PETRI_MACOS_NOTARY_KEY_P8_BASE64, PETRI_MACOS_NOTARY_KEY_ID,
+#   PETRI_MACOS_NOTARY_ISSUER_ID, PETRI_WINDOWS_SIGNING_PFX_BASE64,
+#   PETRI_WINDOWS_SIGNING_PFX_PASSWORD, PETRI_WINDOWS_SIGNING_CERT_THUMBPRINT.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_repository:
+        description: 'Repository (owner/name) for the draft release. Empty: the PETRI_RELEASE_REPOSITORY variable, else amoeba-farm/petri'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cli-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_REPOSITORY: ${{ inputs.release_repository || vars.PETRI_RELEASE_REPOSITORY || 'amoeba-farm/petri' }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.release.outputs.commit }}
+      version: ${{ steps.release.outputs.version }}
+      repository: ${{ steps.release.outputs.repository }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          # History and tags, but only cli/'s blobs (a partial clone).
+          sparse-checkout: |
+            cli
+      - name: Require a vX.Y.Z tag that matches cli/Cargo.toml and is on main
+        id: release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PETRI_RELEASE_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then
+            echo "Run this workflow on a vX.Y.Z tag, not $GITHUB_REF." >&2
+            exit 1
+          fi
+          TAG="$GITHUB_REF_NAME"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "$TAG is not a vX.Y.Z tag." >&2
+            exit 1
+          fi
+          VERSION="$(sed -n '/^\[package\]/,/^\[/s/^version = "\([^"]*\)"/\1/p' cli/Cargo.toml | head -n 1)"
+          if [[ "$TAG" != "v$VERSION" ]]; then
+            echo "Tag $TAG does not match cli/Cargo.toml's version $VERSION." >&2
+            exit 1
+          fi
+          COMMIT="$(git rev-list -n 1 "$TAG")"
+          if ! git merge-base --is-ancestor "$COMMIT" origin/main; then
+            echo "$TAG ($COMMIT) is not on main." >&2
+            exit 1
+          fi
+          if [[ ! "$RELEASE_REPOSITORY" =~ ^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$ ]]; then
+            echo "The release repository must be owner/name, not $RELEASE_REPOSITORY." >&2
+            exit 1
+          fi
+          if ! grep -qF "https://github.com/$RELEASE_REPOSITORY/releases/" cli/README.md; then
+            echo "cli/README.md does not link $RELEASE_REPOSITORY's releases: update it and build.rs's DEFAULT_RELEASE_REPOSITORY first." >&2
+            exit 1
+          fi
+          if [[ "$RELEASE_REPOSITORY" != "$GITHUB_REPOSITORY" ]] &&
+             ! gh api "repos/$RELEASE_REPOSITORY/git/ref/tags/$TAG" > /dev/null; then
+            echo "$RELEASE_REPOSITORY has no tag $TAG: push the release's source there (the public mirror) first." >&2
+            exit 1
+          fi
+          if gh release view "$TAG" --repo "$RELEASE_REPOSITORY" > /dev/null 2>&1; then
+            echo "$RELEASE_REPOSITORY already has a release $TAG; refusing to replace it." >&2
+            exit 1
+          fi
+          {
+            echo "commit=$COMMIT"
+            echo "version=$VERSION"
+            echo "repository=$RELEASE_REPOSITORY"
+          } >> "$GITHUB_OUTPUT"
+
+  linux:
+    needs: validate
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ needs.validate.outputs.commit }}
+          persist-credentials: false
+          # cli/ and what it builds against: needs() in scripts/agent.sh.
+          sparse-checkout: |
+            cli
+            governance
+            sdk
+            futures
+            oracle
+      - name: Native build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libssl-dev libudev-dev pkg-config
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
+        with:
+          toolchain: 1.93.1
+      - name: Build the x86_64 release
+        working-directory: cli
+        shell: bash
+        env:
+          PETRI_RELEASE_REPOSITORY: ${{ needs.validate.outputs.repository }}
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = "x86_64"
+          export CARGO_ENCODED_RUSTFLAGS="--remap-path-prefix=$GITHUB_WORKSPACE=."
+          cargo build --locked --release --bin petri
+          target/release/petri --version
+          target/release/petri --help > /dev/null
+      - name: The release defaults to production and has no dev faucet
+        working-directory: cli
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/check-petri-defaults.mjs target/release/petri production
+          if grep -aqF /v1/faucet target/release/petri; then
+            echo "The release binary contains the dev faucet." >&2
+            exit 1
+          fi
+      - name: Package the tar.gz and its SHA-256
+        working-directory: cli
+        shell: bash
+        run: |
+          set -euo pipefail
+          PACKAGE_NAME="Petri-linux-x86_64"
+          PACKAGE_ROOT="dist/$PACKAGE_NAME"
+          install -d "$PACKAGE_ROOT"
+          install -m 755 target/release/petri "$PACKAGE_ROOT/petri"
+          install -m 644 README.md LICENSE THIRD_PARTY_NOTICES.md THIRD_PARTY_LICENSES.md "$PACKAGE_ROOT/"
+          test "$(find "$PACKAGE_ROOT" -maxdepth 1 -type f | wc -l | tr -d ' ')" = "5"
+          SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)"
+          tar --sort=name --owner=0 --group=0 --numeric-owner \
+            --mtime="@$SOURCE_DATE_EPOCH" --use-compress-program="gzip -n" \
+            -cf "dist/$PACKAGE_NAME.tar.gz" -C dist "$PACKAGE_NAME"
+          (
+            cd dist
+            sha256sum "$PACKAGE_NAME.tar.gz" > "$PACKAGE_NAME.tar.gz.sha256"
+          )
+      - name: Upload the Linux package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: petri-linux-x86_64
+          path: |
+            cli/dist/Petri-linux-x86_64.tar.gz
+            cli/dist/Petri-linux-x86_64.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  macos:
+    needs: validate
+    runs-on: macos-14
+    environment: public-release
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ needs.validate.outputs.commit }}
+          persist-credentials: false
+          sparse-checkout: |
+            cli
+            governance
+            sdk
+            futures
+            oracle
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
+        with:
+          toolchain: 1.93.1
+      - name: Import the release identity and notarization credentials
+        shell: bash
+        env:
+          PETRI_MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.PETRI_MACOS_CERTIFICATE_P12_BASE64 }}
+          PETRI_MACOS_CERTIFICATE_PASSWORD: ${{ secrets.PETRI_MACOS_CERTIFICATE_PASSWORD }}
+          PETRI_MACOS_NOTARY_KEY_P8_BASE64: ${{ secrets.PETRI_MACOS_NOTARY_KEY_P8_BASE64 }}
+          PETRI_MACOS_NOTARY_KEY_ID: ${{ secrets.PETRI_MACOS_NOTARY_KEY_ID }}
+          PETRI_MACOS_NOTARY_ISSUER_ID: ${{ secrets.PETRI_MACOS_NOTARY_ISSUER_ID }}
+          PETRI_MACOS_SIGNING_IDENTITY: ${{ secrets.PETRI_MACOS_SIGNING_IDENTITY }}
+        run: |
+          set -euo pipefail
+          : "${PETRI_MACOS_CERTIFICATE_P12_BASE64:?missing release secret}"
+          : "${PETRI_MACOS_CERTIFICATE_PASSWORD:?missing release secret}"
+          : "${PETRI_MACOS_NOTARY_KEY_P8_BASE64:?missing release secret}"
+          : "${PETRI_MACOS_NOTARY_KEY_ID:?missing release secret}"
+          : "${PETRI_MACOS_NOTARY_ISSUER_ID:?missing release secret}"
+          : "${PETRI_MACOS_SIGNING_IDENTITY:?missing release secret}"
+          CERTIFICATE_PATH="$RUNNER_TEMP/petri-release.p12"
+          NOTARY_KEY_PATH="$RUNNER_TEMP/AuthKey_${PETRI_MACOS_NOTARY_KEY_ID}.p8"
+          KEYCHAIN_PATH="$RUNNER_TEMP/petri-release.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 32)"
+          PROFILE="petri-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "::add-mask::$KEYCHAIN_PASSWORD"
+          printf '%s' "$PETRI_MACOS_CERTIFICATE_P12_BASE64" | base64 -D > "$CERTIFICATE_PATH"
+          printf '%s' "$PETRI_MACOS_NOTARY_KEY_P8_BASE64" | base64 -D > "$NOTARY_KEY_PATH"
+          chmod 600 "$CERTIFICATE_PATH" "$NOTARY_KEY_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" -k "$KEYCHAIN_PATH" \
+            -P "$PETRI_MACOS_CERTIFICATE_PASSWORD" -t cert -f pkcs12 \
+            -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+          security default-keychain -d user -s "$KEYCHAIN_PATH"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH" | \
+            grep -F "$PETRI_MACOS_SIGNING_IDENTITY" > /dev/null
+          xcrun notarytool store-credentials "$PROFILE" \
+            --key "$NOTARY_KEY_PATH" \
+            --key-id "$PETRI_MACOS_NOTARY_KEY_ID" \
+            --issuer "$PETRI_MACOS_NOTARY_ISSUER_ID"
+          echo "PETRI_MACOS_NOTARY_PROFILE=$PROFILE" >> "$GITHUB_ENV"
+          echo "PETRI_MACOS_KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
+      - name: Build, sign, notarize, staple and package Petri
+        working-directory: cli
+        shell: bash
+        env:
+          PETRI_MACOS_SIGNING_IDENTITY: ${{ secrets.PETRI_MACOS_SIGNING_IDENTITY }}
+          PETRI_RELEASE_REPOSITORY: ${{ needs.validate.outputs.repository }}
+        run: |
+          set -euo pipefail
+          ./scripts/package-petri-macos.sh
+          target/release/petri --version
+          target/release/petri --help > /dev/null
+      - name: The release defaults to production and has no dev faucet
+        working-directory: cli
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/check-petri-defaults.mjs target/release/petri production
+          if grep -aqF /v1/faucet target/release/petri; then
+            echo "The release binary contains the dev faucet." >&2
+            exit 1
+          fi
+      - name: Upload the notarized package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: petri-macos
+          path: |
+            cli/dist/Petri-macos-*.zip
+            cli/dist/Petri-macos-*.zip.sha256
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove the temporary signing credentials
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/petri-release.p12" "$RUNNER_TEMP"/AuthKey_*.p8
+          if [[ -n "${PETRI_MACOS_KEYCHAIN_PATH:-}" && -f "$PETRI_MACOS_KEYCHAIN_PATH" ]]; then
+            security delete-keychain "$PETRI_MACOS_KEYCHAIN_PATH"
+          fi
+
+  windows:
+    needs: validate
+    runs-on: windows-latest
+    environment: public-release
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ needs.validate.outputs.commit }}
+          persist-credentials: false
+          sparse-checkout: |
+            cli
+            governance
+            sdk
+            futures
+            oracle
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
+        with:
+          toolchain: 1.93.1
+      - name: Import the Authenticode certificate
+        shell: powershell
+        env:
+          PETRI_WINDOWS_SIGNING_PFX_BASE64: ${{ secrets.PETRI_WINDOWS_SIGNING_PFX_BASE64 }}
+          PETRI_WINDOWS_SIGNING_PFX_PASSWORD: ${{ secrets.PETRI_WINDOWS_SIGNING_PFX_PASSWORD }}
+          PETRI_WINDOWS_SIGNING_CERT_THUMBPRINT: ${{ secrets.PETRI_WINDOWS_SIGNING_CERT_THUMBPRINT }}
+        run: |
+          if (-not $env:PETRI_WINDOWS_SIGNING_PFX_BASE64 -or
+              -not $env:PETRI_WINDOWS_SIGNING_PFX_PASSWORD -or
+              -not $env:PETRI_WINDOWS_SIGNING_CERT_THUMBPRINT) {
+            throw "Missing Windows release signing secret."
+          }
+          $PfxPath = Join-Path $env:RUNNER_TEMP "petri-release.pfx"
+          try {
+            [System.IO.File]::WriteAllBytes(
+              $PfxPath,
+              [Convert]::FromBase64String($env:PETRI_WINDOWS_SIGNING_PFX_BASE64)
+            )
+            $Password = ConvertTo-SecureString $env:PETRI_WINDOWS_SIGNING_PFX_PASSWORD -AsPlainText -Force
+            $Imported = Import-PfxCertificate -FilePath $PfxPath -CertStoreLocation Cert:\CurrentUser\My -Password $Password
+            $Expected = ($env:PETRI_WINDOWS_SIGNING_CERT_THUMBPRINT -replace "\s", "").ToUpperInvariant()
+            $Certificate = $Imported | Where-Object {
+              $_.HasPrivateKey -and $_.Thumbprint.ToUpperInvariant() -eq $Expected
+            } | Select-Object -First 1
+            if (-not $Certificate) {
+              throw "The imported PFX does not contain the configured code-signing certificate."
+            }
+            "PETRI_WINDOWS_SIGNING_THUMBPRINT=$($Certificate.Thumbprint)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          } finally {
+            Remove-Item -LiteralPath $PfxPath -Force -ErrorAction SilentlyContinue
+          }
+      - name: Build, Authenticode-sign, verify and package Petri
+        working-directory: cli
+        shell: powershell
+        env:
+          PETRI_RELEASE_REPOSITORY: ${{ needs.validate.outputs.repository }}
+        run: |
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File scripts\package-petri-windows.ps1 -BuildOnly
+          if ($LASTEXITCODE -ne 0) { throw "Windows release build failed." }
+          $Certificate = Get-Item "Cert:\CurrentUser\My\$env:PETRI_WINDOWS_SIGNING_THUMBPRINT"
+          foreach ($ReleaseFile in @(
+            "target\release\petri.exe",
+            "scripts\install-petri.ps1",
+            "scripts\finish-petri-windows-update.ps1"
+          )) {
+            $Signature = Set-AuthenticodeSignature -FilePath $ReleaseFile -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com"
+            if ($Signature.Status -ne [System.Management.Automation.SignatureStatus]::Valid) {
+              throw "Authenticode signing failed for $ReleaseFile`: $($Signature.StatusMessage)"
+            }
+          }
+          & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File scripts\package-petri-windows.ps1 -SkipBuild
+          if ($LASTEXITCODE -ne 0) { throw "Windows release packaging failed." }
+          .\target\release\petri.exe --version
+          .\target\release\petri.exe --help | Out-Null
+      - name: The release defaults to production and has no dev faucet
+        working-directory: cli
+        shell: powershell
+        run: |
+          node scripts\check-petri-defaults.mjs target\release\petri.exe production
+          if ($LASTEXITCODE -ne 0) { throw "The release binary does not default to production." }
+          if (Select-String -LiteralPath "target\release\petri.exe" -Pattern "/v1/faucet" -SimpleMatch -Quiet) {
+            throw "The release binary contains the dev faucet."
+          }
+      - name: Upload the Authenticode-signed package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: petri-windows
+          path: |
+            cli/dist/Petri-windows-*.zip
+            cli/dist/Petri-windows-*.zip.sha256
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove the temporary signing certificate
+        if: always()
+        shell: powershell
+        run: |
+          if ($env:PETRI_WINDOWS_SIGNING_THUMBPRINT) {
+            Remove-Item "Cert:\CurrentUser\My\$env:PETRI_WINDOWS_SIGNING_THUMBPRINT" -Force -ErrorAction SilentlyContinue
+          }
+          Remove-Item (Join-Path $env:RUNNER_TEMP "petri-release.pfx") -Force -ErrorAction SilentlyContinue
+
+  release:
+    needs: [validate, linux, macos, windows]
+    runs-on: ubuntu-latest
+    environment: public-release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          sparse-checkout: |
+            cli
+      - name: Revalidate the tag before the release
+        shell: bash
+        env:
+          COMMIT: ${{ needs.validate.outputs.commit }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-list -n 1 "$GITHUB_REF_NAME")" = "$COMMIT"
+          git merge-base --is-ancestor "$COMMIT" origin/main
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: release-artifacts
+      - name: Check the packages against their SHA-256 files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t SUMS < <(find release-artifacts -type f -name '*.sha256' -print | LC_ALL=C sort)
+          test "${#SUMS[@]}" -eq 3
+          for sum in "${SUMS[@]}"; do
+            (cd "$(dirname "$sum")" && sha256sum --check --strict "$(basename "$sum")")
+          done
+      - name: Create a draft release with the signed packages and checksums
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PETRI_RELEASE_TOKEN || github.token }}
+          REPOSITORY: ${{ needs.validate.outputs.repository }}
+        run: |
+          set -euo pipefail
+          if gh release view "$GITHUB_REF_NAME" --repo "$REPOSITORY" > /dev/null 2>&1; then
+            echo "$REPOSITORY already has a release $GITHUB_REF_NAME; refusing to replace it." >&2
+            exit 1
+          fi
+          mapfile -t ASSETS < <(find release-artifacts -type f -print | LC_ALL=C sort)
+          test "${#ASSETS[@]}" -eq 6
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$REPOSITORY" \
+            --verify-tag \
+            --draft \
+            --title "Petri $GITHUB_REF_NAME" \
+            --generate-notes \
+            "${ASSETS[@]}"

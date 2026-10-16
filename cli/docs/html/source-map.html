@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Petri CLI Source Map</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b1416;
+        --panel: #102225;
+        --text: #e7f2ef;
+        --muted: #9fb5b1;
+        --line: #2b575b;
+        --accent: #d7b846;
+        --accent-2: #5fc4b8;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+
+      h1,
+      h2 {
+        line-height: 1.15;
+        margin: 0 0 12px;
+      }
+
+      h1 {
+        color: var(--accent);
+        font-size: 2rem;
+      }
+
+      h2 {
+        color: var(--accent-2);
+        font-size: 1.15rem;
+        margin-top: 28px;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--panel);
+        color: var(--accent);
+      }
+
+      code {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        padding: 0.1rem 0.3rem;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <p>Agent execution uses <a href="../../src/mcp_action_bridge.rs">resident typed Rust dispatch</a>
+    through <a href="../../scripts/petri-action-bridge.mjs">the bounded MCP transport</a>.
+    <a href="../../scripts/check-petri-action-bridge.mjs">Transport checks</a> cover process reuse and uncertain outcomes.
+    Futures trades are never MCP actions; agents read futures data and call the read-only quote.</p>
+    <main>
+      <h1>Petri CLI Source Map</h1>
+      <p class="muted">
+        Ownership map for the Rust CLI/TUI. Use this before splitting work
+        across agents or worktrees.
+      </p>
+
+      <h2>Modules</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Path</th>
+            <th>Owns</th>
+            <th>Change Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="../../src/cli.rs">src/cli.rs</a></td>
+            <td>Public command grammar, global flags, help text.</td>
+            <td>Keep user-facing commands aligned with the web product and <a href="../petri-public-cli-user-theory-of-mind.md">public CLI theory of mind</a>.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/main.rs">src/main.rs</a></td>
+            <td>Command dispatch, plain/JSON output, the front door and help sheet, and <code>config show</code>.</td>
+            <td>Route market and trading commands through <code>futures::run</code> into <code>futures::reads</code> and <code>futures::trade</code>, and oracle commands through <code>oracle::run</code>; no business logic here.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/futures/mod.rs">src/futures/mod.rs</a></td>
+            <td>Futures, the product the site trades: the trusted futures program, market resolution by symbol, name or address, loading a market account from chain and checking it (owner, USDC mint, oracle program), the owner's funds, order evaluation against the book (fill, netting, deposit needed), the submit plan, and money helpers.</td>
+            <td>A market account must belong to the deployment's futures program, settle in its USDC and read its oracle. Orders are solved with the futures client crate's proposer; a stale proposal is solved again once.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/futures/api.rs">src/futures/api.rs</a></td>
+            <td>The futures API client: <code>/v1/config</code>, sponsored prepare and submit, the faucet, and the views of <code>/v1/markets</code> (markets, one market, depth, trades, candles, index), <code>/v1/quote</code> and <code>/v1/accounts</code> (an owner's account and history).</td>
+            <td>Atom amounts are strings; <code>*Value</code> fields are index values. API data is never trusted for what gets signed.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/futures/shape.rs">src/futures/shape.rs</a></td>
+            <td>Range, leverage and limit math ported from the web ticket: <code>--range</code> parsing, leverage to the losing-side end, the suggested range or <code>--to</code> for the winning side, premiums, slippage limits, and lots for a <code>--usd</code> budget.</td>
+            <td>Keep it equal to <code>web/src/lib/futures/market.ts</code> so the CLI and the site send the same order for the same inputs.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/futures/reads.rs">src/futures/reads.rs</a></td>
+            <td><code>markets</code>, <code>market</code>, <code>book</code>, <code>trades</code>, <code>chart</code>, <code>positions</code>, <code>history</code> and <code>wallet</code>.</td>
+            <td>Reads need no wallet; owner reads take an address.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/futures/trade.rs">src/futures/trade.rs</a></td>
+            <td><code>quote</code>, <code>long</code>, <code>short</code>, <code>close</code>, <code>cancel</code>, <code>deposit</code> and <code>withdraw</code>, and the local and sponsored send of each. Orders, closes and cancels have a prepare step (<code>prepare_open</code>, <code>prepare_close</code>, <code>prepare_cancel</code>: priced and reviewed) and a send step (<code>send_open</code>, <code>send_close</code>, <code>send_cancel</code>) that the commands and the TUI's Markets view share.</td>
+            <td>Quote first and confirm unless <code>--yes</code>. A market order sends at most the quoted fill with the <code>--slippage</code> limit; <code>auto</code> picks local at 0.01 SOL or more.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/futures/check.rs">src/futures/check.rs</a></td>
+            <td>The sponsored-transaction check: sponsor as fee payer, only the compute budget, the owner's own USDC account creation and the trusted futures program, this market only, the owner's own token account, exactly the requested order, and a deposit bounded by what the order can need.</td>
+            <td>Runs before the owner signs any sponsor-prepared futures transaction; tests tamper with each field.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/futures/">src/futures/</a> (shared)</td>
+            <td><code>ctx</code> (per-command context), <code>settings</code> (flag, config file, then the profile's defaults: <code>production</code>, a release build's default, or <code>dev</code>, the default of a <code>dev-chain</code> build), <code>market</code> (the trusted deployment, held to the production ids in the production profile, and name resolution), <code>rpc</code>, <code>api</code> (above), <code>txbuild</code> (named plans, the compute budget, the owner's USDC account), <code>exec</code> (local and sponsored sending, confirmation), <code>governance</code> (controller gate epochs for each governed target), <code>error</code> (futures, governance and token error names and hints), <code>view</code>, <code>units</code>, <code>ops</code> (<code>wallet new</code>, <code>wallet address</code>, <code>status</code>), <code>funds</code> (the faucet, <code>dev-faucet</code> builds only).</td>
+            <td>Every signing path goes through <code>exec</code>, which calls the identity gate and binds governance gates first.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/oracle/mod.rs">src/oracle/mod.rs</a></td>
+            <td>The index oracle: <code>args</code> grammar, <code>reads</code> (futures API oracle documents and candidates), <code>chain</code> (periods, months, sources, ledgers read and checked from chain), <code>skus</code> (governed SKU sets and Merkle proofs), <code>send</code> (identity, the oracle's own governance gate, review, simulate, sign, send), <code>writes</code> (one handler per instruction), <code>council</code> (emergency council cases), <code>claims</code> (private update-claim reveal material), <code>errors</code> (oracle error names).</td>
+            <td>Build instructions only with <code>ameba_oracle::instruction</code> builders against the deployment's oracle id. Decode every account through <code>chain::decode</code> and check its canonical address and parent. <code>council</code> reads current council rosters, case commitments and round ballots before building a council decision.</td>
+          </tr>
+          <tr>
+            <td><a href="../../../oracle/governance/">../oracle/governance/</a></td>
+            <td>The governed RAMX and NANDX product SKU manifests, compiled in from the monorepo's oracle.</td>
+            <td>Tests pin their roots to the oracle program's; they change only with the oracle.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/chain_identity.rs">src/chain_identity.rs</a></td>
+            <td>Deployment identity gate: genesis, deployed oracle and futures programs, oracle config and bond mint.</td>
+            <td>Every signing path calls it before loading a signer. Cached once per process.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/endpoints.rs">src/endpoints.rs</a></td>
+            <td>The futures API's oracle routes and query encoding.</td>
+            <td>Futures routes live in <code>src/futures/api.rs</code>.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/backend.rs">src/backend.rs</a></td>
+            <td>Terminal-safe text and JSON output.</td>
+            <td>Every printed field passes through it.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/wallet_signer.rs">src/wallet_signer.rs, src/onchain.rs, src/solana_config.rs</a></td>
+            <td>Keypair and hardware-wallet loading, file-permission checks, Solana CLI config.</td>
+            <td>Never print keypair contents; MCP processes cannot sign.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/chart.rs">src/chart.rs</a></td>
+            <td>Terminal chart rendering: candle closes as an ASCII plot with volume.</td>
+            <td><code>futures::reads::chart</code> fetches the candles.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/research/mod.rs">src/research/mod.rs</a></td>
+            <td>Terminal UI: the Markets view and the oracle research tabs Connect, Activity, Evidence and Rewards.</td>
+            <td>Rendering stays free of network and storage effects.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/research/markets.rs">src/research/markets.rs</a></td>
+            <td>TUI Markets view: the market list, the book of the suggested range (as <code>petri book</code>), trades, the index and price, the account's positions and orders, and long, short, close and cancel tickets.</td>
+            <td>Owns no trading logic: tickets call <code>futures::trade</code>'s prepare and send steps, quote before <code>y</code> sends, and use the CLI's 2% slippage default. The leverage keys step through the site's leverages that fit the market's price.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/research/runtime.rs">src/research/runtime.rs and research/</a></td>
+            <td>Embedded Node 24 research service and CLI; private bootstrap pipe.</td>
+            <td>Passes the futures API as the candidate store and oracle read endpoint. Private state stays outside application code.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/research/updates.rs">src/research/updates.rs</a></td>
+            <td>Automatic preview updates at startup and every six hours.</td>
+            <td>Wait for 30 idle seconds with no open form or request.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/release_update/">src/release_update/</a></td>
+            <td>Preview release validation, bounded extraction, staging, replacement and recovery.</td>
+            <td>Never execute downloaded scripts or touch wallets, config or agent registration.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/workspace_update.rs">src/workspace_update.rs</a></td>
+            <td>Source-checkout updater.</td>
+            <td>Fast-forward only to an explicitly trusted commit.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/agent_protocol.rs">src/agent_protocol.rs</a></td>
+            <td>MCP/agent manifest.</td>
+            <td>Lists the same tool names as the stdio server.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/mcp_actions.rs">src/mcp_actions.rs, src/mcp_action_bridge.rs</a></td>
+            <td>Resident <code>wallet.address</code> action and the MCP signer boundary.</td>
+            <td>No action signs or sends.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/mcp_setup.rs">src/mcp_setup.rs</a></td>
+            <td>Owned user-level MCP status, enable, repair, disable.</td>
+            <td>Preserve unrelated settings; refuse an unowned <code>petri</code> entry.</td>
+          </tr>
+          <tr>
+            <td><a href="../../scripts/petri-mcp-server.mjs">scripts/petri-mcp-server.mjs</a></td>
+            <td>MCP stdio wrapper over <code>petri --json</code> reads.</td>
+            <td>Reject undeclared and flag-like arguments; strip signer and provider environment.</td>
+          </tr>
+          <tr>
+            <td><a href="../../scripts/petri-launcher.mjs">scripts/petri-launcher.mjs</a></td>
+            <td>Repo-local delegation to the Rust binary and installation/update work.</td>
+            <td>Implements no product command.</td>
+          </tr>
+          <tr>
+            <td><code>scripts/package-petri-*.{ps1,sh}, scripts/package-petri-preview.mjs</code></td>
+            <td>Release and preview packaging.</td>
+            <td>Signed installers remain separate.</td>
+          </tr>
+          <tr>
+            <td><a href="../../scripts/generate-third-party-licenses.mjs">scripts/generate-third-party-licenses.mjs</a></td>
+            <td>The lockfile-bound license corpus.</td>
+            <td>First-party Amoeba crates are listed without a third-party license.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Research Workspace Boundaries</h2>
+      <ul>
+        <li><code>main</code> dispatches <code>tui</code> and <code>research</code> first. The Markets view builds its own futures context from the shared <code>src/futures/</code> code.</li>
+        <li><code>src/research/</code> owns the terminal session and layout; UI code reads state and emits intent, and its worker performs authenticated local HTTP requests.</li>
+        <li><code>research/service/</code> owns private local research state. The futures API's candidate store is the authority for submitted candidates.</li>
+      </ul>
+
+      <h2>External Contracts</h2>
+      <ul>
+        <li>The futures API (<code>--api</code>, contract in <code>../api/API.md</code>) serves the market views under <code>/v1/markets</code>, <code>/v1/quote</code> and <code>/v1/accounts</code> (markets, depth, trades, candles, quotes, accounts and history), sponsored preparation and submission, the dev faucet, the oracle documents <code>/v1/oracle/public-snapshot</code> and <code>/v1/oracle/catalog</code>, and the candidate store at <code>/oracle/agents</code> and <code>/oracle/source-candidates</code>.</li>
+        <li>The Solana RPC (<code>--rpc</code>) serves account reads, simulation and sending.</li>
+        <li>Program ids come from the trusted deployment (<code>--deployment</code> manifest, else the API's <code>/v1/config</code>).</li>
+        <li>Futures instructions come from the futures client crate (<code>ameba_sdk_futures::futures</code>); oracle instructions, PDAs and layouts from the <code>ameba_oracle</code> crate of the monorepo (<code>../oracle</code>, a path dependency in <code>Cargo.toml</code>).</li>
+        <li>One-click MCP setup owns only marked <code>petri</code> entries in <code>${CODEX_HOME:-$HOME/.codex}/config.toml</code> and <code>$HOME/.claude.json</code>, and installs no boot daemon.</li>
+      </ul>
+
+      <h2>Validation</h2>
+      <p>
+        Futures tests check order shapes, limits and budgets against the web ticket, parse the
+        documented API views, and tamper with every field of a sponsored transaction to prove the
+        check refuses it. Oracle tests pin the governed SKU roots, check Merkle proofs against the
+        program's verification, error names against the crate's variants, evidence commitments
+        against the program and the candidate store, and the grammar of every command. MCP checks
+        cover the tool list, schemas, refusals and the read-only boundary.
+      </p>
+      <p>
+        Run <a href="../../scripts/devloop.sh">scripts/devloop.sh</a> before handing off code. Run
+        <a href="../../scripts/check-petri-launcher.mjs">scripts/check-petri-launcher.mjs</a>
+        and <a href="../../scripts/check-petri-packaging.mjs">scripts/check-petri-packaging.mjs</a>
+        when changing launcher or app packaging, and
+        <a href="../../scripts/check-petri-mcp-server.mjs">scripts/check-petri-mcp-server.mjs</a>
+        when changing the MCP wrapper or manifest. For visible TUI changes, also run the native
+        Windows ConPTY harness or the documented Unix PTY smoke. Live checks against the dev
+        localnet are described in <a href="../localnet-dev.md">localnet-dev.md</a>.
+      </p>
+
+      <p><a href="index.html">Back to index</a></p>
+      <p><code>src/futures/governance.rs</code> authenticates controller gates, binds signed epochs for local transactions, and checks sponsored gate accounts and epochs before the action check.</p>
+    </main>
+  </body>
+</html>

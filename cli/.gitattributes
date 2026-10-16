@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.icns binary
+*.ico binary
+*.png binary
+*.zip binary
+*.zlib binary
+
+# The generator canonicalizes upstream UTF-8 legal text to LF before hashing.
+THIRD_PARTY_LICENSES.md text eol=lf

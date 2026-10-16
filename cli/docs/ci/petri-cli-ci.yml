@@ -1,0 +1,50 @@
+name: petri-cli-ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_BUILD_JOBS: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  devloop:
+    name: format-check-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out ameba_cli
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.14.0'
+
+      - name: Install Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libssl-dev libudev-dev pkg-config
+
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run petri devloop
+        run: scripts/devloop.sh
+
+      - name: Run standalone Node checks
+        run: |
+          node scripts/check-petri-launcher.mjs
+          node scripts/check-petri-packaging.mjs
+          node scripts/check-petri-mcp-server.mjs
+          node scripts/check-bundled-gitbook.mjs

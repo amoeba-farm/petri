@@ -31,4 +31,4 @@ fi
 ln -sfn "$binary" "$HOME/.local/bin/petri"
 "$HOME/.local/bin/petri" --version
 echo 'Petri installed. Run ~/.local/bin/petri, or add ~/.local/bin to PATH.'
-echo 'This Devnet preview is not publisher-signed or notarized. macOS users may need Privacy & Security > Open Anyway for Petri Preview.app.'
+echo 'This preview is not publisher-signed or notarized. macOS users may need Privacy & Security > Open Anyway for Petri Preview.app.'
