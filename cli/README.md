@@ -20,8 +20,9 @@ The executable is `petri`; Amoeba remains the company and product name.
 > A release build of this source talks to Amoeba's production deployment on
 > Solana mainnet-beta (`https://api.amoeba.farm`); the dev build and
 > `--profile dev` talk to the dev localnet (see [Configuration](#configuration)).
-> Releases from v0.1.10 run this code. The earlier "Devnet preview" downloads
-> (v0.1.9 and before) talk to a retired deployment: replace them.
+> Releases from v0.1.11 run this code. The earlier "Devnet preview" downloads
+> (v0.1.9 and before) talk to a retired deployment: update them
+> (`petri update`) or download again.
 
 ## Download Petri
 
@@ -31,7 +32,9 @@ Download and extract the package for your computer:
 | --- | --- | --- |
 | Windows 10/11 x64 | [Petri for Windows](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-windows-x64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-windows-x64.zip.sha256) |
 | macOS 14+ Apple silicon | [Petri for Mac](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-arm64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-arm64.zip.sha256) |
-| Linux x86_64 | [Petri for Linux](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-linux-x86_64.tar.gz) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-linux-x86_64.tar.gz.sha256) |
+| macOS 14+ Intel | [Petri for Intel Mac](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-x86_64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-x86_64.zip.sha256) |
+
+On Linux, [install from source](#install-from-source).
 
 Open `Petri.cmd` on Windows or `Petri.app` on macOS. Petri opens in a terminal.
 From an existing terminal, use `petri tui` for the interface or `petri --help` for commands.
@@ -41,12 +44,12 @@ Windows requires Microsoft's [Visual C++ v14 x64 runtime](https://aka.ms/vc14/vc
 Install it first if it is not already installed, especially if Windows reports
 `VCRUNTIME140.dll` missing. This prerequisite is supplied by Microsoft, not bundled in the ZIP.
 
-Release packages from v0.1.10 are signed: the macOS app with a Developer ID
-and notarized by Apple, the Windows build with Authenticode. Verify the SHA-256
-anyway. On Windows, compare `Get-FileHash .\Petri-windows-x64.zip -Algorithm SHA256`
-with the downloaded checksum; on macOS run `shasum -a 256 -c Petri-macos-arm64.zip.sha256`.
-The earlier preview packages, and a binary you build from source, are not
-publisher-signed or Apple-notarized.
+Preview packages are **not publisher-signed or Apple-notarized**. Verify
+the ZIP's SHA-256 before opening it. macOS may require **System Settings → Privacy
+& Security → Open Anyway** for this specific app. Do not disable system security
+globally. On Windows, compare `Get-FileHash .\Petri-windows-x64.zip -Algorithm SHA256`
+with the downloaded checksum; on macOS run `shasum -a 256 -c Petri-macos-arm64.zip.sha256`
+(substitute `x86_64` for Intel).
 
 ## Install the CLI
 
@@ -313,8 +316,16 @@ cargo build --release --locked --bin petri
 ./target/release/petri --version
 ```
 
+Published downloads come from the **Preview binaries** workflow
+(`.github/workflows/cli-preview.yml`), run by hand in `amoeba-farm/petri` on a
+`vX.Y.Z` tag at its `main` that matches `Cargo.toml`: unsigned preview packages
+for Windows x64 and macOS (Apple silicon and Intel) built with
+`PETRI_UPDATE_CHANNEL=preview`, so installed previews update themselves, on
+GitHub's free runners for public repositories.
+
 The signed release workflow (`.github/workflows/cli-release.yml` in the
-monorepo, run by hand on a `vX.Y.Z` tag that matches `Cargo.toml`) builds the
+monorepo, run by hand on a `vX.Y.Z` tag that matches `Cargo.toml`; it needs
+Apple and Windows signing certificates) builds the
 production binary for Linux x86_64 (tar.gz and SHA-256), Apple silicon macOS
 (Developer ID signed, notarized and stapled) and Windows x64 (Authenticode
 signed), checks that it defaults to production without the dev faucet, and

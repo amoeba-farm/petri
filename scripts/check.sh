@@ -308,6 +308,10 @@ check_cli() {
   run env CARGO_BUILD_JOBS="$JOBS" ${CARGO_TARGET_DIR:+PETRI_MCP_PETRI_BIN="$CARGO_TARGET_DIR/debug/petri"} scripts/devloop.sh
   # devloop's petri has a release build's features: no dev faucet.
   no_faucet "${CARGO_TARGET_DIR:-$PWD/target}/debug/petri"
+  # The license corpus the release packages ship must match Cargo.lock (the
+  # public mirror's CI checks it too; a stale one failed it on 2026-10-17).
+  run cargo fetch --locked
+  run node scripts/generate-third-party-licenses.mjs --check
 }
 
 check_web() {

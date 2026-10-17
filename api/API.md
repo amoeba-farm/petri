@@ -921,9 +921,10 @@ Response:
 * `legs` counts the resting orders and the ladder step sides the package
   fills.
 * With `owner`: `free` is their free cash in the market; `redeemed` the sets
-  the fill releases by netting against their unreserved exact complements
-  (the `close` claim included); `netPay = pay - redeemed`, what their cash
-  actually changes by; `escrow` what a resting remainder (`gtc`/`post`)
+  the fill releases by netting against their opposite claims' unreserved
+  lots wherever the intervals overlap (exact complements, the `close` claim
+  included, first; `futures/docs/futures.md`, "Overlap redemption");
+  `netPay = pay - redeemed`, what their cash actually changes by; `escrow` what a resting remainder (`gtc`/`post`)
   reserves at `limit`; `deposit` what `submit` would deposit from the
   ATA (`max(0, pay - redeemed + escrow - free)`). **[added]** When
   `deposit` exceeds `usdc`: `compressedUsdc` is the owner's compressed USDC

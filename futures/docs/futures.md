@@ -176,15 +176,21 @@ backing.
 - **Opening:** a long pays its premium. A short funds the rest of the set,
   `(hi - lo) * k - premium`. A resting order escrows exactly what it would put
   in at its own price. A ladder escrows `bid` per bid lot and `k - ask` per ask
-  lot.
-- **Exact-complement redemption:** whenever an owner holds a long and a short
-  claim on the *same absolute interval*, the matched lots are redeemed for
-  their backing into free cash. This happens at fill time for the owner's own
-  exact complements, or explicitly with `Redeem`. Shifted or different-width
-  intervals are not complements and release nothing (`c6`). `Split` (exact:
-  `R[a,c) = R[a,b) + R[b,c)`) followed by `Redeem` releases precisely an exact
-  overlap. A ladder's inventory is per step, so its one-step claims net per
-  step.
+  lot, except the lots its inventory backs (below, "The maker").
+- **Overlap redemption (2026-10-17):** a fresh claim nets against its owner's
+  opposite claims wherever their intervals overlap (`state::plan_net`):
+  exact complements first, then the others in slot order. Both claims give
+  up the matched lots; the parts outside the overlap stay as claims of those
+  lots (`Split`: `R[a,c) = R[a,b) + R[b,c)`, the cost basis split by
+  width), and the overlap's sets are redeemed into free cash at once. A long
+  90-110 and a short 100-120 become a long 90-100 and a short 110-120 plus
+  the 100-110 sets in cash; the owner's payoff is the same at every
+  settlement (`c6`, `c9`). It happens at fill time (taker, resting order,
+  transfer). Reserved lots (a resting close order's) stay out. It is best
+  effort: a match whose parts find no free claim slot, and every match after
+  it, is left as it was, and the fill trades all the same (`c10`).
+  `Redeem` still redeems an exact pair explicitly. A ladder's inventory is
+  per step, so its one-step claims net per step.
 - **Sell an existing claim:** submit the opposite side on the same interval
   naming the claim. If it rests, it reserves the claim, not cash. When filled,
   the new opposite claim and the old one redeem, and the seller's free cash
@@ -212,6 +218,22 @@ piece it sold and later buys back nets per step and releases the set (`b1`
 +$0.10, `b2` −$0.50: the handoff's section 9 numbers). Unoffset inventory stays
 funded through settlement at any outcome (`b3`). When the maker is exhausted
 or absent, peer-to-peer packages still trade (`c1`).
+
+**Inventory backs its quotes (2026-10-17).** A step's first ask lots to fill
+(best tier first), as many as it holds long, sell that inventory: a fill
+nets it, the redeemed set pays the ask's `k - ask` share, and the maker keeps
+the premium, as a close order pays from the claim it reserves. So those lots
+need no escrow; likewise its first bid lots, as many as it holds short
+(`Maker::step_escrow`). `Quote` reserves that, summed over its steps. A fill
+pays its escrowed lots' share from the escrow and its inventory-backed lots'
+from the sets they redeem; what else it frees (inventory that now backs the
+step's other side) stays reserved until the next quote, so the escrow never
+falls short of what the steps need, and a fill costs no more compute than
+before (the grid-wide sweep of `wide` still fits). Admission stays
+balance-based: every lot is either escrowed or backed by inventory the maker
+owns. More inventory, more depth for
+the same cash (`b4`, `b5`). `futures-maker` sizes its ladder by this exact
+escrow (`Book::ladder_escrow`), not a full step per lot.
 
 **Ladder shape.** `Quote` takes a core `[core_lo, core_hi)` inside the
 ladder. Core steps quote every depth tier. The ladder's other steps quote only
@@ -528,7 +550,8 @@ Running services:
 | Maker recycling at +$0.10 / −$0.50, unoffset settlement | live: the maker's per-step netting in production | `b1`, `b2`, `b3` | |
 | Sell a claim, withdraw proceeds at once | receipt (sale $250, withdrew $2,150) | `r7` | |
 | Buy the complement and redeem | receipt (released $1,050) | `r8` | |
-| Cancel; shifted redemption rejected | receipt (`NotComplement`) | `c6`, `c7` | |
+| Cancel; shifted intervals net their overlap (since 2026-10-17) | | `c6`, `c7`, `c9`, `c10` | |
+| Inventory-backed ladder quotes (since 2026-10-17) | | `b4`, `b5` | |
 | FIFO across direct and composite routes, maker priority | | `r1`, `r2`, `r6` | brute force (every feasible package) |
 | Full search, non-greedy, capacity errors, worst-case CU | | `r4`, `r5`, `r14` | brute force |
 | Budget exhaustion, one-sided flow, realized loss | | `c1`, `c2`, `r10` | |

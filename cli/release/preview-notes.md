@@ -1,12 +1,10 @@
-# Petri v0.1.10 release preparation
+# Petri v0.1.11 — preview
 
-This candidate prepares capped futures, the standalone index oracle and the
-integrated Oracle research workspace on Amoeba's production deployment
-(mainnet-beta, `https://api.amoeba.farm`); `--profile dev` reaches the dev
-localnet. It has not been published, installed, or deployed.
-
-The qualification report lists checks actually completed for this source and
-artifact. The older release evidence below applies to its recorded inputs.
+Petri now trades Amoeba's capped futures on Solana mainnet-beta
+(`https://api.amoeba.farm`) and reads the standalone index oracle and its
+research workspace; `--profile dev` reaches the dev localnet. It replaces the
+v0.1.x "Devnet preview" builds, which talk to a retired deployment: run
+`petri update` in an installed preview, or download again below.
 
 ## Capped futures
 
@@ -23,21 +21,9 @@ artifact. The older release evidence below applies to its recorded inputs.
 - `petri oracle` reads the oracle's months, sources, catalog and research candidates from the futures API.
 - Oracle writes (collateral, evidence, source proposals and supports, opening prints, Game updates, escrow settlement, council disputes) are built with the oracle program's own crate, reviewed and signed by your wallet; `--simulate` runs them without signing.
 
-## Retained source changes from v0.1.9
+## Also retained
 
-- Windows updates requested with `--restart`, including the TUI's `U` flow, now reopen Petri in a fresh interactive console instead of inheriting the hidden updater's non-terminal handles and immediately closing.
-
-## Updated in v0.1.8
-
-- Shared internal TUI cache and modularized feature state, preserving the existing user-facing content and commands.
-- Retains the v0.1.5 chart-volume and Oracle reward selection fixes below.
-
-Critical Rust regressions passed for these source changes. Platform builds also run startup, configuration, runtime, and package checks. This is not a new full-suite or live-trading qualification. Existing v0.1.4 and later users can install this release with `petri update --restart`.
-
-## Retained fixes from v0.1.5
-
-- Missing chart volume displays as `n/a`, not zero.
-- Oracle reward forms retain the selected reward's source, claim ID, and reward type. Fields render on separate readable lines; incomplete or unsupported reward identities are rejected.
+- Windows updates requested with `--restart`, including the TUI's `U` flow, reopen Petri in a fresh interactive console (the v0.1.9 fix).
 
 ## Download and update
 
@@ -55,6 +41,6 @@ After installing this release, use `petri update check` to check for newer versi
 
 Preview updates trust the official GitHub repository over HTTPS and require matching SHA-256 digests and package identity. They are not publisher-authenticated; signed installers remain separate. Existing v0.1.3 installations need one manual download/install to obtain the new updater.
 
-These are preview packages; check `petri status` for the deployment identity before use. Unfinished features fail closed. This release includes build/startup/package checks, not a new comprehensive trading qualification.
+These are preview packages; check `petri status` for the deployment identity before use. Unfinished features fail closed. Before release, Petri's checks ran in full and its trades, including ones spending compressed USDC, were exercised against Amoeba's dev deployment; these packages are built and checked for startup on GitHub's runners.
 
 See the [README](https://github.com/amoeba-farm/petri#readme) for CLI installation and usage.

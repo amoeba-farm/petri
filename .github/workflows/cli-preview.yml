@@ -1,0 +1,126 @@
+name: Preview binaries
+
+# petri's published downloads: unsigned preview packages for Windows x64 and
+# macOS (Apple silicon and Intel), built with PETRI_UPDATE_CHANNEL=preview so
+# installed previews update themselves. Restored from the public repository's
+# preview-release.yml (removed in amoeba-farm/petri db652da) for the monorepo
+# layout, without the retired bundled SDK runtime. It runs only in the public
+# mirror amoeba-farm/petri (ship/export-public-source.sh mirrors this file),
+# on GitHub's free runners for public repositories: no secrets, no billing.
+# The user chose this over the signed cli-release.yml on 2026-10-17
+# (ship/releases/2026-10-17-petri-preview.md).
+#
+# Run it by hand in amoeba-farm/petri from main with the release tag, which
+# must point at main's head and equal cli/Cargo.toml's version.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag on the current public main commit (vX.Y.Z, cli/Cargo.toml's version)
+        type: string
+        required: true
+      publish:
+        description: Publish after building (disable to qualify artifacts first)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'amoeba-farm/petri' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-14, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: cli
+    env:
+      CARGO_BUILD_JOBS: '3'
+      PETRI_UPDATE_CHANNEL: preview
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.22.1'
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
+        with:
+          toolchain: '1.93.1'
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        id: build-cache
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            cli/target/release
+          key: petri-preview-${{ matrix.os }}-${{ hashFiles('cli/Cargo.lock') }}
+          restore-keys: petri-preview-${{ matrix.os }}-
+      - name: Build release and check startup
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_ENCODED_RUSTFLAGS="--remap-path-prefix=$GITHUB_WORKSPACE=."$'\x1f'"--remap-path-prefix=$HOME=<home>"
+          if [[ "$RUNNER_OS" == macOS ]]; then export CARGO_PROFILE_RELEASE_LTO=false; fi
+          cargo build --release --locked --bin petri -j3
+          target/release/petri --version
+          target/release/petri --help
+          export PETRI_CONFIG_PATH="$RUNNER_TEMP/petri-launch-smoke/config.json"
+          target/release/petri --json config show
+          node scripts/check-petri-defaults.mjs target/release/petri production
+      - name: Package explicit unsigned preview
+        run: node scripts/package-petri-preview.mjs
+      - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        if: always() && steps.build-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            cli/target/release
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ matrix.os }}
+          path: |
+            cli/dist/*.zip
+            cli/dist/*.sha256
+          if-no-files-found: error
+          compression-level: 0
+
+  publish:
+    if: inputs.publish
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Publish preview downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RELEASE_TAG" = "v$(sed -n '/^\[package\]/,/^\[/s/^version = "\([^"]*\)"/\1/p' cli/Cargo.toml | head -1)"
+          test "$(git rev-list -n 1 "$RELEASE_TAG")" = "$GITHUB_SHA"
+          test "$(gh api repos/amoeba-farm/petri/git/ref/heads/main --jq .object.sha)" = "$GITHUB_SHA"
+          test "$(find artifacts -maxdepth 1 -type f | wc -l)" -eq 6
+          (cd artifacts; sha256sum -c ./*.sha256)
+          gh release create "$RELEASE_TAG" artifacts/* --verify-tag --latest --title "Petri $RELEASE_TAG — preview" --notes-file cli/release/preview-notes.md
