@@ -1393,7 +1393,11 @@ fn checked_private_temp_name(
     let opened = file.metadata().map_err(|error| {
         format!("failed to inspect opened temporary Petri configuration: {error}")
     })?;
-    if named.st_dev != opened.dev()
+    // `dev_t` is `i32` on macOS and `u64` on Linux; std's `MetadataExt::dev`
+    // widens it with the same `as u64`.
+    #[allow(clippy::unnecessary_cast)]
+    let named_dev = named.st_dev as u64;
+    if named_dev != opened.dev()
         || named.st_ino != opened.ino()
         || named.st_mode & libc::S_IFMT != libc::S_IFREG
     {

@@ -6,6 +6,7 @@ use solana_program::{hash::hash, pubkey, pubkey::Pubkey};
 pub const VERIFY_PROGRAM: Pubkey = pubkey!("verifycLy8mB96wd9wqq3WDXQwM4oU6r42Th37Db9fC");
 pub const BUILD_IMAGE: &str = "solanafoundation/solana-verifiable-build@sha256:0b4e3716fad9ca4b4aac3e3f977f43aad93a18c22296c0c0f44fc22e644bdd68";
 pub const MAINNET_TARGET_BUILD_IMAGE: &str = "us-central1-docker.pkg.dev/amoeba-hm0q2k/solana-verifiable-builds/gate-final@sha256:7ad1e567f19831e658f5b892a7269d23d7f1826438e025b5d9d2e385240a4d67";
+pub const MAINNET_FUTURES_BUILD_IMAGE: &str = "us-central1-docker.pkg.dev/amoeba-hm0q2k/solana-verifiable-builds/amba-release@sha256:36bdcd0005a5a41f9eba76add58f16fccdc7a2b7b2fbace1be3aaba8cda7b40e";
 pub const INITIALIZE: [u8; 8] = [175, 175, 109, 31, 13, 152, 155, 237];
 pub const UPDATE: [u8; 8] = [219, 200, 88, 176, 158, 63, 253, 127];
 pub const MAINNET_ORACLE: Pubkey = pubkey!("45YCerssGjg2M29RFc9D4fAJh7dfFpMJ3ZcZtaTnRXRS");
@@ -44,6 +45,11 @@ impl VerificationPolicy {
         require(self.target == DEVNET_SPREAD, Error::InvalidAccount)?;
         self.params_for(controller, true)
     }
+    /// Authenticate only the exact release-5 Futures recipe already stored on chain.
+    pub(crate) fn previous_futures_params(&self, controller: &Pubkey) -> Result<Vec<u8>> {
+        require(self.target == MAINNET_FUTURES, Error::InvalidAccount)?;
+        self.params_for(controller, true)
+    }
     fn params_for(&self, controller: &Pubkey, previous: bool) -> Result<Vec<u8>> {
         self.validate()?;
         let own = self.target == *controller;
@@ -51,7 +57,7 @@ impl VerificationPolicy {
         let oracle = self.target == MAINNET_ORACLE;
         let futures = self.target == MAINNET_FUTURES;
         require(own || spread || oracle || futures, Error::InvalidAccount)?;
-        require(!previous || spread, Error::InvalidAccount)?;
+        require(!previous || spread || futures, Error::InvalidAccount)?;
         let repo = repository(own);
         let mut args = Vec::new();
         if spread {
@@ -80,7 +86,9 @@ impl VerificationPolicy {
                 "ameba_futures"
             },
             "--base-image",
-            if oracle || futures {
+            if futures && !previous {
+                MAINNET_FUTURES_BUILD_IMAGE
+            } else if oracle || futures {
                 MAINNET_TARGET_BUILD_IMAGE
             } else {
                 BUILD_IMAGE
@@ -223,7 +231,11 @@ mod tests {
                     "--library-name",
                     library,
                     "--base-image",
-                    MAINNET_TARGET_BUILD_IMAGE,
+                    if target == MAINNET_FUTURES {
+                        MAINNET_FUTURES_BUILD_IMAGE
+                    } else {
+                        MAINNET_TARGET_BUILD_IMAGE
+                    },
                     "--arch",
                     "v1",
                     "--cargo-build-sbf-args",
@@ -233,6 +245,16 @@ mod tests {
             assert_eq!(decoded.4, 123);
             assert!(params.len() <= 640);
             assert!(policy.previous_spread_params(&controller).is_err());
+            if target == MAINNET_FUTURES {
+                let previous = policy.previous_futures_params(&controller).unwrap();
+                let decoded =
+                    <(String, String, String, Vec<String>, u64)>::try_from_slice(&previous)
+                        .unwrap();
+                assert_eq!(decoded.3[5], MAINNET_TARGET_BUILD_IMAGE);
+                assert_ne!(previous, params);
+            } else {
+                assert!(policy.previous_futures_params(&controller).is_err());
+            }
             let metadata = record(
                 &target,
                 &target_authority_for_test(&controller, &target),

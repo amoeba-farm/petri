@@ -20,7 +20,7 @@ The executable is `petri`; Amoeba remains the company and product name.
 > A release build of this source talks to Amoeba's production deployment on
 > Solana mainnet-beta (`https://api.amoeba.farm`); the dev build and
 > `--profile dev` talk to the dev localnet (see [Configuration](#configuration)).
-> Releases from v0.1.11 run this code. The earlier "Devnet preview" downloads
+> Releases from v0.1.12 run this code. The earlier "Devnet preview" downloads
 > (v0.1.9 and before) talk to a retired deployment: update them
 > (`petri update`) or download again.
 

@@ -34,7 +34,7 @@ pub const RETIRE_TARGET: u8 = 7;
 /// and can only install while that release is running, so installing
 /// any newer controller retires all older self-upgrade proposals. Binaries
 /// before this field had release 0 (the eight action bytes were zero).
-pub const CONTROLLER_RELEASE: u64 = 5;
+pub const CONTROLLER_RELEASE: u64 = 6;
 pub const DEVNET_SPREAD: Pubkey =
     solana_program::pubkey!("2jVQSPny9eFoaG1ZWoJVAezQ5VgqJtF8rQCQXMktuBVw");
 

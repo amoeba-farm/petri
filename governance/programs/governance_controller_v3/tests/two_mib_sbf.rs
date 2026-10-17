@@ -934,7 +934,7 @@ async fn actual_sbf_release_one_installs_release_two_and_retires_old_proposals()
         sha256_hex(&deployed),
         "1442c507f6f40f666e4191d767f8a892d61ddf73c82ab80da593c611c7312780"
     );
-    assert_eq!(CONTROLLER_RELEASE, 5);
+    assert_eq!(CONTROLLER_RELEASE, 6);
     let mut current = deployed.clone();
     current.resize(ALLOCATED, 0);
     let mut h = Harness::start_with(&current, &deployed, &[&new, &new]).await;

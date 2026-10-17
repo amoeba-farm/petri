@@ -1,4 +1,4 @@
-# Petri v0.1.11 — preview
+# Petri v0.1.12 — preview
 
 Petri now trades Amoeba's capped futures on Solana mainnet-beta
 (`https://api.amoeba.farm`) and reads the standalone index oracle and its

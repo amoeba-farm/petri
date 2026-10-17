@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "5d7cb07832a3b7576bc585456f754df320ca0e60",
+  "sourceCommit": "1e0f20cefc360ddf82365eff55bb2e58ba231252",
   "component": "cli",
-  "cliVersion": "0.1.11",
-  "publicationType": "source of the signed petri v0.1.11 release and of ameba-sdk 0.4.0 on npm",
+  "cliVersion": "0.1.12",
+  "publicationType": "source of the signed petri v0.1.12 release and of ameba-sdk 0.4.0 on npm",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
   "deployedContractSourceCommit": "315cae4d2ab23d0a54dd7a6717503349bb3fd9c4",
   "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from 315cae4d, the oracle from 4caf83f0); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
@@ -55,12 +55,12 @@
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "267070cb6d566f3793e90dd121f2082e7905b62574a5e61a4a6f11f6acc2be98",
+      "sha256": "d4b8d0b2943f1e2112927b4986145c6d0420b1fcc663cc996fab7e722b879298",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "aacb55d62016ed8bcd5c16d92d88394cd94be85d341dae774b8ba0105d3686fb",
+      "sha256": "605c59110a4fa6699d3e97834a2c60956276e34fae3812e2ee66a7d0e7cf0f5c",
       "executable": false
     },
     {
@@ -80,7 +80,7 @@
     },
     {
       "path": "cli/README.md",
-      "sha256": "deab78ae164aae4b84fcfddc0fa602000b580e6d6f797bad660122c221a30192",
+      "sha256": "0ef91a7ba804760dbb2349630b3d92679e0389182168f7459690ca0a1a23475b",
       "executable": false
     },
     {
@@ -105,7 +105,7 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "bd2730f005b0a21cfca0f2fbdbc29e5c1a5be6b1f4f7b05f3950173ec7ae7a3c",
+      "sha256": "963f477218037e1f7cf73c88db7ca946a81d9f14b806234f604a5731b7f32369",
       "executable": false
     },
     {
@@ -300,7 +300,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "aabad304d109dde0d74912eceee6d7f4321336b02fc5ff6389715b33bacbfb8f",
+      "sha256": "aa2f9a0a574d65f4acecb2d9e5da46c475f86781878eb2c6ff8b69d3eb46e940",
       "executable": false
     },
     {
@@ -755,7 +755,7 @@
     },
     {
       "path": "cli/src/petri_config.rs",
-      "sha256": "9e49df420e3c5f69bd0086efde2467290c9fe104c9fc73e383ab030e60596068",
+      "sha256": "d15f6081ac0d1f74328c0322878a4155ca05ff25eb30f712c477afc3d44752f6",
       "executable": false
     },
     {
@@ -1170,22 +1170,22 @@
     },
     {
       "path": "governance/programs/governance_controller_v3/src/processor/verification.rs",
-      "sha256": "a70f18c99ed1afd9f0dd6f7f5ff0f0719d497cafce417eff22b4a08061ddced1",
+      "sha256": "94cebba0b4a8bdab04a2e3ca53a723075d7608f7473b40ceab2a278030727104",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/src/state.rs",
-      "sha256": "738225b3239c174d2355cdf11928b54f263e7177be8101a638517bfa6d9c02d3",
+      "sha256": "0473a9f1cc16222411a505e309fda1bd7f68166c657fd65b588bf7d459a68b23",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/src/verification.rs",
-      "sha256": "9360fb378611162267212f17a015cbd645d1df1fd5ea044c6d946c8515ae60f3",
+      "sha256": "30959b317509ffcef2533d43bc6e15ce642aa7cdedc3d0ef19c746b18c4f35e9",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/tests/artifact_cap.rs",
-      "sha256": "344a0d5b018fce278dd0b4b87289f9aaae0a8ea8fe4b4a8a38fdb6d5f5ac8087",
+      "sha256": "b653171e6a37242f6ef37e18084e31f495a5e8c216eced66250b3fdd5f1894b2",
       "executable": false
     },
     {
@@ -1215,12 +1215,12 @@
     },
     {
       "path": "governance/programs/governance_controller_v3/tests/two_mib_sbf.rs",
-      "sha256": "1e2aa324fc9003db7c1f4c552afe36a7517a34a509584bbc150e9375d4eb87a0",
+      "sha256": "0439a5765a4afd76e1beb81e6edd742cfdf22ed76666863d01fb85262e0dfdc5",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/tests/verification_metadata.rs",
-      "sha256": "0cbfdf3268d8b2155e2dfdaeed5f38dc0519b5e4ceaa8ee42956cb528255a6af",
+      "sha256": "0d0e826f9304df57e531dc11b13fb44fd73cb89b6d55e8142db28f2da75b1f89",
       "executable": false
     },
     {
@@ -3276,6 +3276,6 @@
   ],
   "lineEndingQualification": "0 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.0",
-  "sourceRelease": "release/2026-10-17-petri-preview",
+  "sourceRelease": "1e0f20ce",
   "deployedOracleSourceCommit": "4caf83f080f7541b1f741e63871c8d701b398e9b"
 }
