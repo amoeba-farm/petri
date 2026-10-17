@@ -33,6 +33,9 @@ pub struct Prepared {
     pub transaction: String,
     pub last_valid_block_height: u64,
     pub summary: Value,
+    /// Transactions that must land first, in order: each moves compressed
+    /// USDC into a classic USDC account (API.md, "Spending compressed USDC").
+    pub before: Vec<Prepared>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -469,6 +472,16 @@ pub fn index(api: &Api, market: &str, limit: usize) -> Result<Vec<IndexPoint>> {
 
 pub fn account(api: &Api, owner: &str) -> Result<Account> {
     parse(api.get(&format!("/v1/accounts/{owner}"))?)
+}
+
+/// `GET /v1/wallets/:owner/compressed-usdc`: the owner's compressed USDC
+/// (Light token ATA plus compressed token accounts), in atoms.
+pub fn compressed_usdc(api: &Api, owner: &str) -> Result<u64> {
+    let v = api.get(&format!("/v1/wallets/{owner}/compressed-usdc"))?;
+    v.get("usdcAtoms")
+        .and_then(Value::as_str)
+        .and_then(|s| s.parse().ok())
+        .ok_or_else(|| Error::msg("unexpected API response: no usdcAtoms"))
 }
 
 /// `POST /v1/quote`.

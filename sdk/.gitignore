@@ -1,0 +1,17 @@
+node_modules/
+target/
+coverage/
+.cache/
+.eslintcache
+*.log
+*.tgz
+.env
+.env.*
+!.env.example
+.npmrc
+!.npmrc.example
+.DS_Store
+
+# Futures vector generator build output and packed tarballs
+/tools/futures-vectors/target/
+/dist-pack/

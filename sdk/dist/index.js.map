@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA;;;GAGG;AACH,cAAc,oBAAoB,CAAC","sourcesContent":["/**\n * Ameba SDK: the root entry re-exports the futures client, which is\n * also available as `ameba-sdk/futures`.\n */\nexport * from \"./futures/index.js\";\n"]}

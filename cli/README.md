@@ -20,7 +20,8 @@ The executable is `petri`; Amoeba remains the company and product name.
 > A release build of this source talks to Amoeba's production deployment on
 > Solana mainnet-beta (`https://api.amoeba.farm`); the dev build and
 > `--profile dev` talk to the dev localnet (see [Configuration](#configuration)).
-> It has not been published. Existing downloadable previews run older code.
+> Releases from v0.1.10 run this code. The earlier "Devnet preview" downloads
+> (v0.1.9 and before) talk to a retired deployment: replace them.
 
 ## Download Petri
 
@@ -30,7 +31,7 @@ Download and extract the package for your computer:
 | --- | --- | --- |
 | Windows 10/11 x64 | [Petri for Windows](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-windows-x64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-windows-x64.zip.sha256) |
 | macOS 14+ Apple silicon | [Petri for Mac](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-arm64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-arm64.zip.sha256) |
-| macOS 14+ Intel | [Petri for Intel Mac](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-x86_64.zip) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-macos-x86_64.zip.sha256) |
+| Linux x86_64 | [Petri for Linux](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-linux-x86_64.tar.gz) | [SHA-256](https://github.com/amoeba-farm/petri/releases/latest/download/Petri-linux-x86_64.tar.gz.sha256) |
 
 Open `Petri.cmd` on Windows or `Petri.app` on macOS. Petri opens in a terminal.
 From an existing terminal, use `petri tui` for the interface or `petri --help` for commands.
@@ -40,12 +41,12 @@ Windows requires Microsoft's [Visual C++ v14 x64 runtime](https://aka.ms/vc14/vc
 Install it first if it is not already installed, especially if Windows reports
 `VCRUNTIME140.dll` missing. This prerequisite is supplied by Microsoft, not bundled in the ZIP.
 
-Preview packages are **not publisher-signed or Apple-notarized**. Verify
-the ZIP's SHA-256 before opening it. macOS may require **System Settings → Privacy
-& Security → Open Anyway** for this specific app. Do not disable system security
-globally. On Windows, compare `Get-FileHash .\Petri-windows-x64.zip -Algorithm SHA256`
-with the downloaded checksum; on macOS run `shasum -a 256 -c Petri-macos-arm64.zip.sha256`
-(substitute `x86_64` for Intel).
+Release packages from v0.1.10 are signed: the macOS app with a Developer ID
+and notarized by Apple, the Windows build with Authenticode. Verify the SHA-256
+anyway. On Windows, compare `Get-FileHash .\Petri-windows-x64.zip -Algorithm SHA256`
+with the downloaded checksum; on macOS run `shasum -a 256 -c Petri-macos-arm64.zip.sha256`.
+The earlier preview packages, and a binary you build from source, are not
+publisher-signed or Apple-notarized.
 
 ## Install the CLI
 
@@ -53,7 +54,7 @@ Windows PowerShell (downloads and verifies the release, adds `petri` to your use
 PATH, and creates a Start-menu shortcut):
 
 ```powershell
-Invoke-WebRequest https://raw.githubusercontent.com/amoeba-farm/petri/main/scripts/install-preview.ps1 -OutFile "$env:TEMP\install-petri-preview.ps1"
+Invoke-WebRequest https://raw.githubusercontent.com/amoeba-farm/petri/main/cli/scripts/install-preview.ps1 -OutFile "$env:TEMP\install-petri-preview.ps1"
 powershell -ExecutionPolicy Bypass -File "$env:TEMP\install-petri-preview.ps1"
 ```
 
@@ -61,7 +62,7 @@ macOS Terminal (downloads the matching architecture, verifies checksums, and
 installs the app plus `~/.local/bin/petri`):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/amoeba-farm/petri/main/scripts/install-preview.sh -o /tmp/install-petri-preview.sh
+curl -fsSL https://raw.githubusercontent.com/amoeba-farm/petri/main/cli/scripts/install-preview.sh -o /tmp/install-petri-preview.sh
 bash /tmp/install-petri-preview.sh
 export PATH="$HOME/.local/bin:$PATH"
 petri
@@ -183,14 +184,14 @@ Oracle writes are reviewed, confirmed (or `--yes`) and signed by your wallet;
 
 ## Install from source
 
-Released public source lives at `amoeba-farm/petri`. This tree builds inside the Amoeba
-monorepo: the futures SDK (`../sdk`) and the oracle crate (`../oracle`) are path
-dependencies, so build it from a monorepo checkout (`cd cli`). Install
-Rust 1.93.1, Node.js 24 (for the research workspace), and native compiler prerequisites, then:
+Released public source lives at `amoeba-farm/petri`, with the folders petri builds
+from by path: the SDK (`sdk/`), the futures and oracle crates (`futures/`, `oracle/`)
+and the governance interface. Install Rust 1.93.1, Node.js 24 (for the research
+workspace), and native compiler prerequisites, then:
 
 ```bash
-git clone https://github.com/spacematter78/amoeba.git
-cd amoeba/cli
+git clone https://github.com/amoeba-farm/petri.git
+cd petri/cli
 cargo build --release --locked --bin petri
 ./target/release/petri --version
 petri --version

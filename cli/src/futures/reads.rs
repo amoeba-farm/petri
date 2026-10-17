@@ -393,11 +393,17 @@ pub fn chart(
 pub fn positions(ctx: &Ctx, p: Paint, owner: Option<&str>) -> Result<Report> {
     let owner = ctx.owner(owner)?;
     let a = api::account(&ctx.api, &owner.to_string())?;
+    let compressed = api::compressed_usdc(&ctx.api, &owner.to_string()).unwrap_or(0);
     let mut lines = vec![format!(
-        "{} {} · wallet {} USDC",
+        "{} {} · wallet {} USDC{}",
         p.bold("Positions"),
         short(&owner.to_string()),
-        money(atoms(&a.usdc))
+        money(atoms(&a.usdc)),
+        if compressed > 0 {
+            format!(" + {} compressed", money(i128::from(compressed)))
+        } else {
+            String::new()
+        }
     )];
     let mut hints = Vec::new();
     let mut any = false;
@@ -679,6 +685,9 @@ pub fn wallet(ctx: &Ctx, p: Paint, owner: Option<&str>) -> Result<Report> {
     let markets = api::account(&ctx.api, &owner.to_string())
         .map(|a| a.markets)
         .unwrap_or_default();
+    // USDC left compressed by Amoeba's earlier product; orders spend it once
+    // the token account runs short.
+    let compressed = api::compressed_usdc(&ctx.api, &owner.to_string()).ok();
     let bonds = crate::oracle::chain::Oracle::new(ctx)
         .ok()
         .and_then(|o| o.collateral(&owner).ok().flatten());
@@ -700,6 +709,9 @@ pub fn wallet(ctx: &Ctx, p: Paint, owner: Option<&str>) -> Result<Report> {
             ""
         }
     ));
+    if let Some(atoms) = compressed.filter(|a| *a > 0) {
+        lines.push(format!("  Compressed     ${} USDC", usdc(atoms)));
+    }
     let mut cash = Vec::new();
     for am in &markets {
         let (free, reserved) = (atoms(&am.trader.free), atoms(&am.trader.reserved));
@@ -734,6 +746,7 @@ pub fn wallet(ctx: &Ctx, p: Paint, owner: Option<&str>) -> Result<Report> {
             "keypair": mine.then(|| ctx.s.keypair.0.clone()),
             "lamports": lamports.to_string(), "usdcMint": mint.to_string(),
             "usdcTokenAccount": token.to_string(), "usdcAtoms": usdc_atoms.map(|a| a.to_string()),
+            "compressedUsdcAtoms": compressed.map(|a| a.to_string()),
             "marketCash": cash,
             "oracleCollateral": bonds.as_ref().map(|b| json!({
                 "availableAtoms": b.available_balance.to_string(),

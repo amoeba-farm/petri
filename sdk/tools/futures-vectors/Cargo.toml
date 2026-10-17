@@ -1,0 +1,21 @@
+# Golden-vector generator for the TypeScript `ameba-sdk/futures` module.
+#
+# Depends by path on the monorepo's futures/ client crate and oracle/
+# interface:
+#
+#   CARGO_TARGET_DIR=tools/futures-vectors/target \
+#     cargo run --offline --manifest-path tools/futures-vectors/Cargo.toml -- test/fixtures/futures
+[package]
+name = "futures-vectors"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+ameba-futures-client = { path = "../../../futures/crates/futures-client" }
+ameba-oracle-interface = { path = "../../../oracle/crates/oracle-interface" }
+solana-program = "=2.3.0"
+serde_json = "1"
+base64 = "0.22"

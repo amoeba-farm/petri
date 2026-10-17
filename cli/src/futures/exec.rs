@@ -43,16 +43,22 @@ pub struct Outcome {
     pub steps: Vec<String>,
     pub logs: Vec<String>,
     pub slot: u64,
+    /// The transactions that moved compressed USDC into the wallet first.
+    pub before: Vec<String>,
 }
 
 impl Outcome {
     pub fn json(&self) -> Value {
-        serde_json::json!({
+        let mut v = serde_json::json!({
             "signature": self.signature,
             "route": self.route.word(),
             "slot": self.slot,
             "instructions": self.steps,
-        })
+        });
+        if !self.before.is_empty() {
+            v["before"] = serde_json::json!(self.before);
+        }
+        v
     }
 }
 
@@ -157,6 +163,7 @@ fn landed(
         steps,
         logs: tx.logs,
         slot: tx.slot,
+        before: Vec::new(),
     })
 }
 
@@ -193,13 +200,16 @@ pub fn send_local(ctx: &Ctx, owner: &dyn Signer, plan: &Plan) -> Result<Outcome>
 /// Asks the API to prepare `action`, verifies the transaction with `check`
 /// (given the trusted sponsor), signs it as the owner and submits it for the
 /// sponsor's co-signature. Refuses an API that serves other programs than
-/// the trusted deployment.
+/// the trusted deployment. When the action spends compressed USDC in
+/// transactions of their own (`before`), each is checked (`check`'s third
+/// argument is true for them) and signed with the main one, then submitted
+/// in order, each landing before the next.
 pub fn send_prepared(
     ctx: &Ctx,
     owner: &dyn Signer,
     action: &str,
     params: Value,
-    check: impl FnOnce(&Transaction, &Pubkey) -> Result<()>,
+    check: impl Fn(&Transaction, &Pubkey, bool) -> Result<()>,
 ) -> Result<Outcome> {
     crate::chain_identity::verify(ctx)?;
     let dep = ctx.deployment()?;
@@ -221,62 +231,83 @@ pub fn send_prepared(
         (None, Some(api)) => api,
         (None, None) => bail("the API names no sponsor")?,
     };
-    let owner_key = owner.pubkey();
-    let prepared = ctx.api.prepare(&owner_key.to_string(), action, params)?;
-    let bytes = B64
-        .decode(prepared.transaction.trim())
-        .map_err(|_| Error::msg("the prepared transaction is not base64"))?;
-    let mut tx: Transaction = bincode::deserialize(&bytes)
-        .map_err(|_| Error::msg("the prepared transaction does not decode"))?;
     if config.governance_controller != dep.governance_controller {
         return Err(Error::msg(
             "API governance deployment differs from the trusted deployment",
         ));
     }
-    let checked = super::governance::verify_prepared(dep, &ctx.rpc, &tx)?;
-    check(&checked, &sponsor)?;
-    let signers = usize::from(tx.message.header.num_required_signatures);
-    let position = tx.message.account_keys[..signers]
+    let owner_key = owner.pubkey();
+    let prepared = ctx.api.prepare(&owner_key.to_string(), action, params)?;
+    // Every transaction is checked and signed before any is submitted.
+    let sign = |part: &super::api::Prepared, before: bool| -> Result<String> {
+        let bytes = B64
+            .decode(part.transaction.trim())
+            .map_err(|_| Error::msg("the prepared transaction is not base64"))?;
+        let mut tx: Transaction = bincode::deserialize(&bytes)
+            .map_err(|_| Error::msg("the prepared transaction does not decode"))?;
+        let checked = super::governance::verify_prepared(dep, &ctx.rpc, &tx)?;
+        check(&checked, &sponsor, before)?;
+        let signers = usize::from(tx.message.header.num_required_signatures);
+        let position = tx.message.account_keys[..signers]
+            .iter()
+            .position(|k| *k == owner_key)
+            .ok_or_else(|| {
+                Error::msg("the prepared transaction does not ask for your signature")
+            })?;
+        if tx.signatures.len() < signers {
+            tx.signatures.resize(signers, Signature::default());
+        }
+        tx.signatures[position] = owner.sign_message(&tx.message_data());
+        Ok(B64.encode(bincode::serialize(&tx).expect("transaction serializes")))
+    };
+    let before: Vec<(&super::api::Prepared, String)> = prepared
+        .before
         .iter()
-        .position(|k| *k == owner_key)
-        .ok_or_else(|| Error::msg("the prepared transaction does not ask for your signature"))?;
-    if tx.signatures.len() < signers {
-        tx.signatures.resize(signers, Signature::default());
-    }
-    tx.signatures[position] = owner.sign_message(&tx.message_data());
-    let wire = B64.encode(bincode::serialize(&tx).expect("transaction serializes"));
-    let steps: Vec<String> = prepared
-        .summary
-        .get("instructions")
-        .and_then(Value::as_array)
-        .map(|a| {
-            a.iter()
-                .filter_map(|s| s.as_str().map(str::to_string))
-                .collect()
-        })
-        .unwrap_or_default();
-    let signature = ctx.api.submit(&prepared.id, &wire).map_err(|e| {
-        let message = match e.message.split_once(": ").map(|(_, rest)| rest) {
-            Some(rest) => {
-                let mut m = format!("{action} failed: {rest}");
-                if let Some(h) = rest.split([' ', ':', '(']).find_map(hint) {
-                    m.push_str(&format!("\n  {h}"));
+        .map(|part| Ok((part, sign(part, true)?)))
+        .collect::<Result<_>>()?;
+    let wire = sign(&prepared, false)?;
+    let steps_of = |part: &super::api::Prepared| -> Vec<String> {
+        part.summary
+            .get("instructions")
+            .and_then(Value::as_array)
+            .map(|a| {
+                a.iter()
+                    .filter_map(|s| s.as_str().map(str::to_string))
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let submit = |part: &super::api::Prepared, wire: &str, what: &str| -> Result<Outcome> {
+        let signature = ctx.api.submit(&part.id, wire).map_err(|e| {
+            let message = match e.message.split_once(": ").map(|(_, rest)| rest) {
+                Some(rest) => {
+                    let mut m = format!("{what} failed: {rest}");
+                    if let Some(h) = rest.split([' ', ':', '(']).find_map(hint) {
+                        m.push_str(&format!("\n  {h}"));
+                    }
+                    m
                 }
-                m
-            }
-            None => e.message.clone(),
-        };
-        Error::msg(message).with_logs(useful_logs(&e.logs))
-    })?;
-    let signature = Signature::from_str(&signature)
-        .map_err(|_| Error::msg(format!("the API returned a bad signature {signature}")))?;
-    landed(
-        ctx,
-        signature,
-        prepared.last_valid_block_height,
-        steps,
-        Route::Sponsored,
-    )
+                None => e.message.clone(),
+            };
+            Error::msg(message).with_logs(useful_logs(&e.logs))
+        })?;
+        let signature = Signature::from_str(&signature)
+            .map_err(|_| Error::msg(format!("the API returned a bad signature {signature}")))?;
+        landed(
+            ctx,
+            signature,
+            part.last_valid_block_height,
+            steps_of(part),
+            Route::Sponsored,
+        )
+    };
+    let mut moved = Vec::new();
+    for (part, wire) in &before {
+        moved.push(submit(part, wire, "moving your compressed USDC")?.signature);
+    }
+    let mut outcome = submit(&prepared, &wire, action)?;
+    outcome.before = moved;
+    Ok(outcome)
 }
 
 /// Whether the API serves the programs this client trusts (the futures

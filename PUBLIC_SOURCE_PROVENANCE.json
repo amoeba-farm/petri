@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "37af722bb47ffa44a5f14dea9cba6bf25212cb49",
+  "sourceCommit": "c49d5594b0240a4279a3726267abd1d649a289a2",
   "component": "cli",
   "cliVersion": "0.1.10",
-  "publicationType": "source only; no binary release",
+  "publicationType": "source of the signed petri v0.1.10 release and of ameba-sdk 0.4.0 on npm",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
-  "deployedContractSourceCommit": "4caf83f080f7541b1f741e63871c8d701b398e9b",
-  "qualification": "CLI source and contract deployed artifact provenance are distinct; this source mirror makes no reproducible ELF or installed binary claim.",
+  "deployedContractSourceCommit": "315cae4d2ab23d0a54dd7a6717503349bb3fd9c4",
+  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from 315cae4d, release 2026-10-16-amba-earn-rewards; the oracle from 4caf83f0); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
   "retainedPublicLegalFiles": [
     ".gitattributes",
     ".gitignore",
@@ -29,6 +29,11 @@
       "executable": false
     },
     {
+      "path": "api/API.md",
+      "sha256": "fdfe6bca91ec9d41fdc9a514ffca636a72faaf7bce7f11b5f51880cc1dea0430",
+      "executable": false
+    },
+    {
       "path": "cli/.gitattributes",
       "sha256": "277237dcd718638ac0a10fca3d0c15ecc581fb09faf17d0861058995c3e6e055",
       "executable": false
@@ -45,7 +50,7 @@
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "2b7aee794cb2956b064cefee8f07654f044b5db331a268de38eb862a1768810d",
+      "sha256": "63334e195403ac098910e5aa2000214f337dfc52336df913757391abaeb47d5d",
       "executable": false
     },
     {
@@ -70,7 +75,7 @@
     },
     {
       "path": "cli/README.md",
-      "sha256": "e2e1691a7c9dd8f5dd5a9c1bfd44c7bdba4b60efaf147d0d0858ca01de762d94",
+      "sha256": "bff0d1b75fc7513d75e04b44ec6a73e597c0aeb9c4ce2014770fb83658760453",
       "executable": false
     },
     {
@@ -290,7 +295,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "6224cd4f8d22b877cc0eda46f7aabe824a4b6ccf65f39abb583a6b72f6519db3",
+      "sha256": "f5d4dc615a2c6f0270f312d667da740072954cef83eb5b75ae3901166b244f65",
       "executable": false
     },
     {
@@ -466,9 +471,7 @@
     {
       "path": "cli/scripts/finish-petri-windows-update.ps1",
       "sha256": "32aeea14af07e5b39bd7ec340dd16d8f80cd36fa35443fc5c2669cf09c81705a",
-      "executable": false,
-      "sourceSha256": "dc028e8a8eb707d3f5a621cb453e1dc10d6285606e6df9767641ac8697e184d2",
-      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
+      "executable": false
     },
     {
       "path": "cli/scripts/generate-third-party-licenses.mjs",
@@ -488,16 +491,12 @@
     {
       "path": "cli/scripts/install-petri.ps1",
       "sha256": "74fdb0abdd0c37270b234ff0210d6c1568399190599342e1ce89b8c33946068c",
-      "executable": false,
-      "sourceSha256": "8c0e826186d750e5d1ba0c210c046f02bf55851653c11f225e833206caa0b7ab",
-      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
+      "executable": false
     },
     {
       "path": "cli/scripts/install-preview.ps1",
       "sha256": "26ff18f17fc5d946f379302c5057e792c6eb557c958d6db44e351ff01b5d238a",
-      "executable": false,
-      "sourceSha256": "f11ebc70d85381b5b793e1d4828e24ea286e48b55c464a96b24fda0a8c8cd2e7",
-      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
+      "executable": false
     },
     {
       "path": "cli/scripts/install-preview.sh",
@@ -517,9 +516,7 @@
     {
       "path": "cli/scripts/package-petri-windows.ps1",
       "sha256": "de912986a0367788dda964512a87acd23cb8d0d8262494f8baeef6e0dc305ec1",
-      "executable": false,
-      "sourceSha256": "ae7686612a233ecf866cc368ff2ba529c569bff9771c20796cf3bbebf001a6ea",
-      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
+      "executable": false
     },
     {
       "path": "cli/scripts/petri-action-bridge.mjs",
@@ -573,7 +570,7 @@
     },
     {
       "path": "cli/src/futures/api.rs",
-      "sha256": "194e9b0f6779e3b5ec6c8d13f50d0188be5823f0154c752bd342c2dc17da63b0",
+      "sha256": "04696da96eb29d3193e74e5046b9810e07938b6c48c0148e783b3d97feb7d3c0",
       "executable": false
     },
     {
@@ -583,7 +580,7 @@
     },
     {
       "path": "cli/src/futures/check.rs",
-      "sha256": "c1b6f2089320089bdd4cab05bb60e2407145ebf972da6d1a4316298bacfd4629",
+      "sha256": "db9104303032d6787eb0ef99b096082ddcf3449e4fa5f9a3999ed373d050d7d1",
       "executable": false
     },
     {
@@ -598,7 +595,7 @@
     },
     {
       "path": "cli/src/futures/exec.rs",
-      "sha256": "73a3fb019433e32376f81ff164e346f6a5ba1c48603bab9715d033e139e10eb7",
+      "sha256": "1c7605f66c0adf70b8a3d204799d7b7e69e2143aba59354cad90cdd00002411f",
       "executable": false
     },
     {
@@ -612,13 +609,18 @@
       "executable": false
     },
     {
+      "path": "cli/src/futures/light.rs",
+      "sha256": "bc7e2bbb94dd0dce6434881137bfb0ad8da4f3aaff45233fd92236b5d92f89f1",
+      "executable": false
+    },
+    {
       "path": "cli/src/futures/market.rs",
       "sha256": "a8938c29afc5fc7ddb1c91b5e66ccaee1a4376695a5141454fde31a46e2207d3",
       "executable": false
     },
     {
       "path": "cli/src/futures/mod.rs",
-      "sha256": "10330c122b94e4bb5a0136040d1ebba992abb21f3ec76e631c5cc2696fd58721",
+      "sha256": "bd94c9bee01436ed7248cb774d168d270752d33ed7e394520b5cfd28bbc50a2b",
       "executable": false
     },
     {
@@ -628,7 +630,7 @@
     },
     {
       "path": "cli/src/futures/reads.rs",
-      "sha256": "56e63c1a6efdbd9303c1e4bb3bd209fe087bad428b64d642cc1a068333aa6144",
+      "sha256": "e58b2fbb0875440c39673c8a1c380c0b422ae81368360c2141f140c852d6566a",
       "executable": false
     },
     {
@@ -648,7 +650,7 @@
     },
     {
       "path": "cli/src/futures/trade.rs",
-      "sha256": "38c1af66ab08b0a79f6f36270bdac9f27ceb74db253fb1680843b7ef1f825a63",
+      "sha256": "9b16acdd592c5df0ea3c950d6d6913b87f66b331d34a7ded87c82eabe214a49b",
       "executable": false
     },
     {
@@ -879,9 +881,7 @@
     {
       "path": "cli/tools/petri-conpty-harness/run.ps1",
       "sha256": "d86bded879cb44b2515a659e9f7f9596287b65c54b38a4aafd7972d217bd8893",
-      "executable": false,
-      "sourceSha256": "8fb5616ecdb7d3ecfd1a60fbcc652c54482cf019c3f7e812ee8f4437b0a6bcb5",
-      "lineEndingNormalization": "CRLF to LF by retained public repository Git text attributes; text content unchanged"
+      "executable": false
     },
     {
       "path": "cli/tools/petri-conpty-harness/src/lib.rs",
@@ -1010,7 +1010,7 @@
     },
     {
       "path": "futures/crates/futures-client/src/lib.rs",
-      "sha256": "29fc25c4e5f0e1e12338ffa31b72c555319b60a03415e0345ea62c68a9a9f22a",
+      "sha256": "1cbb9a409c02fd59785457a3c0520ccf0ac3a2428b3a374d67ca5f55c7fc844f",
       "executable": false
     },
     {
@@ -1074,6 +1074,16 @@
       "executable": false
     },
     {
+      "path": "futures/docs/futures.md",
+      "sha256": "944d9eb0ccc57a0943f614648e2c95fa7de8871eed2eabc6887b2529f418fb9e",
+      "executable": false
+    },
+    {
+      "path": "futures/docs/interfaces.md",
+      "sha256": "7e3d78f62bcd586c838eaabbed94d7ac2013822b6f103ce770c03ed513ec52f4",
+      "executable": false
+    },
+    {
       "path": "futures/programs/futures/Cargo.toml",
       "sha256": "99f0833cb7dceccb581e5c0ed723f85fd5f86cec5c33b56cb22c55f2b0fe6e64",
       "executable": false
@@ -1085,17 +1095,17 @@
     },
     {
       "path": "futures/programs/futures/src/lib.rs",
-      "sha256": "9034b60a553d3cc35527201a63d84c9c1b7da3eb292146a3457d7051839a1fa0",
+      "sha256": "4d71a8544fcbe50e9d44126e1263324c3712ab6699a3bb6609f432fc30ed4268",
       "executable": false
     },
     {
       "path": "futures/programs/futures/src/processor.rs",
-      "sha256": "76bffd805f1507b92d29b2de175ae3c19dd14f74094f19a6134c06a7a48514bd",
+      "sha256": "088ca4790c6e8242a7b382a1bfa44dcaeb0ad383c8682e9b0c34af18a82fc794",
       "executable": false
     },
     {
       "path": "futures/programs/futures/src/state.rs",
-      "sha256": "ea7b6b3802c2ec7c26443d5ca33cbb1e571fa4fe79911fcd4532d522ce514194",
+      "sha256": "dd9a578b110f56b91d0f082ff5229f7f192b92a9b09218ddca03e50f2edc46d0",
       "executable": false
     },
     {
@@ -1106,6 +1116,11 @@
     {
       "path": "governance/Cargo.toml",
       "sha256": "5dbe98ea78a7e0a71153275995ce302241a3eff0215d0afdfbdb8a39172b0b69",
+      "executable": false
+    },
+    {
+      "path": "governance/LICENSE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
       "executable": false
     },
     {
@@ -1135,7 +1150,7 @@
     },
     {
       "path": "governance/programs/governance_controller_v3/src/instruction.rs",
-      "sha256": "1a047cbed8176f5e7fe87adb77d8e9bf6f0071c0c78971cef0c7c801e1836bc3",
+      "sha256": "25a8d7906cbab1fc02eeb0caeffa0fbc638c0e10c208e23af7fd6c1d1125a948",
       "executable": false
     },
     {
@@ -1145,7 +1160,7 @@
     },
     {
       "path": "governance/programs/governance_controller_v3/src/processor.rs",
-      "sha256": "59881152627fffd94f2038086e4bac8d5a47dfd010fa03ef3ec69e83d1324a00",
+      "sha256": "c2a0856d45c3b5bcc8f761c3fe95f2bc324efde5afda02a1131503cf9551966a",
       "executable": false
     },
     {
@@ -1155,22 +1170,22 @@
     },
     {
       "path": "governance/programs/governance_controller_v3/src/state.rs",
-      "sha256": "a5e1b077a53ad58afb3cf04234bc8593c5882d94cc9df56124f36abf27682a0c",
+      "sha256": "738225b3239c174d2355cdf11928b54f263e7177be8101a638517bfa6d9c02d3",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/src/verification.rs",
-      "sha256": "b819d940a9723ad2e56795e0c85d153f066c4dd1266f856bfaeb875a145ba2ed",
+      "sha256": "9360fb378611162267212f17a015cbd645d1df1fd5ea044c6d946c8515ae60f3",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/tests/artifact_cap.rs",
-      "sha256": "9a9c610d10202f3517e3dc3732e4f0d2df32b9dcd673d6898e5aeea887b37361",
+      "sha256": "344a0d5b018fce278dd0b4b87289f9aaae0a8ea8fe4b4a8a38fdb6d5f5ac8087",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/tests/core.rs",
-      "sha256": "a716a3f6c46b746f3b6ad21b318d3cd9dcbcbe98dd471ef8bcd88b1a6f95883f",
+      "sha256": "4006ebd9fe46ced9f398b030d73c6a7a4eb12c61528c78482e82359604d2fb2e",
       "executable": false
     },
     {
@@ -1195,12 +1210,12 @@
     },
     {
       "path": "governance/programs/governance_controller_v3/tests/two_mib_sbf.rs",
-      "sha256": "1da7b13927aeafee7cbeef60344bf1af24dbddae74f516bdb68a90db1f9b7c65",
+      "sha256": "1e2aa324fc9003db7c1f4c552afe36a7517a34a509584bbc150e9375d4eb87a0",
       "executable": false
     },
     {
       "path": "governance/programs/governance_controller_v3/tests/verification_metadata.rs",
-      "sha256": "4cff8aa76b07165dddbaf0748444603af77bb238ec7a96c7b3ad42982de71117",
+      "sha256": "0cbfdf3268d8b2155e2dfdaeed5f38dc0519b5e4ceaa8ee42956cb528255a6af",
       "executable": false
     },
     {
@@ -1856,6 +1871,11 @@
     {
       "path": "governance/programs/upgrade_controller/tests/release1_ceremony_golden.rs",
       "sha256": "183048a3eab5dbfb0004ad676fb8db54cc86bd974351b47f13f27be2209093e7",
+      "executable": false
+    },
+    {
+      "path": "governance/rust-toolchain.toml",
+      "sha256": "92d22712000a7d8c1a6c236f19967550b431b6c3ec8d89d798b214da15dd3c7f",
       "executable": false
     },
     {
@@ -2794,13 +2814,333 @@
       "executable": true
     },
     {
+      "path": "sdk/.editorconfig",
+      "sha256": "a6b98ea7cb6d61ed8d430dd0dffa46c87012b5cf859d4ce7207898954951fdcd",
+      "executable": false
+    },
+    {
+      "path": "sdk/.gitattributes",
+      "sha256": "5d7e44059628ad6fd169b616c530d392efa60cf6608d538488233f9ddd6e38c2",
+      "executable": false
+    },
+    {
+      "path": "sdk/.gitignore",
+      "sha256": "00a3b29c9e8a868e8068790b8752597560464feb29a81c5a5de2e8a95b46d9dc",
+      "executable": false
+    },
+    {
+      "path": "sdk/CHANGELOG.md",
+      "sha256": "5b28b27a068156cf76dfa5672d01e5f9e70a1ee6e68890a13abdc2cb5379609d",
+      "executable": false
+    },
+    {
+      "path": "sdk/CODE_OF_CONDUCT.md",
+      "sha256": "8d242a8e5452f161b589ce54373c115ffb4185d51af52eed6342fc705eb09070",
+      "executable": false
+    },
+    {
+      "path": "sdk/CONTRIBUTING.md",
+      "sha256": "bfd5f22615532ec84b79ca4dadba9120f24fb723fc41c46b8aaee8a3931c013b",
+      "executable": false
+    },
+    {
       "path": "sdk/Cargo.lock",
-      "sha256": "1d49795b64e5920e1689312c91c1ece0711b901734d8c7e2130371c0b1d469e9",
+      "sha256": "5824be7644885a88d7d1e92b8d94064d2b03d4069ed9c29c85327f42e55743c8",
       "executable": false
     },
     {
       "path": "sdk/Cargo.toml",
-      "sha256": "edff81a5c1ebf70917330580cd29d5378a1b753f1dc27f22236a22840e39a151",
+      "sha256": "56b4b3a037165c10bcf8cdce3569a3db62c0a901ce1057d4ae1799e637066def",
+      "executable": false
+    },
+    {
+      "path": "sdk/LICENSE",
+      "sha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+      "executable": false
+    },
+    {
+      "path": "sdk/NOTICE",
+      "sha256": "ce75a7e0ed4ed976590c05c1e817fdf21fadb26b8ce2f5ff6f94ffe702915478",
+      "executable": false
+    },
+    {
+      "path": "sdk/README.md",
+      "sha256": "ecfb7aee3ae3c6c404ec1465544301a65b905e8348b598058be4e5094ae3b370",
+      "executable": false
+    },
+    {
+      "path": "sdk/RELEASING.md",
+      "sha256": "c339e674afee2007c013a33a410c5d0859fde29fb4ed4e9f3672d11df4f8e8c2",
+      "executable": false
+    },
+    {
+      "path": "sdk/SECURITY.md",
+      "sha256": "4ca394653f947447e47d2cad0ee750aee379b6f020d4153863200938523e6910",
+      "executable": false
+    },
+    {
+      "path": "sdk/SUPPORT.md",
+      "sha256": "9adf2ba6beab8f72b937932a3ea7ac75256b926bdf256b2c7ed38747426c3ea4",
+      "executable": false
+    },
+    {
+      "path": "sdk/THIRD_PARTY_NOTICES.md",
+      "sha256": "8af480fccf06c81c271d30ecf589ad54da2d0f2513d93c51bf8767cf2adce811",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/accounts.d.ts",
+      "sha256": "c1e65b978050995bb55b4f66d9df6c32235d41c622e383e7d6445efc58c58063",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/accounts.d.ts.map",
+      "sha256": "b53106ae902205f43524addbb09535f92639167039be3938a9283a383061ff4e",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/accounts.js",
+      "sha256": "af288cf3cb33b80a365ae1dfe31715ce64152cdcb9b0734c4db035e704b2c086",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/accounts.js.map",
+      "sha256": "82b10eda085c0fb23e0f73190b0cf8be61a417afd390c6f23b31e01bdceaf425",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/api.d.ts",
+      "sha256": "1f9a74fb853c0e5da5215810afe4dae82473dd02efc2999f4fcfc5ea9275bbf4",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/api.d.ts.map",
+      "sha256": "de0974fd77ceaea992e674f9fd776d60f3a7b93dd7a0f1cd43dd4e5a2c398404",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/api.js",
+      "sha256": "b0cb6555bd4469f8b8dc553eb4de515afd0cfab9c5561c723a3928cf797525b2",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/api.js.map",
+      "sha256": "8a2a53107e5c6a92d0d2126c579677f93e04e571dc6885fe17d9c2b9e1a6b751",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/codec.d.ts",
+      "sha256": "f9facbe6b5ac862f2aa9fc035474842f25f6a1639fe161a18d1e1b0986c5730f",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/codec.d.ts.map",
+      "sha256": "ef3f1e7b484048598ae1c729dae4ef2ed3a34c79677369ced6b55137bbbbce6a",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/codec.js",
+      "sha256": "0c21d658fb2b5a0a88228a5a51910b9cfbd89a29d0a3c55fb8ef568f1541391b",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/codec.js.map",
+      "sha256": "3837a1749a4661447dd91baa87f8e2763a52a25064fa7cb1fa9f0503089c8d30",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/constants.d.ts",
+      "sha256": "9205a67127c1d7d4f587ecd0af3ce5873cfa8c2db21140e77ac230d7031757ea",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/constants.d.ts.map",
+      "sha256": "ce3eaa286d006dfe0085a88c06c4d8235daf46f7c4d1ccfe707c2d0e1521641d",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/constants.js",
+      "sha256": "31c1e6c2dd2019b8c0246c67717aabfad7d0256e9d058927984e2a866e0a6d3b",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/constants.js.map",
+      "sha256": "1cbe567ffdc86c77a3ece1dc07ca833e79c0b9ba9ea8f66169a0a8a75ccbe0ca",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/governance.d.ts",
+      "sha256": "e34ddd73687c703b9f546d9b7c080450380b94779763bbbd1d6d0cdb2787bd57",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/governance.d.ts.map",
+      "sha256": "abac754d726f1f71ffa2779e17abc40e503c543699f5b66a6156826df49d0550",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/governance.js",
+      "sha256": "afa70d002fae5fbe4603c19dca4234f91fd2e41545997a2412a6a2dfd84c0daa",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/governance.js.map",
+      "sha256": "09c5eb83e136f57376cc46c3c7580545e265d37b75b7a304a49715269b46be63",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/index.d.ts",
+      "sha256": "fc1b7a44c8666e28bfb483092a97462ad3eb5d545dad8935b60f5fc231ef6453",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/index.d.ts.map",
+      "sha256": "8081169ceed53691d900ae2f0539996082d5e28384e5dc9185322981cd7eaaab",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/index.js",
+      "sha256": "a9c8e640610aea1c5e049964f15991634f27a6a6a1e3499db9106d14a9de1f4c",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/index.js.map",
+      "sha256": "0684c24cfac68d7fd5855ca7b58e42a75fbc4bcd2cf4c5f4e6834c0aeb3cd762",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/instructions.d.ts",
+      "sha256": "98df653c8425e0e78ffa6feb438b6ef8c355e8ac5b7379725a0d3e48798d689b",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/instructions.d.ts.map",
+      "sha256": "000b0c55e2d74704fe04dd05c08de7f4186db8b4a887faa9293762ac4f61be56",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/instructions.js",
+      "sha256": "570b76077f6bd013aa250284902971a499d9cc53fcd3e22c0abc746813cee6fe",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/instructions.js.map",
+      "sha256": "83aff5df882cf2b686854186faed7681e5cc83c0795a91a2d1eadc6c1dd72eb5",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/math.d.ts",
+      "sha256": "c679799b6f2fb689c3ccd5a75b970af9fa035dfe0fbe88b5ce413a7d05f7fedf",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/math.d.ts.map",
+      "sha256": "b56277af157e196ace6d786517091da8991b486ef90bcb3e5bead6770e930f44",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/math.js",
+      "sha256": "4d9c47232be26cec28478c4b79e6322275269be953dda1760c970f5ada9fc877",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/math.js.map",
+      "sha256": "bbcdbbabf256c7c38d821459462b7981797f5438d7b4add16fddb993889a4da4",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/pda.d.ts",
+      "sha256": "5df766165a5f68652c90fcc3d78004662c46d236f3448c3fe0a632743356d2ec",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/pda.d.ts.map",
+      "sha256": "ed5c738a78a8e405bb8d043f923643717263fb30618c945140572a79fd9dbbc1",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/pda.js",
+      "sha256": "85867cb532368d1939a418d96344ec1aa1a8ce8746d5af9c74ec1e03cb7596d4",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/pda.js.map",
+      "sha256": "a55432b50fd38e7886eb5396f0f1779854ed2cdff56a878548a3525e692e3219",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/program.d.ts",
+      "sha256": "d3245d9458d9ec1019f7108014408a976f640937e19fcf7f2c98a0912248efa9",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/program.d.ts.map",
+      "sha256": "05874f70d09552b2fac02240857a59ee281d0df6b1fd8dc89d5801760ca5ec96",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/program.js",
+      "sha256": "81bd9a913787997835a45d8ec96f68b143c9466853deccf64cee67330d8c67fb",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/program.js.map",
+      "sha256": "3c7031d295ca02f349bedc9b6c6de02b2ea99bddf9fcb413270427b876d1a1f2",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/proposal.d.ts",
+      "sha256": "f8199412b50338d397187dbe16dcdc79ac81b524e243a3317e954d814773517b",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/proposal.d.ts.map",
+      "sha256": "34fea2494835826157686b75933d4323051c869d9102f8c610df5a091bc7fe01",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/proposal.js",
+      "sha256": "f4228508b721f80bd1375f5b90f0b79191489e53f16b7c43c3265f6c8b76182d",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/futures/proposal.js.map",
+      "sha256": "b2c58a3aae8e791d4e300feaa20e6048bf3c4cc2dc70b4d4c74657b0a5030bd8",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/index.d.ts",
+      "sha256": "64b684b7fc14ae2093417404bebdca492e3a98c75736b9075d58830e14196dbe",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/index.d.ts.map",
+      "sha256": "d34dde2b55e2ce10a501e4c3bbcbeffc3503657d61b89f6489a61d4be967167b",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/index.js",
+      "sha256": "44183262e68c1b613e292385265165c07a7645c75fcd09f02f29bab795783709",
+      "executable": false
+    },
+    {
+      "path": "sdk/dist/index.js.map",
+      "sha256": "3ddeff12de685b7002ff015ad1379e57897d70c710b529454466a6305465ec85",
+      "executable": false
+    },
+    {
+      "path": "sdk/docs/FUTURES.md",
+      "sha256": "5d2a644ab4cffc11a92493a84bc33f03bedd2e784811f677cf2bb44fecdde042",
+      "executable": false
+    },
+    {
+      "path": "sdk/package-lock.json",
+      "sha256": "a235af4f6b33d865c0a2fe3acc20f2d9422a7c5954b34478a165f62624883f20",
+      "executable": false
+    },
+    {
+      "path": "sdk/package.json",
+      "sha256": "793f68bda526a26c32c72d61d0f5b5d395b14e1aab27bbcdf0c790cb7287464b",
       "executable": false
     },
     {
@@ -2819,10 +3159,118 @@
       "executable": false
     },
     {
+      "path": "sdk/src/futures/accounts.ts",
+      "sha256": "e14a7ff12da6ac62642fb9e5df02ed9280b9f413b6e4d89f86165836d5e6b329",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/api.ts",
+      "sha256": "702f26c757df9bf3ff47d8742adec4495058c5c2284960f17858bc7e505dce55",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/codec.ts",
+      "sha256": "ad06702aadc2493f6e620c91a61a7e6ee20d26afb90ea70a6f81504fc733ae85",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/constants.ts",
+      "sha256": "498894ab8f18cb699f77c1adc5559d44c2a235ca9dc9bea410b0a92de1ebac4e",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/governance.ts",
+      "sha256": "3fa601f84ab6538714c945ada526bbba9f85d841dee34c62d05a0787a25d7480",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/index.ts",
+      "sha256": "3749a38bfdafc82d3f049ad7921747ab2472a82ef60e4998a15a80d60b10be2b",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/instructions.ts",
+      "sha256": "689417cef54274ee74c7f4955bc781c614a513ee62233902c12440f3998c7fe7",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/math.ts",
+      "sha256": "3dda2cab86fed4bb7b41084a7f3d89d71694bf8a95f926027b16908c3065b448",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/pda.ts",
+      "sha256": "2f2cd05c9fb3b8e61d80d2c56fe41ccaec950d25ae6b9232e0433532c37061b8",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/program.ts",
+      "sha256": "d1aa55486435908a97029b1786d2a172ae7cec5320e9e7280fe122329073f7c2",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/futures/proposal.ts",
+      "sha256": "fa0114724fa49400d2ba795c844ad5384db7e97334c073f88413b9ff404f56f5",
+      "executable": false
+    },
+    {
+      "path": "sdk/src/index.ts",
+      "sha256": "0c8b07f12823868062c6510b24eebdcfc8a278270198fd183d541b8c97f3815a",
+      "executable": false
+    },
+    {
+      "path": "sdk/test/fixtures/api/responses.json",
+      "sha256": "27215d538fa157188f0fffb994a9140cbc3084c28cfa31867e1c82c38c356271",
+      "executable": false
+    },
+    {
       "path": "sdk/test/fixtures/futures/futures.json",
-      "sha256": "ad500c03cf8473f548d3c62ef489ebbe9ec9ab918fdb4ed7d8a9f25f801a38bf",
+      "sha256": "1b356096fe6d94a5053d4db131e484babdeb8ca2d1e137d96e2f30ffede95134",
+      "executable": false
+    },
+    {
+      "path": "sdk/test/futures-api.test.mjs",
+      "sha256": "aa8cc6a78a033ce20342f2ad12cb06afbf05f740ca32d71410a91693b3148b91",
+      "executable": false
+    },
+    {
+      "path": "sdk/test/futures-governance.test.mjs",
+      "sha256": "2dee76b81cb1113eb108c5e7f89189f3736a3661b26b81a33b17554607e326da",
+      "executable": false
+    },
+    {
+      "path": "sdk/test/futures-package.test.mjs",
+      "sha256": "ab294bf0c3ba1f956cf5c5460d99502249a4ef0b6402e4af202ddd17fabd04c4",
+      "executable": false
+    },
+    {
+      "path": "sdk/test/futures-vectors.test.mjs",
+      "sha256": "c1441e93046e20d257511534340e9272c4793b0df7b3855d51c39460bda76d12",
+      "executable": false
+    },
+    {
+      "path": "sdk/tools/futures-vectors/Cargo.lock",
+      "sha256": "3a1e80a48bfc55216847d0f4f1613d82bd7e79fc5ab92f41ca83f93105bcd7ea",
+      "executable": false
+    },
+    {
+      "path": "sdk/tools/futures-vectors/Cargo.toml",
+      "sha256": "47a8b54a955e43677eb1e620236864f6f821e98e038fbad1b07ec899289e880b",
+      "executable": false
+    },
+    {
+      "path": "sdk/tools/futures-vectors/src/main.rs",
+      "sha256": "ea963d0f6c1544f166097a1e4fedf1da960bb597aae68fc79101ed8f52b98601",
+      "executable": false
+    },
+    {
+      "path": "sdk/tsconfig.json",
+      "sha256": "ef07cdc80cee326782275bbfacd9c1da8983ac5c5ea945a75f163fb94eb4ffa8",
       "executable": false
     }
   ],
-  "lineEndingQualification": "Five PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream."
+  "lineEndingQualification": "0 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
+  "sdkVersion": "0.4.0",
+  "sourceRelease": "release/2026-10-17-cli-sdk",
+  "deployedOracleSourceCommit": "4caf83f080f7541b1f741e63871c8d701b398e9b"
 }

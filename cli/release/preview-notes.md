@@ -14,7 +14,8 @@ artifact. The older release evidence below applies to its recorded inputs.
 - `petri markets`, `market`, `book`, `trades` and `chart` read the market; `petri quote` prices an order without sending anything.
 - `petri long` and `petri short` take lots or `--usd`. Leverage (`-x`, default 10) sets the range's end on the losing side, `--to` the winning side (default: the market's suggested range), or `--range LO-HI` names both. Market orders fill within `--slippage` (default 2%) of the quote; `--limit` rests what does not fill, `--post` only rests. Every order is quoted first and asks for confirmation unless `--yes`.
 - `petri positions` shows positions with P&L, resting orders and cash per market. `close` sells a position at the book and returns the cash to your wallet; `cancel`, `deposit`, `withdraw` and `history` manage orders and cash. Markets settle on the oracle's index at expiry, into your cash in the market.
-- Your wallet pays its own fee when it holds SOL (`--route local`); otherwise the futures API's sponsor pays and Petri checks the prepared transaction before signing (`--route sponsored`).
+- Your wallet pays its own fee when it holds SOL and the order's USDC (`--route local`); otherwise the futures API's sponsor pays and Petri checks the prepared transaction before signing (`--route sponsored`).
+- USDC that Amoeba's earlier product left compressed (Light tokens) counts: `petri wallet` and `petri positions` show it, and an order that needs more than your USDC token account holds spends it. The futures API moves it into your USDC account first, in transactions Petri checks (only your own compressed USDC, only into your own account) and signs with the order. `petri deposit` still moves the token account's USDC only.
 - `petri wallet` shows balances, `petri wallet new` creates a signing wallet and `petri status` checks the setup. `petri tui` opens the terminal interface.
 
 ## Index oracle

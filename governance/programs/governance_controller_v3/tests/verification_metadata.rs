@@ -84,7 +84,7 @@ async fn send(ctx: &mut ProgramTestContext, instructions: &[Instruction]) -> boo
     }
     result.is_ok()
 }
-async fn run(own: bool) {
+async fn run(target_override: Option<Pubkey>) {
     let elf =
         std::fs::read(std::env::var("AMOEBA_GOV_V3_SBF").expect("exact controller ELF required"))
             .unwrap();
@@ -93,7 +93,8 @@ async fn run(own: bool) {
     )
     .unwrap();
     let controller = Pubkey::new_unique();
-    let target = if own { controller } else { DEVNET_SPREAD };
+    let own = target_override.is_none();
+    let target = target_override.unwrap_or(controller);
     let cfg_key = config_pda(&controller).0;
     let auth = if own {
         authority_pda(&controller).0
@@ -352,7 +353,7 @@ async fn run(own: bool) {
         ctx.banks_client.get_account(auth).await.unwrap().unwrap(),
         &authority_before,
     );
-    if !own {
+    if target == DEVNET_SPREAD {
         // Transition an authentic old record using actual Otter SBF. Include
         // donations to both accounts; Anchor refunds all excess on shrink.
         let legacy_bytes = record(
@@ -534,6 +535,8 @@ async fn run(own: bool) {
 #[tokio::test]
 #[ignore = "requires this worktree controller and finalized Mainnet Otter Verify SBF artifacts"]
 async fn actual_sbf_controller_and_frozen_target_metadata() {
-    run(true).await;
-    run(false).await;
+    run(None).await;
+    run(Some(DEVNET_SPREAD)).await;
+    run(Some(MAINNET_ORACLE)).await;
+    run(Some(MAINNET_FUTURES)).await;
 }

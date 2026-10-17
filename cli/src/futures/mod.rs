@@ -21,6 +21,7 @@ pub mod exec;
 #[cfg(feature = "dev-faucet")]
 pub mod funds;
 pub mod governance;
+pub mod light;
 pub mod market;
 pub mod ops;
 pub mod reads;
@@ -238,6 +239,12 @@ pub struct Funds {
 }
 
 impl Funds {
+    /// The owner's compressed USDC from the API, in atoms; 0 when it cannot
+    /// be read (the token account's USDC is then all there is to spend).
+    pub fn compressed(&self, ctx: &Ctx, owner: &Pubkey) -> u64 {
+        api::compressed_usdc(&ctx.api, &owner.to_string()).unwrap_or(0)
+    }
+
     pub fn load(ctx: &Ctx, owner: &Pubkey) -> Result<Self> {
         let ata = txbuild::ata(owner, &ctx.deployment()?.usdc_mint);
         let accounts = ctx.rpc.accounts(&[*owner, ata])?;

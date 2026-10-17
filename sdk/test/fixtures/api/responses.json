@@ -1,0 +1,539 @@
+{
+  "errors": {
+    "market": {
+      "body": {
+        "error": "unknown market NOPE"
+      },
+      "status": 404
+    },
+    "quote": {
+      "body": {
+        "error": "need 0 <= lo < hi <= 200 (the grid)"
+      },
+      "status": 400
+    }
+  },
+  "responses": {
+    "account": {
+      "markets": [
+        {
+          "claims": [
+            {
+              "cost": "347446476",
+              "entryValue": "111.8482",
+              "exit": {
+                "entryValue": "102.7155",
+                "lots": 918,
+                "net": "263608290",
+                "premium": "263608290"
+              },
+              "hi": 129,
+              "hiValue": "129",
+              "lo": 74,
+              "loValue": "74",
+              "lots": 918,
+              "maxPayout": "504900000",
+              "openedTs": 1792046582,
+              "payoutAtIndex": "266220000",
+              "pnlAtIndex": "-81226476",
+              "reserved": 0,
+              "seq": "5789",
+              "side": "long",
+              "slot": 17
+            },
+            {
+              "cost": "181629448",
+              "entryValue": "111.6868",
+              "exit": {
+                "entryValue": "104.9887",
+                "lots": 814,
+                "net": "236151982",
+                "premium": "65028018"
+              },
+              "hi": 134,
+              "hiValue": "134",
+              "lo": 97,
+              "loValue": "97",
+              "lots": 814,
+              "maxPayout": "301180000",
+              "openedTs": 1792046714,
+              "payoutAtIndex": "252340000",
+              "pnlAtIndex": "70710552",
+              "reserved": 0,
+              "seq": "5798",
+              "side": "short",
+              "slot": 27
+            }
+          ],
+          "expiryTs": 1793491200,
+          "label": "RAMX Oct 26",
+          "ladder": null,
+          "lp": null,
+          "markValue": "103",
+          "market": "Fi1t8X27PUPewq5Lo2YnpajNqykTmJQmzkH5Xr1gMvFf",
+          "orders": [],
+          "status": "open",
+          "symbol": "RAMX",
+          "tradable": true,
+          "trader": {
+            "free": "8125680778",
+            "paidOut": "0",
+            "reserved": "0",
+            "slot": 1
+          }
+        }
+      ],
+      "owner": "EDSr4nvx7vNKbC46p3yJN8mhYFUf4EBr6ktA7zzdzNEV",
+      "usdc": "0",
+      "usdcAta": "4h1EsaSunk3ropBVZH6Sgv2GwJzTfXX73aTW4TjHAKhY",
+      "usdcAtaExists": true
+    },
+    "book": {
+      "ladders": [
+        {
+          "escrow": "0",
+          "hi": 200,
+          "hiValue": "200",
+          "live": false,
+          "lo": 0,
+          "loValue": "0",
+          "maker": 0,
+          "owner": "2doHNHthdMce4CToUP93xmbMisdKi5Ji1mEfCbhvougt",
+          "quotedTs": 1792047780,
+          "seq": "0",
+          "steps": [
+            {
+              "ask": null,
+              "askLots": 0,
+              "askValue": null,
+              "bid": null,
+              "bidLots": 0,
+              "bidValue": null,
+              "inventory": -965,
+              "pos": 0
+            },
+            {
+              "ask": null,
+              "askLots": 0,
+              "askValue": null,
+              "bid": null,
+              "bidLots": 0,
+              "bidValue": null,
+              "inventory": -965,
+              "pos": 1
+            }
+          ],
+          "tiers": {
+            "count": 5,
+            "ratio": 120,
+            "spread": 40
+          }
+        },
+        {
+          "escrow": "25303491547",
+          "hi": 200,
+          "hiValue": "200",
+          "live": true,
+          "lo": 0,
+          "loValue": "0",
+          "maker": 1,
+          "owner": "HFaEfjgeppBcfaEZWL38ADzFndP8emhgws78BXRjwmuN",
+          "quotedTs": 1792048021,
+          "seq": "5892",
+          "steps": [
+            {
+              "ask": "10000",
+              "askLots": 7163,
+              "askValue": "1",
+              "bid": "9800",
+              "bidLots": 7163,
+              "bidValue": "0.98",
+              "inventory": 0,
+              "pos": 0
+            },
+            {
+              "ask": "10000",
+              "askLots": 7163,
+              "askValue": "2",
+              "bid": "9800",
+              "bidLots": 7163,
+              "bidValue": "1.98",
+              "inventory": 0,
+              "pos": 1
+            }
+          ],
+          "tiers": {
+            "count": 5,
+            "ratio": 120,
+            "spread": 40
+          }
+        }
+      ],
+      "market": "Fi1t8X27PUPewq5Lo2YnpajNqykTmJQmzkH5Xr1gMvFf",
+      "orders": [
+        {
+          "claim": null,
+          "close": false,
+          "entryValue": "101.8184",
+          "escrow": "61325936",
+          "hi": 111,
+          "hiValue": "111",
+          "lo": 96,
+          "loValue": "96",
+          "lots": 1054,
+          "owner": "5ys3kGrGn4htcDQazBr7p8XvNTZYi3auZKjskBVXaNVK",
+          "placedLots": 1054,
+          "placedTs": 1792047695,
+          "price": "58184",
+          "seq": "5865",
+          "side": "long",
+          "slot": 1
+        }
+      ],
+      "slot": 7459679,
+      "sources": [
+        {
+          "entryValue": "101.8184",
+          "hi": 111,
+          "hiValue": "111",
+          "lo": 96,
+          "loValue": "96",
+          "lots": 1054,
+          "owner": "5ys3kGrGn4htcDQazBr7p8XvNTZYi3auZKjskBVXaNVK",
+          "price": "58184",
+          "side": "long",
+          "source": {
+            "kind": "order",
+            "seq": "5865",
+            "slot": 1
+          }
+        },
+        {
+          "entryValue": "0.964",
+          "hi": 1,
+          "hiValue": "1",
+          "lo": 0,
+          "loValue": "0",
+          "lots": 7163,
+          "owner": "HFaEfjgeppBcfaEZWL38ADzFndP8emhgws78BXRjwmuN",
+          "price": "9640",
+          "side": "long",
+          "source": {
+            "kind": "maker",
+            "maker": 1,
+            "seq": "5892",
+            "step": 0,
+            "tier": 4
+          }
+        },
+        {
+          "entryValue": "1",
+          "hi": 1,
+          "hiValue": "1",
+          "lo": 0,
+          "loValue": "0",
+          "lots": 7163,
+          "owner": "HFaEfjgeppBcfaEZWL38ADzFndP8emhgws78BXRjwmuN",
+          "price": "10000",
+          "side": "short",
+          "source": {
+            "kind": "maker",
+            "maker": 1,
+            "seq": "5892",
+            "step": 0,
+            "tier": 4
+          }
+        }
+      ]
+    },
+    "candles": {
+      "candles": [
+        {
+          "c": 99.3876,
+          "h": 107.3006,
+          "l": 95.7672,
+          "o": 107.3006,
+          "t": 1791997200,
+          "v": 18882
+        },
+        {
+          "c": 104.5836,
+          "h": 111.4582,
+          "l": 94.6982,
+          "o": 109.187,
+          "t": 1792000800,
+          "v": 72841
+        },
+        {
+          "c": 103.5763,
+          "h": 112.4402,
+          "l": 95.6299,
+          "o": 105.5701,
+          "t": 1792004400,
+          "v": 65261
+        }
+      ],
+      "resolution": 3600
+    },
+    "depth": {
+      "asks": [
+        {
+          "cumulativeLots": 50,
+          "entryValue": "100.3123",
+          "lots": 50,
+          "premium": "143123"
+        }
+      ],
+      "bids": [
+        {
+          "cumulativeLots": 50,
+          "entryValue": "99.9523",
+          "lots": 50,
+          "premium": "139523"
+        }
+      ],
+      "hi": 104,
+      "hiValue": "104",
+      "lo": 86,
+      "loValue": "86"
+    },
+    "market": {
+      "backing": "25672770000",
+      "chainTime": 1792048055,
+      "change24hValue": "1.082",
+      "claimsOpen": 386,
+      "custody": "280957279118",
+      "expiryTs": 1793491200,
+      "grid": 200,
+      "index": {
+        "ts": 1792048018,
+        "value": "103"
+      },
+      "k": "10000",
+      "label": "RAMX Oct 26",
+      "lastEntryValue": "102.9155",
+      "lastTradeTs": 1792048042,
+      "lotUsdPerPoint": "0.01",
+      "maker": {
+        "askLots": 0,
+        "bidLots": 0,
+        "escrow": "0",
+        "free": "0",
+        "hi": null,
+        "inventoryLots": 424296,
+        "lo": null,
+        "maker": 0,
+        "owner": "2doHNHthdMce4CToUP93xmbMisdKi5Ji1mEfCbhvougt",
+        "payoutMax": "2958100000",
+        "payoutMin": "208370000",
+        "reserved": "0",
+        "slot": 0
+      },
+      "market": "Fi1t8X27PUPewq5Lo2YnpajNqykTmJQmzkH5Xr1gMvFf",
+      "period": "HzPJwxV47iTYoji9LiECtiTWBjr52Hs6PXg7NXa2m6TH",
+      "periodState": {
+        "effectiveListingTs": 1791846887,
+        "expiryTs": 1793491200,
+        "settlementValue": null,
+        "status": "live",
+        "valueDecimals": 6
+      },
+      "pool": {
+        "address": "HFaEfjgeppBcfaEZWL38ADzFndP8emhgws78BXRjwmuN",
+        "deposited": "219396678349",
+        "free": "193484361609",
+        "operator": "2doHNHthdMce4CToUP93xmbMisdKi5Ji1mEfCbhvougt",
+        "reserved": "25303491547",
+        "shares": "219296678349",
+        "valueHigh": "219640223156",
+        "valueLow": "218930913156",
+        "withdrawn": "100000000"
+      },
+      "productId": "52414d5800000000000000000000000000000000000000000000000000000000",
+      "referenceValue": "100",
+      "settlementValue": null,
+      "slot": 7459679,
+      "status": "open",
+      "stepValue": "1",
+      "suggestion": {
+        "centerValue": "103",
+        "hi": 199,
+        "highValue": "199",
+        "lo": 1,
+        "lowValue": "1",
+        "sigmaValue": "206.2247",
+        "source": "oracle-index",
+        "vol": "9.3595"
+      },
+      "symbol": "RAMX",
+      "tradable": true,
+      "trades": 1844,
+      "valueDecimals": 6,
+      "vault": "2Ny52EVuUaVXgv18rEnLDk9fm2NxzzGBVKDS1bLsY6wf",
+      "volume24hLots": 3557428,
+      "volumeLots": 3557428,
+      "volumePremium": "376553594117"
+    },
+    "markets": {
+      "markets": [
+        {
+          "backing": "25672770000",
+          "chainTime": 1792048055,
+          "change24hValue": "1.082",
+          "claimsOpen": 386,
+          "custody": "280957279118",
+          "expiryTs": 1793491200,
+          "grid": 200,
+          "index": {
+            "ts": 1792048018,
+            "value": "103"
+          },
+          "k": "10000",
+          "label": "RAMX Oct 26",
+          "lastEntryValue": "102.9155",
+          "lastTradeTs": 1792048042,
+          "lotUsdPerPoint": "0.01",
+          "maker": {
+            "askLots": 0,
+            "bidLots": 0,
+            "escrow": "0",
+            "free": "0",
+            "hi": null,
+            "inventoryLots": 424296,
+            "lo": null,
+            "maker": 0,
+            "owner": "2doHNHthdMce4CToUP93xmbMisdKi5Ji1mEfCbhvougt",
+            "payoutMax": "2958100000",
+            "payoutMin": "208370000",
+            "reserved": "0",
+            "slot": 0
+          },
+          "market": "Fi1t8X27PUPewq5Lo2YnpajNqykTmJQmzkH5Xr1gMvFf",
+          "period": "HzPJwxV47iTYoji9LiECtiTWBjr52Hs6PXg7NXa2m6TH",
+          "periodState": {
+            "effectiveListingTs": 1791846887,
+            "expiryTs": 1793491200,
+            "settlementValue": null,
+            "status": "live",
+            "valueDecimals": 6
+          },
+          "pool": {
+            "address": "HFaEfjgeppBcfaEZWL38ADzFndP8emhgws78BXRjwmuN",
+            "deposited": "219396678349",
+            "free": "193484361609",
+            "operator": "2doHNHthdMce4CToUP93xmbMisdKi5Ji1mEfCbhvougt",
+            "reserved": "25303491547",
+            "shares": "219296678349",
+            "valueHigh": "219640223156",
+            "valueLow": "218930913156",
+            "withdrawn": "100000000"
+          },
+          "productId": "52414d5800000000000000000000000000000000000000000000000000000000",
+          "referenceValue": "100",
+          "settlementValue": null,
+          "slot": 7459679,
+          "status": "open",
+          "stepValue": "1",
+          "suggestion": {
+            "centerValue": "103",
+            "hi": 199,
+            "highValue": "199",
+            "lo": 1,
+            "lowValue": "1",
+            "sigmaValue": "206.2247",
+            "source": "oracle-index",
+            "vol": "9.3595"
+          },
+          "symbol": "RAMX",
+          "tradable": true,
+          "trades": 1844,
+          "valueDecimals": 6,
+          "vault": "2Ny52EVuUaVXgv18rEnLDk9fm2NxzzGBVKDS1bLsY6wf",
+          "volume24hLots": 3557428,
+          "volumeLots": 3557428,
+          "volumePremium": "376553594117"
+        }
+      ]
+    },
+    "quote": {
+      "averageEntryValue": "100.3123",
+      "deposit": "0",
+      "escrow": "0",
+      "filled": 3,
+      "free": "8125680778",
+      "hi": 104,
+      "hiValue": "104",
+      "legs": {
+        "ladderSteps": 18,
+        "orders": 0
+      },
+      "limit": "180000",
+      "lo": 86,
+      "loValue": "86",
+      "lots": 3,
+      "market": "Fi1t8X27PUPewq5Lo2YnpajNqykTmJQmzkH5Xr1gMvFf",
+      "maxPayout": "540000",
+      "mode": "ioc",
+      "netPay": "429369",
+      "pay": "429369",
+      "premium": "429369",
+      "redeemed": "0",
+      "side": "long",
+      "slot": 7459679,
+      "usdc": "0"
+    },
+    "trades": {
+      "trades": [
+        {
+          "entryValue": "102.9155",
+          "eventIndex": 1,
+          "hi": 200,
+          "hiValue": "200",
+          "lo": 84,
+          "loValue": "84",
+          "lots": 70,
+          "premium": "13240850",
+          "side": "sell",
+          "signature": "R6BZrZf1SDNSQ6tF2mACQUoFdqTCnAHBWrp2NCaPK5FzUroDGHfZKRqpjLJwop8dCp7AmUX5GvsSHqHr4GdyvNk",
+          "slot": 7459679,
+          "sources": "ladder",
+          "taker": "EDSr4nvx7vNKbC46p3yJN8mhYFUf4EBr6ktA7zzdzNEV",
+          "ts": 1792048043
+        },
+        {
+          "entryValue": "103.3832",
+          "eventIndex": 1,
+          "hi": 118,
+          "hiValue": "118",
+          "lo": 68,
+          "loValue": "68",
+          "lots": 591,
+          "premium": "209114712",
+          "side": "buy",
+          "signature": "yMWmbTN22pevETVd6JyCo4xNssa9nMDVW2Svimnbs42BLgnrRv3mE3LTkbsaYqQkPqfcLhAWuYtXX651AKn24Ev",
+          "slot": 7459461,
+          "sources": "ladder",
+          "taker": "EDSr4nvx7vNKbC46p3yJN8mhYFUf4EBr6ktA7zzdzNEV",
+          "ts": 1792047985
+        },
+        {
+          "entryValue": "105.1063",
+          "eventIndex": 2,
+          "hi": 190,
+          "hiValue": "190",
+          "lo": 89,
+          "loValue": "89",
+          "lots": 229,
+          "premium": "36883427",
+          "side": "buy",
+          "signature": "3yWPLixZ6phAcb6bR6KRY8o9a3M8h6AML41kwjqGdNfEWwzw5pskvMdDH5MymPVSkYapbJQQCRFv2zmmEc6tVgjY",
+          "slot": 7459290,
+          "sources": "ladder",
+          "taker": "5x5pcxxG84GYgachySCCQww7jW1xHXRuPSSA4WhuU56Y",
+          "ts": 1792047954
+        }
+      ]
+    }
+  },
+  "source": "GET/POST http://127.0.0.1:4500 (dev futures API), 2026-10-15; arrays trimmed"
+}

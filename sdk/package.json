@@ -1,0 +1,85 @@
+{
+  "name": "ameba-sdk",
+  "version": "0.4.0",
+  "description": "TypeScript and Rust SDK for Ameba futures: API client, instruction builders, market decoder, proposal codec and governance gate binding",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amoeba-farm/petri.git",
+    "directory": "sdk"
+  },
+  "homepage": "https://github.com/amoeba-farm/petri/tree/main/sdk#readme",
+  "bugs": {
+    "url": "https://github.com/amoeba-farm/petri/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./futures": {
+      "types": "./dist/futures/index.d.ts",
+      "import": "./dist/futures/index.js",
+      "default": "./dist/futures/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "NOTICE",
+    "SECURITY.md",
+    "SUPPORT.md",
+    "THIRD_PARTY_NOTICES.md",
+    "README.md",
+    "LICENSE",
+    "docs/*.md",
+    "dist/**/*.js",
+    "dist/**/*.d.ts"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test --test-concurrency=1",
+    "check:rust": "cargo fmt -- --check && cargo test --locked",
+    "check": "npm run typecheck && npm test && npm run check:rust",
+    "vectors": "cargo run --offline --manifest-path tools/futures-vectors/Cargo.toml -- test/fixtures/futures"
+  },
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "keywords": [
+    "ameba",
+    "amoeba",
+    "futures",
+    "capped-futures",
+    "sdk",
+    "typescript",
+    "solana"
+  ],
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public",
+    "provenance": false,
+    "registry": "https://registry.npmjs.org/"
+  },
+  "packageManager": "npm@10.9.8",
+  "dependencies": {
+    "@solana/web3.js": "1.98.4",
+    "buffer": "6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  }
+}

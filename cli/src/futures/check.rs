@@ -1,8 +1,9 @@
 //! Checks a sponsor-prepared futures transaction before the owner signs it:
 //! the sponsor pays the fee, only the compute budget, the owner's own USDC
-//! account creation and the trusted futures program are called, every futures
-//! step targets this market with the owner as signer and the owner's own
-//! token account, and the steps do exactly what was asked.
+//! account creation, the trusted futures program and decompressions of the
+//! owner's compressed USDC into their own USDC account (`light`) are called,
+//! every futures step targets this market with the owner as signer and the
+//! owner's own token account, and the steps do exactly what was asked.
 
 use ameba_sdk_futures::futures::{FuturesInstruction, NO_CLAIM, SubmitArgs};
 use borsh::BorshDeserialize;
@@ -11,7 +12,9 @@ use solana_transaction::Transaction;
 
 use super::{
     error::{Error, Result, bail},
+    light,
     txbuild::{ATA_PROGRAM, COMPUTE_BUDGET_PROGRAM},
+    units::USDC_DECIMALS,
 };
 
 /// What the owner asked for.
@@ -36,6 +39,9 @@ pub enum Intent {
         seq: u64,
         withdraw: bool,
     },
+    /// A transaction that only moves the owner's compressed USDC into their
+    /// USDC account, ahead of the one that spends it (the API's `before`).
+    Decompress,
 }
 
 /// The accounts the transaction must stay within.
@@ -68,6 +74,7 @@ pub fn check(tx: &Transaction, s: &Scope, intent: &Intent) -> Result<()> {
         bail("refusing: the prepared transaction asks for unexpected signers")?;
     }
     let mut deposited: u128 = 0;
+    let mut decompressed: u128 = 0;
     let mut did = (false, false, false); // (main step, withdraw, ata)
     for (i, ci) in msg.instructions.iter().enumerate() {
         let program = keys
@@ -84,6 +91,17 @@ pub fn check(tx: &Transaction, s: &Scope, intent: &Intent) -> Result<()> {
                 ))?;
             }
             did.2 = true;
+            continue;
+        }
+        if *program == light::PROGRAM {
+            let expect = light::Expect {
+                owner: s.owner,
+                sponsor: s.sponsor,
+                mint: s.mint,
+                decimals: USDC_DECIMALS as u8,
+                destination: s.owner_token,
+            };
+            decompressed += u128::from(light::check(keys, ci, i, &expect)?);
             continue;
         }
         if program != s.program {
@@ -165,6 +183,12 @@ pub fn check(tx: &Transaction, s: &Scope, intent: &Intent) -> Result<()> {
                 name(&ix)
             ))?;
         }
+    }
+    if matches!(intent, Intent::Decompress) {
+        if decompressed == 0 {
+            bail("refusing: the prepared transaction moves none of your compressed USDC")?;
+        }
+        return Ok(());
     }
     if !did.0 {
         bail("refusing: the prepared transaction leaves out the requested step")?;
@@ -351,5 +375,57 @@ mod tests {
         assert!(run(&f, &tx(&f.sponsor, wrong), &intent).is_err());
         // An empty transaction does nothing asked for.
         assert!(run(&f, &tx(&f.sponsor, vec![compute_unit_limit(1)]), &intent).is_err());
+    }
+
+    #[test]
+    fn your_compressed_usdc_may_be_moved_into_your_own_account_only() {
+        let f = fx();
+        let owner_token = ata(&f.owner, &f.mint);
+        let step = |to: &Pubkey| crate::futures::light::api_step(&f.sponsor, &f.owner, &f.mint, to);
+        let scope = Scope {
+            owner: &f.owner,
+            sponsor: &f.sponsor,
+            program: &f.market.program,
+            market: &f.market.market,
+            owner_token: &owner_token,
+            mint: &f.mint,
+        };
+        let deposit = f.market.deposit(&f.owner, &owner_token, 12);
+        // In the transaction that spends it, ahead of the deposit.
+        let main = tx(
+            &f.sponsor,
+            vec![
+                compute_unit_limit(400_000),
+                step(&owner_token),
+                deposit.clone(),
+            ],
+        );
+        assert!(check(&main, &scope, &Intent::Deposit { amount: 12 }).is_ok());
+        // In a transaction of its own, ahead of the order.
+        let before = tx(
+            &f.sponsor,
+            vec![
+                create_ata_idempotent(&f.sponsor, &f.owner, &f.mint),
+                step(&owner_token),
+            ],
+        );
+        assert!(check(&before, &scope, &Intent::Decompress).is_ok());
+        // Paid into anyone else's account: refused.
+        let elsewhere = tx(
+            &f.sponsor,
+            vec![step(&Pubkey::new_unique()), deposit.clone()],
+        );
+        let e = check(&elsewhere, &scope, &Intent::Deposit { amount: 12 }).unwrap_err();
+        assert!(
+            e.message.contains("not a decompression of your own USDC"),
+            "{}",
+            e.message
+        );
+        // A decompression transaction that also does something else, or
+        // nothing: refused.
+        let sneaky = tx(&f.sponsor, vec![step(&owner_token), deposit]);
+        assert!(check(&sneaky, &scope, &Intent::Decompress).is_err());
+        let empty = tx(&f.sponsor, vec![compute_unit_limit(400_000)]);
+        assert!(check(&empty, &scope, &Intent::Decompress).is_err());
     }
 }

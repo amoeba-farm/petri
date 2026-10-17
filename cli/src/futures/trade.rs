@@ -541,12 +541,15 @@ pub fn taken(outcome: &Outcome, program: &Pubkey) -> Option<Taken> {
     })
 }
 
-fn route(ctx: &Ctx, funds: &Funds) -> Route {
+/// `need`: the USDC the transaction takes from the wallet. When the wallet's
+/// token account holds less, only the sponsored route can make up the rest
+/// from compressed USDC (the API decompresses it), so `auto` takes it.
+fn route(ctx: &Ctx, funds: &Funds, need: u64) -> Route {
     use super::args::RouteArg;
     match ctx.s.route {
         RouteArg::Local => Route::Local,
         RouteArg::Sponsored => Route::Sponsored,
-        RouteArg::Auto if funds.sol >= LOCAL_MIN_LAMPORTS => Route::Local,
+        RouteArg::Auto if funds.sol >= LOCAL_MIN_LAMPORTS && need <= funds.usdc => Route::Local,
         RouteArg::Auto => Route::Sponsored,
     }
 }
@@ -589,7 +592,10 @@ fn send_submit(
     loop {
         let chain = Chain::load(ctx, market)?;
         let funds = Funds::load(ctx, &owner)?;
-        let result = match route(ctx, &funds) {
+        let need = evaluate(&chain, &owner, args)
+            .map(|e| e.deposit)
+            .unwrap_or(0);
+        let result = match route(ctx, &funds, need) {
             Route::Local => {
                 let e = evaluate(&chain, &owner, args)?;
                 if args.mode == MODE_POST && e.filled > 0 {
@@ -632,8 +638,9 @@ fn send_submit(
                     withdraw,
                     max_deposit: worst_need(&args, chain.grid.k),
                 };
-                exec::send_prepared(ctx, signer, "submit", params, |tx, sponsor| {
-                    scope_check(ctx, &chain, &owner, &funds, &intent, tx, sponsor)
+                exec::send_prepared(ctx, signer, "submit", params, |tx, sponsor, before| {
+                    let intent = if before { &Intent::Decompress } else { &intent };
+                    scope_check(ctx, &chain, &owner, &funds, intent, tx, sponsor)
                 })
             }
         };
@@ -680,6 +687,11 @@ fn sent_lines(
         if let Some(slot) = t.rested {
             lines.push(format!("Resting as order #{slot}"));
         }
+    }
+    for signature in &outcome.before {
+        lines.push(p.dim(&format!(
+            "{signature} · moved compressed USDC into your wallet"
+        )));
     }
     lines.push(p.dim(&format!(
         "{} · {} route",
@@ -1154,7 +1166,7 @@ fn send_simple(ctx: &Ctx, signer: &dyn Signer, market: &Pubkey, intent: Intent) 
     let owner = signer.pubkey();
     let chain = Chain::load(ctx, market)?;
     let funds = Funds::load(ctx, &owner)?;
-    match route(ctx, &funds) {
+    match route(ctx, &funds, 0) {
         Route::Local => {
             let mut plan = Plan::new();
             match &intent {
@@ -1177,6 +1189,7 @@ fn send_simple(ctx: &Ctx, signer: &dyn Signer, market: &Pubkey, intent: Intent) 
                     plan.push("cancel", chain.market.cancel(&owner, *slot, *seq));
                 }
                 Intent::Submit { .. } => unreachable!("orders go through send_submit"),
+                Intent::Decompress => unreachable!("only the API prepares decompressions"),
             }
             exec::send_local(ctx, signer, &plan)
         }
@@ -1200,9 +1213,11 @@ fn send_simple(ctx: &Ctx, signer: &dyn Signer, market: &Pubkey, intent: Intent) 
                     json!({ "market": m, "slot": slot, "seq": seq.to_string(), "withdraw": withdraw }),
                 ),
                 Intent::Submit { .. } => unreachable!("orders go through send_submit"),
+                Intent::Decompress => unreachable!("only the API prepares decompressions"),
             };
-            exec::send_prepared(ctx, signer, action, params, |tx, sponsor| {
-                scope_check(ctx, &chain, &owner, &funds, &intent, tx, sponsor)
+            exec::send_prepared(ctx, signer, action, params, |tx, sponsor, before| {
+                let intent = if before { &Intent::Decompress } else { &intent };
+                scope_check(ctx, &chain, &owner, &funds, intent, tx, sponsor)
             })
         }
     }
@@ -1219,6 +1234,16 @@ pub fn deposit(ctx: &Ctx, p: Paint, a: &AmountArgs) -> Result<Report> {
     }
     let funds = Funds::load(ctx, &owner)?;
     if amount > funds.usdc {
+        // A deposit moves only the token account's USDC; orders spend
+        // compressed USDC themselves (the API decompresses it).
+        let compressed = funds.compressed(ctx, &owner);
+        if compressed > 0 {
+            bail(format!(
+                "your wallet has {} USDC, plus {} compressed that orders spend directly; deposit less, or place the order",
+                usdc(funds.usdc),
+                usdc(compressed)
+            ))?;
+        }
         bail(format!(
             // DEV-ONLY: REMOVE FOR PROD (the dev build's `petri faucet`).
             "your wallet has {} USDC; {}deposit less",
@@ -1361,6 +1386,7 @@ mod tests {
             steps: vec![],
             logs,
             slot: 1,
+            before: vec![],
         };
         assert_eq!(
             taken(&outcome, &futures),

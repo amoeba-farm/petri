@@ -1,0 +1,5 @@
+Ameba SDK for the Amoeba project
+
+The Rust crate depends on the Ameba futures client crate
+(`ameba-futures-client`), linked by path from this monorepo's
+`futures/crates/futures-client`.

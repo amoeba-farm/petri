@@ -1,6 +1,6 @@
 {
   "source": {
-    "futuresCommit": "c1005099dbcd872156a791464477109cf83d46b3",
+    "futuresCommit": "unknown",
     "generator": "tools/futures-vectors"
   },
   "vectors": {
@@ -1447,12 +1447,32 @@
       "vault": {
         "position": {
           "bump": 249,
-          "data": "QUZSVkxQUzH5AAAAAAAAACAImZ8ZXD6VKTAzzI0dDJ7wGJxL9wZPTqy3LFHl77KThcH+Onez8CxopeEeWpfTD0yIxQE+erbzL2yo5SFdmtb//////////wcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+          "data": "QUZSVkxQUzH5/////////yAImZ8ZXD6VKTAzzI0dDJ7wGJxL9wZPTqy3LFHl77KThcH+Onez8CxopeEeWpfTD0yIxQE+erbzL2yo5SFdmtb//////////wcAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAIAAAAFc1bBwAAAAA=",
           "deposited": "7",
           "owner": "A18nxBUCAuqPCPBm3Aiae5WuHAoQ7WkD81DSgv3Uyyed",
+          "rewardPaid": "72057594037927935",
+          "rewardPending": "123456789",
+          "rewardSnapshot": "633825300114114700748351602693",
           "shares": "18446744073709551615",
           "vault": "3A3eqHrnruUkbXHYEwNJ1gJWigHe86GinQE21m9eWcSe",
           "withdrawn": "0"
+        },
+        "rewarded": {
+          "data": "QUZSVkFMVDH6AwAAAAAAAML/O3i08S1ppuIfW5jUEE2JxgI/e7f0MG2p5iJem9cU3BhVkc0KRoO//Dh0se0qZqPfG1iU0Q1KhsL/O3i08S2d2RVSjssHRIC8+TVyrusnY6DcGVWSzgpHg8D8OXWx7ofWEgAAAAAAzcEZDzMAAADNog8VMwAAAADh9QUAAAAAQFzQagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAj56t/MwbKnlIV6a1xNQjMgFQX669zNvrOglYZ7aFlOQzAlFgr77N3Ow7Cllot4aV5PQDEmFwf46d7PwLGil4YPA/Dl1se4qZ6PgHFiV0Q5Kh8MAPHi18S5qp+MfXJjVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBRlJWUldEMQkAAAAAAAAAd7PwLGil4R5al9MPTIjFAT56tvMvbKjlIV2a1hNPjMhqp+MfXJjVEU6KxgM/fLj1MW2q5iNfnNgUUY3KBkN/u12a1hNPjMgEQX269jNvrOgkYZ3aFlOPywhEgb36NnKvgKK9agAAAAAAgeZqAAAAAABAehDzWgAAwH3AagAAAAA5MAAAAAAAAAAAAAAQAAAAAF7QsgAAAAAAjHd8WwYAAAAQpdToAAAAAAAAAAAAAAA=",
+          "rewards": {
+            "acc": "1267650600228229401496703217721",
+            "account": "8BLhPBwM9SJvkEVUkNx2vNqhEATp5uuNNaUkR78jirgS",
+            "amount": "100000000000000",
+            "decimals": 9,
+            "distributed": "6990000000000",
+            "endTs": "1793491200",
+            "house": "7JPrXKWw6Ww5u9gS7duVPDHjqeWSRys8RZmiFSCMqzpe",
+            "houseShares": "3000000000",
+            "lastTs": "1791000000",
+            "mint": "94GewxwTHvnfxMi9BsZ8dCciqeKRpACq8vwTFLwLZ4xw",
+            "paid": "1000000000000",
+            "startTs": "1790812800"
+          }
         },
         "vault": {
           "bump": 250,
@@ -1468,6 +1488,7 @@
           ],
           "operator": "E8BpgbWXkDmzX3bKnrEyDT59NjRELg1k9ainkzD2YgeF",
           "quoteMint": "FpADTkCNT22LQDbcipCH1enWSrcPv6tiiA2Nw5UZwRx8",
+          "rewards": null,
           "shares": "219296678349",
           "withdrawn": "100000000"
         }

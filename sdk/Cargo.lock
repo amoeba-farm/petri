@@ -65,7 +65,7 @@ dependencies = [
 
 [[package]]
 name = "ameba-sdk"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "ameba-futures-client",
  "base64 0.22.1",
