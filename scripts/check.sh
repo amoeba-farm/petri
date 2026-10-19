@@ -9,8 +9,8 @@
 # Each runs from its own folder, so its rust-toolchain.toml applies.
 #
 # Environment:
-#   JOBS=3                       cargo / cargo-build-sbf parallelism (the dev VM
-#                                shares 4 cores with the live services)
+#   JOBS=N                       cargo / cargo-build-sbf parallelism; default half
+#                                the cores (`nproc`), so two builds fit at once
 #   FUTURES_TEST_DATABASE_URL    a scratch Postgres database for the API's
 #                                history and candidate tests (they TRUNCATE
 #                                its futures tables; never point it at a live
@@ -27,11 +27,11 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 # Rust cache, no incremental data or debug info, its ports.
 # shellcheck disable=SC1091
 [ -f "$root/.agent.env" ] && . "$root/.agent.env"
-JOBS="${JOBS:-3}"
+JOBS="${JOBS:-$(( ($(nproc) + 1) / 2 ))}"
 AGAVE_BIN="${AGAVE_BIN:-$HOME/.local/share/solana/install/releases/4.0.0/solana-release/bin}"
 export PATH="$AGAVE_BIN:$PATH"
 export CARGO_BUILD_JOBS="$JOBS"
-ALL=(governance oracle futures api sdk cli web research docs)
+ALL=(governance oracle futures api sdk cli web research docs ops-dashboard)
 # Node tests in research/ that fail on main today (pre-existing; the research
 # oracle reader test expects a catalog shape the API no longer serves).
 # Skipped in the gating run, then run and reported; fix and remove.
@@ -347,6 +347,13 @@ check_research() {
   node_known "$RESEARCH_KNOWN_FAILURES" test/*.test.mjs
   run cargo fmt -- --check
   run cargo test --locked -j "$JOBS"
+}
+
+check_ops-dashboard() {
+  cd "$root/ops-dashboard"
+  for file in server.mjs lib/*.mjs public/*.mjs test/*.mjs; do run node --check "$file"; done
+  run bash -n deploy/install.sh
+  run node --test test/*.test.mjs
 }
 
 check_docs() {

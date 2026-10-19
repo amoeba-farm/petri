@@ -90,7 +90,7 @@ export declare function futuresSideName(side: number): "long" | "short";
 /** Futures program errors are `Custom(ERROR_BASE + n)`. */
 export declare const ERROR_BASE = 1179779072;
 /** `FuturesError` in declaration order; the code is `ERROR_BASE + index + 1`. */
-export declare const ERROR_NAMES: readonly ["InvalidInstruction", "InvalidAccount", "Unauthorized", "NotTradable", "InvalidShape", "InvalidPrice", "InsufficientFunds", "TraderCapacity", "OrderCapacity", "ClaimCapacity", "MakerCapacity", "BadProposal", "Unbalanced", "NotBestPrice", "NotMaxFill", "FifoViolation", "SearchLimit", "MinFill", "WouldCross", "NotComplement", "ClaimNotFound", "OrderNotFound", "NotSettled", "AlreadyFinal", "Overflow", "Custody", "Insolvent", "LimitExceeded", "NotExpired", "ClaimReserved", "VaultCapacity"];
+export declare const ERROR_NAMES: readonly ["InvalidInstruction", "InvalidAccount", "Unauthorized", "NotTradable", "InvalidShape", "InvalidPrice", "InsufficientFunds", "TraderCapacity", "OrderCapacity", "ClaimCapacity", "MakerCapacity", "BadProposal", "Unbalanced", "NotBestPrice", "NotMaxFill", "FifoViolation", "SearchLimit", "MinFill", "WouldCross", "NotComplement", "ClaimNotFound", "OrderNotFound", "NotSettled", "AlreadyFinal", "Overflow", "Custody", "Insolvent", "LimitExceeded", "NotExpired", "ClaimReserved", "VaultCapacity", "CreditLimit", "NeedsRecovery"];
 export type FuturesErrorName = (typeof ERROR_NAMES)[number];
 /** Futures error code by name, e.g. `ERROR_CODES.MinFill === 0x46520012`. */
 export declare const ERROR_CODES: Readonly<Record<FuturesErrorName, number>>;

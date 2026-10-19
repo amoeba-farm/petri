@@ -60,13 +60,113 @@ fn heading(frame: &mut Frame, area: Rect, value: &str) {
     frame.render_widget(Paragraph::new(safe(value)).style(strong()), area);
 }
 /// Registers a clickable area; returns whether it has keyboard focus or the pointer.
+/// Behind an open modal or ticket nothing does: a click there closes it.
 pub(crate) fn register(app: &mut App, area: Rect, action: Action) -> bool {
     let focused = app.modal.is_none() && app.focus == app.hits.len();
-    let hovered = app
-        .pointer
-        .is_some_and(|(x, y)| area.contains((x, y).into()));
+    let behind = (app.modal.is_some() || app.markets.ticket.is_some()) && !app.drawing_modal;
+    let hovered = !behind
+        && app
+            .pointer
+            .is_some_and(|(x, y)| area.contains((x, y).into()));
     app.hits.push(Hit { area, action });
     focused || hovered
+}
+/// The Fund view: the oracle balance with Add funds and Withdraw, then the
+/// finds (each a button that opens it) and your sources (fund.rs).
+fn fund_view(frame: &mut Frame, app: &mut App, screen: Rect, body: Rect) {
+    use crate::research::fund::{self, Kind};
+    let inner = panel(frame, body, None);
+    let content = Rect::new(
+        inner.x + 1,
+        inner.y,
+        inner.width.saturating_sub(2),
+        inner.height,
+    );
+    let balance = fund::balance_line(&app.fund);
+    let x = content.x + balance.chars().count() as u16 + 3;
+    label(
+        frame,
+        within(content, content.y, 1),
+        balance,
+        Style::default().fg(TEXT),
+    );
+    // Add funds and Withdraw beside the balance, else under it.
+    let mut top = content.y + 2;
+    if app.fund.snap.owner.is_some() {
+        let row = if x + 23 <= content.right() {
+            Rect::new(x, content.y, content.right() - x, 1)
+        } else {
+            top += 1;
+            within(content, content.y + 1, 1)
+        };
+        buttons(
+            frame,
+            app,
+            row,
+            vec![
+                ("Add funds", Action::FundTicket(Kind::Deposit), false),
+                ("Withdraw", Action::FundTicket(Kind::Withdraw), false),
+            ],
+        );
+    }
+    let below = Rect::new(
+        content.x,
+        top,
+        content.width,
+        content.bottom().saturating_sub(top),
+    );
+    let drawn = fund::content(frame, &app.fund, below);
+    for (area, title, index) in drawn.finds {
+        button(
+            frame,
+            app,
+            area,
+            &safe(&title),
+            Action::ShowFind(index),
+            false,
+        );
+    }
+    if let Some(ticket) = drawn.ticket {
+        outside(app, screen, ticket, Action::CloseFundTicket);
+    }
+}
+
+/// Clicks anywhere on `screen` outside a pop-up's `box_` close it, as on a
+/// web page: `close` covers the four sides around the box.
+fn outside(app: &mut App, screen: Rect, box_: Rect, close: Action) {
+    for area in [
+        Rect::new(
+            screen.x,
+            screen.y,
+            screen.width,
+            box_.y.saturating_sub(screen.y),
+        ),
+        Rect::new(
+            screen.x,
+            box_.bottom(),
+            screen.width,
+            screen.bottom().saturating_sub(box_.bottom()),
+        ),
+        Rect::new(
+            screen.x,
+            box_.y,
+            box_.x.saturating_sub(screen.x),
+            box_.height,
+        ),
+        Rect::new(
+            box_.right(),
+            box_.y,
+            screen.right().saturating_sub(box_.right()),
+            box_.height,
+        ),
+    ] {
+        if area.width > 0 && area.height > 0 {
+            app.hits.push(Hit {
+                area,
+                action: close.clone(),
+            });
+        }
+    }
 }
 fn button(frame: &mut Frame, app: &mut App, area: Rect, title: &str, action: Action, active: bool) {
     if area.width == 0 || area.height == 0 {
@@ -229,13 +329,11 @@ fn footer(frame: &mut Frame, app: &App, area: Rect) {
         let key = Style::default().fg(MUTED);
         let separator = Style::default().fg(DIM);
         Line::from(vec![
-            Span::styled("Click", key),
-            Span::styled(" or ", muted()),
             Span::styled("Tab", key),
             Span::styled(" · ", separator),
             Span::styled("Enter", key),
             Span::styled(" · ", separator),
-            Span::styled("m/c/a/e/r", key),
+            Span::styled("m/c/a/e/r/f", key),
             Span::styled(" · ", separator),
             Span::styled("↑/↓", key),
             Span::styled(" Agents", muted()),
@@ -261,6 +359,7 @@ fn footer(frame: &mut Frame, app: &App, area: Rect) {
 
 pub fn draw(frame: &mut Frame, app: &mut App) {
     app.hits.clear();
+    app.drawing_modal = false;
     let area = frame.area();
     frame.render_widget(
         Block::default().style(Style::default().fg(TEXT).bg(BG)),
@@ -269,10 +368,8 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     if area.width < 45 || area.height < 16 {
         frame.render_widget(
             Paragraph::new(vec![
-                Line::styled("Petri research", accent().add_modifier(Modifier::BOLD)),
-                Line::raw(""),
-                Line::raw("Enlarge the terminal to at least 45 × 16."),
-                Line::styled("Press q to quit.", muted()),
+                Line::styled("Petri", accent().add_modifier(Modifier::BOLD)),
+                Line::styled("45 × 16 minimum · q Quit", muted()),
             ]),
             area,
         );
@@ -301,13 +398,28 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     let body = rows[4];
     tabs(frame, app, rows[2]);
     let mut main = body;
+    if app.view == View::Fund {
+        fund_view(frame, app, area, body);
+        footer(frame, app, rows[6]);
+        if let Some(modal) = app.modal.clone() {
+            let parent = Rect::new(area.x + 1, area.y + 1, area.width - 2, area.height - 2);
+            modal_view(frame, app, parent, modal);
+        }
+        if app.focus >= app.hits.len() {
+            app.focus = 0;
+        }
+        return;
+    }
     if app.view == View::Markets {
         if body.width >= 72 {
-            crate::research::markets::sidebar(
+            let shown = crate::research::markets::sidebar(
                 frame,
                 &app.markets,
                 Rect::new(body.x, body.y, 22, body.height),
             );
+            for (index, area) in shown.into_iter().enumerate() {
+                register(app, area, Action::Market(index));
+            }
             main = Rect::new(body.x + 25, body.y, body.width - 25, body.height);
         }
         let inner = panel(frame, main, None);
@@ -317,7 +429,13 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             inner.width.saturating_sub(2),
             inner.height,
         );
-        crate::research::markets::content(frame, &app.markets, content);
+        let now = chain_now(app);
+        let months = app.fund.snap.months.clone();
+        if let Some(ticket) =
+            crate::research::markets::content(frame, &app.markets, content, &months, now)
+        {
+            outside(app, area, ticket, Action::CloseTicket);
+        }
         footer(frame, app, rows[6]);
         if let Some(modal) = app.modal.clone() {
             let parent = Rect::new(area.x + 1, area.y + 1, area.width - 2, area.height - 2);
@@ -351,14 +469,27 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                 .unwrap_or(0);
             let a = app.snapshot.agents[index].clone();
             let next = app.snapshot.agents[(index + 1) % count].id.clone();
+            let title = format!("{} · {}  next →", safe(&a.harness), safe(&a.name));
+            let width = (title.chars().count() as u16 + 2).min(content.width);
             button(
                 frame,
                 app,
-                Rect::new(content.x, content.y, content.width, 1),
-                &format!("{} · {}  [next agent →]", safe(&a.name), safe(&a.harness)),
+                Rect::new(content.x, content.y, width, 1),
+                &title,
                 Action::Agent(next),
-                true,
+                !app.new_agent,
             );
+            let x = content.x + width + 2;
+            if x + 13 <= content.right() {
+                button(
+                    frame,
+                    app,
+                    Rect::new(x, content.y, 13, 1),
+                    "+ New agent",
+                    Action::NewAgent,
+                    app.new_agent && app.view == View::Connect,
+                );
+            }
             content.y += 2;
             content.height = content.height.saturating_sub(2);
         }
@@ -366,11 +497,8 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     if let Some(error) = app.research_error.clone() {
         frame.render_widget(
             Paragraph::new(vec![
-                Line::styled("Oracle research is unavailable here.", strong()),
-                Line::raw(""),
-                Line::raw(safe(&error)),
-                Line::raw(""),
-                Line::styled("Press m for futures Markets.", muted()),
+                Line::styled("Research unavailable", strong()),
+                Line::styled(safe(&error), muted()),
             ])
             .wrap(Wrap { trim: true }),
             content,
@@ -378,8 +506,14 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         footer(frame, app, rows[6]);
         return;
     }
+    // Until the workspace is first read, nothing rather than an empty one.
+    if !app.loaded {
+        footer(frame, app, rows[6]);
+        return;
+    }
     match app.view {
-        View::Markets => {}
+        // Drawn earlier, without the agents beside them.
+        View::Markets | View::Fund => {}
         View::Connect => connect(frame, app, content),
         View::Activity => activity(frame, app, content),
         View::Evidence => evidence(frame, app, content),
@@ -398,16 +532,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
 fn sidebar(frame: &mut Frame, app: &mut App, area: Rect) {
     app.sidebar = area;
     let inner = panel(frame, area, Some("AGENTS"));
-    if app.snapshot.agents.is_empty() {
-        label(
-            frame,
-            Rect::new(inner.x + 1, inner.y + 1, inner.width.saturating_sub(2), 3),
-            "No agents yet.",
-            muted(),
-        );
+    if !app.loaded {
         return;
     }
-    let capacity = usize::from(inner.height.saturating_sub(1) / 3).max(1);
+    // Each agent is one block of two lines, its harness over its name; the
+    // selected one has one bar down its side. "+ New agent" follows them.
+    let capacity = usize::from(inner.height.saturating_sub(3) / 3).max(1);
     app.agent_scroll = app
         .agent_scroll
         .min(app.snapshot.agents.len().saturating_sub(capacity));
@@ -419,21 +549,23 @@ fn sidebar(frame: &mut Frame, app: &mut App, area: Rect) {
         .take(capacity)
         .cloned()
         .collect::<Vec<_>>();
-    for (index, agent) in agents.iter().enumerate() {
-        let y = inner.y + 1 + index as u16 * 3;
+    let mut y = inner.y + 1;
+    if agents.is_empty() {
+        label(
+            frame,
+            Rect::new(inner.x + 1, y, inner.width.saturating_sub(2), 1),
+            "No agents yet.",
+            muted(),
+        );
+        y += 2;
+    }
+    for agent in &agents {
         if y + 2 > inner.bottom() {
             break;
         }
-        let selected = Some(&agent.id) == app.selected_agent.as_ref();
-        let focused = register(
-            app,
-            Rect::new(inner.x, y, inner.width, 1),
-            Action::Agent(agent.id.clone()),
-        );
-        app.hits.push(Hit {
-            area: Rect::new(inner.x, y + 1, inner.width, 1),
-            action: Action::Agent(agent.id.clone()),
-        });
+        let selected = !app.new_agent && Some(&agent.id) == app.selected_agent.as_ref();
+        let block = Rect::new(inner.x, y, inner.width, 2);
+        let focused = register(app, block, Action::Agent(agent.id.clone()));
         let background = if selected {
             SELECTED
         } else if focused {
@@ -441,508 +573,445 @@ fn sidebar(frame: &mut Frame, app: &mut App, area: Rect) {
         } else {
             PANEL
         };
-        let marker = if selected { "> " } else { "  " };
-        let name = if selected || focused {
+        let bar = Span::styled(if selected { "▌" } else { " " }, accent());
+        let harness = if agent.revoked_at.is_some() {
+            Style::default().fg(DIM).add_modifier(Modifier::BOLD)
+        } else if selected || focused {
             accent().add_modifier(Modifier::BOLD)
         } else {
             strong()
         };
-        let subtitle = if agent.revoked_at.is_some() {
-            Span::styled("Disconnected", Style::default().fg(ALERT))
-        } else {
-            Span::styled(safe(&agent.harness), muted())
-        };
+        let mut second = vec![bar.clone(), Span::styled(safe(&agent.name), muted())];
+        if agent.revoked_at.is_some() {
+            second.push(Span::styled(" · off", Style::default().fg(ALERT)));
+        }
         frame.render_widget(
             Paragraph::new(vec![
-                Line::from(vec![
-                    Span::styled(marker, accent()),
-                    Span::styled(safe(&agent.name), name),
-                ]),
-                Line::from(vec![Span::styled(marker, accent()), subtitle]),
+                Line::from(vec![bar, Span::styled(safe(&agent.harness), harness)]),
+                Line::from(second),
             ])
             .style(Style::default().bg(background)),
-            Rect::new(inner.x, y, inner.width, 2),
+            block,
+        );
+        // A dot while it is researching.
+        if agent.revoked_at.is_none() && app.activity_of(&agent.id).is_some() {
+            frame.buffer_mut().set_string(
+                inner.right().saturating_sub(2),
+                y,
+                "●",
+                accent().bg(background),
+            );
+        }
+        y += 3;
+    }
+    let new = app.new_agent && app.view == View::Connect;
+    if y < inner.bottom() {
+        button(
+            frame,
+            app,
+            Rect::new(inner.x + 1, y, 13.min(inner.width.saturating_sub(1)), 1),
+            "+ New agent",
+            Action::NewAgent,
+            new,
         );
     }
 }
 
+/// Connect: the selected agent, or a fresh setup for a new one ("+ New
+/// agent", or when there are none yet).
 fn connect(frame: &mut Frame, app: &mut App, area: Rect) {
-    if area.height < 21 || area.width < 62 {
-        compact_connect(frame, app, area);
-        return;
-    }
-    heading(frame, within(area, area.y, 1), "Connect your agent");
+    let agent = app
+        .snapshot
+        .agents
+        .iter()
+        .find(|a| Some(&a.id) == app.selected_agent.as_ref())
+        .cloned();
+    // Short terminals drop the blank rows between the parts.
+    let requests = app.snapshot.pairings.len() as u16;
+    let gap = u16::from(area.height >= 10 + 2 * requests.min(2));
+    let y = match agent {
+        Some(agent) if !app.new_agent => agent_page(frame, app, area, &agent, gap),
+        _ => new_agent_page(frame, app, area, gap),
+    };
+    connection_requests(frame, app, area, y);
+}
+
+/// Buttons from row `y`, left to right, onto the next row when one does
+/// not fit; returns the row after the last.
+fn button_rows(
+    frame: &mut Frame,
+    app: &mut App,
+    area: Rect,
+    mut y: u16,
+    values: Vec<(&str, Action, bool)>,
+) -> u16 {
     let mut x = area.x;
-    let mut y = area.y + 2;
-    for (index, harness) in App::HARNESSES.iter().enumerate() {
-        let width = harness.len() as u16 + 2;
-        if x + width > area.right() {
-            y += 2;
+    for (title, action, active) in values {
+        let width = title.chars().count() as u16 + 2;
+        if x > area.x && x + width > area.right() {
             x = area.x;
+            y += 1;
         }
         if y >= area.bottom() {
-            return;
+            break;
         }
+        let width = width.min(area.right().saturating_sub(x));
+        button(frame, app, Rect::new(x, y, width, 1), title, action, active);
+        x += width + 2;
+    }
+    y + 1
+}
+
+/// A connected agent: what it is doing, the wallet it earns for, Copy
+/// start message and Disconnect.
+fn agent_page(
+    frame: &mut Frame,
+    app: &mut App,
+    area: Rect,
+    agent: &crate::research::model::Agent,
+    gap: u16,
+) -> u16 {
+    heading(
+        frame,
+        within(area, area.y, 1),
+        &format!("{} · {}", agent.harness, agent.name),
+    );
+    let mut y = area.y + 1;
+    let activity = app.activity_of(&agent.id).cloned();
+    let status = if agent.revoked_at.is_some() {
+        "Disconnected".to_string()
+    } else {
+        match &activity {
+            Some(run) => format!("Connected · researching {}", work_title(app, run)),
+            None => "Connected · idle".into(),
+        }
+    };
+    label(frame, within(area, y, 1), status, muted());
+    y += 1;
+    if let Some(message) = activity.as_ref().and_then(|a| a.last_message.clone()) {
+        label(
+            frame,
+            within(area, y, 1),
+            format!("Last: {}", safe(&message)),
+            muted(),
+        );
+        y += 1;
+    }
+    y = wallet(frame, app, area, y + gap, &agent.payout_authority, false) + gap;
+    if agent.revoked_at.is_none() {
+        let mut actions = Vec::new();
+        if activity.is_none() {
+            actions.push((
+                "Copy start message",
+                Action::CopyStart(agent.id.clone()),
+                false,
+            ));
+        }
+        actions.push(("Disconnect agent", Action::Revoke(agent.id.clone()), false));
+        y = button_rows(frame, app, area, y, actions) + gap;
+    }
+    y
+}
+
+/// Setting up an agent: which one, its name, the message to paste into
+/// its terminal, and the wallet its rewards go to.
+fn new_agent_page(frame: &mut Frame, app: &mut App, area: Rect, gap: u16) -> u16 {
+    heading(frame, within(area, area.y, 1), "New agent");
+    let agent = format!("Agent: {}", App::HARNESSES[app.harness]);
+    let name = format!("Name: {}", app.name);
+    let mut y = button_rows(
+        frame,
+        app,
+        area,
+        area.y + 1 + gap,
+        vec![
+            (&agent, Action::ChooseHarness, false),
+            (&name, Action::Name, false),
+            ("Copy agent setup", Action::CopyCommand, false),
+        ],
+    ) + gap;
+    let connected = app.snapshot.settings.payout_authority.clone();
+    y = if connected.is_empty() {
+        button_rows(
+            frame,
+            app,
+            area,
+            y,
+            vec![("Connect wallet", Action::Payout, false)],
+        )
+    } else {
+        wallet(frame, app, area, y, &connected, true)
+    };
+    y + gap
+}
+
+/// "Active wallet" and its address, on one row where they fit; `change`
+/// adds a button to connect another (only new agents take it: a connected
+/// agent keeps its own). Returns the row after it.
+fn wallet(
+    frame: &mut Frame,
+    app: &mut App,
+    area: Rect,
+    y: u16,
+    address: &str,
+    change: bool,
+) -> u16 {
+    let title = "Active wallet";
+    let address = safe(address);
+    let x = area.x + title.len() as u16 + 2;
+    let width = address.chars().count() as u16;
+    let inline = x + width + if change { 10 } else { 0 } <= area.right();
+    label(frame, within(area, y, 1), title, muted());
+    let (at, next) = if inline {
+        (Rect::new(x, y, width, 1), x + width + 2)
+    } else {
+        (within(area, y + 1, 1), x)
+    };
+    label(
+        frame,
+        at.intersection(area),
+        address,
+        Style::default().fg(TEXT),
+    );
+    if change {
         button(
             frame,
             app,
-            Rect::new(x, y, width, 1),
-            harness,
-            Action::Harness(index),
-            app.harness == index,
+            Rect::new(next, y, 8, 1).intersection(area),
+            "Change",
+            Action::Payout,
+            false,
         );
-        x += width + 2;
     }
-    y += 3;
-    let name = format!("Name: {}", app.name);
-    buttons(
-        frame,
-        app,
-        within(area, y, 1),
-        vec![(&name, Action::Name, false)],
-    );
-    y += 2;
-    buttons(
-        frame,
-        app,
-        within(area, y, 1),
-        vec![
-            ("Copy login", Action::CopyCommand, false),
-            ("Copy MCP setup", Action::CopyMcp, false),
-        ],
-    );
-    y += 2;
-    label(
-        frame,
-        within(area, y, 2),
-        "Run the login command in your agent's harness. Approve its code here.",
-        muted(),
-    );
-    y += 3;
-    buttons(
-        frame,
-        app,
-        within(area, y, 1),
-        vec![("Reward address", Action::Payout, false)],
-    );
-    y += 2;
-    let address = if app.snapshot.settings.payout_authority.is_empty() {
-        "Set your public Solana address before approving.".into()
-    } else {
-        app.snapshot.settings.payout_authority.clone()
-    };
-    label(frame, within(area, y, 2), address, muted());
-    y += 3;
+    y + if inline { 1 } else { 2 }
+}
+
+/// Agents asking to connect, each with Approve and Reject (beside it where
+/// they fit), from row `y`.
+fn connection_requests(frame: &mut Frame, app: &mut App, area: Rect, mut y: u16) {
     let pairings = app.snapshot.pairings.clone();
     if pairings.is_empty() {
-        label(
-            frame,
-            within(area, y, 2),
-            "No connection requests.",
-            muted(),
-        );
-        y += 3;
-        if let Some(agent) = app
-            .snapshot
-            .agents
-            .iter()
-            .find(|a| Some(&a.id) == app.selected_agent.as_ref() && a.revoked_at.is_none())
-            .cloned()
-        {
-            buttons(
-                frame,
-                app,
-                within(area, y, 1),
-                vec![("Disconnect agent", Action::Revoke(agent.id), false)],
-            );
-        }
         return;
     }
     app.scroll = app.scroll.min(pairings.len().saturating_sub(1) as u16);
     for pair in pairings.iter().skip(usize::from(app.scroll)) {
-        if y + 4 > area.bottom() {
+        let request = pairing_line(
+            format!("{} / {}", safe(&pair.name), safe(&pair.harness)),
+            &pair.code,
+        );
+        let x = area.x + request.width() as u16 + 2;
+        let inline = x + 19 <= area.right();
+        let rows = if inline { 1 } else { 2 };
+        if y + rows > area.bottom() {
             break;
         }
-        frame.render_widget(
-            Paragraph::new(pairing_line(
-                format!("{} / {}", safe(&pair.name), safe(&pair.harness)),
-                &pair.code,
-            )),
-            within(area, y, 1),
-        );
-        y += 1;
+        frame.render_widget(Paragraph::new(request), within(area, y, 1));
+        if pair.status != "approving" {
+            buttons(
+                frame,
+                app,
+                if inline {
+                    Rect::new(x, y, area.right() - x, 1)
+                } else {
+                    within(area, y + 1, 1)
+                },
+                vec![
+                    ("Approve", Action::Approve(pair.id.clone()), false),
+                    ("Reject", Action::Reject(pair.id.clone()), false),
+                ],
+            );
+        }
+        y += rows;
         if let Some(error) = &pair.error {
             label(frame, within(area, y, 1), safe(error), muted());
             y += 1;
         }
-        if pair.status == "approving" {
-            label(frame, within(area, y, 1), "Connecting…", muted());
-        } else {
-            buttons(
-                frame,
-                app,
-                within(area, y, 1),
-                vec![
-                    ("Approve", Action::Approve(pair.id.clone()), false),
-                    ("Reject", Action::Reject(pair.id.clone()), false),
-                ],
-            );
-        }
-        y += 3;
     }
 }
 
-fn compact_connect(frame: &mut Frame, app: &mut App, area: Rect) {
-    let name = format!("Name: {}", app.name);
-    buttons(
-        frame,
-        app,
-        within(area, area.y, 1),
-        vec![
-            (&name, Action::Name, false),
-            ("Reward address", Action::Payout, false),
-        ],
-    );
-    let harness = App::HARNESSES[app.harness];
-    buttons(
-        frame,
-        app,
-        within(area, area.y + 2, 1),
-        vec![
-            (
-                harness,
-                Action::Harness((app.harness + 1) % App::HARNESSES.len()),
-                false,
-            ),
-            ("Copy login", Action::CopyCommand, false),
-            ("Copy MCP", Action::CopyMcp, false),
-        ],
-    );
-    let pairs = app.snapshot.pairings.clone();
-    app.scroll = app.scroll.min(pairs.len().saturating_sub(1) as u16);
-    let mut y = area.y + 4;
-    if pairs.is_empty() {
-        label(
-            frame,
-            within(area, y, 1),
-            "No connection requests.",
-            muted(),
-        );
-        if let Some(agent) = app
-            .snapshot
-            .agents
-            .iter()
-            .find(|a| Some(&a.id) == app.selected_agent.as_ref() && a.revoked_at.is_none())
-            .cloned()
-        {
-            buttons(
-                frame,
-                app,
-                within(area, y + 2, 1),
-                vec![("Disconnect agent", Action::Revoke(agent.id), false)],
-            );
-        }
-        return;
-    }
-    for pair in pairs.iter().skip(usize::from(app.scroll)) {
-        if y + 3 > area.bottom() {
-            break;
-        }
-        frame.render_widget(
-            Paragraph::new(pairing_line(safe(&pair.name), &pair.code)),
-            within(area, y, 1),
-        );
-        y += 1;
-        if pair.status == "approving" {
-            label(frame, within(area, y, 1), "Connecting…", muted());
-        } else {
-            buttons(
-                frame,
-                app,
-                within(area, y, 1),
-                vec![
-                    ("Approve", Action::Approve(pair.id.clone()), false),
-                    ("Reject", Action::Reject(pair.id.clone()), false),
-                ],
-            );
-        }
-        y += 3;
-    }
+/// The product an agent is researching, as the list names it.
+fn work_title(app: &App, run: &crate::research::model::Activity) -> String {
+    app.snapshot
+        .work
+        .iter()
+        .find(|w| w.id == run.work_id)
+        .map(gap_title)
+        .unwrap_or_else(|| safe(&run.title))
 }
 
+/// Research: the navigator beside the selected agent's page
+/// (research_page.rs).
 fn activity(frame: &mut Frame, app: &mut App, area: Rect) {
-    buttons(
-        frame,
-        app,
-        within(area, area.y, 1),
-        vec![
-            (
-                "Work",
-                Action::ActivitySection(0),
-                app.activity_section == 0,
-            ),
-            (
-                "Runs",
-                Action::ActivitySection(1),
-                app.activity_section == 1,
-            ),
-            (
-                "Directives",
-                Action::ActivitySection(2),
-                app.activity_section == 2,
-            ),
-            ("Scan", Action::Discover, false),
-        ],
-    );
-    let content = Rect::new(
-        area.x,
-        area.y + 2,
-        area.width,
-        area.height.saturating_sub(2),
-    );
-    if app.activity_section == 0 {
-        research_work(frame, app, content);
-        return;
-    }
-    if app.activity_section == 2 {
-        directives(frame, app, content);
-        return;
-    }
-    let Some(detail) = app.selected().cloned() else {
-        label(
-            frame,
-            content,
-            "Select an agent to follow its research runs.",
-            muted(),
-        );
-        return;
-    };
-    if detail.events.is_empty() {
-        label(
-            frame,
-            content,
-            "This agent has not started a research run yet.",
-            muted(),
-        );
-        return;
-    }
-    let mut lines = vec![
-        Line::styled(safe(&format!("{} / Activity", detail.agent.name)), strong()),
-        line(""),
-    ];
-    let columns = content.width >= 62;
-    let prefix_width = if columns { 38 } else { 0 };
-    if columns {
-        lines.push(subdued(format!(
-            "{:<10}{:<10}{:<18}DETAIL",
-            "TIME UTC", "FROM", "EVENT"
-        )));
-        lines.push(subdued("─".repeat(usize::from(content.width))));
-    }
-    for event in detail.events.iter().rev() {
-        let seconds = event.created_at / 1000 % 60;
-        let minutes = event.created_at / 60000 % 60;
-        let hours = event.created_at / 3600000 % 24;
-        let time = format!("{hours:02}:{minutes:02}:{seconds:02}");
-        let kind = match event.kind.as_str() {
-            "note" => "Progress".to_string(),
-            "blocked" => "Blocked".to_string(),
-            "source_found" => "Source found".to_string(),
-            "run_finished" => "Run finished".to_string(),
-            "run_started" => "Run started".to_string(),
-            "candidate_received" => "Received".to_string(),
-            "candidate_duplicate" => "Duplicate".to_string(),
-            other => safe(&other.replace('_', " ")),
-        };
-        let actor = safe(&event.actor);
-        let prefix = if columns {
-            format!(
-                "{time:<10}{actor:<10}{:<18}",
-                kind.chars().take(16).collect::<String>()
-            )
-        } else {
-            lines.push(subdued(format!("{time} UTC    {actor}    {kind}")));
-            String::new()
-        };
-        let width = usize::from(content.width)
-            .saturating_sub(prefix_width)
-            .max(1);
-        for (index, text) in wrap_feed(&safe(&event.message), width)
-            .into_iter()
-            .enumerate()
-        {
-            lines.push(Line::from(vec![
-                Span::styled(
-                    if index == 0 {
-                        prefix.clone()
-                    } else {
-                        " ".repeat(prefix_width)
-                    },
-                    muted(),
-                ),
-                Span::raw(text),
-            ]));
-        }
-        if let Some(reference) = &event.reference_url {
-            for text in wrap_feed(&safe(reference), width) {
-                lines.push(subdued(format!("{}{text}", " ".repeat(prefix_width))));
-            }
-        }
-        lines.push(line(""));
-    }
-    paragraph(frame, app, content, lines);
-}
-fn wrap_feed(value: &str, width: usize) -> Vec<String> {
-    let mut lines = Vec::new();
-    for paragraph in value.split('\n') {
-        let mut row = String::new();
-        let mut cells = 0;
-        for word in paragraph.split_whitespace() {
-            let size = Span::raw(word).width();
-            if !row.is_empty() && cells + 1 + size > width {
-                lines.push(std::mem::take(&mut row));
-                cells = 0;
-            }
-            if !row.is_empty() {
-                row.push(' ');
-                cells += 1;
-            }
-            for symbol in word.chars() {
-                let size = Span::raw(symbol.to_string()).width();
-                if cells + size > width && !row.is_empty() {
-                    lines.push(std::mem::take(&mut row));
-                    cells = 0;
-                }
-                row.push(symbol);
-                cells += size;
-            }
-        }
-        lines.push(row);
-    }
-    lines
+    crate::research::research_page::draw(frame, app, area);
 }
 
-fn research_work(frame: &mut Frame, app: &mut App, area: Rect) {
-    heading(frame, within(area, area.y, 1), "Oracle coverage gaps");
-    if app.snapshot.work.is_empty() {
-        let mut lines = vec![line("No research gaps confirmed."), line("")];
-        if let Some(error) = app.snapshot.discovery["error"].as_str() {
-            lines.push(line(error));
-        } else if app.snapshot.discovery["assessedAt"].is_null() {
-            lines.push(subdued("Reading oracle coverage against your directives…"));
-        } else if let Some(assessments) = app.snapshot.discovery["assessments"].as_array() {
-            for assessment in assessments
-                .iter()
-                .filter(|a| a["status"] == "unknown")
-                .take(32)
-            {
-                lines.push(line(field(assessment, "expiryId")));
-                lines.push(subdued(field(assessment, "reason")));
-                lines.push(line(""));
-            }
-            if lines.len() == 2 {
-                lines.push(subdued("Your enabled directives have no open coverage gaps in the available inventories."));
-            }
-        }
-        paragraph(
-            frame,
-            app,
-            Rect::new(
-                area.x,
-                area.y + 2,
-                area.width,
-                area.height.saturating_sub(2),
-            ),
-            lines,
-        );
-        return;
-    }
-    let jobs = app.snapshot.work.clone();
-    app.scroll = app.scroll.min(jobs.len().saturating_sub(1) as u16);
-    let mut y = area.y + 2;
-    for (index, job) in jobs.iter().enumerate().skip(usize::from(app.scroll)) {
-        if y + 2 > area.bottom() {
-            break;
-        }
-        button(
-            frame,
-            app,
-            Rect::new(area.x, y, area.width, 1),
-            &safe(&format!(
-                "{}{}",
-                if job.availability == "available" || job.availability.is_empty() {
-                    String::new()
-                } else {
-                    format!("{} · ", job.availability)
-                },
-                job.title
-            )),
-            Action::ShowWork(index),
-            false,
-        );
-        y += 2;
-    }
+/// A coverage gap's potential earnings, as a temperature: the share of its
+/// target sources (and distinct hosts, once known) still missing. More
+/// missing is more to earn; a gap no longer open has nothing.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Heat {
+    Hot,
+    Warm,
+    Lukewarm,
+    Cold,
 }
 
-fn directives(frame: &mut Frame, app: &mut App, area: Rect) {
-    buttons(
-        frame,
-        app,
-        within(area, area.y, 1),
-        vec![("Add directive", Action::NewDirective, false)],
-    );
-    let policies = app.snapshot.directives.clone();
-    app.scroll = app.scroll.min(policies.len().saturating_sub(1) as u16);
-    let mut y = area.y + 2;
-    for policy in policies.iter().skip(usize::from(app.scroll)) {
-        if y + 4 > area.bottom() {
-            break;
+impl Heat {
+    pub(crate) fn of(job: &crate::research::model::Work) -> Self {
+        if !(job.availability == "available" || job.availability.is_empty()) {
+            return Heat::Cold;
         }
-        let markets = if policy.market_ids.is_empty() {
-            "All markets".into()
-        } else {
-            policy.market_ids.join(", ")
+        let objective = &job.objective;
+        // An opening or update earns from its rewards, if there are any.
+        if let Some(earns) = staked_earns(objective) {
+            return if earns { Heat::Warm } else { Heat::Cold };
+        }
+        let short = |have: &serde_json::Value, want: &serde_json::Value| {
+            let want = want.as_f64().unwrap_or(0.0);
+            if want <= 0.0 {
+                return 0.0;
+            }
+            ((want - have.as_f64().unwrap_or(0.0)) / want).clamp(0.0, 1.0)
         };
-        label(
-            frame,
-            within(area, y, 1),
-            markets,
-            accent().add_modifier(Modifier::BOLD),
+        let mut need = short(
+            &objective["activeSources"],
+            &objective["targets"]["activeSources"],
         );
-        label(
-            frame,
-            within(area, y + 1, 1),
-            format!(
-                "{} active sources · {} hosts per product",
-                policy.min_active_sources, policy.min_distinct_hosts
-            ),
-            muted(),
-        );
-        buttons(
-            frame,
-            app,
-            within(area, y + 2, 1),
-            vec![
-                ("Edit", Action::EditDirective(policy.id.clone()), false),
-                (
-                    if policy.enabled { "Pause" } else { "Resume" },
-                    Action::ToggleDirective(policy.id.clone()),
-                    false,
-                ),
+        if objective["distinctHosts"].is_number() {
+            need = need.max(short(
+                &objective["distinctHosts"],
+                &objective["targets"]["distinctHosts"],
+            ));
+        }
+        match need {
+            n if n >= 0.75 => Heat::Hot,
+            n if n >= 0.5 => Heat::Warm,
+            n if n >= 0.25 => Heat::Lukewarm,
+            _ => Heat::Cold,
+        }
+    }
+
+    pub(crate) fn word(self) -> &'static str {
+        match self {
+            Heat::Hot => "hot",
+            Heat::Warm => "warm",
+            Heat::Lukewarm => "lukewarm",
+            Heat::Cold => "cold",
+        }
+    }
+
+    /// The box's color now: red through blue. Hot and warm flicker like a
+    /// flame (a jump between shades); lukewarm and cold shimmer like ice (a
+    /// drift through them). `tick` moves about seven times a second.
+    pub(crate) fn color(self, tick: u64, row: usize) -> Color {
+        let shades: &[(u8, u8, u8)] = match self {
+            Heat::Hot => &[(255, 69, 0), (255, 40, 25), (255, 120, 20), (230, 30, 30)],
+            Heat::Warm => &[(255, 140, 0), (255, 165, 40), (240, 120, 20)],
+            Heat::Lukewarm => &[(120, 200, 190), (150, 215, 205), (100, 185, 180)],
+            Heat::Cold => &[
+                (70, 140, 255),
+                (120, 180, 255),
+                (190, 225, 255),
+                (95, 160, 255),
             ],
-        );
-        y += 4;
+        };
+        let step = match self {
+            Heat::Hot | Heat::Warm => {
+                (tick.wrapping_mul(2_654_435_761) ^ (row as u64).wrapping_mul(40_503)) >> 5
+            }
+            Heat::Lukewarm | Heat::Cold => tick / 2 + row as u64,
+        };
+        let (r, g, b) = shades[(step % shades.len() as u64) as usize];
+        Color::Rgb(r, g, b)
     }
+}
+
+/// Whether staked work earns: an update from its month's remaining rewards,
+/// an opening from its product's opening budget (none when not known). None
+/// for other work.
+pub(crate) fn staked_earns(objective: &serde_json::Value) -> Option<bool> {
+    let field = match objective["kind"].as_str()? {
+        "update" => "rewardsRemainingAtomic",
+        "opening" => "openingBudgetAtomic",
+        _ => return None,
+    };
+    Some(
+        objective[field]
+            .as_str()
+            .and_then(|v| v.parse::<u64>().ok())
+            .is_some_and(|left| left > 0),
+    )
+}
+
+/// A gap as a person reads it: market, month and product, like
+/// "RAMX · Dec 2026 · DDR5 16Gb". Work from before objectives keeps its title.
+pub(crate) fn gap_title(job: &crate::research::model::Work) -> String {
+    let objective = &job.objective;
+    let (Some(market), Some(month)) = (
+        objective["marketId"].as_str(),
+        objective["expiryId"].as_str().and_then(month_name),
+    ) else {
+        return safe(&job.title);
+    };
+    let product = match (
+        objective["bucketLabel"].as_str().filter(|l| !l.is_empty()),
+        objective["bucketId"].as_str(),
+    ) {
+        (Some(label), _) => label.to_string(),
+        (None, Some(id)) => format!("Unnamed product {}", &id[..id.len().min(6)]),
+        // A gap across the whole month: no product has a source yet.
+        (None, None) => "All products".into(),
+    };
+    // An opening or update names its source's page.
+    let page = objective["kind"]
+        .as_str()
+        .filter(|kind| matches!(*kind, "opening" | "update"))
+        .and_then(|kind| Some((kind, objective["url"].as_str().and_then(host)?)))
+        .map(|(kind, h)| format!(" · {kind} {h}"))
+        .unwrap_or_default();
+    safe(&format!(
+        "{} · {month} · {product}{page}",
+        market.to_uppercase()
+    ))
+}
+
+/// A page's host without `www.`.
+fn host(url: &str) -> Option<String> {
+    let rest = url.split_once("://")?.1;
+    let host = rest.split(['/', '?', '#']).next()?;
+    Some(host.trim_start_matches("www.").to_string())
+}
+
+/// "RAMX-202612" is "Dec 2026".
+pub(super) fn month_name(expiry: &str) -> Option<String> {
+    let digits = expiry.rsplit('-').next()?;
+    if digits.len() != 6 || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    const MONTHS: [&str; 12] = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+    let month: usize = digits[4..].parse().ok()?;
+    Some(format!(
+        "{} {}",
+        MONTHS.get(month.checked_sub(1)?)?,
+        &digits[..4]
+    ))
+}
+
+/// The chain's clock (a dev chain's runs slow), else this computer's.
+pub(crate) fn chain_now(app: &App) -> i64 {
+    app.fund.snap.chain_now.unwrap_or_else(|| {
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs() as i64)
+            .unwrap_or(0)
+    })
 }
 
 fn evidence(frame: &mut Frame, app: &mut App, area: Rect) {
     let Some(detail) = app.selected().cloned() else {
-        label(
-            frame,
-            area,
-            "Connect an agent to follow its evidence.",
-            muted(),
-        );
+        label(frame, area, "No agents yet.", muted());
         return;
     };
     let sources = app.sources();
@@ -952,7 +1021,7 @@ fn evidence(frame: &mut Frame, app: &mut App, area: Rect) {
             area,
             detail
                 .validation_error
-                .unwrap_or_else(|| "No source evidence submitted yet.".into()),
+                .unwrap_or_else(|| "No evidence yet.".into()),
             muted(),
         );
         return;
@@ -978,23 +1047,31 @@ fn evidence(frame: &mut Frame, app: &mut App, area: Rect) {
             ),
         ],
     );
-    let mut lines = vec![
-        subdued(format!("Source {} of {}", app.source + 1, sources.len())),
-        line(""),
-    ];
+    // "1 of 3" after the two buttons.
+    let count = format!("{} of {}", app.source + 1, sources.len());
+    frame.buffer_mut().set_stringn(
+        area.x + 24,
+        area.y,
+        &count,
+        usize::from(area.right().saturating_sub(area.x + 24)),
+        muted(),
+    );
+    let mut lines = Vec::new();
     for (title, key) in [
-        ("Source URL", "canonicalUrl"),
+        ("URL", "canonicalUrl"),
         ("Product", "productDefinition"),
         ("Price field", "priceField"),
         ("Region", "region"),
         ("Currency", "currency"),
-        ("Submitted evidence", "evidence"),
+        ("Evidence", "evidence"),
     ] {
-        lines.push(subdued(title));
-        lines.push(line(field(data, key)));
-        lines.push(line(""));
+        lines.push(Line::from(vec![
+            Span::styled(format!("{title:<13}"), muted()),
+            Span::raw(field(data, key)),
+        ]));
     }
     if let Some(error) = detail.validation_error {
+        lines.push(line(""));
         lines.push(subdued(error));
     }
     paragraph(
@@ -1010,56 +1087,127 @@ fn evidence(frame: &mut Frame, app: &mut App, area: Rect) {
     );
 }
 
+/// Rewards: what the agent's finds earned it, month by month as a chart,
+/// then each sponsored find and what became of it (rewards.rs).
 fn rewards(frame: &mut Frame, app: &mut App, area: Rect) {
-    let Some(detail) = app.selected().cloned() else {
-        label(
-            frame,
-            area,
-            "Connect an agent to follow its rewards.",
-            muted(),
-        );
+    use crate::research::rewards::by_month;
+    use ratatui::widgets::{Bar, BarChart, BarGroup};
+    let Some(agent) = app
+        .snapshot
+        .agents
+        .iter()
+        .find(|a| Some(&a.id) == app.selected_agent.as_ref())
+        .cloned()
+    else {
+        label(frame, area, "No agents yet.", muted());
         return;
     };
-    if let Some(error) = detail.validation_error {
-        label(frame, area, error, muted());
-        return;
+    // Nothing is said about earnings until they are read.
+    let read = app.rewards.by_agent.get(&agent.id).cloned();
+    let earnings = read.clone().unwrap_or_default();
+    let total: u64 = earnings.iter().map(|e| e.earned).sum();
+    let atoms =
+        |value: u64| usdc(&serde_json::Value::String(value.to_string())).unwrap_or_default();
+    frame.render_widget(
+        Paragraph::new(Line::from(vec![
+            Span::styled(
+                safe(&format!("{} · {}", agent.harness, agent.name)),
+                strong(),
+            ),
+            Span::styled(if app.rewards.offline { "  offline" } else { "" }, muted()),
+        ])),
+        within(area, area.y, 1),
+    );
+    // "Earned  3.5 USDC   4 finds · 2 sponsored".
+    let submitted = app.sources().len();
+    let finds = if submitted == 1 { "find" } else { "finds" };
+    let mut figures = Vec::new();
+    if read.is_some() {
+        figures.push(Span::styled("Earned  ", muted()));
+        figures.push(Span::styled(atoms(total), strong()));
+        figures.push(Span::raw("   "));
     }
-    let mut lines = vec![
-        Line::styled(safe(&format!("{} / Rewards", detail.agent.name)), strong()),
-        subdued("Recorded payouts · USDC"),
-        subdued(format!("Reward address: {}", detail.agent.payout_authority)),
-        line(""),
-    ];
-    let candidates = detail.candidates.unwrap_or_default();
-    if candidates.is_empty() {
-        lines.push(subdued("No confirmed rewards yet."));
-    }
-    for candidate in &candidates {
-        lines.push(line(field(&candidate["details"], "productDefinition")));
-        let observation = &candidate["observation"];
-        if observation.is_null() {
-            lines.push(subdued("Awaiting oracle outcome."));
-        } else if observation["rewardSettled"] != true {
-            lines.push(subdued("No settled reward recorded."));
-        } else {
-            for (title, key) in [
-                ("Researcher cash paid", "researcherCashAtomic"),
-                ("Retained from reward", "researcherReserveAtomic"),
-                ("Sponsor share", "sponsorAtomic"),
-            ] {
-                if let Some(value) = usdc(&observation["allocation"][key]) {
-                    lines.push(line(format!("{title}: {value}")));
-                }
-            }
-        }
-        lines.push(line(""));
-    }
-    if !detail.complete {
-        lines.push(subdued(
-            "More source history is available from the candidate API.",
+    figures.push(Span::styled(format!("{submitted} {finds}"), muted()));
+    if read.is_some() {
+        figures.push(Span::styled(
+            format!(" · {} sponsored", earnings.len()),
+            muted(),
         ));
     }
-    paragraph(frame, app, area, lines);
+    frame.render_widget(
+        Paragraph::new(Line::from(figures)),
+        within(area, area.y + 1, 1),
+    );
+    // The chart, once something earns: a bar per oracle month, its height
+    // what that month paid.
+    let months = by_month(&earnings);
+    let mut below = area.y + 3;
+    // Room kept under it for the list's heading and a few of its rows.
+    let list = 2 + earnings.len().min(3) as u16;
+    let chart = Rect::new(
+        area.x,
+        below,
+        area.width,
+        9.min(area.bottom().saturating_sub(below + list)),
+    );
+    if !months.is_empty() && chart.height >= 4 {
+        let bars: Vec<Bar> = months
+            .iter()
+            .map(|(month, value)| {
+                Bar::default()
+                    .value(*value)
+                    .text_value(atoms(*value).trim_end_matches(" USDC").to_string())
+                    .label(Line::from(month.clone()))
+                    .style(accent())
+                    .value_style(Style::default().fg(BG).bg(ACCENT))
+            })
+            .collect();
+        frame.render_widget(
+            BarChart::default()
+                .block(
+                    Block::default()
+                        .borders(Borders::LEFT | Borders::BOTTOM)
+                        .border_style(Style::default().fg(BORDER))
+                        .title(Line::styled("USDC per month", muted())),
+                )
+                .data(BarGroup::default().bars(&bars))
+                .bar_width(8)
+                .bar_gap(3)
+                .max(months.iter().map(|(_, v)| *v).max().unwrap_or(0).max(1))
+                .label_style(muted()),
+            chart,
+        );
+        below = chart.bottom() + 1;
+    }
+    if earnings.is_empty() {
+        return;
+    }
+    let mut lines = vec![subdued("Sponsored finds")];
+    for e in &earnings {
+        lines.push(Line::from(vec![
+            Span::styled(safe(&e.title), Style::default().fg(TEXT)),
+            Span::styled(format!("  · {}", e.outcome), muted()),
+            Span::styled(
+                if e.earned > 0 {
+                    format!("  · {}", atoms(e.earned))
+                } else {
+                    String::new()
+                },
+                accent(),
+            ),
+        ]));
+    }
+    paragraph(
+        frame,
+        app,
+        Rect::new(
+            area.x,
+            below,
+            area.width,
+            area.bottom().saturating_sub(below),
+        ),
+        lines,
+    );
 }
 
 /// Dims everything already drawn so a dialog stands out.
@@ -1076,14 +1224,12 @@ pub(super) fn scrim(buf: &mut Buffer, area: Rect) {
 
 fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
     app.hits.clear();
+    app.drawing_modal = true;
     let screen = frame.area();
     scrim(frame.buffer_mut(), screen);
     let width = parent.width.saturating_sub(4).min(80);
     let height = parent.height.saturating_sub(2).min(
-        if matches!(
-            modal,
-            Modal::Directive { .. } | Modal::Refine { .. } | Modal::Assignment(_)
-        ) {
+        if matches!(modal, Modal::Refine { .. } | Modal::Find(_)) {
             21
         } else {
             13
@@ -1096,12 +1242,13 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
         height,
     );
     frame.render_widget(Clear, area);
+    outside(app, screen, area, Action::Cancel);
     let title = match &modal {
-        Modal::Payout(_) => " REWARD ADDRESS ",
+        Modal::Payout(_) => " CONNECT WALLET ",
         Modal::Name(_) => " AGENT NAME ",
-        Modal::Directive { .. } => " STANDING DIRECTIVE ",
-        Modal::Refine { .. } => " RESEARCH GUIDANCE ",
-        Modal::Assignment(_) => " COVERAGE OBJECTIVE ",
+        Modal::Harness => " YOUR AGENT ",
+        Modal::Find(_) => " FOUND BY A RESEARCHER ",
+        Modal::Refine { .. } => " DIRECTIVE FOR YOUR AGENT ",
         Modal::Revoke(_) => " DISCONNECT AGENT ",
     };
     let block = Block::default()
@@ -1124,7 +1271,7 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
         inner.height.saturating_sub(4),
     );
     match modal {
-        Modal::Payout(value) | Modal::Name(value) => {
+        Modal::Payout(value) => {
             input(
                 frame,
                 app,
@@ -1132,73 +1279,111 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
                 &value,
                 0,
             );
-            label(
-                frame,
-                within(body, body.y + 5, 1),
-                "Enter to save · Esc to cancel",
-                muted(),
-            );
+            // This Petri's own wallet, offered first.
+            if app.snapshot.settings.payout_authority.is_empty()
+                && app.markets.snap.owner.as_deref() == Some(value.as_str())
+            {
+                label(frame, within(body, body.y + 4, 1), "Petri wallet", muted());
+            }
         }
-        Modal::Directive {
-            markets,
-            sources,
-            hosts,
-            ..
-        } => {
-            label(
-                frame,
-                within(body, body.y, 1),
-                "Markets (empty means all)",
-                muted(),
-            );
+        Modal::Name(value) => {
             input(
                 frame,
                 app,
                 Rect::new(body.x, body.y + 1, body.width, 3),
-                &markets,
+                &value,
                 0,
             );
-            label(
-                frame,
-                within(body, body.y + 4, 1),
-                "Active sources per product",
-                muted(),
-            );
-            let half = body.width / 2;
-            input(
-                frame,
-                app,
-                Rect::new(body.x, body.y + 5, half.saturating_sub(1), 3),
-                &sources,
-                1,
-            );
-            label(
-                frame,
-                Rect::new(body.x + half, body.y + 4, half, 1),
-                "Distinct hosts",
-                muted(),
-            );
-            input(
-                frame,
-                app,
-                Rect::new(body.x + half, body.y + 5, half, 3),
-                &hosts,
-                2,
-            );
-            label(
-                frame,
-                within(body, body.y + 9, 2),
-                "Coverage targets guide research. Oracle acceptance remains separate.",
-                muted(),
-            );
         }
-        Modal::Refine { instruction, .. } => {
+        Modal::Find(find) => {
+            let field = |name: &str, value: &str| {
+                Line::from(vec![
+                    Span::styled(format!("{name:<11}"), muted()),
+                    Span::styled(safe(value), Style::default().fg(TEXT)),
+                ])
+            };
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let mine = app
+                .snapshot
+                .agents
+                .iter()
+                .find(|a| a.id == find.agent)
+                .map(|a| format!("your agent {}", a.name));
+            let by = mine.unwrap_or_else(|| {
+                format!("a researcher ({})", &find.agent[..find.agent.len().min(8)])
+            });
+            let lines = vec![
+                field("Price page", &find.url),
+                field("Product", &find.definition),
+                field("Priced as", &find.price),
+                field("Evidence", &find.evidence),
+                field(
+                    "Found by",
+                    &format!(
+                        "{by} · {}",
+                        crate::research::fund::ago(now, find.created_ms)
+                    ),
+                ),
+                field(
+                    "Oracle",
+                    &find
+                        .on_oracle
+                        .as_deref()
+                        .map_or("not yet".into(), str::to_lowercase),
+                ),
+            ];
             label(
                 frame,
                 within(body, body.y, 1),
-                "Lower-level research direction",
+                safe(&find.title),
+                accent().add_modifier(Modifier::BOLD),
+            );
+            paragraph(
+                frame,
+                app,
+                within(body, body.y + 2, body.height.saturating_sub(2)),
+                lines,
+            );
+        }
+        Modal::Harness => {
+            for (index, harness) in App::HARNESSES.iter().enumerate() {
+                let y = body.y + index as u16;
+                if y >= body.bottom() {
+                    break;
+                }
+                let mark = if index == app.harness { "●" } else { "○" };
+                button(
+                    frame,
+                    app,
+                    Rect::new(body.x, y, body.width.min(32), 1),
+                    &format!("{mark} {harness}"),
+                    Action::Harness(index),
+                    index == app.harness,
+                );
+            }
+            label(
+                frame,
+                within(body, body.bottom().saturating_sub(1), 1),
+                "↑/↓ · Enter",
                 muted(),
             );
+        }
+        Modal::Refine {
+            instruction,
+            work_id,
+        } => {
+            // Which work it is for; the agent reads it before it starts.
+            let title = app
+                .snapshot
+                .work
+                .iter()
+                .find(|w| w.id == work_id)
+                .map(|w| crate::research::nav::short_title(&w.objective, &w.title))
+                .unwrap_or_default();
+            label(frame, within(body, body.y, 1), title, muted());
             input(
                 frame,
                 app,
@@ -1212,44 +1397,11 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
                 0,
             );
         }
-        Modal::Assignment(work) => {
-            label(
-                frame,
-                within(body, body.y, 2),
-                safe(&work.title),
-                accent().add_modifier(Modifier::BOLD),
-            );
-            let mut lines: Vec<_> = work
-                .brief
-                .lines()
-                .map(|value| line(value.to_string()))
-                .collect();
-            if let Some(instruction) = work.guidance["instruction"]
-                .as_str()
-                .filter(|s| !s.is_empty())
-            {
-                lines.push(line(""));
-                lines.push(subdued("Human guidance"));
-                lines.extend(instruction.lines().map(|v| line(v.to_string())));
-            }
-            if let Some(sources) = work.objective["sources"].as_array() {
-                lines.push(line(""));
-                lines.push(subdued("Existing source URLs"));
-                for source in sources {
-                    if let Some(url) = source["url"].as_str() {
-                        lines.push(line(url.to_string()));
-                    }
-                }
-            }
-            paragraph(
-                frame,
-                app,
-                within(body, body.y + 2, body.height.saturating_sub(2)),
-                lines,
-            );
-        }
         Modal::Revoke(agent) => {
-            frame.render_widget(Paragraph::new(format!("Disconnect {}?\n\nFuture requests will be denied. Research history stays available.", safe(&agent.name))).wrap(Wrap { trim: false }), body);
+            frame.render_widget(
+                Paragraph::new(format!("Disconnect {}?", safe(&agent.name))),
+                body,
+            );
             buttons(
                 frame,
                 app,
@@ -1267,19 +1419,19 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
         }
     }
     let fields = app.form_fields();
-    let values = if let Some(Modal::Assignment(work)) = &app.modal {
-        if work.objective.is_null() {
-            vec![("Close", Action::Cancel, true)]
-        } else {
-            vec![
-                (
-                    "Refine",
-                    Action::Refine(work.id.clone()),
-                    app.form_focus == 0,
-                ),
-                ("Close", Action::Cancel, app.form_focus == 1),
-            ]
-        }
+    let values = if let Some(Modal::Find(find)) = &app.modal
+        && app.find_sponsorable(find)
+    {
+        vec![
+            (
+                "Sponsor it",
+                Action::Sponsor(find.content_hash.clone()),
+                app.form_focus == 0,
+            ),
+            ("Close", Action::Cancel, app.form_focus == 1),
+        ]
+    } else if matches!(app.modal, Some(Modal::Find(_) | Modal::Harness)) {
+        vec![("Close", Action::Cancel, true)]
     } else {
         vec![
             ("Save", Action::Save, app.form_focus == fields),

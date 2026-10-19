@@ -20,7 +20,7 @@ export function createUpstream(baseUrl, fetcher = fetch) {
     try { result = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw fail('UPSTREAM_INVALID', 'The validation service returned an invalid response.', 502); }
     if (!response.ok || result.ok !== true || !result.data) {
       // Remote error text is untrusted and may contain transport details or secrets.
-      throw fail('SOURCE_REJECTED', response.status >= 500 ? 'Source validation is unavailable.' : 'The source service rejected this request. Check the required source fields and public reward address.', response.status >= 500 ? 503 : 422);
+      throw fail('SOURCE_REJECTED', response.status >= 500 ? 'Source validation is unavailable.' : 'The source service rejected this request. Check the required source fields and the connected wallet.', response.status >= 500 ? 503 : 422);
     }
     return result.data;
   }

@@ -14,7 +14,7 @@ use super::{
     units::{short, sol},
     view::{Paint, Table, span, utc},
 };
-use crate::petri_config;
+use crate::{petri_config, solana_config};
 
 /// `petri wallet new`: a new keypair at Petri's wallet path, saved as the
 /// signing wallet; with `--out`, written there and left unsaved.
@@ -34,14 +34,15 @@ pub fn wallet_new(_ctx: &Ctx, p: Paint, out: Option<&PathBuf>, force: bool) -> R
             path.display()
         ))?;
     }
-    if let Some(dir) = path.parent() {
-        std::fs::create_dir_all(dir)
-            .map_err(|e| Error::msg(format!("cannot create {}: {e}", dir.display())))?;
-    }
+    // write_private_file makes any missing folders, for the owner alone; a
+    // folder made here first, with the umask's mode, it refuses as not private.
     let keypair = Keypair::new();
     let bytes = serde_json::to_vec(&keypair.to_bytes().to_vec()).expect("keypair encodes");
     petri_config::write_private_file(&path, &bytes).map_err(Error::msg)?;
-    let path = std::fs::canonicalize(&path).unwrap_or(path);
+    // Windows' canonical form, `\\?\C:\…`, is one the keypair checks refuse.
+    let path = std::fs::canonicalize(&path)
+        .map(|p| PathBuf::from(solana_config::plain_disk_path(&p.to_string_lossy())))
+        .unwrap_or(path);
     if make_default {
         petri_config::set_futures_value(petri_config::FuturesKey::Keypair, &path.to_string_lossy())
             .map_err(Error::msg)?;

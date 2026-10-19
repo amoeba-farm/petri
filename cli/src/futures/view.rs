@@ -124,27 +124,64 @@ pub fn relative(ts: i64, now: i64) -> String {
     }
 }
 
-const BARS: [char; 8] = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+/// A cell filled to so many eighths from the bottom (0 to 7; 8 is █).
+const EIGHTHS: [char; 8] = [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇'];
+/// The classic Windows console's default font (Consolas) has no ▁▂▃▅▆▇ and
+/// draws them as boxes, so there a cell fills in halves: ▄, then █.
+const HALVES: [char; 2] = [' ', '▄'];
 
-/// A one-line sparkline of `values`, at most `width` cells (newest last).
-pub fn sparkline(values: &[f64], width: usize) -> String {
+/// The classic Windows console: not Windows Terminal (`WT_SESSION`) or
+/// another terminal that says what it is (`TERM_PROGRAM`, VS Code's).
+fn classic_windows_console() -> bool {
+    cfg!(windows)
+        && std::env::var_os("WT_SESSION").is_none()
+        && std::env::var_os("TERM_PROGRAM").is_none()
+}
+
+/// An area chart of `values` (newest last), `rows` lines high and `width`
+/// cells wide, top line first: each column filled up to its value. The
+/// newest `width` values; fewer are widened to fill it.
+pub fn area_chart(values: &[f64], width: usize, rows: usize) -> Vec<String> {
+    let steps: &[char] = if classic_windows_console() {
+        &HALVES
+    } else {
+        &EIGHTHS
+    };
+    area_chart_in(values, width, rows, steps)
+}
+
+fn area_chart_in(values: &[f64], width: usize, rows: usize, steps: &[char]) -> Vec<String> {
     let values: Vec<f64> = values.iter().copied().filter(|v| v.is_finite()).collect();
     if values.is_empty() || width == 0 {
-        return String::new();
+        return vec![String::new(); rows];
     }
-    let start = values.len().saturating_sub(width);
-    let values = &values[start..];
+    let values = &values[values.len().saturating_sub(width)..];
     let (lo, hi) = values
         .iter()
         .fold((f64::MAX, f64::MIN), |(lo, hi), v| (lo.min(*v), hi.max(*v)));
-    values
-        .iter()
-        .map(|v| {
-            if (hi - lo).abs() < f64::EPSILON {
-                BARS[3]
-            } else {
-                BARS[(((v - lo) / (hi - lo)) * 7.0).round() as usize]
-            }
+    let per = steps.len();
+    let full = rows * per;
+    let level = |v: f64| {
+        if (hi - lo).abs() < f64::EPSILON {
+            full / 2
+        } else {
+            // The lowest value still shows a sliver.
+            1 + (((v - lo) / (hi - lo)) * (full - 1) as f64).round() as usize
+        }
+    };
+    let levels: Vec<usize> = (0..width)
+        .map(|x| level(values[x * values.len() / width]))
+        .collect();
+    (0..rows)
+        .rev()
+        .map(|row| {
+            levels
+                .iter()
+                .map(|&l| match l.saturating_sub(row * per).min(per) {
+                    f if f == per => '█',
+                    f => steps[f],
+                })
+                .collect()
         })
         .collect()
 }
@@ -225,13 +262,24 @@ mod tests {
     }
 
     #[test]
-    fn times_and_sparklines() {
+    fn times_and_area_charts() {
         assert_eq!(span(19 * 86_400 + 4 * 3_600 + 5), "19d 4h");
         assert_eq!(relative(100, 40), "in 1m");
         assert_eq!(relative(40, 100), "1m ago");
         assert_eq!(utc(1_793_491_200), "2026-11-01 00:00 UTC");
-        assert_eq!(sparkline(&[1.0, 2.0, 3.0], 10), "▁▅█");
-        assert_eq!(sparkline(&[5.0, 5.0], 10), "▄▄");
-        assert_eq!(sparkline(&[1.0, 2.0, 3.0], 2).chars().count(), 2);
+        // Columns filled up to each value, top line first.
+        assert_eq!(
+            area_chart_in(&[1.0, 2.0, 3.0], 3, 2, &HALVES),
+            [" ▄█", "▄██"]
+        );
+        assert_eq!(area_chart_in(&[1.0, 3.0], 2, 1, &EIGHTHS), ["▁█"]);
+        assert_eq!(area_chart_in(&[5.0, 5.0], 2, 2, &HALVES), ["  ", "██"]);
+        // The newest values when there are more than fit; fewer are widened.
+        assert_eq!(area_chart_in(&[9.0, 1.0, 3.0], 2, 1, &EIGHTHS), ["▁█"]);
+        assert_eq!(area_chart_in(&[1.0, 3.0], 4, 1, &EIGHTHS), ["▁▁██"]);
+        for line in area_chart(&[1.0, 2.0, 3.0], 30, 4) {
+            assert_eq!(line.chars().count(), 30);
+        }
+        assert_eq!(area_chart(&[], 30, 3), ["", "", ""]);
     }
 }

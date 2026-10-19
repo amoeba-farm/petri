@@ -203,7 +203,7 @@ test('MCP supports initialization, bounded schemas and structured tools without 
   assert.equal((await send(2, 'initialize', { protocolVersion: '2025-06-18' })).result.protocolVersion, '2025-06-18');
   assert.equal(await handler({ jsonrpc: '2.0', method: 'notifications/initialized' }), null);
   const list = (await send(3, 'tools/list')).result.tools;
-  assert.equal(list.length, 10); assert(!list.some(t => /approve|fund|withdraw|trade|owner/u.test(t.name)));
+  assert.equal(list.length, 11); assert(!list.some(t => /approve|fund|withdraw|trade|owner/u.test(t.name)));
   const login = (await send(4, 'tools/call', { name: 'petri_login', arguments: {} })).result;
   assert.equal(login.structuredContent.status, 'pending'); assert.equal(login.isError, false);
   assert.equal((await send(5, 'tools/call', { name: 'petri_login', arguments: { ownerToken: 'no' } })).error.code, -32602);
@@ -236,7 +236,7 @@ test('the launched MCP process pairs, resumes and completes a research run over 
   try {
     await send('initialize', { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'Petri integration test', version: '1' } });
     child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' })}\n`);
-    assert.equal((await send('tools/list')).tools.length, 10);
+    assert.equal((await send('tools/list')).tools.length, 11);
     assert.equal((await call('petri_login')).status, 'pending');
     await server.owner('POST', 'settings', { payoutAuthority: payout });
     const snapshot = await server.owner('GET', 'snapshot');

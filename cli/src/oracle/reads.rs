@@ -17,8 +17,13 @@ use crate::futures::{
 use crate::endpoints::{ORACLE_CATALOG as CATALOG, ORACLE_SNAPSHOT as SNAPSHOT};
 
 /// `data` of an `{ ok: true, data }` oracle document.
-fn document(ctx: &Ctx, path: &str) -> Result<Value> {
-    let value = ctx.api.get(path)?;
+pub(crate) fn document(ctx: &Ctx, path: &str) -> Result<Value> {
+    document_at(&ctx.api, path)
+}
+
+/// `document`, from the API client alone (it can be read from any thread).
+pub(crate) fn document_at(api: &crate::futures::api::Api, path: &str) -> Result<Value> {
+    let value = api.get(path)?;
     if value.get("ok") != Some(&Value::Bool(true)) {
         bail(format!("{path}: unexpected oracle response"))?;
     }

@@ -10,7 +10,7 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 bin_dir="${AMEBA_DEV_BIN_DIR:-/opt/ameba-dev/bin}"
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$root/target}"
 cd "$root"  # so rust-toolchain.toml applies
-cargo build --release --locked -j "${CARGO_JOBS:-3}" --bin petri --features dev-chain,dev-faucet
+cargo build --release --locked -j "${CARGO_JOBS:-$(( ($(nproc) + 1) / 2 ))}" --bin petri --features dev-chain,dev-faucet
 built="$CARGO_TARGET_DIR/release/petri"
 # With no flags, environment or saved settings it must talk to the dev chain.
 node scripts/check-petri-defaults.mjs "$built" dev

@@ -31,18 +31,33 @@ export function createDirectiveStore(db, clock = Date.now) {
     db.atomic(() => {
       db.run("UPDATE work SET availability='unknown',valid_until=NULL WHERE discovery_key IS NOT NULL");
       for (const assessment of result.assessments) {
+        // An opening or update is one per source, claims one per month; a
+        // source gap keeps its original key.
+        const perSource = assessment.kind === 'update' || assessment.kind === 'opening';
         const key = digest(JSON.stringify([assessment.protocol.programId, assessment.protocol.cluster, assessment.protocol.namespace,
-          assessment.directiveId, assessment.marketId, assessment.expiryId, assessment.oracleMonthAddress, assessment.bucketId]));
+          assessment.directiveId, assessment.marketId, assessment.expiryId, assessment.oracleMonthAddress, assessment.bucketId,
+          ...(perSource ? [assessment.kind, assessment.sourceId] : assessment.kind === 'claims' ? ['claims'] : [])]));
         const previous = db.get('SELECT id FROM work WHERE discovery_key=?', key);
         if (assessment.status !== 'gap' && !previous) continue;
         if (!previous && db.get('SELECT count(*) AS n FROM work').n >= 5000) throw fail('WORK_LIMIT', 'Workspace research history capacity reached.', 429);
         const { title, brief } = describeGap(assessment);
-        const scope = { marketId: assessment.marketId, expiryId: assessment.expiryId, ...(assessment.bucketId ? { bucketId: assessment.bucketId } : {}) };
+        const scope = { marketId: assessment.marketId, expiryId: assessment.expiryId, ...(assessment.bucketId ? { bucketId: assessment.bucketId } : {}),
+          ...(perSource ? { sourceId: assessment.sourceId } : {}) };
         db.run(`INSERT INTO work(id,title,brief,created_at,scope_json,objective_json,discovery_key,availability,valid_until)
           VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(discovery_key) WHERE discovery_key IS NOT NULL DO UPDATE SET title=excluded.title,
           brief=excluded.brief,objective_json=excluded.objective_json,availability=excluded.availability,valid_until=excluded.valid_until`,
           previous?.id || randomUUID(), title, brief, clock(), JSON.stringify(scope), JSON.stringify(assessment), key,
           assessment.status === 'gap' ? 'available' : assessment.status === 'covered' ? 'resolved' : assessment.status, assessment.validUntil ?? null);
+      }
+      // A series the oracle no longer lists takes its work with it: archived,
+      // and back if the series is listed again. Work of a series still listed
+      // stays, whatever its assessment; the owner's own archive is theirs.
+      const name = item => JSON.stringify([item?.marketId, item?.expiryId]);
+      const listed = new Set([...(result.series ?? []), ...result.assessments].map(name)), now = clock();
+      for (const row of db.all('SELECT id,scope_json,objective_json,retired_at FROM work WHERE discovery_key IS NOT NULL AND (archived_at IS NULL OR retired_at IS NOT NULL)')) {
+        const served = listed.has(name(JSON.parse(row.scope_json ?? row.objective_json)));
+        if (!served && row.retired_at === null) db.run('UPDATE work SET archived_at=?,retired_at=? WHERE id=?', now, now, row.id);
+        else if (served && row.retired_at !== null) db.run('UPDATE work SET archived_at=NULL,retired_at=NULL WHERE id=?', row.id);
       }
       db.run("INSERT INTO settings VALUES ('discovery',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify({ ...result, error: null }));
     });

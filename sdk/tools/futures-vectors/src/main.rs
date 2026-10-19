@@ -615,6 +615,8 @@ fn header(status: u8, settlement_fine: u64) -> Header {
             1_793_500_000
         },
         last_trade_ts: 1_792_047_367,
+        // No stake-backed credit: those header bytes stay zero.
+        ..Header::default()
     }
 }
 
@@ -1204,7 +1206,7 @@ fn math() -> Value {
 }
 
 fn errors() -> Value {
-    (client::ERROR_BASE..=client::ERROR_BASE + 32)
+    (client::ERROR_BASE..=client::ERROR_BASE + 34)
         .chain([0, 1, u32::MAX])
         .map(|c| json!({ "code": c, "name": client::error_name(c) }))
         .collect()

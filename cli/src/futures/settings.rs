@@ -163,7 +163,11 @@ impl Settings {
             (Some(path), _) if !path.trim().is_empty() => {
                 (solana_config::expand_tilde(path.trim()), Source::Flag)
             }
-            (_, Some(path)) => (solana_config::expand_tilde(path), Source::File),
+            // `petri wallet new` on Windows once saved the verbatim `\\?\C:\…`.
+            (_, Some(path)) => (
+                solana_config::plain_disk_path(&solana_config::expand_tilde(path)),
+                Source::File,
+            ),
             _ => {
                 let config = solana_config::load_solana_cli_config(cli.solana_config.as_deref())
                     .ok()

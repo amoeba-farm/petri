@@ -46,7 +46,7 @@ pub const METHODS: &[(&str, &str, Served)] = &[
     ),
     (
         "getProgramAccounts",
-        "the oracle's periods and sources",
+        "the oracle's periods, sources, sponsorships and a wallet's reward claims",
         Served::FullRpc,
     ),
     ("getBalance", "a wallet's SOL", Served::FullRpcAndGateway),
@@ -148,6 +148,28 @@ fn refusal_hint(method: &str) -> &'static str {
     }
 }
 
+/// Whether an RPC turned a call away for its request rate: HTTP 429, or a
+/// JSON-RPC error saying so (Solana's public RPC limits getProgramAccounts
+/// per caller: "Too many requests for a specific RPC call").
+fn rate_limited(status: u16, error: Option<&Value>) -> bool {
+    status == 429
+        || error.is_some_and(|e| {
+            e.get("code").and_then(Value::as_i64) == Some(429)
+                || e.get("message")
+                    .and_then(Value::as_str)
+                    .is_some_and(|m| m.to_ascii_lowercase().contains("too many requests"))
+        })
+}
+
+/// A rate-limited call, in plain words. Petri doesn't retry (preflight
+/// decision: no retries); another RPC is the way past it.
+fn rate_limit_message(url: &str, method: &str) -> String {
+    format!(
+        "The RPC {url} is limiting requests and turned away {method}: use an RPC provider's \
+         node with --rpc <provider URL> or PETRI_RPC_URL"
+    )
+}
+
 pub struct Rpc {
     url: String,
     http: reqwest::blocking::Client,
@@ -193,6 +215,9 @@ impl Rpc {
             .send()
             .map_err(|e| Error::msg(format!("RPC {} is unreachable: {e}", self.url)))?;
         let status = response.status();
+        if rate_limited(status.as_u16(), None) {
+            return Err(Error::msg(rate_limit_message(&self.url, method)));
+        }
         let value: Value = response.json().map_err(|e| {
             Error::msg(format!(
                 "RPC {method} returned HTTP {status}: {e}{}",
@@ -211,6 +236,9 @@ impl Rpc {
                 self.url,
                 refusal_hint(method)
             )));
+        }
+        if rate_limited(status.as_u16(), value.get("error")) {
+            return Err(Error::msg(rate_limit_message(&self.url, method)));
         }
         if let Some(error) = value.get("error") {
             let data = error.get("data");
@@ -516,6 +544,65 @@ impl Rpc {
         v.as_str()
             .and_then(|s| Signature::from_str(s).ok())
             .ok_or_else(|| Error::msg("the RPC did not return an airdrop signature"))
+    }
+}
+
+#[cfg(test)]
+mod rate_limit_tests {
+    use super::{Rpc, rate_limited};
+    use serde_json::json;
+    use std::{
+        io::{Read, Write},
+        net::TcpListener,
+    };
+
+    #[test]
+    fn a_rate_limited_call_is_named_as_such_whatever_the_rpc_says() {
+        assert!(rate_limited(429, None));
+        let public = json!({"code": 429, "message": "Too many requests for a specific RPC call"});
+        assert!(rate_limited(200, Some(&public)));
+        assert!(rate_limited(
+            200,
+            Some(&json!({"code": -32005, "message": "Too many requests"}))
+        ));
+        assert!(!rate_limited(
+            200,
+            Some(&json!({"code": -32601, "message": "Method not found"}))
+        ));
+        assert!(!rate_limited(503, None));
+    }
+
+    /// Solana's public RPC answers a rate-limited getProgramAccounts with
+    /// HTTP 429 and a JSON-RPC error: Petri says to use another RPC, and
+    /// asks only once.
+    #[test]
+    fn a_rate_limited_rpc_points_to_rpc_and_is_asked_once() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}", listener.local_addr().unwrap());
+        let serving = listener.try_clone().unwrap();
+        let server = std::thread::spawn(move || {
+            let (mut stream, _) = serving.accept().unwrap();
+            let mut request = [0u8; 4096];
+            let _ = stream.read(&mut request);
+            let body = r#"{"jsonrpc":"2.0","error":{"code":429,"message":"Too many requests for a specific RPC call"},"id":1}"#;
+            let reply = format!(
+                "HTTP/1.1 429 Too Many Requests\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
+                body.len()
+            );
+            stream.write_all(reply.as_bytes()).unwrap();
+        });
+        let error = Rpc::new(&url)
+            .call("getProgramAccounts", json!([]))
+            .unwrap_err()
+            .message;
+        server.join().unwrap();
+        assert!(error.contains("--rpc <provider URL>"), "{error}");
+        assert!(error.contains("PETRI_RPC_URL"), "{error}");
+        assert!(error.contains("getProgramAccounts"), "{error}");
+        assert!(!error.contains(" is unreachable"), "{error}");
+        // No retry: nothing else connected.
+        listener.set_nonblocking(true).unwrap();
+        assert!(listener.accept().is_err(), "petri asked again");
     }
 }
 

@@ -38,7 +38,7 @@ export function createApplication(config, options = {}) {
   }
   async function approve(pairingId) {
     const payout = auth.setting('payoutAuthority');
-    if (!payout) throw fail('PAYOUT_REQUIRED', 'Set your public reward address before connecting an agent.');
+    if (!payout) throw fail('PAYOUT_REQUIRED', 'Connect a wallet before connecting an agent.');
     auth.beginApproval(pairingId);
     try {
       const registered = await upstream.register(payout);
@@ -68,12 +68,15 @@ export function createApplication(config, options = {}) {
         }
         if (method === 'GET' && path === '/v1/owner/snapshot') {
           const agents = auth.list(), selected = query.get('agentId') || agents[0]?.id;
-          return { agents, pairings: auth.pending(), work: work.listWork(false, true), directives: directives.list(), discovery: directives.status(), settings: { payoutAuthority: auth.setting('payoutAuthority') },
+          // Who is researching what right now (the TUI's "researching").
+          const activity = work.activeRuns().filter(run => agents.some(agent => agent.id === run.agentId && !agent.revokedAt));
+          const items = work.listWork(false, true).map(item => ({ ...item, researchers: activity.filter(run => run.workId === item.id).map(run => run.agentId) }));
+          return { agents, pairings: auth.pending(), work: items, activity, directives: directives.list(), discovery: directives.status(), settings: { payoutAuthority: auth.setting('payoutAuthority') },
             selected: selected ? await detail(selected) : null };
         }
         if (method === 'POST' && path === '/v1/owner/settings') {
           object(body, ['payoutAuthority']);
-          const payout = text(body.payoutAuthority, 44, 'public reward address');
+          const payout = text(body.payoutAuthority, 44, 'wallet address');
           if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/u.test(payout)) throw fail('INVALID_PAYOUT', 'Provide a Solana public address.');
           auth.setSetting('payoutAuthority', payout); return { payoutAuthority: payout };
         }
@@ -92,8 +95,12 @@ export function createApplication(config, options = {}) {
         if (method === 'POST' && path === '/v1/owner/directives') {
           const directive = directives.save(body); void discovery.refresh(); return { directive };
         }
+        if (method === 'POST' && path === '/v1/owner/work/focus') {
+          object(body, ['workId','focused']); return { focused: work.focusWork(text(body.workId, 36, 'work ID'), body.focused) };
+        }
         if (method === 'POST' && path === '/v1/owner/work/refine') {
-          object(body, ['workId','instruction']); return { guidance: directives.refine(body.workId, body.instruction) };
+          object(body, ['workId','instruction']);
+          return { guidance: db.atomic(() => { const guidance = directives.refine(body.workId, body.instruction); work.directed(body.workId, guidance.instruction); return guidance; }) };
         }
         if (method === 'POST' && path === '/v1/owner/discovery/refresh') {
           object(body, []); return { discovery: await discovery.refresh() };
@@ -103,6 +110,10 @@ export function createApplication(config, options = {}) {
       const agent = auth.authenticate(credential);
       if (method === 'GET' && path === '/v1/me') return { agent };
       if (method === 'GET' && path === '/v1/work') return { work: work.listWork(), directives: directives.list(), discovery: directives.status() };
+      if (method === 'POST' && path === '/v1/work/next') {
+        // How the agent runs petri here (`petri-live petri` on a dev PC).
+        object(body, ['sessionId']); return { ...work.next(agent, { sessionId: text(body.sessionId, 36, 'session ID') }), petri: options.petriCommand ?? process.env.PETRI_COMMAND ?? null };
+      }
       if (method === 'GET' && path === '/v1/activity') return detail(agent.id);
       if (method === 'GET' && path === '/v1/rewards') {
         const result = await readCandidates(agent.id);

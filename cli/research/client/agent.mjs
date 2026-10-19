@@ -3,6 +3,7 @@ import { existsSync, readFileSync, lstatSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { createHttpClient } from './http.mjs';
 import { endpoint, fail, privateDirectory, privateWrite, stateDirectory, token } from '../service/security.mjs';
+import { REPORT_KINDS } from '../service/work-store.mjs';
 
 export function createAgentClient({ name = 'researcher', harness = 'Custom harness', baseUrl, profileDirectory } = {}) {
   if (!/^[a-z0-9][a-z0-9_-]{0,39}$/u.test(name)) throw fail('INVALID_NAME', 'Use lowercase letters, digits, hyphens or underscores for the agent name.');
@@ -62,10 +63,13 @@ export function createAgentClient({ name = 'researcher', harness = 'Custom harne
     openSession: () => session(true),
     async closeSession() { const profile = read(); if (!profile.sessionId) return { closed: true }; const result = await authorized('POST', '/v1/sessions/close', { sessionId: profile.sessionId }); delete profile.sessionId; save(profile); return result; },
     listWork: () => authorized('GET', '/v1/work'),
+    async next() { return authorized('POST', '/v1/work/next', { sessionId: (await session()).id }); },
     activity: () => authorized('GET', '/v1/activity'),
     rewards: () => authorized('GET', '/v1/rewards'),
     async startWork(workId, clientKey = randomUUID()) { return authorized('POST', '/v1/runs', { workId, clientKey, sessionId: (await session()).id }); },
+    // One step of the agent's work, for the owner's live feed (REPORT_KINDS).
     async report(runId, { kind = 'note', message, referenceUrl, clientKey = randomUUID() }) {
+      if (!REPORT_KINDS.includes(kind)) throw fail('INVALID_EVENT', `Report one of: ${REPORT_KINDS.join(', ')}.`);
       return authorized('POST', `/v1/runs/${encodeURIComponent(runId)}/events`, { sessionId: (await session()).id, clientKey, kind, message, ...(referenceUrl ? { referenceUrl } : {}) });
     },
     async submit(runId, candidate, clientKey = randomUUID()) { return authorized('POST', `/v1/runs/${encodeURIComponent(runId)}/candidates`, { sessionId: (await session()).id, clientKey, candidate }); },

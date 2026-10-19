@@ -1779,6 +1779,14 @@
       },
       {
         "code": 1179779104,
+        "name": "CreditLimit"
+      },
+      {
+        "code": 1179779105,
+        "name": "NeedsRecovery"
+      },
+      {
+        "code": 1179779106,
         "name": null
       },
       {

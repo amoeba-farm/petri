@@ -1,7 +1,9 @@
 //! Sending oracle transactions: the deployment identity gate, a review the
 //! user confirms (or `--yes`), then each transaction signed by the attached
 //! wallet as fee payer and sent through the RPC. `--simulate` runs the same
-//! transactions through `simulateTransaction` without loading a signer.
+//! transactions through `simulateTransaction` without loading a signer; one
+//! that uses what an earlier one writes (its evidence) is left to the send's
+//! preflight, since the earlier one is not on chain yet.
 
 use serde_json::{Value, json};
 use solana_program::{instruction::Instruction, pubkey::Pubkey};
@@ -176,6 +178,12 @@ fn instructions(ctx: &Ctx, tx: &Tx) -> Result<Vec<Instruction>> {
     bind_oracle(gate.as_ref(), tx.instructions())
 }
 
+/// Bytes on the wire: an unsigned transaction already holds a zeroed slot
+/// for every signature.
+fn wire_size(tx: &Transaction) -> usize {
+    bincode::serialized_size(tx).unwrap_or(u64::MAX) as usize
+}
+
 fn build(ctx: &Ctx, tx: &Tx, payer: &Pubkey) -> Result<Transaction> {
     Ok(Transaction::new_with_payer(
         &instructions(ctx, tx)?,
@@ -183,11 +191,104 @@ fn build(ctx: &Ctx, tx: &Tx, payer: &Pubkey) -> Result<Transaction> {
     ))
 }
 
+/// `steps` in order, in as few transactions as fit a packet once each
+/// oracle instruction carries its gate (the account and tail
+/// `GateBinding::bind` adds).
+pub fn pack(oracle: &Pubkey, payer: &Pubkey, steps: Vec<(String, Instruction)>) -> Vec<Tx> {
+    let gate = GateBinding {
+        controller: Pubkey::default(),
+        target: *oracle,
+        address: Pubkey::new_from_array([1; 32]),
+        epoch: 0,
+    };
+    let fits = |tx: &Tx| {
+        bind_oracle(Some(&gate), tx.instructions()).is_ok_and(|ixs| {
+            wire_size(&Transaction::new_with_payer(&ixs, Some(payer))) <= PACKET_SIZE
+        })
+    };
+    let mut txs: Vec<Tx> = Vec::new();
+    for (name, ix) in steps {
+        if let Some(last) = txs.last_mut() {
+            let mut grown = last.clone();
+            grown.push(&name, ix.clone());
+            if fits(&grown) {
+                *last = grown;
+                continue;
+            }
+        }
+        txs.push(Tx::one(&name, ix));
+    }
+    txs
+}
+
+/// For each transaction, the earlier transactions of the same write whose
+/// accounts it uses (an evidence object they write, say), by index. Signers
+/// (the fee payer) don't count.
+fn waits_for(txs: &[Tx]) -> Vec<Vec<usize>> {
+    let written: Vec<Vec<Pubkey>> = txs
+        .iter()
+        .map(|tx| {
+            tx.steps
+                .iter()
+                .flat_map(|(_, ix)| &ix.accounts)
+                .filter(|a| a.is_writable && !a.is_signer)
+                .map(|a| a.pubkey)
+                .collect()
+        })
+        .collect();
+    txs.iter()
+        .enumerate()
+        .map(|(i, tx)| {
+            (0..i)
+                .filter(|&j| {
+                    tx.steps
+                        .iter()
+                        .flat_map(|(_, ix)| &ix.accounts)
+                        .any(|a| written[j].contains(&a.pubkey))
+                })
+                .collect()
+        })
+        .collect()
+}
+
+/// Why a transaction waits, in plain words: simulated alone against today's
+/// chain it would fail for want of the earlier ones, and the send's
+/// preflight checks it once they landed.
+fn waiting_note(txs: &[Tx], waits: &[usize]) -> String {
+    let evidence = waits
+        .iter()
+        .all(|&j| txs[j].steps.iter().all(|(n, _)| n == "writeEvidence"));
+    if evidence {
+        return "checked when sent, once the evidence above is on chain".to_string();
+    }
+    let numbers: Vec<String> = waits.iter().map(|j| (j + 1).to_string()).collect();
+    format!(
+        "checked when sent, once transaction{} {} {} on chain",
+        if numbers.len() == 1 { "" } else { "s" },
+        numbers.join(", "),
+        if numbers.len() == 1 { "is" } else { "are" }
+    )
+}
+
 /// Simulates every transaction in order without signing; stops at the first
-/// failure (later transactions may depend on earlier ones).
+/// failure. A transaction that uses what an earlier one writes is not
+/// simulated, since the earlier one is not on chain yet.
 fn simulate(ctx: &Ctx, write: &Write, payer: &Pubkey, oracle: &Pubkey) -> Result<Value> {
+    let waits = waits_for(&write.txs);
     let mut results = Vec::new();
     for (i, tx) in write.txs.iter().enumerate() {
+        if !waits[i].is_empty() {
+            results.push(json!({
+                "transaction": i + 1,
+                "steps": tx.names(),
+                "simulated": false,
+                "ok": null,
+                "error": null,
+                "waitsFor": waits[i].iter().map(|j| j + 1).collect::<Vec<_>>(),
+                "note": waiting_note(&write.txs, &waits[i]),
+            }));
+            continue;
+        }
         let sim = ctx.rpc.simulate(&build(ctx, tx, payer)?)?;
         let ok = sim.err.is_none();
         let error = sim
@@ -197,6 +298,7 @@ fn simulate(ctx: &Ctx, write: &Write, payer: &Pubkey, oracle: &Pubkey) -> Result
         results.push(json!({
             "transaction": i + 1,
             "steps": tx.names(),
+            "simulated": true,
             "ok": ok,
             "error": error,
             "unitsConsumed": sim.units,
@@ -209,13 +311,21 @@ fn simulate(ctx: &Ctx, write: &Write, payer: &Pubkey, oracle: &Pubkey) -> Result
     Ok(Value::Array(results))
 }
 
+/// Every transaction was reached and every one simulated passed.
+fn simulated_ok(results: &[Value], count: usize) -> bool {
+    results.len() == count
+        && results
+            .iter()
+            .all(|t| t["simulated"] == false || t["ok"] == true)
+}
+
 /// Reviews, confirms and sends `write`, or simulates it with `simulate`.
 pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Report> {
     let (identity, _config) = chain_identity::verify_oracle(ctx)?;
     let oracle = identity.oracle;
     let payer = ctx.wallet_pubkey()?;
     for tx in &write.txs {
-        let size = bincode::serialized_size(&build(ctx, tx, &payer)?).unwrap_or(0) as usize + 64;
+        let size = wire_size(&build(ctx, tx, &payer)?);
         if size > PACKET_SIZE {
             bail(format!(
                 "{} would be {size} bytes, over the {PACKET_SIZE}-byte packet limit",
@@ -238,7 +348,14 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
         let results = simulate(ctx, &write, &payer, &oracle)?;
         let all_ok = results
             .as_array()
-            .is_some_and(|r| r.len() == write.txs.len() && r.iter().all(|t| t["ok"] == true));
+            .is_some_and(|r| simulated_ok(r, write.txs.len()));
+        let not_simulated: Vec<Value> = results
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|t| t["simulated"] == false)
+            .map(|t| t["transaction"].clone())
+            .collect();
         for result in results.as_array().into_iter().flatten() {
             let steps = result["steps"]
                 .as_array()
@@ -250,6 +367,10 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
                 })
                 .unwrap_or_default();
             match result["error"].as_str() {
+                None if result["simulated"] == false => lines.push(format!(
+                    "  {steps}: {}",
+                    result["note"].as_str().unwrap_or_default()
+                )),
                 None => lines.push(format!(
                     "  simulated {steps}: ok ({} compute units)",
                     result["unitsConsumed"].as_u64().unwrap_or(0)
@@ -263,6 +384,7 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
             "action": write.action,
             "simulated": true,
             "wouldSucceed": all_ok,
+            "notSimulated": not_simulated,
             "feePayer": payer.to_string(),
             "identity": identity.json(),
             "transactions": results,
@@ -350,6 +472,25 @@ use solana_signer::Signer as _;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_size_check_measures_the_signed_transaction() {
+        use solana_keypair::Keypair;
+        use solana_signer::Signer;
+        let payer = Keypair::new();
+        let ix = Instruction::new_with_bytes(
+            Pubkey::new_unique(),
+            &[7; 900],
+            vec![solana_program::instruction::AccountMeta::new(
+                payer.pubkey(),
+                true,
+            )],
+        );
+        let mut tx = Transaction::new_with_payer(&[ix], Some(&payer.pubkey()));
+        let unsigned = wire_size(&tx);
+        tx.sign(&[&payer], solana_program::hash::Hash::new_unique());
+        assert_eq!(unsigned, bincode::serialize(&tx).unwrap().len());
+    }
 
     #[test]
     fn oracle_errors_are_named_with_their_step() {
@@ -440,6 +581,118 @@ mod tests {
         assert_eq!(bound[1], gate.bind(write).unwrap());
         assert_eq!(bound[1].accounts.last().unwrap().pubkey, gate.address);
         assert_eq!(bound[1].data.len(), 1 + GOVERNANCE_TAIL_LEN);
+    }
+
+    #[test]
+    fn steps_that_need_earlier_evidence_wait_for_the_send() {
+        use ameba_oracle::instruction as ix;
+        let program = Pubkey::new_unique();
+        let payer = Pubkey::new_unique();
+        let other = Pubkey::new_unique();
+        let write = |payer: &Pubkey, kind: u8, offset: u16| {
+            ix::write_evidence(&program, payer, kind, [kind; 32], 400, offset, vec![1])
+        };
+        let locator = ix::find_evidence_object_address(&program, &payer, 1, &[1; 32]);
+        let definition = ix::find_evidence_object_address(&program, &payer, 2, &[2; 32]);
+        let activate = Instruction {
+            program_id: program,
+            accounts: vec![
+                solana_program::instruction::AccountMeta::new(payer, true),
+                solana_program::instruction::AccountMeta::new_readonly(locator, false),
+                solana_program::instruction::AccountMeta::new_readonly(definition, false),
+            ],
+            data: vec![1],
+        };
+        let mut evidence = Tx::one("writeEvidence", write(&payer, 1, 0));
+        evidence.push("writeEvidence", write(&payer, 1, 192));
+        let txs = vec![
+            evidence,
+            Tx::one("writeEvidence", write(&payer, 1, 384)),
+            Tx::one("writeEvidence", write(&payer, 2, 0)),
+            Tx::one("sponsorSource", activate.clone()),
+        ];
+        // The fee payer is in every transaction; only the objects count.
+        assert_eq!(
+            waits_for(&txs),
+            vec![vec![], vec![0], vec![], vec![0usize, 1, 2]]
+        );
+        assert_eq!(
+            waiting_note(&txs, &[0, 1, 2]),
+            "checked when sent, once the evidence above is on chain"
+        );
+        // Evidence already sealed: the activation simulates on its own.
+        assert_eq!(
+            waits_for(&[Tx::one("sponsorSource", activate)]),
+            vec![Vec::<usize>::new()]
+        );
+        // Another wallet's evidence is not this activation's.
+        let unrelated = vec![
+            Tx::one("writeEvidence", write(&other, 1, 0)),
+            Tx::one("writeEvidence", write(&payer, 2, 0)),
+        ];
+        assert_eq!(waits_for(&unrelated), vec![Vec::<usize>::new(); 2]);
+        let mixed = vec![
+            Tx::one("council", write(&payer, 1, 0)),
+            Tx::one("sponsorSource", write(&payer, 1, 192)),
+        ];
+        assert_eq!(
+            waiting_note(&mixed, &[0]),
+            "checked when sent, once transaction 1 is on chain"
+        );
+    }
+
+    #[test]
+    fn a_simulation_passes_when_every_simulated_step_did() {
+        let ok = json!({"simulated": true, "ok": true});
+        let waits = json!({"simulated": false, "ok": null});
+        let failed = json!({"simulated": true, "ok": false});
+        assert!(simulated_ok(&[ok.clone(), waits.clone()], 2));
+        assert!(!simulated_ok(&[ok.clone(), failed], 3));
+        // Stopped early: a transaction was never reached.
+        assert!(!simulated_ok(&[ok], 2));
+        assert!(simulated_ok(&[waits], 1));
+    }
+
+    #[test]
+    fn steps_pack_into_transactions_that_fit_once_gated() {
+        use solana_program::instruction::AccountMeta;
+        let oracle = Pubkey::new_unique();
+        let payer = Pubkey::new_unique();
+        // Seven fresh accounts each: a few to a transaction.
+        let step = |_| {
+            let accounts = (0..7)
+                .map(|_| AccountMeta::new(Pubkey::new_unique(), false))
+                .chain([AccountMeta::new(payer, true)])
+                .collect();
+            (
+                "claimReward".to_string(),
+                Instruction {
+                    program_id: oracle,
+                    accounts,
+                    data: vec![174, 0],
+                },
+            )
+        };
+        let txs = pack(&oracle, &payer, (0..9).map(step).collect());
+        assert!(txs.len() > 1 && txs.len() < 9, "{}", txs.len());
+        assert_eq!(txs.iter().map(|t| t.steps.len()).sum::<usize>(), 9);
+        let gate = GateBinding {
+            controller: Pubkey::new_unique(),
+            target: oracle,
+            address: Pubkey::new_unique(),
+            epoch: 7,
+        };
+        for tx in &txs {
+            let ixs = bind_oracle(Some(&gate), tx.instructions()).unwrap();
+            assert!(wire_size(&Transaction::new_with_payer(&ixs, Some(&payer))) <= PACKET_SIZE);
+        }
+        // Each transaction is as full as it can be: the next step would not fit.
+        let first = &txs[0];
+        let mut grown = first.clone();
+        grown.push("claimReward", txs[1].steps[0].1.clone());
+        let ixs = bind_oracle(Some(&gate), grown.instructions()).unwrap();
+        assert!(wire_size(&Transaction::new_with_payer(&ixs, Some(&payer))) > PACKET_SIZE);
+        assert!(pack(&oracle, &payer, Vec::new()).is_empty());
     }
 
     #[test]

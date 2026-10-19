@@ -2,9 +2,10 @@
 //! documents (`/v1/oracle/public-snapshot`, `/v1/oracle/catalog`) and its
 //! source-candidate store (`/oracle/source-candidates`); writes are built with
 //! the pinned oracle crate's instruction builders against the trusted
-//! deployment's oracle program and signed by the attached wallet. Instruction
-//! families the program has not ported yet (reward claims,
-//! sponsorship, cleanup) refuse with a "not available yet" error.
+//! deployment's oracle program and signed by the attached wallet. Sponsorship
+//! (tag 30/22: sponsor, settle, claim, reserve withdraw) is in `sponsor.rs`,
+//! the other reward claims (tag 174) in `rewards.rs`. Cleanup (30/24) has no
+//! command.
 
 pub mod args;
 pub mod chain;
@@ -12,8 +13,10 @@ pub mod claims;
 pub mod council;
 pub mod errors;
 pub mod reads;
+pub mod rewards;
 pub mod send;
 pub mod skus;
+pub mod sponsor;
 pub mod writes;
 
 use crate::{
@@ -23,7 +26,7 @@ use crate::{
 };
 use args::{
     CandidateCommand, CollateralCommand, EvidenceCommand, OracleCommand, PrintCommand,
-    SourceCommand, StakeCommand, UpdateCommand,
+    ReserveCommand, RewardCommand, SourceCommand, SponsorshipCommand, StakeCommand, UpdateCommand,
 };
 
 /// Runs one oracle command with the futures connection settings (`--rpc`,
@@ -114,6 +117,7 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 source,
                 stake,
             } => writes::source_support(ctx, p, target, source, stake),
+            SourceCommand::Close { target } => writes::sources_close(ctx, p, target),
             SourceCommand::Challenge {
                 target,
                 source,
@@ -244,6 +248,48 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
             ),
             UpdateCommand::Expire { target, claim } => writes::update_expire(ctx, p, target, claim),
         },
+        O::Sponsor { candidate, send } => sponsor::sponsor(ctx, p, candidate, send),
+        O::Rewards {
+            command: None,
+            market,
+            expiry,
+            owner,
+        } => rewards::show(
+            ctx,
+            p,
+            market.as_deref(),
+            expiry.as_deref(),
+            owner.as_deref(),
+        ),
+        O::Rewards {
+            command: Some(RewardCommand::Claim { target, kind }),
+            ..
+        } => send::run(
+            ctx,
+            p,
+            rewards::claim_write(ctx, target, *kind)?,
+            target.send.simulate,
+        ),
+        O::Sponsorships { command: None } => sponsor::sponsorships(ctx, p),
+        O::Sponsorships {
+            command: Some(SponsorshipCommand::Settle { source, send: s }),
+        } => send::run(ctx, p, sponsor::settle_write(ctx, source)?, s.simulate),
+        O::Sponsorships {
+            command: Some(SponsorshipCommand::Claim { source, send: s }),
+        } => send::run(ctx, p, sponsor::claim_write(ctx, source)?, s.simulate),
+        O::Reserve {
+            command:
+                ReserveCommand::Withdraw {
+                    agent,
+                    amount,
+                    send: s,
+                },
+        } => send::run(
+            ctx,
+            p,
+            sponsor::reserve_withdraw_write(ctx, agent, amount)?,
+            s.simulate,
+        ),
         O::Stakes {
             command:
                 StakeCommand::Settle {

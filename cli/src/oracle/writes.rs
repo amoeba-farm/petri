@@ -3,7 +3,7 @@
 //! signed by the attached wallet (see [`super::send`]).
 
 use ameba_oracle::{
-    constants::ORACLE_OPENING_ARCHIVE_URL_PREFIX,
+    constants::{ORACLE_OPENING_ARCHIVE_URL_PREFIX, ORACLE_SCRAMBLE_WINDOW_SECONDS},
     instruction::{
         self as ix, ChallengeOracleOpeningClaimParams, ChallengeOracleSourceParams,
         ChallengeOracleUpdateClaimParams, CommitOracleUpdateClaimV2Params, PrelistingEscrow,
@@ -12,8 +12,9 @@ use ameba_oracle::{
     },
     processor::oracle_update_claim_v2_commitment_hash,
     state::{
-        OracleEscrowKind, OracleOpeningClaim, OracleOpeningClaimChallenge, OracleSourceChallenge,
-        OracleUpdateChallenge, OracleUpdateClaimV2, derive_user_collateral_pda,
+        OracleEscrowKind, OracleMonthState, OracleOpeningClaim, OracleOpeningClaimChallenge,
+        OraclePhase, OracleSourceChallenge, OracleUpdateChallenge, OracleUpdateClaimV2,
+        derive_user_collateral_pda,
     },
 };
 use chrono::NaiveDateTime;
@@ -33,12 +34,12 @@ use crate::futures::{
     error::{Error, Result, bail},
     txbuild::{ata, create_ata_idempotent},
     units::{parse_decimal, parse_usdc, trim_decimal, usdc},
-    view::Paint,
+    view::{Paint, utc},
 };
 
 /// The oracle program's commitment domains for source type and definition
 /// text (the futures API's candidate store commits with the same ones).
-const SOURCE_TYPE_DOMAIN: &str = "ameba-oracle-source-type-v1";
+pub(super) const SOURCE_TYPE_DOMAIN: &str = "ameba-oracle-source-type-v1";
 const SOURCE_DEFINITION_DOMAIN: &str = "ameba-oracle-source-definition-v1";
 const SOURCE_ID_DOMAIN: &[u8] = b"ameba-petri-source-id-v1";
 /// Bytes per evidence chunk (the program's limit) and chunks per transaction.
@@ -77,7 +78,7 @@ fn id_or_random(text: Option<&str>, what: &str) -> Result<[u8; 32]> {
 }
 
 /// `SHA-256(domain || 0 || u32-LE length || text)`.
-fn semantic_hash(domain: &str, text: &str) -> [u8; 32] {
+pub(super) fn semantic_hash(domain: &str, text: &str) -> [u8; 32] {
     let len = (text.len() as u32).to_le_bytes();
     hashv(&[domain.as_bytes(), &[0], &len, text.as_bytes()]).to_bytes()
 }
@@ -164,7 +165,7 @@ fn object_header(oracle: &Oracle, object: &Pubkey) -> Result<Option<(ObjectHeade
 
 /// The transactions that write and seal `bytes` as the payer's evidence
 /// object; none when it is already sealed. Resumes a partial draft.
-fn evidence_txs(
+pub(super) fn evidence_txs(
     oracle: &Oracle,
     payer: &Pubkey,
     kind: u8,
@@ -236,7 +237,7 @@ fn read_body(text: Option<&str>, file: Option<&std::path::Path>) -> Result<Strin
     }
 }
 
-fn month_line(month: &MonthRef) -> String {
+pub(super) fn month_line(month: &MonthRef) -> String {
     format!(
         "{} ({}, period {}, month {}, phase {})",
         month.period.expiry_id(),
@@ -247,7 +248,7 @@ fn month_line(month: &MonthRef) -> String {
     )
 }
 
-fn month_json(month: &MonthRef) -> Value {
+pub(super) fn month_json(month: &MonthRef) -> Value {
     json!({
         "expiryId": month.period.expiry_id(),
         "period": month.period.address.to_string(),
@@ -300,6 +301,11 @@ pub fn collateral_show(ctx: &Ctx, p: Paint, owner: Option<&str>) -> Result<Repor
 
 /// `petri oracle collateral deposit <USDC>`: tags 9 (once) and 10.
 pub fn collateral_deposit(ctx: &Ctx, p: Paint, amount: &str, send: &SendArgs) -> Result<Report> {
+    send::run(ctx, p, deposit_write(ctx, amount)?, send.simulate)
+}
+
+/// The deposit to review and send (the CLI, and the TUI's Fund view).
+pub fn deposit_write(ctx: &Ctx, amount: &str) -> Result<Write> {
     let oracle = Oracle::new(ctx)?;
     let owner = ctx.wallet_pubkey()?;
     let mint = ctx.deployment()?.usdc_mint;
@@ -331,11 +337,16 @@ pub fn collateral_deposit(ctx: &Ctx, p: Paint, amount: &str, send: &SendArgs) ->
         details: json!({"amountAtoms": atoms.to_string(), "ledger": oracle.collateral_address(&owner).to_string()}),
         txs: vec![tx],
     };
-    send::run(ctx, p, write, send.simulate)
+    Ok(write)
 }
 
 /// `petri oracle collateral withdraw <USDC|all>`: tag 11.
 pub fn collateral_withdraw(ctx: &Ctx, p: Paint, amount: &str, send: &SendArgs) -> Result<Report> {
+    send::run(ctx, p, withdraw_write(ctx, amount)?, send.simulate)
+}
+
+/// The withdrawal to review and send (the CLI, and the TUI's Fund view).
+pub fn withdraw_write(ctx: &Ctx, amount: &str) -> Result<Write> {
     let oracle = Oracle::new(ctx)?;
     let owner = ctx.wallet_pubkey()?;
     let mint = ctx.deployment()?.usdc_mint;
@@ -370,7 +381,7 @@ pub fn collateral_withdraw(ctx: &Ctx, p: Paint, amount: &str, send: &SendArgs) -
         details: json!({"amountAtoms": atoms.to_string()}),
         txs: vec![tx],
     };
-    send::run(ctx, p, write, send.simulate)
+    Ok(write)
 }
 
 // ------------------------------------------------------------------ evidence
@@ -719,6 +730,90 @@ fn opening_claim(
     Ok((key, claim))
 }
 
+/// A month's Opening: its phase, and its start (the end of Scramble's seven
+/// days) and listing, unix seconds on the chain's clock.
+#[derive(Clone, Copy, Debug)]
+struct Opening {
+    phase: OraclePhase,
+    start: u64,
+    listing: u64,
+}
+
+impl Opening {
+    fn of(month: &OracleMonthState) -> Self {
+        Opening {
+            phase: month.phase,
+            start: month
+                .scramble_start_ts
+                .saturating_add(ORACLE_SCRAMBLE_WINDOW_SECONDS),
+            listing: month.listing_ts,
+        }
+    }
+}
+
+/// What an opening must meet, by the oracle's rules, checked before anything
+/// is sent (its archive goes on chain first): the month is in Opening and the
+/// chain's clock (`now`) between the Opening's start and listing; the archive
+/// is of the source's own page, captured from the Opening's start up to that
+/// clock; the stake is the product's opening bond.
+fn check_opening(
+    month: Opening,
+    now: u64,
+    archive_url: &str,
+    locator_hash: &[u8; 32],
+    stake: u64,
+    bond: u64,
+) -> Result<()> {
+    let at = |t: u64| utc(i64::try_from(t).unwrap_or(i64::MAX));
+    let start = month.start;
+    if month.phase != OraclePhase::Opening {
+        bail(format!(
+            "the month is in {:?}: opening values are taken in Opening, from {} to listing at {}",
+            month.phase,
+            at(start),
+            at(month.listing)
+        ))?;
+    }
+    if now < start || now >= month.listing {
+        bail(format!(
+            "the Opening runs from {} to listing at {} on the chain's clock, which says {}",
+            at(start),
+            at(month.listing),
+            at(now)
+        ))?;
+    }
+    let captured = archive_time(archive_url)?;
+    if captured < start {
+        bail(format!(
+            "the archive was captured at {}, before the Opening began at {}: archive the page again",
+            at(captured),
+            at(start)
+        ))?;
+    }
+    if captured > now {
+        bail(format!(
+            "the archive was captured at {}, after the chain's clock ({}): use a capture from {} up to the chain's clock, or wait for the chain to pass {}",
+            at(captured),
+            at(now),
+            at(start),
+            at(captured)
+        ))?;
+    }
+    let page = &archive_url[ORACLE_OPENING_ARCHIVE_URL_PREFIX.len() + 15..];
+    if hashv(&[b"locator", page.as_bytes()]).to_bytes() != *locator_hash {
+        bail(format!(
+            "{page} is not this source's page: archive its URL exactly as the source names it"
+        ))?;
+    }
+    if stake != bond {
+        let bond = trim_decimal(u128::from(bond), 6);
+        bail(format!(
+            "the opening bond of this product is {bond} USDC: pass --stake {bond}"
+        ))?;
+    }
+    Ok(())
+}
+
 #[allow(clippy::too_many_arguments)]
 pub fn print_opening(
     ctx: &Ctx,
@@ -744,9 +839,23 @@ pub fn print_opening(
             "the stake"
         },
     )?;
+    let challenging = challenge_id.is_some();
+    if !challenging {
+        let bond = oracle
+            .sku_pool(&month, &source.state.bucket_id)?
+            .opening_bond;
+        let now = u64::try_from(ctx.rpc.clock()?.unix_timestamp).unwrap_or(0);
+        check_opening(
+            Opening::of(&month.state),
+            now,
+            archive_url,
+            &source.state.canonical_locator_hash,
+            amount,
+            bond,
+        )?;
+    }
     let (_, bytes, hash) = evidence_preimage(EvidenceKind::Archive, archive_url)?;
     let (archive_object, mut txs, _) = evidence_txs(&oracle, &actor, 3, &bytes, hash)?;
-    let challenging = challenge_id.is_some();
     let (name, ixn) = if challenging {
         let challenge_id = id_or_random(challenge_id.filter(|c| !c.is_empty()), "challenge id")?;
         (
@@ -869,6 +978,55 @@ pub fn print_expire(ctx: &Ctx, p: Paint, target: &Target, source: &str) -> Resul
                 &month.period.address,
                 &month.address,
                 &source.address,
+            ),
+        )],
+    };
+    send::run(ctx, p, write, target.send.simulate)
+}
+
+/// `petri oracle sources close`: finalizes the month's SKU coverage (184,
+/// anyone may send it). It ends the source window: from then the month runs
+/// Scramble's challenge days, its freeze, Opening and Game on the calendar.
+pub fn sources_close(ctx: &Ctx, p: Paint, target: &Target) -> Result<Report> {
+    let oracle = Oracle::new(ctx)?;
+    let cranker = ctx.wallet_pubkey()?;
+    let month = oracle.month(&target.market, target.expiry.as_deref())?;
+    let coverage = oracle.coverage(&month)?;
+    if coverage.coverage_finalized {
+        bail(format!(
+            "{} has closed its source window already",
+            month.period.expiry_id()
+        ))?;
+    }
+    if coverage.covered_sku_count < coverage.required_sku_count {
+        bail(format!(
+            "{} of {} products of {} have a supported source: each needs one before its source window can close",
+            coverage.covered_sku_count,
+            coverage.required_sku_count,
+            month.period.expiry_id()
+        ))?;
+    }
+    let write = Write {
+        action: "oracle.sources.close",
+        title: format!(
+            "Close the source window of {}: Scramble's challenge days start",
+            month.period.expiry_id()
+        ),
+        review: vec![
+            month_line(&month),
+            format!(
+                "All {} products have a supported source",
+                coverage.required_sku_count
+            ),
+        ],
+        details: json!({"month": month_json(&month), "products": coverage.required_sku_count}),
+        txs: vec![Tx::one(
+            "finalizeSkuCoverage",
+            ix::finalize_oracle_sku_coverage(
+                &oracle.program,
+                &cranker,
+                &month.period.address,
+                &month.address,
             ),
         )],
     };
@@ -1411,6 +1569,45 @@ mod tests {
         let (kind, _, hash) = evidence_preimage(EvidenceKind::Archive, url).unwrap();
         assert_eq!((kind, hash), (3, ix::archive_url_hash(url)));
         assert!(evidence_preimage(EvidenceKind::Locator, "ftp://x").is_err());
+    }
+
+    #[test]
+    fn an_opening_meets_the_oracles_rules_before_anything_is_sent() {
+        let day = 86_400;
+        // Scramble from Oct 18 00:00 UTC: the Opening runs Oct 25 to listing Oct 26.
+        let start = 1_792_281_600 + 7 * day;
+        let month = Opening {
+            phase: OraclePhase::Opening,
+            start,
+            listing: start + day,
+        };
+        let page = "https://example.com/ram?id=1";
+        let hash = hashv(&[b"locator", page.as_bytes()]).to_bytes();
+        // Captured Oct 25 01:00; the chain says Oct 25 02:00.
+        let url = format!("https://web.archive.org/web/20261025010000/{page}");
+        let now = start + 2 * 3600;
+        assert!(check_opening(month, now, &url, &hash, 1_000_000, 1_000_000).is_ok());
+        let fails = |month: Opening, now: u64, url: &str, stake: u64| {
+            check_opening(month, now, url, &hash, stake, 1_000_000)
+                .unwrap_err()
+                .message
+        };
+        assert!(
+            fails(month, now, &url, 2_000_000)
+                .contains("the opening bond of this product is 1 USDC: pass --stake 1")
+        );
+        let early = format!("https://web.archive.org/web/20261024230000/{page}");
+        assert!(fails(month, now, &early, 1_000_000).contains("before the Opening began"));
+        // A capture the chain's clock has not reached yet.
+        assert!(fails(month, start + 1800, &url, 1_000_000).contains("after the chain's clock"));
+        let other = "https://web.archive.org/web/20261025010000/https://example.com/ram";
+        assert!(fails(month, now, other, 1_000_000).contains("is not this source's page"));
+        assert!(fails(month, month.listing, &url, 1_000_000).contains("on the chain's clock"));
+        let game = Opening {
+            phase: OraclePhase::Game,
+            ..month
+        };
+        assert!(fails(game, now, &url, 1_000_000).contains("the month is in Game"));
     }
 
     #[test]

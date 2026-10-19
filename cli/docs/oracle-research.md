@@ -14,7 +14,14 @@ For local development, `PETRI_RESEARCH_UPSTREAM`, `PETRI_RESEARCH_ORACLE_URL`, a
 `PETRI_RESEARCH_PORT` configure a new workspace. Existing workspace upstream
 bindings remain protected.
 
-The four views are **Connect**, **Activity**, **Evidence**, and **Rewards**.
+The four views are **Connect**, **Research**, **Evidence**, and **Rewards**.
+**Fund** is the other side: it lists the price pages research agents found
+(candidates, not yet on the oracle), your oracle balance that bonds and
+stakes come from (**Add funds**, **Withdraw**, reviewed and signed by your
+wallet), the sources your wallet listed, and your sponsorships. **Sponsor
+it** on a find posts its product's bond from your oracle balance and puts it
+on the oracle under the researcher's name: if it goes live, the researcher
+gets half its reward and you the rest (`petri oracle sponsor`).
 Agents keep their own model and harness. The same authenticated operations are
 available through the JSON CLI and a local stdio MCP server.
 
@@ -66,23 +73,47 @@ dependencies. This is a local application; a hosted service is not included.
 
 ## Connect an agent and direct research
 
-1. In **Connect**, click **Reward address** and enter your public Solana address.
-   This is the destination recorded for newly registered agents. Existing agent
-   identities keep their original destination.
-2. Choose an agent name and harness. **Copy login** gives you a command to run
-   from that agent's terminal. **Copy MCP** gives you its connection configuration.
-3. Have the agent log in. Match its pairing code with the request shown in
-   **Connect**, then click **Approve**. Have the agent call login again to finish.
-4. In **Activity → Directives**, edit the coverage targets or market scope.
-   Petri starts with an enabled directive for all markets: at least **3 active
-   sources and 2 distinct source hosts per product group**. These editable targets
-   guide research; they do not change the oracle's acceptance rules.
-5. **Activity → Work** shows research objectives derived from confirmed coverage
-   gaps. Open one and click **Refine** to add human guidance about where to look,
-   product requirements or research priorities. No title or brief is required.
-   Agents discover this work, start runs, report progress and submit candidates.
-6. Select an agent in the sidebar to inspect its **Runs**, **Evidence** and
-   **Rewards**. **Disconnect agent** in Connect revokes access and retains its history.
+1. In **Connect**, click **Connect wallet**. It offers this Petri's own wallet;
+   Enter connects it, or enter another public Solana address. Connect then
+   shows it as the **Active wallet** (**Change** connects another). Rewards go
+   to it: it is recorded for newly registered agents, and existing agent
+   identities keep their original one, which their own page shows.
+2. Click **Agent** to choose your harness from the list, and **Name** to name
+   the agent. **Copy agent setup** copies a short message with the agent's
+   login command: paste it into your agent's terminal.
+3. The agent runs the command and shows a pairing code. Match it with the
+   request in **Connect**, then click **Approve**. The agent runs the command
+   again to finish, then `work next`, and keeps researching from there.
+4. The sidebar lists your agents, each its harness over its name (a dot while
+   it researches). Click one for its page in **Connect**: what it is doing,
+   its wallet and **Disconnect agent**. An agent that is connected but idle
+   offers **Copy start message**: paste it into the agent's terminal to get it
+   researching again. **+ New agent** sets up another one.
+5. **Research** is a navigator beside the selected agent's page. The
+   navigator drills down: **Products** (one row per oracle product, with its
+   months and open tasks; products and months are the oracle's own, so work
+   of a month it no longer lists shows nowhere), then a product's months
+   (each with its phase as five dots, done ●, now ◉, to come ○, and its
+   rewards left), then a
+   month's categories (its products, each with its source count, its
+   temperature box, hot to cold, and the agent on it), then one category:
+   what it still needs, who is on it, your directive, and its tasks (an
+   update or opening per source; click one to pick it). Every crumb of
+   `Products › RAMX › Dec 2026 › …` goes back up, as Backspace does.
+   **Research this** puts the work first in your agents' list (they can
+   still take any; **Stop researching** undoes it), and **Directive** tells
+   them where to look. The list checks again every minute by itself.
+6. The agent's page says what it is on, then its live feed, newest at the
+   bottom: ⌕ a search, ↗ a page it read, $ a value it read, ✓ a source found
+   or received, ⇪ a write it made, · a note, ! blocked, ▸ and ■ a run's start
+   and end, and `you:` your directives. Scroll up to read back; it keeps its
+   place until you scroll down again or click **▾ newer**. A line of a run
+   shows that run's work in the navigator. Selecting an agent follows it:
+   the navigator moves to its work as it moves. A click in the navigator
+   stops following; **Follow** resumes it. Each agent keeps its own page.
+7. Select an agent in the sidebar for its **Evidence** and **Rewards** too:
+   what it earned, as a chart of each month, and each of its finds a sponsor
+   put on the oracle.
 
 Petri does not launch a model or run research by itself. Claude Code, Codex,
 Kimi Code, Gemini CLI or your own DeepSeek harness continues doing the work.
@@ -90,13 +121,11 @@ Any harness able to invoke a local command can use the JSON CLI. A harness with
 stdio MCP support can use the same operations through MCP. Provider accounts
 and model credentials stay with that harness.
 
-MCP connection snippets use the private bundled Node runtime and a stable agent
-launcher, with the current workspace URL and agent name. This leaves the Petri
-executable free to update while agents are connected. New agent sessions load
-the current application code; existing sessions finish with their loaded client. The Codex selection produces a TOML `mcp_servers` section; the
-others produce the common JSON `mcpServers` format. Merge the snippet into your
-harness configuration without replacing other servers. Exact installation
-locations and configuration support depend on the harness.
+The setup message's command uses the private bundled Node runtime and a stable
+agent launcher, with the current workspace URL and agent name. This leaves the
+Petri executable free to update while agents are connected. New agent sessions
+load the current application code; existing sessions finish with their loaded
+client.
 
 Give each independently running agent its own name/profile. An identity can be
 resumed after restarting its harness. Profiles default to
@@ -106,16 +135,18 @@ different dedicated directory. A profile is bound to its original workspace.
 
 ## Keyboard and mouse
 
-Click tabs, agent rows, buttons and form fields. Use the mouse wheel to scroll.
-At narrow widths, click the displayed harness name to cycle through harnesses.
+Click tabs, agent rows, buttons and form fields; a click outside a pop-up
+closes it. Use the mouse wheel to scroll. **Agent** in Connect opens the list
+of harnesses.
 An 80×24 terminal works; 100×32 gives the connection form more room.
 
 | Key | Action |
 | --- | --- |
-| `c`, `a`, `e`, `r` | Connect, Activity, Evidence, Rewards |
+| `c`, `a`, `e`, `r`, `f` | Connect, Research, Evidence, Rewards, Fund |
 | `Tab` / `Shift+Tab`, `Enter` | Focus and activate a control |
 | `↑` / `↓` | Select an agent |
-| `n` | New standing directive |
+| `n` | New agent |
+| `Backspace` | Research: up one level |
 | `PageUp` / `PageDown`, `Home` | Scroll content |
 | `Ctrl+Enter` | Save a form |
 | `Esc` | Close a form; quit from the main view |
@@ -128,20 +159,42 @@ Every CLI result is JSON; credentials are saved privately rather than printed.
 
 ```powershell
 petri research agent login --name cedar --harness 'Claude Code'
+petri research work next --agent cedar
 petri research work list --agent cedar
 petri research work start <work-id> --agent cedar --key research-1
-petri research work report <run-id> --agent cedar --key step-1 --message 'Read the exact public listing.'
+petri research work report <run-id> --agent cedar --kind read --source https://example.com/ram --message 'Crucial 64GB DDR5 RDIMM'
 petri research work submit <run-id> --agent cedar --key source-1 --file candidate.json
 petri research work finish <run-id> --agent cedar --summary 'Submitted the matching public source.'
 petri research rewards --agent cedar
 ```
+
+`work next` starts (or resumes) the agent's next run: your picks first, then
+what needs the most, skipping what another agent is on while there is other
+work. It prints the run, its assignment with your directive, and the exact
+commands to report, submit and finish; then the agent runs `work next` again.
+An agent counts as researching while it has checked in within 20 minutes.
+
+Agents report each step as they go, one short line each (`--kind`, default
+`note`); the agent's page in the TUI shows them live:
+
+| Kind | Message | `--source` |
+| --- | --- | --- |
+| `search` | the query | optional |
+| `read` | the page opened, e.g. its title | required |
+| `value` | a value read off a page, e.g. `289.99 USD, DDR5 RDIMM 64GB` | optional |
+| `submit` | a petri write, e.g. `update committed` | optional |
+| `note`, `source_found`, `blocked` | anything else, a price page, a blocker | optional |
+
+References are public HTTPS URLs. When you add or change a directive for a
+product, each agent on it gets it in its feed (`owner`, `directive`), and a
+run that starts later opens with it.
 
 Reuse the same `--key` and request content when retrying a start, report or
 submission whose response was lost. MCP requires these keys. A retry must not
 be represented as new work. Candidate duplicates retain the original researcher's
 attribution, including when another agent finds the same source.
 
-The ten MCP tools are `petri_login`, `petri_work_list`, `petri_work_start`,
+The eleven MCP tools are `petri_login`, `petri_work_next`, `petri_work_list`, `petri_work_start`,
 `petri_report_progress`, `petri_submit_candidate`, `petri_run_finish`,
 `petri_activity`, `petri_rewards`, `petri_session_open`, and `petri_session_close`.
 Start the server with `petri research mcp --agent cedar --harness 'Claude Code'`.
@@ -210,10 +263,34 @@ be exhaustively discovered without a canonical bucket catalog. Source-observatio
 freshness is checked; the snapshot does not establish that a publisher's page
 or quoted price is current. This version does not detect website-price staleness.
 
+Each month's oracle phase sets its work. While it takes sources
+(SourceSubmission, Scramble's placement days 1-4) every product it lists gets a
+source gap. In Opening each frozen source still without an opening value gets
+one opening task, with its product's opening bond and budget when the snapshot
+lists them; it follows the chain's phase, since the oracle takes openings until
+listing on the chain's own clock. In Game each live source gets an update task.
+A Settled month whose rewards are frozen gets one claims task, if this
+workspace's agents worked on that month. It comes up until a run on it
+finishes, and again when the owner picks it: `petri oracle rewards <month>`,
+then `petri oracle rewards claim <month> --yes` and `petri oracle sponsorships
+claim <source> --yes` for what that lists. Scramble's challenge and freeze
+days take nothing. `work next` hands out the
+owner's picks first, then openings (the Opening lasts a day), then what needs
+the most, and prints that phase's petri steps for the owner's wallet: for an
+opening, read the value, archive the source's exact URL with a capture from the
+Opening's start up to the chain's clock, `petri oracle prints opening` with the
+product's opening bond, `prints finalize` 300 slots later and before listing,
+and `petri oracle stakes settle --kind opening-claim` for the bond. An opening
+or update that earns nothing this month comes up only when the owner picks it.
+
 Repeated assessments update stable objectives. Fresh evidence of adequate
 coverage resolves an objective; a later shortage reopens it. Stale or failed
-assessments withdraw new work until the facts can be checked again. Finishing a
-run or submitting candidates never resolves a gap. Research may happen before
+assessments withdraw new work until the facts can be checked again. A
+successful assessment archives the work of a series the catalog no longer
+lists (a month no longer served), with its runs kept; it comes back if the
+series is listed again. Work of a listed series stays, whatever its status, and
+a failed assessment archives nothing. Finishing a run or submitting
+candidates never resolves a gap. Research may happen before
 an admission window: a coverage objective is not permission to activate a source.
 
 Edit a directive without a title or brief:

@@ -55,9 +55,7 @@ impl Api {
         builder = builder
             .bearer_auth(&self.token)
             .header("Cache-Control", "no-store");
-        let response = builder
-            .send()
-            .map_err(|_| "The research workspace is unavailable. Your local view is still open.")?;
+        let response = builder.send().map_err(|_| "Research workspace offline.")?;
         let status = response.status();
         let mut bytes = Vec::new();
         response

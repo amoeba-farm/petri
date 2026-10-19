@@ -35,7 +35,9 @@ This repo owns the Rust CLI/TUI entrypoint for Amoeba. The executable command is
 7. `src/main.rs` for dispatch and output behavior
 8. `src/futures/` for the markets: reads, quotes, orders and sending, with
    the shared clients, identity and units
-9. `src/research/mod.rs` for the interactive TUI (`src/research/markets.rs` for the Markets view)
+9. `src/research/mod.rs` for the interactive TUI (`src/research/markets.rs` for the Markets view,
+   `src/research/fund.rs` for the Fund view, `src/research/rewards.rs` for the Rewards view's
+   earnings)
 10. `src/chart.rs` for terminal chart rendering
 
 When a change touches browser parity, inspect the sibling repos before changing
@@ -92,7 +94,8 @@ contracts:
   (futures API documents), `chain.rs` (periods, months, sources and ledgers read
   and checked from chain), `skus.rs` (governed SKU sets and Merkle proofs),
   `send.rs` (review, simulate, sign and send), `writes.rs` (one handler per
-  instruction), `claims.rs` (private update-claim reveal material) and
+  instruction), `rewards.rs` (a wallet's rewards read from chain and their
+  claims, tag 174), `claims.rs` (private update-claim reveal material) and
   `errors.rs` (oracle error names).
 - `src/chain_identity.rs` owns the deployment identity gate: the RPC's genesis
   must be the trusted deployment's and the oracle and futures programs must be
@@ -235,9 +238,11 @@ command example.
 - Never print or log an update claim's salt; reveal material lives only in the
   private claims file.
 - Council 30/18 uses the real Spread controller roster through `oracle emergency`
-  commands. Families the oracle program has not ported (rewards 170/171/173/174,
-  sponsorship 30/22, cleanup 30/24) have no command; add one when the program
-  ports them.
+  commands. Sponsorship 30/22 is `oracle sponsor`, `oracle sponsorships
+  [settle|claim]` and `oracle reserve withdraw` (the TUI's Fund tab sends the
+  same writes). The other reward claims (tag 174) are `oracle rewards
+  claim`; the operator's registration and freeze (170/171/173) are
+  `futures-ops`'. Cleanup (30/24) has no command.
 - Every write supports `--simulate`, confirms unless `--yes`, and sets the 1.4M
   compute-unit limit. Name oracle errors (`errors.rs`, codes 6000 and up).
 

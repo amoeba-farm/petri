@@ -148,7 +148,7 @@
           </tr>
           <tr>
             <td><a href="../../src/oracle/mod.rs">src/oracle/mod.rs</a></td>
-            <td>The index oracle: <code>args</code> grammar, <code>reads</code> (futures API oracle documents and candidates), <code>chain</code> (periods, months, sources, ledgers read and checked from chain), <code>skus</code> (governed SKU sets and Merkle proofs), <code>send</code> (identity, the oracle's own governance gate, review, simulate, sign, send), <code>writes</code> (one handler per instruction), <code>council</code> (emergency council cases), <code>claims</code> (private update-claim reveal material), <code>errors</code> (oracle error names).</td>
+            <td>The index oracle: <code>args</code> grammar, <code>reads</code> (futures API oracle documents and candidates), <code>chain</code> (periods, months, sources, ledgers read and checked from chain), <code>skus</code> (governed SKU sets and Merkle proofs), <code>send</code> (identity, the oracle's own governance gate, review, simulate, sign, send), <code>writes</code> (one handler per instruction), <code>sponsor</code> (sponsorships), <code>rewards</code> (a wallet's rewards read from chain and their tag 174 claims), <code>council</code> (emergency council cases), <code>claims</code> (private update-claim reveal material), <code>errors</code> (oracle error names).</td>
             <td>Build instructions only with <code>ameba_oracle::instruction</code> builders against the deployment's oracle id. Decode every account through <code>chain::decode</code> and check its canonical address and parent. <code>council</code> reads current council rosters, case commitments and round ballots before building a council decision.</td>
           </tr>
           <tr>
@@ -190,6 +190,11 @@
             <td><a href="../../src/research/markets.rs">src/research/markets.rs</a></td>
             <td>TUI Markets view: the market list, the book of the suggested range (as <code>petri book</code>), trades, the index and price, the account's positions and orders, and long, short, close and cancel tickets.</td>
             <td>Owns no trading logic: tickets call <code>futures::trade</code>'s prepare and send steps, quote before <code>y</code> sends, and use the CLI's 2% slippage default. The leverage keys step through the site's leverages that fit the market's price.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/research/nav.rs">src/research/nav.rs</a>, <a href="../../src/research/research_page.rs">src/research/research_page.rs</a></td>
+            <td>TUI Research view: the navigator (products, months, categories, one category's tasks) built from the oracle's months (<code>phase.rs</code>) and the workspace's work in them, each agent's feed, and following an agent's work; <code>research_page.rs</code> draws it beside the agent's page.</td>
+            <td>Displays only: its writes are the owner's Research this, Stop researching and Directive (<code>/v1/owner/work/focus</code>, <code>/v1/owner/work/refine</code>).</td>
           </tr>
           <tr>
             <td><a href="../../src/research/runtime.rs">src/research/runtime.rs and research/</a></td>

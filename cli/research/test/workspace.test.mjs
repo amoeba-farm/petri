@@ -140,3 +140,30 @@ test('a lost login response can be recovered without creating another pairing', 
     await assert.rejects(f.request('POST', '/v1/login', { ...request, name: 'flint' }), { code: 'REQUEST_CONFLICT' });
   } finally { f.close(); }
 });
+
+test('work next starts the owner’s pick, resumes it, and the owner sees who is researching what', async () => {
+  const f = fixture(); try {
+    const a = await f.connect('cedar');
+    const work = await f.discover();
+    await f.owner('POST', 'work/focus', { workId: work.id, focused: true });
+    const first = await a.call('POST', '/v1/work/next', { sessionId: a.session.id });
+    assert.equal(first.status, 'assigned'); assert.equal(first.assignment.id, work.id); assert.equal(first.resumed, false);
+    const again = await a.call('POST', '/v1/work/next', { sessionId: a.session.id });
+    assert.equal(again.run.id, first.run.id); assert.equal(again.resumed, true);
+    let snapshot = await f.owner('GET', 'snapshot');
+    assert.deepEqual(snapshot.activity.map(run => [run.agentId, run.workId]), [[a.agent.id, work.id]]);
+    assert.deepEqual(snapshot.work.find(item => item.id === work.id).researchers, [a.agent.id]);
+    await a.call('POST', `/v1/runs/${first.run.id}/events`, { sessionId: a.session.id, clientKey: 'e', kind: 'note', message: 'Checked a listing.' });
+    assert.equal((await f.owner('GET', 'snapshot')).activity[0].lastMessage, 'Checked a listing.');
+    // A finished run is not research; the next one starts afresh.
+    await a.call('POST', `/v1/runs/${first.run.id}/finish`, { sessionId: a.session.id, summary: 'Done.' });
+    assert.deepEqual((await f.owner('GET', 'snapshot')).activity, []);
+    const next = await a.call('POST', '/v1/work/next', { sessionId: a.session.id });
+    assert.notEqual(next.run.id, first.run.id);
+    // An agent that stopped checking in is not researching.
+    f.time(20 * 60000 + 1);
+    snapshot = await f.owner('GET', 'snapshot');
+    assert.deepEqual(snapshot.activity, []);
+    assert.deepEqual(snapshot.work.find(item => item.id === work.id).researchers, []);
+  } finally { f.close(); }
+});

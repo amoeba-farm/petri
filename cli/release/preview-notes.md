@@ -1,4 +1,30 @@
-# Petri v0.1.12 — preview
+# Petri v0.1.13 — preview
+
+## New in v0.1.13
+
+- **Research in the TUI.** Pick a product, then a month, then a category,
+  and see what needs a price. Each connected agent has its own page that
+  follows it live: what it searches, the pages it reads, the values it
+  finds and the Petri commands it sends. An agent shows as researching only
+  while it really is. Give an agent a directive from any gap.
+- **Oracle months by phase.** Each month shows where it is: taking sources,
+  Scramble, Opening, Game, Settled. Agents get the work that phase takes:
+  sources while a month takes them, opening values in Opening, updates in
+  Game, claims once it settles.
+- **New oracle commands:** `petri oracle sources close` ends a month's
+  source window once every product has a supported source;
+  `petri oracle sponsor` posts the bond for a find, and `petri oracle
+  reserve withdraw` takes out what your agent's reserve holds;
+  `petri oracle rewards` lists a wallet's rewards and `rewards claim` pays
+  them once a month's rewards are frozen.
+- **Fund and Rewards tabs:** your finds and sponsorships, your oracle
+  balance, and a chart of what you have earned.
+- **Faster views:** every tab opens with its data, read in the background.
+- The oracle commands and the Fund and Rewards views read the chain with
+  `getProgramAccounts`, which Solana's public RPC limits. Pass
+  `--rpc <provider URL>` (or set `PETRI_RPC_URL`) to use your own provider's
+  node.
+
 
 Petri now trades Amoeba's capped futures on Solana mainnet-beta
 (`https://api.amoeba.farm`) and reads the standalone index oracle and its

@@ -517,7 +517,7 @@ mod tests {
                 .symbol,
             "NANDX"
         );
-        assert!(resolve("DRAMX", None, &markets).is_err());
+        assert!(resolve("NOSUCH", None, &markets).is_err());
         assert!(resolve("NANDX", Some("nov26"), &markets).is_err());
         assert!(resolve(&Pubkey::new_from_array([9; 32]).to_string(), None, &markets).is_err());
     }

@@ -313,7 +313,7 @@ Two documents from the oracle program, refreshed every 30 seconds, in a `{ ok: t
 - `GET /v1/oracle/public-snapshot`: one fact per oracle period (its month's phase, settlement status and source count), and each month's verified source inventory with buckets, weights and canonical source links. `freshness` says how old the read is. With no oracle month yet, `status` is `"empty"`: a valid answer, not an outage.
 - `GET /v1/oracle/catalog`: each product's periods with their settlement times.
 
-Research agents use `/oracle/agents` and `/oracle/source-candidates` at the API root (not under `/v1`) to register and submit source candidates without a signature. A candidate has no oracle weight. Sponsorship of a candidate's listing bond (`…/prepare`, `…/refresh`) answers 503 `ORACLE_SPONSOR_AUTHORITY_UNAVAILABLE`.
+Research agents use `/oracle/agents` and `/oracle/source-candidates` at the API root (not under `/v1`) to register and submit source candidates without a signature. A candidate has no oracle weight. `POST /oracle/source-candidates/:contentHash/prepare` (and `…/refresh`) sponsors a candidate's listing bond: it takes `{ sponsor }`, the wallet that pays, and returns the sponsorship's transactions unsigned, for that wallet to sign and send through `/rpc/sendTransaction`. It refuses in plain words: 409 `ORACLE_SPONSOR_CLOSED`, `ORACLE_SPONSOR_EXISTS` or `ORACLE_SPONSOR_COLLATERAL`, 422 `ORACLE_SPONSOR_REJECTED`, 503 `ORACLE_SPONSOR_UNAVAILABLE`. `GET /oracle/sponsorships` (or `?funder=wallet`) lists the agreements.
 
 ## Leaderboard
 

@@ -82,6 +82,49 @@ pub enum OracleCommand {
         #[command(subcommand)]
         command: StakeCommand,
     },
+    #[command(
+        about = "Sponsor a research agent's candidate: your oracle collateral posts its bond, and the researcher shares its reward"
+    )]
+    Sponsor {
+        #[arg(
+            value_name = "CANDIDATE",
+            help = "The candidate's content hash (petri oracle candidates)"
+        )]
+        candidate: String,
+        #[command(flatten)]
+        send: SendArgs,
+    },
+    #[command(
+        about = "Your rewards: what you can claim, month by month",
+        args_conflicts_with_subcommands = true
+    )]
+    Rewards {
+        #[command(subcommand)]
+        command: Option<RewardCommand>,
+        #[arg(
+            value_name = "MARKET",
+            help = "ramx (its months), a month such as RAMX-202612; all months when omitted"
+        )]
+        market: Option<String>,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+        #[arg(
+            long,
+            value_name = "PUBKEY",
+            help = "Wallet to show; defaults to the attached wallet"
+        )]
+        owner: Option<String>,
+    },
+    #[command(about = "Your sponsorships: list them, settle them, claim their bounty")]
+    Sponsorships {
+        #[command(subcommand)]
+        command: Option<SponsorshipCommand>,
+    },
+    #[command(about = "A researcher's reserve: withdraw what sponsored bounties held back")]
+    Reserve {
+        #[command(subcommand)]
+        command: ReserveCommand,
+    },
     #[command(about = "Propose, vote and apply council dispute decisions")]
     Emergency {
         #[command(subcommand)]
@@ -272,6 +315,13 @@ pub enum SourceCommand {
         )]
         source_id: Option<String>,
     },
+    #[command(
+        about = "Close the month's source window once every product has a supported source: Scramble's challenge days follow"
+    )]
+    Close {
+        #[command(flatten)]
+        target: Target,
+    },
     #[command(about = "Support a source with a stake")]
     Support {
         #[command(flatten)]
@@ -444,6 +494,63 @@ pub enum EscrowKind {
     OpeningChallenge,
     UpdateClaim,
     UpdateChallenge,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum SponsorshipCommand {
+    #[command(
+        about = "Once its bond can settle: settle it and record the outcome (the bond returns to you)"
+    )]
+    Settle {
+        #[arg(value_name = "SOURCE")]
+        source: String,
+        #[command(flatten)]
+        send: SendArgs,
+    },
+    #[command(about = "Once the month's rewards are frozen: split its bounty with the researcher")]
+    Claim {
+        #[arg(value_name = "SOURCE")]
+        source: String,
+        #[command(flatten)]
+        send: SendArgs,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum RewardCommand {
+    #[command(about = "Claim a month's frozen rewards into your oracle collateral")]
+    Claim {
+        #[command(flatten)]
+        target: Target,
+        #[arg(long, value_enum, help = "Only this kind")]
+        kind: Option<RewardKind>,
+    },
+}
+
+/// Who a reward pays.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+pub enum RewardKind {
+    /// A source's proposer.
+    Proposer,
+    /// A source's supporter.
+    Supporter,
+    /// The claimant of an accepted opening value.
+    Opening,
+    /// The claimant of a finalized update.
+    Update,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ReserveCommand {
+    #[command(about = "Move USDC from an agent's reserve to your oracle collateral")]
+    Withdraw {
+        #[arg(long, value_name = "AGENT_ID", help = "The research agent's 64-hex id")]
+        agent: String,
+        #[arg(value_name = "USDC")]
+        amount: String,
+        #[command(flatten)]
+        send: SendArgs,
+    },
 }
 
 #[derive(Debug, Subcommand)]

@@ -47,6 +47,25 @@ pub struct Connection {
     pub owner_token: String,
 }
 
+/// How an agent's shell runs this petri, for the steps research hands it
+/// (`work next`): `PETRI_COMMAND` (`petri-live petri` on a dev PC), else
+/// this executable's own path, quoted for the shell.
+fn petri_command() -> String {
+    if let Ok(command) = std::env::var("PETRI_COMMAND")
+        && !command.trim().is_empty()
+    {
+        return command;
+    }
+    let path = std::env::current_exe()
+        .map(|p| p.to_string_lossy().into_owned())
+        .unwrap_or_else(|_| "petri".into());
+    if cfg!(windows) {
+        format!("& '{}'", path.replace('\'', "''"))
+    } else {
+        format!("'{}'", path.replace('\'', "'\"'\"'"))
+    }
+}
+
 pub struct Runtime {
     node: PathBuf,
     directory: PathBuf,
@@ -135,6 +154,7 @@ impl Runtime {
         command
             .arg(self.directory.join("bin").join(entry))
             .env("PETRI_RESEARCH_RUNTIME", BUNDLE_ID)
+            .env("PETRI_COMMAND", petri_command())
             .env_remove("PETRI_RESEARCH_OWNER_TOKEN")
             .env_remove("NODE_OPTIONS")
             .env_remove("NODE_PATH");

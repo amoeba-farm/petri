@@ -143,7 +143,8 @@ fn read_cache(path: &Path) -> Result<TermsCache, CliError> {
 
 fn write_cache(path: &Path, cache: &TermsCache) -> Result<(), CliError> {
     if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|error| {
+        // Petri's config folder: made private, or Petri's own files can't go there.
+        crate::petri_config::create_private_dir_all(parent).map_err(|error| {
             CliError::new(format!(
                 "failed to create wallet terms cache directory: {error}"
             ))

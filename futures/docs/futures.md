@@ -4,7 +4,9 @@ The implementation of the founder's range-composition handoff (Revision 2,
 14 October 2026): one range-aware market per index and expiry, packages
 composed from actual orders, an optional funded maker that trades missing and
 surplus pieces, fully funded accounting, no protocol fees and no funding.
-Dev chain only; not audited.
+Since 2026-10-17 the Earn vault's maker may also borrow what staked AMBA
+backs (below, "Staked AMBA backs the maker"): the one exception to full
+funding, the user's call. Dev chain only; not audited.
 
 | Piece | Where |
 |---|---|
@@ -128,7 +130,7 @@ Full search covers the whole admitted market; the admitted market is bounded:
 | maker ladders | 4 per market, ≤ 256 steps wide (the whole dev grid); 1,024 ladder arcs (steps × tiers × sides with lots) per book | verification heap and compute |
 | resting orders | 64 per market | same |
 | traders | 128 per market (idle slots are reused) | account size |
-| claims | 1,024 per market | account size |
+| claims | 1,024 per market (a resting opening order holds one; "Claim slots") | account size |
 | FIFO search work | 30,000 edges per package | only exact price ties search; beyond it `SearchLimit` |
 
 **Measured worst supported cases.** Two worst cases were measured:
@@ -163,7 +165,9 @@ One market account holds every trader's `free` (withdrawable) and `reserved`
 (escrow) cash, every claim, and the market's `backing`. After every
 instruction the program recomputes:
 
-- custody (deposits − withdrawals) = free + reserved + backing;
+- custody (deposits − withdrawals) + debt = free + reserved + backing,
+  where `debt` is what the market's credit owner (the Earn vault, when its
+  stake pool lent it credit) borrowed; 0 everywhere else;
 - reserves = exactly the escrow of resting orders and ladders;
 - while open, backing = `k` × long coverage = `k` × short coverage: one
   complete set behind every promised payoff;
@@ -191,6 +195,31 @@ backing.
   it, is left as it was, and the fill trades all the same (`c10`).
   `Redeem` still redeems an exact pair explicitly. A ladder's inventory is
   per step, so its one-step claims net per step.
+- **Claim slots (2026-10-18):** a fresh claim takes a slot last. It first
+  redeems against the claim its close names (or its close order reserves)
+  and its owner's other exact complements, without a slot of its own. What
+  is left joins its owner's claim of the same side and range (as `Merge`
+  joins: lots and cost basis add up, the earliest open time stays), or else
+  takes a free slot, and then nets the overlaps as above. A resting opening
+  order holds one slot from the moment it rests: its owner's claim of its
+  side and range, or an empty placeholder. Every fill joins it, so a fill
+  never waits for a free slot, and the slot is free again when the order
+  stops resting. `Split` and an adjacent `Merge` of a held claim move the
+  claim out to free slots; the order keeps its slot. An order placed before
+  this change holds nothing until its first fill takes a slot and holds it
+  (`k5`). So on a full table every exit trades: a close against ladders,
+  resting orders and close orders, a close order's fills, buying the
+  complement, and `Redeem`, `Merge`, `Cancel`, `Withdraw` and settlement
+  (`k1`, `k2`). What waits for a free slot: a new position that joins no
+  claim its owner holds, a new resting order (`ClaimCapacity`), `Split`, a
+  partial `Transfer` to a wallet without that claim, and overlap parts
+  (best effort). Repeat fills of one range stay one claim (`k3`, `k4`).
+  A full table still keeps new positions out until claims close or the
+  market settles, and filling one is cheap: on the mainnet shape, 1,024
+  one-lot, one-step claims at the treasury's far quotes cost about $0.20
+  plus about 0.005 SOL of fees (measured on dev, 2026-10-18). A cost per
+  slot or per-trader position accounts would close that; neither exists
+  (the user's call).
 - **Sell an existing claim:** submit the opposite side on the same interval
   naming the claim. If it rests, it reserves the claim, not cash. When filled,
   the new opposite claim and the old one redeem, and the seller's free cash
@@ -445,6 +474,468 @@ more; leaving Earn keeps what was earned; the grown vault still trades),
 `v10` (a second stream after the first; mint, account and house fixed; the
 house's later moves).
 
+## Staked AMBA backs the maker (2026-10-17)
+
+The user's notes "AMBA as Backing for the Market Maker" (2026-10-16/17) and
+their decisions of 2026-10-17, built on dev first. With Earn's USDC fully
+deployed, the maker can quote no more. Stakers' pooled AMBA now backs the
+part of the maker's obligations that its USDC doesn't, for as long as it
+takes to offset them: the maker borrows inside one market's custody (the
+traders' own collateral) and its stakers carry what that could cost. Once the
+maker offsets a piece, its netting repays the debt. AMBA is never sold; it
+backs credit, and in a tail loss it is paid to that market's winners. An
+independent review of 2026-10-18 found nine holes, and its re-review two
+more; the rules below include their fixes (tests `f1` to `f7`).
+
+**Accounts.** One stake pool per Earn vault, a PDA `["ameba-range-v1",
+"stake", vault]` (`AFRSTAK1`, 800 bytes, `state::StakePool`). The vault's
+operator creates it (`CreateStakePool`, tag 28) over two token accounts the
+pool's address owns: its AMBA (Token-2022) and its USDC. The program's
+upgrade authority signs it as the payer; once the program is governed,
+three council seats sign instead, as for `CreateMarket`. An immutable
+program has no pools. A pool lends credit in any market, so nobody can make
+themselves a credit owner against a token they minted (`f1`). The pool
+counts both balances itself, so gifts are not counted. Each staker has a
+position `["ameba-range-v1", "stake-pos", pool, owner]` (`AFRSTKP1`, 208
+bytes). The market header's spare bytes (376..512 and 28..32) carry the
+market's credit: `credit_owner` (the vault), `credit_limit`, `debt`,
+`credit_until`, the vault's funding in and out, the time-weighted credit and
+funding, and after a shortfall `shortfall`, `recovery_amba`, `winners`. A
+market from before reads all zero: no credit.
+
+**Price.** The operator posts the AMBA price (`StakePrice`, tag 30: USDC
+atoms per whole AMBA times `PRICE_SCALE` = 10^6). The program uses a
+time-weighted average of the posts. After a post the average moves linearly
+from where it stood toward the posted price and reaches it `twap_window`
+seconds later (dev: an hour). Source: the user, 2026-10-17, "operator posts,
+TWAP". On dev the treasury maker posts DexScreener's price of the Meteora
+AMBA/SOL pair every five minutes (`ops::price_feed`; the user, 2026-10-18).
+The price is trusted on dev.
+
+A price counts only while it is fresh (the user, 2026-10-18, after Codex's
+review of `PoolPrice`). One posted more than `MAX_PRICE_AGE` = 3,600 s ago
+(an hour, the averaging window) gives the pool no capacity: no new
+`CreditFund`, and no `Unstake` while credit is lent, since what stays must
+keep the capacity at or above the credit lent. Credit already lent stays,
+as when the price falls. A shortfall's `CreditSettle` refuses
+(`NotSettled`) until a fresh price is posted, so it never sets AMBA aside
+at an old average. Dev's operator post every five minutes keeps the price
+fresh; on mainnet anyone may crank `PoolPrice` (below). In the production
+build (no `operator-price`) a new pool also lends nothing until its prices
+have run `MAX_PRICE_AGE` from its first post (`first_price_ts`; zero in an
+older pool, read as long ago), so no first sample lends alone.
+
+On mainnet there is no trusted poster (the user, 2026-10-18): the
+production build refuses `StakePrice` (`Unauthorized`; only dev builds,
+feature `operator-price` in `localnet-governance`, keep it), and anyone may
+crank `PoolPrice` (tag 40, `programs/futures/src/price_source.rs`), which
+reads two mainnet accounts and posts their product into the same average:
+
+- **AMBA/SOL**: the Meteora pair `DxUB19khkvd3FehY8sovQ1FTTcEktPL4CM6yc49coWQH`
+  is a DAMM v2 (CP-AMM) pool, program
+  `cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG`, not DLMM: token A is AMBA
+  (`BxKJN4PKAT2CFhVbsyKzVyCznu5a2n2oVh8Pb2wdDjam`, Token-2022, 9 decimals),
+  token B wrapped SOL; its `sqrt_price` is Q64.64 of lamports per AMBA atom.
+  DAMM v2 keeps no oracle or cumulative price, and this pool's dynamic fee
+  (whose `sqrt_price_reference` would be a pre-trade price) is off, so there
+  is no average in the pool to read: the program takes its spot price as the
+  sample. On 2026-10-18 (slot 458,288,450) it held about 97.9M AMBA and 174
+  SOL at a 1.25% fee, and priced AMBA at 1.774e-6 SOL ($0.000184).
+- **SOL/USD**: Pyth's sponsored SOL/USD feed account
+  `7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE` (a `PriceUpdateV2` owned by
+  the Pyth Solana Receiver `rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ`,
+  feed id `ef0d8b6f…80b56d`, exponent -8). The program takes its
+  `ema_price`, Pyth's own exponentially weighted average (about an hour),
+  only from a `Full`y verified update (every Wormhole guardian signature
+  checked by the receiver), at most `PYTH_MAX_AGE` = 300 s old (a safety
+  check: the sponsored feed updated every 50 to 210 s when sampled).
+
+Every address, owner, discriminator, length and field offset is a
+compile-time constant; the pool's mints must be mainnet AMBA (also the stake
+pool's `amba_mint`) and wrapped SOL, and a disabled, not yet active or empty
+pool is refused. The price in the pool's units is `sqrt_price^2 * ema_price *
+10^(amba_decimals + 3 + exponent) / 2^128` (USDC 6 decimals, `PRICE_SCALE`
+10^6), rounded down (`docs/interfaces.md` has the layouts and sources).
+
+Manipulation. The Meteora pool keeps no average, so the program averages
+the samples itself, and each sample is the pool's spot price. What keeps it
+honest is the program: `PoolPrice` must be the only instruction in its
+transaction besides compute-budget ones (instructions sysvar), so a
+swap-crank-swap back in one transaction is refused; a sample moves the
+average only linearly over `twap_window`, so a sample that a later honest
+one replaces after `t` seconds moves it by `t / twap_window` of its error
+(with the five-minute crank, a twelfth); and the freshness and first-hour
+rules above keep an old or lone sample from lending. The risk that remains:
+a bundle of separate transactions (swap, `PoolPrice`, swap back, in one
+slot) after each honest crank can still skew the average, at a cost. On the
+pool above, pushing the price to half costs about 1.6 SOL of fees per
+crank. Each such crank moves the average a twelfth of the way there, which
+would give a shortfall's winners about 4% more AMBA from `CreditSettle`;
+repeated after every honest crank, at that cost each time, it keeps
+pulling. Pushing the other way (doubling the price, about 72 SOL in and 1.8
+SOL of fees per crank) raises the capacity the maker lends against. The
+user chose on 2026-10-18 to ship with these safety checks and start
+mainnet credit small. A deeper pool, or a pool that keeps its own
+time-weighted price (Meteora DLMM's oracle), would raise the bar; this pair
+keeps none. On mainnet the treasury maker cranks it every five minutes
+(`futures-maker`; `futures-ops stake-pool-price` by hand).
+
+**Capacity.** The pool's credit capacity is its staked AMBA at the average
+price, times `haircut_bps` (the user, 2026-10-17: a 50% haircut; no cap
+relative to Earn's USDC), leaving out the AMBA of shares that are unstaking
+(`StakePool::unbonding`, below: they back no new credit). The operator lends it to markets: `CreditFund`
+(tag 36) adds to a market's `credit_limit` while the sum lent (`allocated`)
+stays within the capacity. `CreditDefund` (37) takes it back down to what
+the vault's position there could still cost (all of its debt when the vault
+has no trader slot there), and only while the market is open: once it is
+final the credit stays for `CreditSettle` (`NotTradable`). A falling price
+lends nothing new and lets no stake leave that backs lent credit. Credit
+already lent stays: covering a price drop is what the haircut is for.
+
+**Borrowing.** In a market with credit, the vault's trader may escrow more
+than its free cash: `Quote` and the vault's own `Submit` borrow what its
+free cash lacks, raising `debt` (virtual cash in its free balance that custody
+does not hold). Hence the invariant above. Every instruction ends by
+repaying the debt from the vault's free cash there (`repay`, in `store`).
+While it owes, the vault therefore has no free cash in that market to move
+out, and what it earns or nets pays the debt first. Two rules bound the debt
+(`state::credit_risk`):
+
+- **Exposure**, what borrowing exposes the stakers to: the debt less the
+  vault's free cash and the least its claims and inventory pay at any
+  settlement, with its escrow counted as spent. At most `credit_limit`.
+- **Carry**, what pays the debt back: the vault's own free and reserved cash
+  there plus the backing its own claims and inventory hold, `k` times the
+  larger of its long and short lots at each step. Long and short coverage
+  match at every step, so that is never more than the market's backing, and
+  only the vault's own instructions and the fills of its resting liquidity
+  move it. The debt stays within it. A carry past a `u64` counts as
+  `u64::MAX`, which covers any debt, so an admitted fill can't overflow it
+  (Codex's review, 2026-10-18). So everyone else's free and reserved
+  cash stays in custody, and no one else's `Redeem`, `Transfer` or netting
+  ever answers to the vault's rules (`f6`). (`repay` still checks the debt
+  against the open sets' backing plus the vault's cash, the backing alone
+  once the credit has settled; the carry implies it.) A loss beyond the
+  vault's cash can only come out of settlement payouts, where the buffer and
+  the stakers' AMBA make the winners whole.
+
+Both rules are checked when the vault acts, at the worst any later fill of
+its resting orders, close orders and ladder could do (the re-review of
+2026-10-18): after its own `Quote` or `Submit` while it owes anything
+(`CreditLimit` otherwise); `CreditDefund` never takes the limit below that
+worst exposure; its withdrawals take no more than both rules leave. A fill
+of its liquidity is, before netting, a new claim (or inventory) of the
+order's side paid by its contribution: from escrow (an opening order, a
+ladder lot its inventory doesn't back) or from the sets its netting then
+redeems (a close order, a lot its inventory backs). Netting and `repay`
+leave both rules as they are. For the exposure only the pieces paid from
+free cash count: at settlement `s` a lot costs at most `(c - pays(s))^+`
+more, so every close-order lot and every inventory-backed ladder lot (the
+first to fill, best tier first) is counted as sold for only its price,
+summed at each grid position. For the carry, at each step the costliest
+lots that offset its net position hold nothing new and cost their price, any
+other lot holds `k` for at most `k`, and a pair of opposite lots holds `k`
+for both prices; the program sums each step's exact least. Both bounds hold
+for every partial fill in any order, so the checks that follow a fill of the
+vault's liquidity can't fail (they stay, as asserts) and a taker's package
+through it, which price priority may require, always trades (`f4`, `f7`).
+Its compute: the program evaluates both rules in one pass over the grid in
+64-bit arithmetic (`state::credit_risk_fast`: each ladder step read once, a
+ladder alone counted tier by tier only as far as the step's inventory and
+net position reach), with the same values as the reviewed two-pass 128-bit
+form (checked over random books), which decides wherever a lot count,
+price or `k` reaches `2^31`. On the SBF target 128-bit arithmetic is
+branches and spills and a checked multiply a call: in that form an indebted
+vault's whole-grid `Quote` at the dev markets' shape ran out of the 1.4M cap
+on dev (2026-10-18); now it takes about 875k, the check about 140k (`c1`).
+The price of that: before expiry the vault can't post asks, bids or a close
+that could realize a loss beyond its own cash there (`f2`); losses the
+stakers carry arise only at settlement. While the credit is unsettled, the
+vault's trader slot holds its debt: no other trader takes it, even when idle
+(`f3`). Rule for the oracle
+front-running concern (the user, 2026-10-17: "no credit near expiry"): from
+`credit_until` (expiry less the pool's `expiry_window`, dev a day) the vault
+borrows nothing new. Trading itself stays open, and its quotes may still be
+re-priced within what it already owes.
+
+**Earn.** `VaultDeposit` and `VaultWithdraw` value the vault's trader in a
+credit market at its equity (`state::credit_equity`):
+
+1. the raw value less its debt, never below zero, since the stakers carry
+   the rest;
+2. less the stakers' share of its profit (below).
+
+Earn depositors can lose at most the vault's own cash in a market. The
+stakers carry the rest, up to its credit limit. A withdrawal may still take
+cash a retired ladder releases while the vault owes; that leaves the
+exposure as it was. A withdrawal from a credit market (`VaultWithdraw`,
+`VaultDefund`) leaves the most the stakers' share of what the vault has
+earned there can become in the market for `CreditSettle`: `profit_bps` of
+its best-case profit, at full credit weight, since a withdrawal makes credit
+a larger part of its capacity from then on. Settlement pays the stakers
+their actual share and the rest is the vault's again. Only the credit
+owner's own `VaultFund` and withdrawals move the market's funding in and
+out, the baseline of that share; another vault's cash there doesn't (`f5`).
+
+**Settlement (the tail rule, automatic and published).** After `Finalize`,
+the vault's own claims, inventory and orders settle first (`Settle`,
+`SettleMaker`, `Prune`). Their payouts repay its debt. Everyone else's
+settlement waits (`NotSettled`), and so does the vault's cash there. Then
+anyone sends `CreditSettle` (38):
+
+- **No debt left:** the stakers get their share of the vault's profit there,
+  `profit_bps` (the user, 2026-10-17: 50%) of its equity above its net
+  funding, times the credit weight. The weight is the credit limit's share
+  of limit plus net funding, time-weighted from the first `CreditFund` to
+  expiry. The first `CreditFund` sets the funding baseline to what the
+  vault's position there was worth at best, so stakers share only what it
+  earns after credit arrives. The share moves to the pool's USDC account. It
+  fills the pool's buffer up to `buffer_bps` of the credit lent (dev 10%),
+  and the rest goes to the shares.
+- **A shortfall:** the buffer pays first, into the market's custody. Then
+  the rest is set aside in AMBA at the average price (rounded up), taken
+  from the staked AMBA (at most all of it, so a very low price takes every
+  atom rather than overflowing; the shares lose it pro rata). The market
+  records the uncovered `shortfall`, the AMBA and the `winners` (the
+  remaining payouts). Each winner then settles through `SettleRecovery`
+  (39), per owner: its payout less its share of the shortfall in USDC (cut
+  rounded up, so the whole shortfall is spread), plus its share of the AMBA
+  (rounded down) straight into its AMBA account. Plain `Settle` pays only
+  the claims that pay nothing (`NeedsRecovery` otherwise). The winners'
+  USDC is exactly what custody holds. `repay` kept the debt within the open
+  sets' backing and the vault's cash, which the vault's own settlement has
+  paid into the debt by now, so the winners' payouts carry what the buffer
+  didn't (`Insolvent` otherwise, checked after the buffer pays).
+
+Either way the credit goes back to the pool, and a buffer above its new
+target goes to the shares.
+
+From `Finalize` until the credit settles, and for good if it settles short,
+claims leave the market only through settlement (`Settle`,
+`SettleRecovery`). `Transfer` and `Redeem` refuse everyone but the vault
+(`NeedsRecovery`): a redemption, or a transfer's netting, would pay a set in
+full past the shortfall's cut (`f3`). The vault's own redemptions repay its
+debt, so they stay open to it.
+
+**Stakers.** `Stake` (31) takes AMBA by a checked transfer; the shares are
+for what arrives (the 0.25% fee comes out). Unstaking takes a timer (the
+user, 2026-10-18: 7 days, as staking normally works; before, `Unstake` paid
+at once whatever wasn't backing lent credit, and since the maker lends the
+whole capacity and re-lends freed credit every pass, stakers were in effect
+locked with no date). `StartUnstake` (41) marks `shares` (`u64::MAX`: all
+the position's shares not unstaking yet) as unstaking: the position's
+`unbonding` and the pool's grow by them and the position's `unbond_ts` is
+now; adding more restarts the timer for all of them. Unstaking shares stay
+shares: they earn the USDC profit share and the AMBA stream and bear
+shortfalls exactly as the rest, but count for no capacity, so the maker
+lends nothing against them and takes back the credit they backed (down to
+each market's exposure, as for any capacity drop). `CancelUnstake` (42)
+returns them to active. `Unstake` (32) pays unstaking shares (`u64::MAX`:
+all of them) once `UNBOND_SECS` = 604,800 s (7 days) have passed since
+`unbond_ts` (`NotSettled` before), as long as what stays, unstaking AMBA
+included, keeps the capacity at or above `allocated` (`CreditLimit`
+otherwise: the rest comes out as markets settle and the credit comes back).
+A stale price gives no capacity, so while credit is lent nothing leaves
+until a fresh price is posted.
+
+Nor does anything leave while a market the pool lends to is near its end
+(Codex's review of the timer, 2026-10-18, as agreed with the user). Once a
+market is in its last `expiry_window` (dev a day: the user's rule of no new
+credit near expiry), or past expiry with its credit unsettled, its
+shortfall may be certain; a staker whose timer is done could leave before
+`CreditSettle`, and the stakers who stay would bear the whole loss. So
+`Unstake` waits (`NotSettled`) from the earlier of the market's
+`credit_until` and its expiry less the pool's window until its
+`CreditSettle`. For the program to check that, the pool counts the
+markets holding its credit unsettled (`credit_markets`): the first
+`CreditFund` in a market counts it and marks its header (`CREDIT_COUNTED`
+in `credit_flags`), and its `CreditSettle` uncounts it. `Unstake` takes
+exactly that many markets after its fixed accounts, distinct, each owned by
+the program, with the pool's vault as `credit_owner`, counted and
+unsettled (`InvalidAccount` otherwise), so none can be left out. The ops
+tools find them by a scan of the program's markets (`stake::unstake_markets`,
+through `ameba_futures_client::unstake_markets`); the API from its cached
+markets. A pool from before the count (792 bytes or shorter) may have lent
+in markets it never counted: it reads its count as unknown
+(`credit_counted` false, also once grown) and refuses every `Unstake` while
+it lends anything; once the credit lent is back to zero every market it
+didn't count has a zero limit, which no shortfall can reach, and its count
+is complete from then on (a market it lends to again is counted). Only a
+pool of `STAKE_LEN` counts at `CreditFund`.
+
+Anyone may send `Unstake`: it pays only into the owner's own AMBA account,
+and the keeper completes every finished timer each pass
+(`stake::complete_unstakes`; a refusal waits for a later pass). Anyone but
+the owner pays all of the position's unstaking shares, never a part
+(`Unauthorized`), and an `Unstake` that would pay no AMBA is refused
+(`InsufficientFunds`), so nobody burns another's shares for dust (Codex's
+review of the timer). A pool or position from before the timer (784 or
+704 bytes, 192 bytes) reads nothing unstaking; `StartUnstake` grows it to
+`STAKE_LEN` = 800 / `STAKE_POS_LEN` = 208 bytes first, the payer paying the
+rent (a 792-byte pool too).
+`StakeClaim` (33, permissionless, into the owner's own accounts) pays the
+position's USDC (`usdc_acc`, at a finer scale than Earn's, since shares are
+AMBA atoms) and its AMBA subsidy. The subsidy is a stream like Earn's
+(`StakeRewards`, 34, no house): the user funds it with the AMBA transfer-fee
+tax they receive. `StakeRewardsWithdraw` (35) takes back only its surplus.
+The keeper pays every staker after each credit settlement and once a
+stream ends.
+
+**Epochs.** A shortfall can take every staked atom while shares are still
+out, leaving them worth nothing, or leave a few atoms against many shares
+(a near-total wipe-out), when a large new stake would need more shares than
+a `u64` holds. So `Stake` starts
+a new share epoch (`StakePool::epoch`) when every staked atom is gone while
+shares are out, or when the shares for what arrives (computed in `u128`)
+don't fit a `u64`, alone or added to the pool's (`StakePool::rolls_over`; no
+other threshold). First the AMBA stream accrues to the old shares; the pool
+keeps the stream's and the USDC's accumulators as of the epoch's end
+(`epoch_ends`) and its rate (`epoch_rates`): the `R` atoms still staked
+against its `N` shares. The new epoch starts at one share per atom, with
+those `R` atoms as `R` shares, the old cohort's. The pool keeps the last
+`EPOCH_ENDS` = 4 ends (all its header has room for; the rates follow the
+stream). A position of an earlier epoch, at its next `Stake`,
+`StartUnstake`, `CancelUnstake`, `Unstake` or `StakeClaim`
+(`StakePool::touch`), is paid against its epoch's end what its
+shares earned, then its shares convert to `shares * R / N`, rounded down,
+and so on through each later end kept, to the current epoch; it earns in
+each epoch on the way. Its unstaking shares convert the same way (never
+above its shares), and so does the pool's `unbonding` at the rollover. So the old stakers keep the residual's value: their
+converted shares are worth the atoms their old ones were. A full wipe-out
+has `R = 0`: the old shares convert to none, as before. Rounding leaves less
+than one share (one atom) per old position owned by nobody: those atoms stay
+staked in the pool, back its credit and take their part of later
+shortfalls, and their part of the USDC and the stream stays in the pool's
+accounts unclaimed (`usdc_owed` counts it).
+
+A position untouched through more than four rollovers has no kept end for
+its epoch, yet its principal still converts (Codex's review of the
+conversion, 2026-10-18; before, it lost its shares). The pool keeps a
+running share index (`share_index`, times `INDEX_ONE` = 2^126; zero reads
+as one): every rollover's rate `R / N` multiplied up since the last full
+wipe-out, each product in 256 bits and rounded down. Each position keeps
+its epoch's index (`index`). Such a position converts at once to
+`shares * share_index / index` (likewise in 256 bits), rounded down, never
+more than it had nor than the rates exactly give. A full wipe-out, or a rate
+so small the index would round to zero, restarts the index at one and
+records the epoch it starts (`wipe_epoch`); a position of an earlier epoch
+converts to none, however far back. The scale keeps that rounding to
+positions worth under an atom: an index of 2^64 or more rounds to zero only
+at a rate under one over it, and a position holds under 2^64 shares; only
+once the rates multiplied up fall below 2^-62 can it take an atom (Codex's
+review of the index, 2026-10-18: at 10^18, 10^18 shares left one atom, then
+a rollover keeping 1%, wiped positions still worth millions of atoms). Only
+what its shares earned since it was last touched and never collected is
+lost (its pending amounts stay); the keeper pays every staker after each
+credit settlement, so that is at most what accrued since.
+
+The rates and the index came after the first pools (the reviews of
+2026-10-18): a pool created before is `STAKE_V1_LEN` = 704 bytes, without
+them, and reads the rates as zero, which is what its rollovers were (full
+wipe-outs), and the index as one. Every instruction takes all four sizes
+(704, 784 before the unstake timer, 792 before the count of credit
+markets, 800). A rollover of an older pool first grows it to `STAKE_LEN` =
+800 bytes, the rent paid by the `Stake`'s payer.
+
+**Trust.** The operator (the treasury key) posts the price, lends the credit
+and quotes with it. The program bounds what that can cost stakers, at most
+each market's limit, but trusts its quoting, as Earn depositors already do.
+The pool's parameters (`StakeConfig`, 29) are the operator's to change;
+creating a pool is the upgrade authority's (above).
+
+**Dev parameters** (`ops::stake::DEFAULT_PARAMS`): haircut 50%, profit
+share 50% (both the user's), buffer target 10% of the credit lent, average
+over 3,600 s, no new credit 86,400 s before expiry (Claude's defaults).
+
+**Maker.** `futures-maker` lends each open, tradable market an equal share
+of the pool's capacity until the market's credit window closes, and takes
+back what a market holds above its share. The 1% band only spares a
+transaction every pass while the average drifts. It quotes with its own cash
+plus `Book::credit_room`, as many lots a step as the credit rules admit at
+the ladder's worst fill (`Book::quote_admits`): holding inventory bought on
+credit, with asks that could sell it at a loss beyond its own cash, it quotes
+thinner until they fit, so its quotes keep landing. It lends the whole
+capacity, with no unlent reserve (the user, 2026-10-18): unstaking shares
+leave the capacity, so it hands their credit back as it can, and the rest
+comes back at settlement. It does not yet steer the credit toward close-outs and
+buybacks, as the user's notes recommend; the credit simply deepens its whole
+ladder.
+
+**Events.** `ARSCRT01` [pool, vault, mint], `ARSCFG01`, `ARSPRC01` (`StakePrice` or `PoolPrice`) [pool,
+price, average, ts], `ARSSTK01` [pool, owner, AMBA, shares], `ARSUNS01`
+[pool, owner, shares, AMBA], `ARSUBD01` (`StartUnstake`) [pool, owner,
+shares added, unstaking, timer's end], `ARSUBC01` (`CancelUnstake`) [pool,
+owner, shares],
+`ARSCLM01` [pool, owner, AMBA, USDC], `ARSRWD01`, `ARSRWX01`, `ARCFND01` /
+`ARCDFD01` [market, pool, amount, limit], `ARCSET01` [market, pool, share,
+covered, shortfall, AMBA], `ARRCVR01` [market, owner, payout, USDC, AMBA].
+
+**Tests.** `integration/tests/stake.rs`:
+
+- `s1`: credit lets the maker quote beyond its cash, within the market's
+  limit and the pool's capacity. Fills leave the exposure as it was, Earn
+  prices the vault at its equity, and a profit pays the stakers their share.
+- `s2`: a shortfall drains the buffer, then pays the winner in AMBA.
+  Unstaking waits past expiry until the credit settles, its timer long
+  done.
+- `s3`: unstaking keeps what backs credit, the price's average moves the
+  capacity, an offset repays the debt, nothing new is borrowed near expiry,
+  and the subsidy stream pays.
+- `s4`: the keeper's settlement and payments.
+- `e1`: a near-total wipe-out, then a stake whose shares used to overflow
+  starts a new epoch; the old staker unstakes its residual (on a pool of
+  either size: the legacy one grows).
+- `u1` to `u6`, the unstake timer: `Unstake` waits the week and the
+  unstaking shares back no new credit (`u1`); a shortfall during the timer
+  cuts them like every share, and they keep earning the stream (`u2`);
+  cancelling, restarting the timer, only the owner starting or cancelling
+  (`u3`); a 192-byte position and a 704-, 784- or 792-byte pool grow, the
+  ops tools finding both sizes (`u4`); anyone, and the keeper, completes a
+  finished timer, only into the owner's account and only all of it (`u5`);
+  an unstake that would take AMBA backing lent credit waits, then goes
+  through once the credit is back (`u6`); an unstake paying no AMBA is
+  refused (`u2`).
+- `w1`, `w2`, the markets an unstake waits for: a finished timer can't
+  leave in a lending market's last day nor after its expiry before its
+  `CreditSettle`, then can, the keeper waiting as well; missing, repeated,
+  wrong or uncounted market accounts are refused (`w1`); a pool grown from
+  792 bytes refuses while it lends, its count complete once the credit is
+  back, a market lent to again counted (`w2`).
+- `f1` to `f7`, the reviews' fixes: only the upgrade authority creates a
+  pool (`f1`); the vault's asks that would realize a loss beyond its cash
+  are refused when posted, the least it may ask fills in full, and another
+  trader's deposit stays withdrawable (`f2`); after expiry a transfer waits
+  for settlement, the indebted vault's slot stays its own and its credit
+  can't be taken back (`f3`); a close order whose fill could take the
+  exposure over the limit is refused when it rests, and once one rests the
+  limit can't go below its worst fill, which then trades (`f4`); the
+  stakers' share stays in the market when the vault withdraws, and another
+  vault's funding leaves the baseline alone (`f5`); others' sets redeem
+  through fills and transfers while the vault owes (`f6`); takers trade
+  through the vault's two-sided ladder at the least asks it may post, in
+  pieces and in full, the rules holding after every fill (`f7`).
+- `c1`, the compute of the indebted vault's own `Quote` at the dev markets'
+  shape (grid 200, 1,024 claim slots), futures-maker's whole-grid 5-tier
+  ladder sized as the maker sizes it, inventory on most of the grid: under
+  1,000,000 CU, 400k below the cap for what it leaves out (resting vault
+  orders, a full claim table).
+
+The integration tests write the price into the pool as `PoolPrice` posts
+it, its prices taken as having run `MAX_PRICE_AGE`, and post a fresh one
+(at the average so far) before each `CreditSettle`.
+
+`state` unit tests cover the math, the capped AMBA conversion and the
+epochs included (full and near-total wipe-outs, chained conversions, a
+position past the kept ends converting by the share index, a full wipe-out
+restarting it, the legacy size), the unstake timer (unstaking shares out
+of the capacity, their conversion at a rollover, every account size),
+check that a stale price, and in the
+production build a pool's first hour of prices, lend nothing
+(`a_stale_or_new_price_lends_nothing`), check a step's least over every
+fill (`step_least`, in both forms) against brute force, and the one-pass
+credit check against the reviewed form over random books
+(`credit_risk_matches_the_reviewed_form`).
+
 ## Trading window
 
 A market can be created on its oracle period while the period is still
@@ -551,6 +1042,7 @@ Running services:
 | Sell a claim, withdraw proceeds at once | receipt (sale $250, withdrew $2,150) | `r7` | |
 | Buy the complement and redeem | receipt (released $1,050) | `r8` | |
 | Cancel; shifted intervals net their overlap (since 2026-10-17) | | `c6`, `c7`, `c9`, `c10` | |
+| Exits on a full claim table, resting orders hold their slot, fills join one claim (since 2026-10-18) | | `k1`–`k5` | |
 | Inventory-backed ladder quotes (since 2026-10-17) | | `b4`, `b5` | |
 | FIFO across direct and composite routes, maker priority | | `r1`, `r2`, `r6` | brute force (every feasible package) |
 | Full search, non-greedy, capacity errors, worst-case CU | | `r4`, `r5`, `r14` | brute force |

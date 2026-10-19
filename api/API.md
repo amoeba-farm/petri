@@ -98,7 +98,8 @@ error codes (base `0x46520000`).
   "sponsor": "…",
   "faucet": { "enabled": true, "amount": "10000000000", "perHour": 3 },
   "computeUnitLimit": 1400000,
-  "preparedTtlSecs": 90
+  "preparedTtlSecs": 90,
+  "sponsorship": { "researcherBps": 2000, "retentionBps": 2000 }
 }
 ```
 
@@ -128,6 +129,13 @@ governed programs always reject that encoding.
 
 **[added]** `wsUrl`, `genesisHash`, `faucet.perHour`, `computeUnitLimit`
 and `preparedTtlSecs`.
+
+**[added]** `sponsorship`: what a sponsored find's bounty pays its
+researcher (`researcherBps`) and how much of that their reserve holds
+(`retentionBps`); the sponsor gets the rest. 2,000 and 2,000 (the sponsor
+80%, the researcher 16% and their reserve 4%) on every cluster but
+`mainnet-beta`, whose deployed oracle predates that split and still takes
+the researcher's half (5,000 and 2,000) until it is upgraded.
 
 **[added]** `programs.futures` (the futures program) and `treasury` (its
 dev maker's trader key) are `null` until the deployment manifest has a
@@ -270,7 +278,8 @@ withdrawal).
 
 The service keeps every account a quote or prepare needs in memory. The
 cache is fed by websocket subscriptions at `processed` commitment, and the
-blockhash is refreshed every 400 ms. As a result, quotes and prepares make no
+blockhash is refreshed every 400 ms while it is in use (every 5 s after a
+quiet minute, and at once on the next use). As a result, quotes and prepares make no
 RPC calls and never simulate. Submission skips preflight and is rebroadcast
 until it lands. The UI flow should be:
 
@@ -387,8 +396,9 @@ Response:
   `instrument` takes) is refused with 400.
 * Refresh it while the user edits. Only the latest unsigned prepare per
   owner matters; every prepared message stays usable until it expires.
-* The blockhash is at most about 400 ms old, so a prepared transaction stays
-  valid for roughly 60 s.
+* The blockhash is at most about 400 ms old (5 s for the first prepare
+  after a quiet minute), so a prepared transaction stays valid for roughly
+  60 s.
 
 ### `POST /v1/tx/prepare`
 
@@ -412,7 +422,7 @@ must land first, in order (see "Spending compressed USDC").
 * **[adjusted]** Prepare makes no RPC call. The market account, its
   period, its legacy Earn pool, the Earn vault, the owner's positions and
   USDC ATA come from the in-memory cache. The blockhash is the cached latest confirmed one,
-  refreshed every 400 ms. The first request for a never-seen owner reads
+  refreshed every 400 ms while in use (every 5 s when idle). The first request for a never-seen owner reads
   that owner's ATA once and then subscribes to it.
   `GET /v1/accounts/:owner` warms this too.
 * `transaction` is a bincode-serialized legacy `Transaction` with every
@@ -421,6 +431,9 @@ must land first, in order (see "Spending compressed USDC").
   example with `wallet.signTransaction`. The service adds the sponsor
   signature at submit time.
 * Every transaction starts with `SetComputeUnitLimit(1_400_000)`.
+  **[added 2026-10-19]** The stake actions with `params.payer: "owner"` are
+  built for the owner to pay and send instead (see "Owner-paid stake
+  transactions").
 * `summary` is
   `{ action, owner, feePayer, instructions: [step names], expiresAt, …action fields }`.
   The step names are `computeBudget`, `heapFrame`, `createAta`, `deposit`,
@@ -437,6 +450,7 @@ Actions and their `params`:
 |---|---|---|
 | `deposit`, `withdraw`, `submit`, `close`, `cancel`, `poolWithdraw`, `finalize`, `settle` **[added]** | `market, …` | see "Futures", Market transactions |
 | `earnDeposit`, `earnWithdraw` **[added]** | `amount` (no `market`) | see "Earn" |
+| `stake`, `startUnstake`, `cancelUnstake`, `unstake`, `stakeClaim` **[added]** | `amount` (`startUnstake`, `unstake`: or `"all"`/omitted; `cancelUnstake`, `stakeClaim`: none) | see "Stake" |
 | `cashOut` **[added]** | `destination, amount` (no `market`) | [createDestinationAta], [decompressLightAta], [decompress], [cashOut]: a `TransferChecked` of up to `amount` USDC atoms from the owner's ATA to the destination's ATA, the rest decompressed from the owner's compressed USDC into it |
 
 * **[adjusted]** The market actions lost their `range` prefix (see
@@ -493,10 +507,28 @@ Response:
 The service co-signs only when all of these hold:
 
 * The id was prepared less than 90 s ago and has not been used.
-* The message bytes are identical to the prepared ones.
+* The message bytes are identical to the prepared ones, or the message is
+  the prepared one with only wallet guard instructions added (below).
 * The fee payer is the sponsor.
-* Every required signature other than the sponsor's verifies, including the
-  owner's.
+* Every required signature other than the sponsor's verifies over the
+  submitted message, including the owner's.
+
+**Wallet guard instructions.** Phantom inserts Lighthouse assertions
+(program `L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95`) into transactions
+that change token balances, and re-compiles the message. Such a legacy
+message is accepted when: the blockhash and the set and number of required
+signers are the prepared ones, with the sponsor as account 0; every prepared
+account keeps its signer and writable status, and any added account is
+read-only and unsigned; the prepared instructions are all there, in order,
+with the same program, account metas and data; every added instruction is a
+Lighthouse one given no signer (it may name an account the prepared
+instructions already write); and the transaction fits 1232 bytes. So no
+compute budget instruction (a priority fee) or any other program can be
+added. The sponsor then signs the submitted message. In `/v1/tx/:sig` and
+`wait`, an added instruction's step label is `walletGuard`; the others keep
+their prepared labels. Any other change is refused (403, "the transaction
+message differs from the prepared one"), and the service logs the program
+ids of the instructions that differ.
 
 **[adjusted]** It then signs as the sponsor and sends once with
 `skipPreflight: true` and `maxRetries: 0`, returning as soon as the node
@@ -671,6 +703,7 @@ MarketView = {
   maker: null | { owner, slot, free, reserved, maker (ladder slot|null), lo|null, hi|null, escrow,
                   bidLots, askLots, inventoryLots, payoutMin, payoutMax },
   pool: null | { address, operator, shares, valueLow, valueHigh, free, reserved, deposited, withdrawn },
+  credit: null | { owner, limit, debt, exposure, makerCash, lends, lendsUntil, settled, shortfall, recoveryAmba },
   slot, chainTime
 }
 ```
@@ -738,6 +771,18 @@ MarketView = {
   strings). A deposit mints `amount` shares into an empty pool, else
   `floor(amount * shares / valueHigh)`; withdrawing pays
   `floor(shares * valueLow / pool shares)` from `free`.
+
+* `credit` **[added 2026-10-17]** is what backs the maker's side here
+  beyond its own cash: the stake-backed credit its stake pool lent the Earn
+  vault (`owner`) in this market (see "Stake"), `null` without any.
+  `limit` is the most its position may cost the stakers; `debt` the cash it
+  borrowed (custody + debt = free + reserved + backing); `exposure` what its
+  position could cost them at worst over every fill of its resting orders
+  and ladder (the bound the program keeps within `limit`); `makerCash` its own cash (free and
+  reserved less the debt); `lends` whether it may borrow more now (open,
+  before `lendsUntil`, the expiry less the pool's window); `settled`,
+  `shortfall` and `recoveryAmba` after `CreditSettle` (a shortfall's winners
+  are paid that much less USDC, in AMBA instead). Atoms as decimal strings.
 
 ### `GET /v1/markets/:market/book`
 
@@ -1040,7 +1085,10 @@ fee; the 1232-byte limit applies.
 Every futures instruction writes its market (account 0), so each market's
 transactions are indexed from `getSignaturesForAddress(market)` (oldest
 first, a cursor per market in `futures.cursors`), and the tracker stores
-the events of the transactions it follows at once. Only lines logged while
+the events of the transactions it follows at once. Rounds follow the
+futures program's logs (`logsSubscribe`): a round 500 ms after each of its
+transactions, then every 1.5 s until that transaction is indexed, and one
+every 10 s regardless. Only lines logged while
 the futures program is on top of the invoke stack count; each is attributed
 to the market of its top-level instruction. Tables (created idempotently,
 append-only, never cleared): `futures.events` (every event, idempotent on
@@ -1271,6 +1319,141 @@ as there).
 * `poolWithdraw` remains for the legacy per-market pools' shares (dev);
   `poolDeposit` is gone.
 
+## Stake [added 2026-10-17]
+
+Staked AMBA backs the Earn vault's maker (`futures/docs/futures.md`,
+"Staked AMBA backs the maker"). Stakers' AMBA, at the operator's posted
+price averaged over time and haircut, is credit the maker may borrow in a
+market (each market's `credit`). The stakers earn their share of its profit
+there in USDC and an AMBA stream (the transfer-fee AMBA). When a market
+ends short, the stakers' USDC buffer and then their AMBA pay that market's
+winners. Read from the account cache.
+
+**[adjusted 2026-10-18]** Unstaking takes seven days (`unstakeSecs`,
+604,800; the user's decision). `startUnstake` starts the clock on staked
+AMBA; until it ends that AMBA keeps earning and still pays a shortfall, but
+no longer counts toward the capacity. Then `unstake` (or the keeper, which
+completes finished unstaking by itself into the owner's associated AMBA
+account) pays it out, as far as what stays still backs the credit lent;
+the rest waits for that credit to come back as markets settle. Nothing
+leaves while a market the pool lends to is in its last day before expiry
+(the pool's `expiryWindowSecs`) or past expiry with its credit unsettled:
+it waits until the markets it backs settle.
+
+### `GET /v1/stake`
+
+`{ pool: StakePool | null, chainTime }`, `null` while the pool does not
+exist.
+
+```text
+StakePool = {
+  address, vault, operator, ambaMint, ambaDecimals, ambaProgram, ambaAccount, usdcAccount,
+  staked (AMBA atoms), shares, unstaking (AMBA atoms of shares unstaking), unstakeSecs (604800),
+  price: { posted, postedUsd, postedTs, average, averageUsd, windowSecs },
+  stakedValue (USDC atoms at the average), capacity (of the AMBA not unstaking, × haircut), allocated (credit lent),
+  free (AMBA atoms not backing lent credit), buffer, usdcOwed, usdcDistributed, profitIn, covered,
+  recoveryOwed (AMBA set aside for winners, unpaid), slashed (ever),
+  params: { haircutBps, profitBps, bufferBps, twapWindowSecs, expiryWindowSecs },
+  rewards: null | { account, startTs, endTs, amount, distributed, paid },
+  markets: [{ market, symbol, label, limit, debt, exposure, lends, settled, shortfall, recoveryAmba }]
+}
+```
+
+Prices are USDC atoms per whole AMBA times 10^6 (`postedUsd`/`averageUsd`
+in dollars). Atoms are decimal strings.
+
+### `GET /v1/accounts/:owner/stake`
+
+`{ owner, amba (the owner's AMBA balance, atoms), pool, position, chainTime }`:
+
+```text
+StakePosition = {
+  address, exists, shares, amba (what the shares hold), value (USDC at the average), share,
+  active (AMBA atoms not unstaking), unstaking (AMBA atoms unstaking),
+  unstakeEndsAt (unix seconds the seven days end, or null when nothing is unstaking),
+  claimable (AMBA atoms `unstake` pays now: finished, not backing lent credit, and no market it backs
+    in its last day or settling; 0 while one is),
+  stakedIn, unstaked,
+  pending: { amba, usdc }, paid: { amba, usdc }
+}
+```
+
+**[adjusted 2026-10-18]** `unstakeable` is gone: `claimable` is what may
+leave now, `active` what `startUnstake` may take.
+
+### Stake transactions (`POST /v1/tx/prepare`)
+
+| action | params | instructions |
+|---|---|---|
+| `stake` | `amount` (AMBA atoms) | stake from the owner's associated AMBA account |
+| `startUnstake` **[added 2026-10-18]** | `amount` (AMBA atoms, or `"all"`/omitted) | startUnstake |
+| `cancelUnstake` **[added 2026-10-18]** | none | cancelUnstake |
+| `unstake` | `amount` (AMBA atoms, or `"all"`/omitted) | [createAmbaAta], unstake |
+| `stakeClaim` | none | [createAmbaAta], [createAta], stakeClaim |
+
+* **`stake`**: `amount` is `1..=` the AMBA balance; the shares are for what
+  arrives (AMBA's 0.25% transfer fee comes out). The sponsor pays the fee
+  and, the first time, the position's rent.
+* **`startUnstake`**: starts the seven days on `amount` atoms of `active`,
+  sent as the fewest shares paying at least that (never more than the
+  active shares); `"all"` or no `amount`: every active share. More while
+  some is unstaking restarts the seven days for all of it. The sponsor
+  pays the fee and any rent (an older position grows for the timer). The summary adds `shares`, `amba` and
+  `unstakeEndsAt`. 400 `NothingActive` when all of it is already unstaking.
+* **`cancelUnstake`**: everything unstaking is staked again (it counts
+  toward the capacity again). 400 `NothingUnstaking` without any.
+* **`unstake`** **[adjusted 2026-10-18]**: pays finished unstaking AMBA.
+  `amount` atoms are sent as the fewest unstaking shares paying at least
+  that, up to `claimable`; `"all"` or no `amount`: all of it. Refused with
+  400 `NothingUnstaking` (nothing unstaking), `NotSettled: unstaking ends
+  <date>` before the seven days end, and `CreditLimit` when the stake left
+  would not back the credit lent ("… the rest waits for credit to come back
+  as markets settle"; `"all"` while only part is claimable).
+  **[adjusted 2026-10-18]** Also `NotSettled: the unstaked AMBA waits until
+  the markets it backs settle` while a market holding the pool's credit is
+  in its last `expiryWindowSecs` or past expiry with its credit unsettled
+  (or the pool, from before it counted its markets, lends anything), and
+  `MarketsUnknown` while the API doesn't know every market holding the
+  pool's credit. The `unstake` instruction carries those markets
+  (read-only) after its fixed accounts.
+* **`stakeClaim`**: pays the position's pending AMBA and USDC into the
+  owner's associated accounts. 400 `NothingOwed` without any.
+
+### Owner-paid stake transactions [added 2026-10-19]
+
+Wallets such as Phantom change the transactions they sign (Lighthouse
+assertions, priority fees), so the user decided (2026-10-19, "Unsponsored
+staking now") that wallet-adapter wallets pay for their own stake actions;
+Magic (Google) wallets stay sponsored. Any stake action takes
+`params.payer`: `"sponsor"` (the default, unchanged) or `"owner"`. Any
+other value is refused with 400, and `"owner"` on an action that is not a
+stake action too (`` `payer: "owner"` is for the stake actions only ``).
+
+With `"payer": "owner"` the instructions are the sponsored ones with the
+owner in the sponsor's place:
+
+* the owner is the fee payer and the only signer, and pays every rent the
+  sponsor would: the position account (`stake`), an older pool's or
+  position's growth (`startUnstake`), `createAmbaAta` and `createAta`;
+* the sponsor is not among the transaction's accounts at all;
+* it starts with `SetComputeUnitLimit(200_000)` instead of 1,400,000 (a
+  stake measured about 32,000 CU on mainnet; a wallet's priority fee is
+  priced per unit of the limit, so the lower limit keeps it small). The
+  API adds no `SetComputeUnitPrice`.
+
+Response:
+
+```text
+{ transaction (base64 legacy transaction, unsigned), blockhash, lastValidBlockHeight, summary }
+```
+
+No `id` and nothing stored: the sponsor never signs it and `/v1/tx/submit`
+does not take it. The owner's wallet signs it, may change it, and sends it
+itself (for example `sendTransaction` of the wallet adapter); follow it
+with `/v1/tx/:sig/wait`. `summary` is the sponsored one's with `feePayer`
+the owner and no `expiresAt` (the blockhash's `lastValidBlockHeight` is
+the limit).
+
 ## Stream [added]
 
 ### `GET /v1/stream?market=<market>&owner=<pubkey>`
@@ -1394,7 +1577,13 @@ Freshness = { source: "futures-api", observedAt (ISO, the last good read), obser
 Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: true, oracleMonthAvailable,
               lastUpdatedSlot (string|null), settlementStatus ("Final"|"Provisional"|"FrozenPendingEvidence"|null),
               phase ("SourceSubmission"|"Scramble"|"Opening"|"Game"|"Settled"|"Closed"|null),
-              sourceCount (number|null), oracleMonthAddress }
+              sourceCount (number|null), oracleMonthAddress,
+              schedule: { scrambleStartUtc, listingUtc, expiryUtc, finalizedUtc } | null,
+              coverage: { requiredSkus, coveredSkus, finalized, plannedScrambleStartUtc, plannedListingUtc } | null,
+              rewards: { phase ("Building"|"Funded"|"EntitlementsFinalized"|…), totalAtomic, remainingAtomic } | null,
+              skus: [{ bucketId (hex), bucketLabel (string|null), sourceBudgetAtomic, openingBudgetAtomic,
+                       updateBudgetAtomic, listingBondAtomic, supportBondAtomic, openingBondAtomic,
+                       updateBondAtomic (strings) }] }
 ```
 
 * One fact per oracle `Period` (product, expiry): the manifest's
@@ -1403,6 +1592,21 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
   else every period of the program. `marketId` is the
   lowercase product id; `expiryId` is `PRODUCT-YYYYMM` with the UTC month of
   `expiry_ts - 1` (the futures label month: 1793491200 → `202610`).
+* **[added]** The month's calendar (`schedule`, ISO times, `null` for an
+  unset one): Scramble's day 1 (`scrambleStartUtc`; placement days 1-4, the
+  kill window days 5-6, the freeze on day 7), its listing (`listingUtc`:
+  Opening ends and Game begins), its period's expiry and when it was
+  finalized. `coverage` is the month's SKU coverage manifest (a month formed
+  the ordinary way; `null` for one created in Game): how many of its products
+  have a supported source and whether coverage is finalized (which ends the
+  source window). `rewards` is its USDC reward schedule (`null` without one:
+  no rewards). `skus` lists, only while the month forms (SourceSubmission,
+  Scramble, Opening) and has a schedule, the products it takes sources for:
+  its SKU pools (`getProgramAccounts`, 240 bytes, month at offset 38, each
+  at its PDA under the schedule), by `bucketId`, with each product's reward
+  budgets and bonds; `[]` otherwise. Their `bucketLabel`, like a source's, is
+  the governed label, or for a product with no governed label set the
+  bucket id's own padded ASCII.
 * `oracleMonthAddress` is the period's canonical month PDA
   (`[ameba-oracle-v1, g3-oracle_month, period, expiry_le]`), also when the
   month does not exist yet (`oracleMonthAvailable: false`, the month fields
@@ -1436,10 +1640,17 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
   read-ready. It is a valid, current answer ("no oracle months yet"), not an
   outage: show the empty state, not an error.
 * `sourceLinks` has one inventory per month (every month, by `expiryId`):
-  the month's sources (`getProgramAccounts`, 352 bytes, month at offset 2),
-  by `sourceId`. An inventory is published only when it is complete (as many
-  verified sources as the month's `sourceCount`); otherwise it is left out
-  and the series has no inventory.
+  the month's sources (`getProgramAccounts`, 352 bytes, month at offset 2;
+  for a Game month, read again by key while its `sourceCount` holds), by
+  `sourceId`. While a month takes sources (SourceSubmission, Scramble) the
+  inventory is every verified proposal: the month's own `sourceCount` counts
+  only supported ones, so a proposal still waiting for a supporter is listed
+  too. From the freeze on it is the month's recipe (sources Frozen,
+  OpeningPending, Active or Inactive; proposals left out of it, rejected,
+  merged, timed out or never supported, are not listed), and it is published
+  only when complete (as many as the month's `sourceCount`); otherwise it is
+  left out and the series has no inventory. The inventory's own
+  `sourceCount` is how many it lists.
 * `canonicalLocator` is the sealed locator object the source's role-0
   evidence link points to, when its bytes hash to the source's
   `canonical_locator_hash` (`SHA-256("locator" || url)`) and the URL is
@@ -1447,7 +1658,8 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
 * `bucketLabel` is the governed SKU label (`governance/*_product_sku_manifest.v1.json`
   of the oracle program) whose zero-padded ASCII bytes equal `bucketId`,
   provided the product's on-chain SKU manifest is absent or commits to the
-  same root; else `null`. `status` is the source status name (`Active`, …).
+  same root; for a product with no governed label set, `bucketId`'s own
+  zero-padded printable ASCII; else `null`. `status` is the source status name (`Active`, …).
 
 ### `GET /v1/oracle/catalog`
 
@@ -1475,7 +1687,12 @@ and freshness), for the research service.
 
 Keys are `<SYMBOL>-<expiry unix seconds>`. `months` may be omitted (each
 period's canonical month PDA is used); `releaseTag` and `releaseCommit` are
-optional (reported as `unreleased` and `unknown`). The section drives
+optional (reported as `unreleased` and `unknown`). **[added]**
+`formingSeries` (series keys, written by `futures-ops open-month`) and the
+older `forming` (symbols) mark the series that form the ordinary way; they
+are in `periods` and `months` too and are served like any series. The
+service reads them only to take a forming series' changes in place
+("Deployment changes"). The section drives
 `programs.oracle`, the index months and the `/v1/oracle/*` reads.
 `FUTURES_ORACLE_PROGRAM` names the oracle program for the reads only (not the
 index) while the manifest has no `oracle` section.
@@ -1490,12 +1707,15 @@ and envelopes of the old server (:4100), so consumers change only their base
 URL. Stored in Postgres (`futures.oracle_candidate_agents`,
 `futures.oracle_candidates`, `futures.oracle_candidate_rate`; a redeploy keeps
 them). No request signs or submits a transaction, and a candidate has no
-oracle weight.
+oracle weight. Sponsorship (oracle tag 30/22) puts a candidate on the oracle:
+`prepare` returns the transactions unsigned, and the sponsor's wallet pays
+for, signs and sends them (`/rpc/sendTransaction` relays them).
 
 Replies are `200|201 { ok: true, data: { protocol: Protocol, ... } }` (the
 oracle's `Protocol`, as in "Oracle") or `{ ok: false, message, code }` with
 the status below; every reply has `Cache-Control: no-store`. Until the
-database is ready every route answers 503 `ORACLE_CANDIDATE_STORE_UNAVAILABLE`.
+database is ready every route but `GET /oracle/sponsorships` answers 503
+`ORACLE_CANDIDATE_STORE_UNAVAILABLE`.
 
 ```text
 Agent     = { agentId (64 hex), payoutAuthority (base58 pubkey), createdAt (ms) }
@@ -1553,24 +1773,97 @@ a bad `limit` is 400 `ORACLE_CANDIDATE_PAGE_INVALID`.
 ### `GET /oracle/source-candidates/:contentHash`
 
 `200 { candidate }` (also once expired, until deleted); 404
-`ORACLE_CANDIDATE_NOT_FOUND`. `POST .../:contentHash/prepare` and
-`.../refresh` (sponsorship) answer 503 `ORACLE_SPONSOR_AUTHORITY_UNAVAILABLE`
-for a known candidate (404 otherwise). Any other method or path under these
+`ORACLE_CANDIDATE_NOT_FOUND`. Any other method or path under these
 prefixes is 405 `METHOD_NOT_ALLOWED`.
+
+### `POST /oracle/source-candidates/:contentHash/prepare` (and `/refresh`)
+
+Sponsors a known candidate (404 otherwise), as `petri oracle sponsor` does.
+Body `{ sponsor }` (exactly that key, at most 1024 bytes, `Content-Type:
+application/json`): the sponsor's wallet, a canonical base58 key on the
+ed25519 curve, else 400 `ORACLE_SPONSOR_INPUT_INVALID`. `refresh` is the same
+request: it prepares what is left to send now (uploads already sealed are
+skipped, an unfinished one resumes).
+
+```text
+200 { sponsorship: {
+  candidate, sponsor, marketId ("REHX"), expiryId ("REHX-202612"), sku (the bucket's label | null),
+  period, month, source, agreement, bondAtoms, collateralAtoms, outstandingAtoms, researcher, agentId,
+  evidence: { locator, definition },          // the sponsor's evidence objects
+  blockhash, lastValidBlockHeight,
+  transactions: [{ label, steps: [name], transaction (base64, unsigned) }] } }
+```
+
+* **Reads.** The candidate's period: the oracle's periods whose product is
+  `details.marketId` and whose label month (`expiryId`) is
+  `details.expiryId`, a Live one first, then Forming, then the nearest
+  expiry. Then, in one read, its month, SKU coverage manifest, the product's
+  SKU reward pool, the sponsor's oracle collateral, the source (id: the
+  content hash), its agreement, the sponsor's two evidence objects and its
+  exposure to the researcher; and,
+  for a month outside the governed SKU set, the month's sources.
+* **Refusals**, in this order: the commitments (`sourceTypeHash`,
+  `canonicalLocatorHash`, `sourceDefinitionHash`) must match the details (422
+  `ORACLE_SPONSOR_REJECTED`); no period or month, a month not in
+  `SourceSubmission` or `Scramble`, or no reward pool for the product (409
+  `ORACLE_SPONSOR_CLOSED`); the source or its agreement exists (409
+  `ORACLE_SPONSOR_EXISTS`); the sponsor's `available_balance` is below the
+  pool's `listing_bond` (409 `ORACLE_SPONSOR_COLLATERAL`); the product is not
+  in the month's committed SKU set, an unfinished upload holds other bytes,
+  or a transaction is over 1232 bytes on the wire (422
+  `ORACLE_SPONSOR_REJECTED`). Messages are plain sentences for people. A chain
+  read, the blockhash or the governance gate that is not available is 503
+  `ORACLE_SPONSOR_UNAVAILABLE`.
+* **Transactions**, in the order they must land (each confirmed before the
+  next): `uploadLocator` (kind 1: the locator URL's bytes) and
+  `uploadDefinition` (kind 2: the source definition's semantic preimage),
+  three 192-byte `writeEvidence` chunks per transaction, none for an object
+  already sealed; then `sponsorSource` (`SponsoredActivate`, source id = the
+  content hash, the pool's exact `listing_bond`, the SKU index and proof).
+  Terms: funding 0 (sponsor cash), the cluster's split (`/v1/config`
+  `sponsorship`: 80/20 with a fifth of the researcher's part held in their
+  reserve, or on mainnet-beta the legacy half), `maximumBond` = the bond, `maximumOutstanding` =
+  the sponsor's bonds already out to this researcher (its `SponsorExposure`)
+  plus the collateral's `available_balance`, at least the bond. The program
+  refuses when the bonds out, this one included, pass that cap, so it never
+  binds before the collateral does. Each
+  transaction starts with the compute-unit limit (1,400,000); the sponsor is
+  its fee payer and only signer, and pays every account's rent. Oracle
+  instructions carry the oracle's governance gate where the deployment gates
+  it (as `/v1/tx/prepare` binds the futures gate). Sizes are measured on the
+  wire (the unsigned transaction's zeroed signature slot included): a
+  one-SKU month's `sponsorSource` is 1219 bytes. The blockhash is the cached
+  one, so the transactions are good for about a minute.
+
+### `GET /oracle/sponsorships?funder`
+
+`200 { sponsorships: Sponsorship[] }`: every agreement of the oracle program
+(`SourceSponsorship`, 320 bytes, marker `ORSPONS1`, at its canonical address),
+or with `funder` (a wallet; the funder is at byte 73) the ones it paid for, by
+agreement address. Read from chain on each request.
+
+```text
+Sponsorship = { agreement, source, month, candidate (content hash), funder, reserve, bucketId, sku,
+                bondAtoms, outcome ("waiting"|"accepted"|"rejected"|"closed"), rewardSettled, rewardPaidAtoms }
+```
+
+Another parameter, or a `funder` that is not a wallet, is 400
+`ORACLE_SPONSOR_INPUT_INVALID`.
 
 | Status | Code |
 |---|---|
-| 400 | `INVALID_JSON`, `INVALID_REQUEST_ENCODING`, `INCOMPLETE_REQUEST_BODY`, `ORACLE_AGENT_INPUT_INVALID`, `ORACLE_CANDIDATE_QUERY_INVALID`, `ORACLE_CANDIDATE_PAGE_INVALID` |
+| 400 | `INVALID_JSON`, `INVALID_REQUEST_ENCODING`, `INCOMPLETE_REQUEST_BODY`, `ORACLE_AGENT_INPUT_INVALID`, `ORACLE_CANDIDATE_QUERY_INVALID`, `ORACLE_CANDIDATE_PAGE_INVALID`, `ORACLE_SPONSOR_INPUT_INVALID` |
 | 401 | `ORACLE_AGENT_UNAUTHORIZED` (missing, malformed or unknown credential) |
 | 403 | `ORACLE_AGENT_BINDING_MISMATCH` |
 | 404 | `ORACLE_AGENT_NOT_FOUND`, `ORACLE_CANDIDATE_NOT_FOUND` |
 | 405 | `METHOD_NOT_ALLOWED` |
+| 409 | `ORACLE_SPONSOR_CLOSED`, `ORACLE_SPONSOR_EXISTS`, `ORACLE_SPONSOR_COLLATERAL` |
 | 413 | `REQUEST_TOO_LARGE`, `ORACLE_CANDIDATE_TOO_LARGE` |
 | 415 | `UNSUPPORTED_MEDIA_TYPE` |
-| 422 | `ORACLE_SPONSOR_REJECTED` (invalid payout authority or candidate) |
+| 422 | `ORACLE_SPONSOR_REJECTED` (invalid payout authority or candidate; a candidate that can't be sponsored as it is) |
 | 429 | `ORACLE_CANDIDATE_RATE_LIMIT`, `ORACLE_CANDIDATE_CAPACITY` |
 | 500 | `ORACLE_CANDIDATE_STORE_FAILED` |
-| 503 | `ORACLE_CANDIDATE_STORE_UNAVAILABLE`, `ORACLE_AGENT_CAPACITY`, `ORACLE_SPONSOR_AUTHORITY_UNAVAILABLE`, `ORACLE_CANDIDATE_DECISION_UNAVAILABLE` |
+| 503 | `ORACLE_CANDIDATE_STORE_UNAVAILABLE`, `ORACLE_AGENT_CAPACITY`, `ORACLE_SPONSOR_UNAVAILABLE`, `ORACLE_CANDIDATE_DECISION_UNAVAILABLE` |
 
 The old server answered every `ORACLE_*` refusal as `CURRENT_REQUEST_FAILED`
 with the message `current request failed` (same statuses); this service
@@ -1710,10 +2003,30 @@ The service reads the deployment manifest every 5 s.
   them at its next round; their months join the reference index and
   `/v1/oracle/*`, and their Earn pools the reserved owners. Open streams,
   prepared transactions and caches carry on.
+* **[added] Months forming the ordinary way** are served in place too:
+  * a month `futures-ops open-month` opens: its series in `oracle.periods`,
+    `oracle.months` and `oracle.formingSeries`. It joins `/v1/oracle/*` at
+    the next oracle read (every 30 s): a fact in `state.months` with its
+    `schedule`, `coverage`, `rewards` and `skus`, and its proposals in
+    `sourceLinks`. Sponsoring a find for it (`POST
+    /oracle/source-candidates/:contentHash/prepare`) reads its period, month,
+    coverage and SKU pools from chain, so it never waits for the manifest;
+  * any change to the lists of forming series, `oracle.formingSeries` or
+    the older whole-product `oracle.forming` (a series leaving one keeps its
+    period and month served: the service reads each month's phase from
+    chain, not from these lists);
+  * a forming series (in `formingSeries`, or of a product in `forming`) with
+    no futures market leaving `oracle.periods` and `oracle.months`, as
+    `futures-ops unlist-month` takes it out: it leaves `/v1/oracle/*` and
+    the reference index at their next read.
 * **Any other change** (programs, keys, accounts, the oracle or futures
   program, a listed entry changed or removed, also pruning fields the
-  service ignores): the service exits, and systemd restarts it on the new
-  manifest within about 10 s.
+  service ignores): the service logs what changed and exits with status 75
+  (`EX_TEMPFAIL`; the journal shows `status=75/TEMPFAIL`), and systemd
+  restarts it on the new manifest within about 10 s. **[adjusted]** It
+  exited with status 0 before, which only the dev unit (`Restart=always`)
+  restarts; the production unit (`Restart=on-failure`) restarts a non-zero
+  exit, so both units restart it 5 s later (`RestartSec=5`).
 
 A manifest that does not parse yet is read again at the next check; one
 whose new listings do not load is logged, and the service keeps serving

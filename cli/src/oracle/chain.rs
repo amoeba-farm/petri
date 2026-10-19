@@ -6,10 +6,12 @@
 use ameba_oracle::{
     instruction as ix,
     interface::{Period, PeriodStatus, find_period_address},
+    sponsorship::{SourceSponsorship, SponsorExposure, agreement_address, exposure_address},
     state::{
         OracleConfig, OracleMonthState, OracleSkuCoverageManifest, OracleSourceState,
-        UserCollateral, derive_oracle_sku_coverage_manifest_pda, derive_user_collateral_pda,
-        find_config_address,
+        OracleUsdcSkuPool, UserCollateral, derive_oracle_sku_coverage_manifest_pda,
+        derive_oracle_usdc_reward_schedule_pda, derive_oracle_usdc_sku_pool_pda,
+        derive_user_collateral_pda, find_config_address,
     },
 };
 use borsh::BorshDeserialize;
@@ -143,6 +145,78 @@ fn squash(text: &str) -> String {
         .to_ascii_uppercase()
 }
 
+/// The period of `market` among `periods` (see [`Oracle::period`]).
+fn pick(periods: Vec<PeriodRef>, market: &str, expiry: Option<&str>) -> Result<PeriodRef> {
+    if let Ok(address) = market.trim().parse::<Pubkey>() {
+        return periods
+            .into_iter()
+            .find(|p| p.address == address)
+            .ok_or_else(|| Error::msg(format!("{address} is not a period of the oracle")));
+    }
+    let query = squash(market);
+    let wanted = expiry.map(squash);
+    let mut matches: Vec<PeriodRef> = periods
+        .iter()
+        .filter(|p| {
+            let symbol = squash(&p.symbol);
+            let keys = p.expiry_keys();
+            let by_name = query == symbol
+                || keys.iter().any(|k| {
+                    query == format!("{symbol}{k}") || query == *k && k.starts_with(&symbol)
+                });
+            let by_expiry = wanted.as_ref().is_none_or(|e| keys.iter().any(|k| k == e));
+            by_name && by_expiry
+        })
+        .cloned()
+        .collect();
+    if matches.is_empty() {
+        let known: Vec<String> = periods.iter().map(PeriodRef::expiry_id).collect();
+        bail(format!(
+            "no oracle period matches `{market}`{}; periods: {}",
+            expiry.map(|e| format!(" expiring {e}")).unwrap_or_default(),
+            if known.is_empty() {
+                "none".to_string()
+            } else {
+                known.join(", ")
+            }
+        ))?;
+    }
+    matches.sort_by_key(|p| {
+        (
+            match p.period.status {
+                PeriodStatus::Live => 0,
+                PeriodStatus::Forming => 1,
+                _ => 2,
+            },
+            p.period.expiry_ts,
+        )
+    });
+    Ok(matches.remove(0))
+}
+
+/// The periods among `periods` that `market` names (see [`Oracle::periods_of`]).
+fn select(
+    periods: Vec<PeriodRef>,
+    market: Option<&str>,
+    expiry: Option<&str>,
+) -> Result<Vec<PeriodRef>> {
+    let Some(market) = market else {
+        return Ok(periods);
+    };
+    if expiry.is_none() {
+        let symbol = squash(market);
+        let all: Vec<PeriodRef> = periods
+            .iter()
+            .filter(|p| squash(&p.symbol) == symbol)
+            .cloned()
+            .collect();
+        if !all.is_empty() {
+            return Ok(all);
+        }
+    }
+    Ok(vec![pick(periods, market, expiry)?])
+}
+
 /// The oracle program of the trusted deployment, read through the RPC.
 pub struct Oracle<'a> {
     pub ctx: &'a Ctx,
@@ -215,52 +289,13 @@ impl<'a> Oracle<'a> {
     /// address) and an optional expiry (`oct26`, `2026-10`, unix seconds). A
     /// bare symbol picks the live period with the nearest expiry.
     pub fn period(&self, market: &str, expiry: Option<&str>) -> Result<PeriodRef> {
-        let periods = self.periods()?;
-        if let Ok(address) = market.trim().parse::<Pubkey>() {
-            return periods
-                .into_iter()
-                .find(|p| p.address == address)
-                .ok_or_else(|| Error::msg(format!("{address} is not a period of the oracle")));
-        }
-        let query = squash(market);
-        let wanted = expiry.map(squash);
-        let mut matches: Vec<PeriodRef> = periods
-            .iter()
-            .filter(|p| {
-                let symbol = squash(&p.symbol);
-                let keys = p.expiry_keys();
-                let by_name = query == symbol
-                    || keys.iter().any(|k| {
-                        query == format!("{symbol}{k}") || query == *k && k.starts_with(&symbol)
-                    });
-                let by_expiry = wanted.as_ref().is_none_or(|e| keys.iter().any(|k| k == e));
-                by_name && by_expiry
-            })
-            .cloned()
-            .collect();
-        if matches.is_empty() {
-            let known: Vec<String> = periods.iter().map(PeriodRef::expiry_id).collect();
-            bail(format!(
-                "no oracle period matches `{market}`{}; periods: {}",
-                expiry.map(|e| format!(" expiring {e}")).unwrap_or_default(),
-                if known.is_empty() {
-                    "none".to_string()
-                } else {
-                    known.join(", ")
-                }
-            ))?;
-        }
-        matches.sort_by_key(|p| {
-            (
-                match p.period.status {
-                    PeriodStatus::Live => 0,
-                    PeriodStatus::Forming => 1,
-                    _ => 2,
-                },
-                p.period.expiry_ts,
-            )
-        });
-        Ok(matches.remove(0))
+        pick(self.periods()?, market, expiry)
+    }
+
+    /// The periods `market` names: every one without it, each month of a
+    /// bare symbol (`ramx`), else the one it names (as [`Self::period`]).
+    pub fn periods_of(&self, market: Option<&str>, expiry: Option<&str>) -> Result<Vec<PeriodRef>> {
+        select(self.periods()?, market, expiry)
     }
 
     /// The month of a period: canonical address, current layout, bound to the period.
@@ -353,16 +388,19 @@ impl<'a> Oracle<'a> {
 
     /// Every source of a month, read from chain.
     pub fn sources(&self, month: &MonthRef) -> Result<Vec<SourceRef>> {
-        let accounts = self.ctx.rpc.program_accounts(
-            &self.program,
-            &[
-                Filter::DataSize(OracleSourceState::LEN as u64),
-                Filter::Memcmp {
-                    offset: 2,
-                    bytes: month.address.to_bytes().to_vec(),
-                },
-            ],
-        )?;
+        self.sources_in(Some(&month.address))
+    }
+
+    /// Every source of `month`, or of every month.
+    pub fn sources_in(&self, month: Option<&Pubkey>) -> Result<Vec<SourceRef>> {
+        let mut filters = vec![Filter::DataSize(OracleSourceState::LEN as u64)];
+        if let Some(month) = month {
+            filters.push(Filter::Memcmp {
+                offset: 2,
+                bytes: month.to_bytes().to_vec(),
+            });
+        }
+        let accounts = self.ctx.rpc.program_accounts(&self.program, &filters)?;
         let mut out = Vec::new();
         for (address, account) in accounts {
             let state: OracleSourceState = match decode(
@@ -376,8 +414,8 @@ impl<'a> Oracle<'a> {
                 Err(_) => continue,
             };
             if state.is_initialized
-                && state.month == month.address
-                && ix::find_oracle_source_address(&self.program, &month.address, &state.source_id)
+                && month.is_none_or(|m| state.month == *m)
+                && ix::find_oracle_source_address(&self.program, &state.month, &state.source_id)
                     == address
             {
                 out.push(SourceRef { address, state });
@@ -393,32 +431,169 @@ impl<'a> Oracle<'a> {
     /// of bucket ids its sources carry, whichever reproduces that root.
     pub fn sku_proof(&self, month: &MonthRef, bucket: &[u8; 32]) -> Result<(u16, Vec<[u8; 32]>)> {
         let coverage = self.coverage(month)?;
-        let governed = skus::for_symbol(&month.period.symbol)?;
-        let set = if coverage.required_sku_root == governed.root {
-            governed
-        } else {
-            let ids = self
-                .sources(month)?
+        let symbol = &month.period.symbol;
+        let governed = skus::for_symbol(symbol).ok();
+        let set = match governed {
+            Some(governed) if coverage.required_sku_root == governed.root => governed,
+            _ => {
+                // The month's source buckets, with or without this one (a
+                // product's first source, or a one-SKU month).
+                let ids: Vec<[u8; 32]> = self
+                    .sources(month)?
+                    .into_iter()
+                    .map(|s| s.state.bucket_id)
+                    .collect();
+                let with_bucket = ids.iter().copied().chain([*bucket]).collect();
+                [
+                    skus::SkuSet::from_ids(symbol, with_bucket),
+                    skus::SkuSet::from_ids(symbol, ids),
+                ]
                 .into_iter()
-                .map(|s| s.state.bucket_id)
-                .collect();
-            let observed = skus::SkuSet::from_ids(&month.period.symbol, ids);
-            if coverage.required_sku_root != observed.root {
-                bail(format!(
-                    "{} commits to SKU root {} ({} SKUs), which neither the governed {} set ({}) nor the month's source buckets reproduce; Petri cannot prove membership",
-                    month.period.expiry_id(),
-                    hex(&coverage.required_sku_root),
-                    coverage.required_sku_count,
-                    governed.symbol,
-                    hex(&governed.root)
-                ))?;
+                .find(|set| set.root == coverage.required_sku_root)
+                .ok_or_else(|| {
+                    Error::msg(format!(
+                        "{} commits to SKU root {} ({} SKUs), which neither a governed {symbol} set nor the month's source buckets reproduce; Petri cannot prove membership",
+                        month.period.expiry_id(),
+                        hex(&coverage.required_sku_root),
+                        coverage.required_sku_count,
+                    ))
+                })?
             }
-            observed
         };
         if usize::from(coverage.required_sku_count) != set.ids.len() {
             bail("the SKU coverage manifest's count does not match its SKU set")?;
         }
         set.proof(bucket)
+    }
+
+    /// A month by its address (a sponsorship records only that).
+    pub fn month_at(&self, address: &Pubkey) -> Result<MonthRef> {
+        let account = self.ctx.rpc.account(address)?;
+        let state: OracleMonthState = decode(
+            &self.program,
+            address,
+            account.as_ref(),
+            OracleMonthState::LEN,
+            "oracle month",
+        )?;
+        let month = self.month_of(self.period(&state.period.to_string(), None)?)?;
+        if month.address != *address {
+            bail(format!(
+                "{address} is not the canonical month of its period"
+            ))?;
+        }
+        Ok(month)
+    }
+
+    /// A product's reward pool for a month: its exact bonds and budgets.
+    pub fn sku_pool(&self, month: &MonthRef, bucket: &[u8; 32]) -> Result<OracleUsdcSkuPool> {
+        let schedule = derive_oracle_usdc_reward_schedule_pda(&self.program, &month.address).0;
+        let key = derive_oracle_usdc_sku_pool_pda(&self.program, &schedule, bucket).0;
+        let account = self.ctx.rpc.account(&key)?;
+        if account.is_none() {
+            bail(format!(
+                "{} has no reward pool for this product, so it takes no sources",
+                month.period.expiry_id()
+            ))?;
+        }
+        let pool: OracleUsdcSkuPool = decode(
+            &self.program,
+            &key,
+            account.as_ref(),
+            OracleUsdcSkuPool::LEN,
+            "SKU reward pool",
+        )?;
+        if !pool.is_initialized || pool.month != month.address || pool.bucket_id != *bucket {
+            bail(format!(
+                "SKU reward pool {key} is not this month's for this product"
+            ))?;
+        }
+        Ok(pool)
+    }
+
+    /// The sponsorship of a source, if it was sponsored.
+    pub fn sponsorship(&self, source: &Pubkey) -> Result<Option<(Pubkey, SourceSponsorship)>> {
+        let key = agreement_address(&self.program, source).0;
+        let account = self.ctx.rpc.account(&key)?;
+        if account.is_none() {
+            return Ok(None);
+        }
+        let agreement: SourceSponsorship = decode(
+            &self.program,
+            &key,
+            account.as_ref(),
+            SourceSponsorship::LEN,
+            "sponsorship",
+        )?;
+        if agreement.discriminator != SourceSponsorship::MAGIC || agreement.source != *source {
+            bail(format!(
+                "sponsorship {key} is not the agreement of {source}"
+            ))?;
+        }
+        Ok(Some((key, agreement)))
+    }
+
+    /// Every sponsorship `funder` paid for.
+    pub fn sponsorships(&self, funder: &Pubkey) -> Result<Vec<(Pubkey, SourceSponsorship)>> {
+        // The funder follows the marker, the bump, the source and the reserve.
+        self.sponsorships_at(8 + 1 + 32 + 32, funder)
+    }
+
+    /// Every sponsorship that pays the agent reserve `reserve` (its
+    /// researcher's share).
+    pub fn sponsorships_of_reserve(
+        &self,
+        reserve: &Pubkey,
+    ) -> Result<Vec<(Pubkey, SourceSponsorship)>> {
+        // The reserve follows the marker, the bump and the source.
+        self.sponsorships_at(8 + 1 + 32, reserve)
+    }
+
+    /// Every sponsorship of the program.
+    pub fn all_sponsorships(&self) -> Result<Vec<(Pubkey, SourceSponsorship)>> {
+        self.sponsorships_where(None)
+    }
+
+    /// The sponsorships with `key` at `offset`.
+    fn sponsorships_at(
+        &self,
+        offset: usize,
+        key: &Pubkey,
+    ) -> Result<Vec<(Pubkey, SourceSponsorship)>> {
+        self.sponsorships_where(Some(Filter::Memcmp {
+            offset,
+            bytes: key.to_bytes().to_vec(),
+        }))
+    }
+
+    fn sponsorships_where(
+        &self,
+        filter: Option<Filter>,
+    ) -> Result<Vec<(Pubkey, SourceSponsorship)>> {
+        let mut filters = vec![
+            Filter::DataSize(SourceSponsorship::LEN as u64),
+            Filter::Memcmp {
+                offset: 0,
+                bytes: SourceSponsorship::MAGIC.to_vec(),
+            },
+        ];
+        filters.extend(filter);
+        let accounts = self.ctx.rpc.program_accounts(&self.program, &filters)?;
+        let mut out = Vec::new();
+        for (key, account) in accounts {
+            let agreement: SourceSponsorship = decode(
+                &self.program,
+                &key,
+                Some(&account),
+                SourceSponsorship::LEN,
+                "sponsorship",
+            )?;
+            if key != agreement_address(&self.program, &agreement.source).0 {
+                continue;
+            }
+            out.push((key, agreement));
+        }
+        Ok(out)
     }
 
     pub fn collateral_address(&self, owner: &Pubkey) -> Pubkey {
@@ -446,6 +621,32 @@ impl<'a> Oracle<'a> {
         }
         Ok(Some(ledger))
     }
+
+    /// What `funder` has out in bonds to the agent reserve `reserve`: 0
+    /// before their first sponsorship there.
+    pub fn exposure(&self, reserve: &Pubkey, funder: &Pubkey) -> Result<u64> {
+        let key = exposure_address(&self.program, reserve, funder).0;
+        let account = self.ctx.rpc.account(&key)?;
+        if account.is_none() {
+            return Ok(0);
+        }
+        let exposure: SponsorExposure = decode(
+            &self.program,
+            &key,
+            account.as_ref(),
+            SponsorExposure::LEN,
+            "sponsor exposure",
+        )?;
+        if exposure.discriminator != SponsorExposure::MAGIC
+            || exposure.reserve != *reserve
+            || exposure.funder != *funder
+        {
+            bail(format!(
+                "sponsor exposure {key} is not {funder}'s to {reserve}"
+            ))?;
+        }
+        Ok(exposure.outstanding)
+    }
 }
 
 #[cfg(test)]
@@ -470,6 +671,28 @@ mod tests {
         for key in ["1793491200", "OCT26", "OCT", "202610", "RAMX202610"] {
             assert!(keys.iter().any(|k| k == key), "{key}");
         }
+    }
+
+    #[test]
+    fn a_symbol_names_each_of_its_months_and_a_month_itself() {
+        let all = vec![
+            period("RAMX", 1_798_761_600),
+            period("RAMX", 1_801_440_000),
+            period("NANDX", 1_798_761_600),
+        ];
+        let names = |market: Option<&str>, expiry: Option<&str>| {
+            select(all.clone(), market, expiry)
+                .unwrap()
+                .iter()
+                .map(PeriodRef::expiry_id)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(names(None, None).len(), 3);
+        assert_eq!(names(Some("ramx"), None), ["RAMX-202612", "RAMX-202701"]);
+        assert_eq!(names(Some("RAMX-202612"), None), ["RAMX-202612"]);
+        assert_eq!(names(Some("ramx"), Some("jan27")), ["RAMX-202701"]);
+        assert_eq!(names(Some("nandx"), None), ["NANDX-202612"]);
+        assert!(select(all, Some("nandx"), Some("jan27")).is_err());
     }
 
     #[test]

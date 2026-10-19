@@ -9,14 +9,17 @@ pub enum View {
     Activity,
     Evidence,
     Rewards,
+    /// Funding what researchers found (render.rs, fund.rs).
+    Fund,
 }
 impl View {
-    pub const ALL: [Self; 5] = [
+    pub const ALL: [Self; 6] = [
         Self::Markets,
         Self::Connect,
         Self::Activity,
         Self::Evidence,
         Self::Rewards,
+        Self::Fund,
     ];
     /// Tab text for narrow terminals.
     pub fn short_label(self) -> &'static str {
@@ -26,15 +29,17 @@ impl View {
             Self::Activity => "Act",
             Self::Evidence => "Evid",
             Self::Rewards => "Rew",
+            Self::Fund => "Fund",
         }
     }
     pub fn label(self) -> &'static str {
         match self {
             Self::Markets => "Markets",
             Self::Connect => "Connect",
-            Self::Activity => "Activity",
+            Self::Activity => "Research",
             Self::Evidence => "Evidence",
             Self::Rewards => "Rewards",
+            Self::Fund => "Fund",
         }
     }
 }
@@ -62,27 +67,41 @@ pub struct Work {
     #[serde(default)]
     pub id: String,
     pub title: String,
-    pub brief: String,
     #[serde(default)]
     pub objective: Value,
     #[serde(default)]
     pub guidance: Value,
     #[serde(default)]
     pub availability: String,
+    /// The owner's "Research this": agents see it first.
+    #[serde(default)]
+    pub focused: bool,
+    /// The agents researching it right now (their ids).
+    #[serde(default)]
+    pub researchers: Vec<String>,
 }
+/// What an agent is researching right now: its newest open run, while it
+/// still checks in (the workspace's `activity`).
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Directive {
-    pub id: String,
-    pub market_ids: Vec<String>,
-    pub min_active_sources: u64,
-    pub min_distinct_hosts: u64,
-    pub max_observation_age_ms: u64,
-    pub enabled: bool,
+pub struct Activity {
+    pub agent_id: String,
+    pub work_id: String,
+    #[serde(default)]
+    pub run_id: Option<String>,
+    /// The work's own title, for work no longer listed.
+    #[serde(default)]
+    pub title: String,
+    pub last_message: Option<String>,
 }
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Event {
+    #[serde(default)]
+    pub sequence: u64,
+    /// The run it belongs to (Detail::runs).
+    #[serde(default)]
+    pub run_id: Option<String>,
     pub actor: String,
     pub kind: String,
     pub message: String,
@@ -94,10 +113,24 @@ pub struct Event {
 pub struct Detail {
     pub agent: Agent,
     pub events: Vec<Event>,
+    /// Its runs, newest first.
+    #[serde(default)]
+    pub runs: Vec<Run>,
     pub candidates: Option<Vec<Value>>,
     pub submissions: Vec<Value>,
     pub validation_error: Option<String>,
-    pub complete: bool,
+}
+/// One research run of an agent: the work it took, as it was then.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Run {
+    pub id: String,
+    pub work_id: String,
+    #[serde(default)]
+    pub title: String,
+    /// The work item when the run started (its objective).
+    #[serde(default)]
+    pub research_context: Value,
 }
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -112,7 +145,7 @@ pub struct Snapshot {
     pub settings: Settings,
     pub selected: Option<Detail>,
     #[serde(default)]
-    pub directives: Vec<Directive>,
+    pub activity: Vec<Activity>,
     #[serde(default)]
     pub discovery: Value,
 }
@@ -120,23 +153,49 @@ pub struct Snapshot {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Action {
     View(View),
+    /// A market in the Markets view's list, by its place there.
+    Market(usize),
+    /// Closes the Markets view's ticket, as Esc does (a click outside it).
+    CloseTicket,
+    /// A find in the Fund view's list, by its place there.
+    ShowFind(usize),
+    /// Add funds or Withdraw in the Fund view.
+    FundTicket(crate::research::fund::Kind),
+    /// Closes the Fund view's ticket (a click outside it).
+    CloseFundTicket,
+    /// Sponsor the find with this content hash (from its pop-up).
+    Sponsor(String),
     Agent(String),
+    /// "+ New agent": Connect, set up afresh.
+    NewAgent,
     Harness(usize),
     Name,
     Payout,
-    ActivitySection(usize),
-    NewDirective,
-    EditDirective(String),
-    ToggleDirective(String),
-    Discover,
+    /// Research's navigator goes to a product, month or category (a row or
+    /// a crumb); it stops following the agent.
+    Nav(crate::research::nav::Path),
+    /// A task in the shown category (its work id).
+    Task(String),
+    /// The navigator follows the selected agent's work again.
+    Follow,
+    /// Scrolls the navigator's list to this row.
+    Scroll(u16),
+    /// The agent's feed shows its newest again.
+    Newest,
+    /// "Research this" (true) or "Stop researching" for an objective.
+    Focus(String, bool),
     Refine(String),
-    ShowWork(usize),
     Approve(String),
     Reject(String),
     Revoke(String),
     ConfirmRevoke(String),
+    /// Copies the message to paste into the agent's terminal (App::agent_setup).
     CopyCommand,
-    CopyMcp,
+    /// Copies the message that gets a connected agent researching again
+    /// (App::start_message).
+    CopyStart(String),
+    /// Opens the harness choice (Modal::Harness).
+    ChooseHarness,
     Source(usize),
     FormFocus(usize),
     Save,
@@ -153,19 +212,14 @@ pub struct Hit {
 pub enum Modal {
     Payout(String),
     Name(String),
-    Directive {
-        id: Option<String>,
-        markets: String,
-        sources: String,
-        hosts: String,
-        enabled: bool,
-        max_age: u64,
-    },
+    /// Which agent harness the setup is for: one of App::HARNESSES.
+    Harness,
+    /// A find in the Fund view: what it is, who found it.
+    Find(Box<crate::research::fund::Find>),
     Refine {
         work_id: String,
         instruction: String,
     },
-    Assignment(Work),
     Revoke(Agent),
 }
 #[derive(Clone, Debug)]
@@ -178,6 +232,19 @@ pub struct App {
     pub view: View,
     pub snapshot: Snapshot,
     pub selected_agent: Option<String>,
+    /// Connect shows a fresh setup for another agent ("+ New agent").
+    pub new_agent: bool,
+    /// Research's navigator for each agent (by id; "" with none selected).
+    pub navs: std::collections::HashMap<String, crate::research::nav::Nav>,
+    /// Where the selected agent's feed was drawn, and the furthest it can
+    /// scroll (its top row with the newest at the bottom).
+    pub feed_area: Rect,
+    pub feed_max: usize,
+    /// Each agent's last read (its events, finds and submissions), by id.
+    pub details: std::collections::HashMap<String, Detail>,
+    /// The workspace has been read once: until then the research views
+    /// draw nothing rather than an empty workspace.
+    pub loaded: bool,
     pub source: usize,
     pub scroll: u16,
     pub agent_scroll: usize,
@@ -187,7 +254,6 @@ pub struct App {
     pub modal: Option<Modal>,
     pub form_focus: usize,
     pub harness: usize,
-    pub activity_section: usize,
     pub name: String,
     pub status: String,
     pub busy: bool,
@@ -196,10 +262,15 @@ pub struct App {
     pub quit: bool,
     pub refresh: bool,
     pub pointer: Option<(u16, u16)>,
+    /// While a frame draws: whether the controls now registered are the open
+    /// modal's (render::modal_view), the only ones the pointer highlights then.
+    pub drawing_modal: bool,
     pub node_path: String,
     pub cli_path: String,
     pub base_url: String,
     pub markets: crate::research::markets::Markets,
+    pub fund: crate::research::fund::Fund,
+    pub rewards: crate::research::rewards::Rewards,
     /// Why the oracle research workspace could not start, if it could not.
     pub research_error: Option<String>,
 }
@@ -216,6 +287,12 @@ impl App {
             view: View::Markets,
             snapshot: Snapshot::default(),
             selected_agent: None,
+            new_agent: false,
+            details: Default::default(),
+            navs: Default::default(),
+            feed_area: Rect::default(),
+            feed_max: 0,
+            loaded: false,
             source: 0,
             scroll: 0,
             agent_scroll: 0,
@@ -225,7 +302,6 @@ impl App {
             modal: None,
             form_focus: 0,
             harness: 0,
-            activity_section: 0,
             name: "researcher".into(),
             status: String::new(),
             busy: false,
@@ -234,14 +310,27 @@ impl App {
             quit: false,
             refresh: true,
             pointer: None,
+            drawing_modal: false,
             node_path,
             cli_path,
             base_url,
             markets: Default::default(),
+            fund: Default::default(),
+            rewards: Default::default(),
             research_error: None,
         }
     }
     pub fn update(&mut self, mut snapshot: Snapshot) {
+        // The agent whose request was just approved: show it.
+        if let Some(added) = snapshot.agents.iter().find(|a| {
+            a.revoked_at.is_none()
+                && !self.snapshot.agents.iter().any(|old| old.id == a.id)
+                && self.snapshot.pairings.iter().any(|p| p.name == a.name)
+        }) {
+            self.selected_agent = Some(added.id.clone());
+            self.new_agent = false;
+            self.refresh = true;
+        }
         if self
             .selected_agent
             .as_ref()
@@ -249,21 +338,52 @@ impl App {
         {
             self.selected_agent = snapshot.agents.first().map(|a| a.id.clone());
         }
-        if snapshot
-            .selected
+        // Each agent's last read stays, so switching to it draws at once.
+        if let Some(detail) = snapshot.selected.take() {
+            self.details.insert(detail.agent.id.clone(), detail);
+        }
+        self.details
+            .retain(|id, _| snapshot.agents.iter().any(|a| &a.id == id));
+        if self
+            .selected_agent
             .as_ref()
-            .is_some_and(|d| Some(&d.agent.id) != self.selected_agent.as_ref())
+            .is_some_and(|id| !self.details.contains_key(id))
         {
-            snapshot.selected = None;
             self.refresh = true;
         }
         self.snapshot = snapshot;
+        self.loaded = true;
+        self.follow();
+    }
+    /// Research's navigator for the selected agent.
+    pub fn nav(&self) -> crate::research::nav::Nav {
+        self.navs
+            .get(self.selected_agent.as_deref().unwrap_or_default())
+            .cloned()
+            .unwrap_or_default()
+    }
+    pub fn nav_mut(&mut self) -> &mut crate::research::nav::Nav {
+        let key = self.selected_agent.clone().unwrap_or_default();
+        self.navs.entry(key).or_default()
+    }
+    /// While the navigator follows the selected agent, it shows the work
+    /// the agent is on.
+    pub fn follow(&mut self) {
+        let Some(id) = self.selected_agent.clone() else {
+            return;
+        };
+        let place = crate::research::nav::place_of(self, &id);
+        let nav = self.nav_mut();
+        if let (true, Some((path, work))) = (nav.follow, place)
+            && (nav.path != path || nav.task.as_ref() != Some(&work))
+        {
+            nav.path = path;
+            nav.task = Some(work);
+            self.scroll = 0;
+        }
     }
     pub fn selected(&self) -> Option<&Detail> {
-        self.snapshot
-            .selected
-            .as_ref()
-            .filter(|d| Some(&d.agent.id) == self.selected_agent.as_ref())
+        self.details.get(self.selected_agent.as_ref()?)
     }
     pub fn sources(&self) -> Vec<Value> {
         let Some(detail) = self.selected() else {
@@ -291,15 +411,27 @@ impl App {
             && !matches!(
                 action,
                 Action::View(_)
+                    | Action::Market(_)
+                    | Action::CloseTicket
+                    | Action::ShowFind(_)
+                    | Action::FundTicket(_)
+                    | Action::CloseFundTicket
+                    | Action::Sponsor(_)
                     | Action::Agent(_)
                     | Action::Source(_)
                     | Action::Refresh
                     | Action::Quit
                     | Action::CopyCommand
-                    | Action::CopyMcp
+                    | Action::CopyStart(_)
+                    | Action::NewAgent
+                    | Action::Nav(_)
+                    | Action::Task(_)
+                    | Action::Follow
+                    | Action::Scroll(_)
+                    | Action::Newest
+                    | Action::ChooseHarness
             )
         {
-            self.status = "Saving…".into();
             return;
         }
         match action {
@@ -308,65 +440,85 @@ impl App {
                 self.scroll = 0;
                 self.focus = 0;
             }
+            Action::Market(index) => self.markets.show(index),
+            Action::CloseTicket => self.markets.ticket = None,
+            Action::ShowFind(index) => {
+                self.form_focus = 0;
+                self.modal = self
+                    .fund
+                    .snap
+                    .finds
+                    .get(index)
+                    .cloned()
+                    .map(|find| Modal::Find(Box::new(find)));
+            }
+            Action::FundTicket(kind) => self.fund.open(kind),
+            Action::CloseFundTicket => self.fund.ticket = None,
+            Action::Sponsor(hash) => {
+                self.modal = None;
+                self.fund.open(crate::research::fund::Kind::Sponsor(hash));
+            }
             Action::Agent(id) => {
                 self.selected_agent = Some(id);
+                self.new_agent = false;
                 self.source = 0;
                 self.scroll = 0;
                 self.refresh = true;
-                self.activity_section = 1;
+                // Its page follows its work.
+                let nav = self.nav_mut();
+                nav.follow = true;
+                nav.feed_top = None;
+                self.follow();
             }
-            Action::Harness(index) => self.harness = index.min(Self::HARNESSES.len() - 1),
+            Action::NewAgent => {
+                self.new_agent = true;
+                self.view = View::Connect;
+                self.scroll = 0;
+                self.focus = 0;
+            }
+            Action::Harness(index) => {
+                self.harness = index.min(Self::HARNESSES.len() - 1);
+                if matches!(self.modal, Some(Modal::Harness)) {
+                    self.modal = None;
+                }
+            }
+            Action::ChooseHarness => self.modal = Some(Modal::Harness),
             Action::Name => {
                 self.modal = Some(Modal::Name(self.name.clone()));
                 self.form_focus = 0;
             }
             Action::Payout => {
-                self.modal = Some(Modal::Payout(
-                    self.snapshot.settings.payout_authority.clone(),
-                ));
+                // Connecting a wallet: this Petri's own wallet unless another
+                // is connected already.
+                let connected = self.snapshot.settings.payout_authority.clone();
+                self.modal = Some(Modal::Payout(if connected.is_empty() {
+                    self.markets.snap.owner.clone().unwrap_or_default()
+                } else {
+                    connected
+                }));
                 self.form_focus = 0;
             }
-            Action::ActivitySection(section) => {
-                self.activity_section = section;
+            Action::Nav(path) => {
+                let nav = self.nav_mut();
+                nav.follow = false;
+                nav.path = path;
                 self.scroll = 0;
             }
-            Action::NewDirective => {
-                self.modal = Some(Modal::Directive {
-                    id: None,
-                    markets: String::new(),
-                    sources: "3".into(),
-                    hosts: "2".into(),
-                    enabled: true,
-                    max_age: 600000,
-                });
-                self.form_focus = 0;
+            Action::Task(id) => {
+                let nav = self.nav_mut();
+                nav.follow = false;
+                nav.task = Some(id);
             }
-            Action::EditDirective(id) => {
-                if let Some(directive) = self.snapshot.directives.iter().find(|d| d.id == id) {
-                    self.modal = Some(Modal::Directive {
-                        id: Some(id),
-                        markets: directive.market_ids.join(", "),
-                        sources: directive.min_active_sources.to_string(),
-                        hosts: directive.min_distinct_hosts.to_string(),
-                        enabled: directive.enabled,
-                        max_age: directive.max_observation_age_ms,
-                    });
-                    self.form_focus = 0;
-                }
+            Action::Follow => {
+                self.nav_mut().follow = true;
+                self.follow();
             }
-            Action::ToggleDirective(id) => {
-                if let Some(d) = self
-                    .snapshot
-                    .directives
-                    .iter()
-                    .find(|d| d.id == id)
-                    .cloned()
-                {
-                    self.post("/v1/owner/directives", serde_json::json!({"id":d.id,"marketIds":d.market_ids,"minActiveSources":d.min_active_sources,
-                      "minDistinctHosts":d.min_distinct_hosts,"maxObservationAgeMs":d.max_observation_age_ms,"enabled":!d.enabled}));
-                }
-            }
-            Action::Discover => self.post("/v1/owner/discovery/refresh", serde_json::json!({})),
+            Action::Scroll(row) => self.scroll = row,
+            Action::Newest => self.nav_mut().feed_top = None,
+            Action::Focus(id, focused) => self.post(
+                "/v1/owner/work/focus",
+                serde_json::json!({"workId": id, "focused": focused}),
+            ),
             Action::Refine(id) => {
                 if let Some(work) = self.snapshot.work.iter().find(|w| w.id == id) {
                     self.modal = Some(Modal::Refine {
@@ -375,16 +527,6 @@ impl App {
                     });
                     self.form_focus = 0;
                 }
-            }
-            Action::ShowWork(index) => {
-                self.modal = self
-                    .snapshot
-                    .work
-                    .get(index)
-                    .cloned()
-                    .map(Modal::Assignment);
-                self.form_focus = 0;
-                self.scroll = 0;
             }
             Action::Source(index) => {
                 self.source = index;
@@ -417,12 +559,13 @@ impl App {
             Action::Save => self.save(),
             Action::Refresh => self.refresh = true,
             Action::Quit => self.quit = true,
-            Action::CopyCommand | Action::CopyMcp => {}
+            Action::CopyCommand | Action::CopyStart(_) => {}
         }
     }
+    /// Queues one owner action. While another is pending or in flight the
+    /// new one is quietly ignored: no loading text.
     pub fn post(&mut self, path: &'static str, body: Value) {
         if self.pending.is_some() || self.mutation_inflight {
-            self.status = "Please wait for the current action.".into();
             return;
         }
         self.pending = Some(Post { path, body });
@@ -449,37 +592,13 @@ impl App {
             }
             Some(Modal::Payout(value)) => {
                 if value.trim().is_empty() {
-                    self.status = "Enter your public Solana reward address.".into();
+                    self.status = "Enter your wallet's public address.".into();
                     return;
                 }
                 self.post(
                     "/v1/owner/settings",
                     serde_json::json!({"payoutAuthority":value.trim()}),
                 );
-            }
-            Some(Modal::Directive {
-                id,
-                markets,
-                sources,
-                hosts,
-                enabled,
-                max_age,
-            }) => {
-                let (Ok(sources), Ok(hosts)) =
-                    (sources.trim().parse::<u64>(), hosts.trim().parse::<u64>())
-                else {
-                    self.status = "Enter whole-number coverage targets.".into();
-                    return;
-                };
-                let markets: Vec<_> = markets
-                    .split(|c: char| c == ',' || c.is_whitespace())
-                    .filter(|s| !s.is_empty())
-                    .collect();
-                let mut body = serde_json::json!({"marketIds":markets,"minActiveSources":sources,"minDistinctHosts":hosts,"maxObservationAgeMs":max_age,"enabled":enabled});
-                if let Some(id) = id {
-                    body["id"] = Value::String(id);
-                }
-                self.post("/v1/owner/directives", body);
             }
             Some(Modal::Refine {
                 work_id,
@@ -499,9 +618,6 @@ impl App {
             Some(Modal::Payout(text)) | Some(Modal::Name(text)) if self.form_focus == 0 => {
                 (text, 80, false)
             }
-            Some(Modal::Directive { markets, .. }) if self.form_focus == 0 => (markets, 512, false),
-            Some(Modal::Directive { sources, .. }) if self.form_focus == 1 => (sources, 3, false),
-            Some(Modal::Directive { hosts, .. }) if self.form_focus == 2 => (hosts, 3, false),
             Some(Modal::Refine { instruction, .. }) if self.form_focus == 0 => {
                 (instruction, 8000, true)
             }
@@ -527,47 +643,64 @@ impl App {
             .find(|hit| hit.area.contains((x, y).into()))
             .map(|hit| hit.action.clone())
     }
-    pub fn form_fields(&self) -> usize {
-        if matches!(self.modal, Some(Modal::Directive { .. })) {
-            3
-        } else {
-            1
-        }
+    /// Whether a find's pop-up offers Sponsor it: not on the oracle yet, and
+    /// a wallet to sponsor with.
+    pub fn find_sponsorable(&self, find: &crate::research::fund::Find) -> bool {
+        find.on_oracle.is_none() && self.fund.snap.owner.is_some()
     }
-    pub fn command(&self, mcp: bool) -> String {
-        let args = if mcp {
-            vec![
-                self.cli_path.clone(),
-                "mcp".into(),
-                "--agent".into(),
-                self.name.clone(),
-            ]
-        } else {
-            vec![
-                self.cli_path.clone(),
-                "agent".into(),
-                "login".into(),
-                "--name".into(),
-                self.name.clone(),
-            ]
-        };
-        let mut args = args;
-        args.extend([
+
+    pub fn form_fields(&self) -> usize {
+        1
+    }
+    /// What to paste into the agent's terminal: the agent connects itself
+    /// with the command in it, the person approves its code in Connect, and
+    /// it researches from then on.
+    pub fn agent_setup(&self) -> String {
+        format!(
+            "Connect to my Petri oracle research workspace as the agent \"{name}\" and research for it. \
+             Run this command, tell me the pairing code it shows, and once I approve it \
+             in Petri, run it again and follow what it prints. Keep researching until it says \
+             nothing needs research:\n{command}",
+            name = self.name,
+            command = self.command(),
+        )
+    }
+    /// The agent's login command (in agent_setup).
+    pub fn command(&self) -> String {
+        self.agent_command(vec![
+            "agent".into(),
+            "login".into(),
+            "--name".into(),
+            self.name.clone(),
             "--harness".into(),
             Self::HARNESSES[self.harness].into(),
             "--url".into(),
             self.base_url.clone(),
-        ]);
-        if mcp {
-            if self.harness == 1 {
-                return format!(
-                    "[mcp_servers.petri_research]\ncommand = {}\nargs = {}",
-                    serde_json::to_string(&self.node_path).unwrap_or_default(),
-                    serde_json::to_string(&args).unwrap_or_default()
-                );
-            }
-            return serde_json::to_string_pretty(&serde_json::json!({"mcpServers":{"petri-research":{"command":self.node_path,"args":args}}})).unwrap_or_default();
-        }
+        ])
+    }
+    /// What gets a connected agent researching again, pasted into its
+    /// terminal: `work next` and what it prints, until nothing is left.
+    pub fn start_message(&self, agent: &Agent) -> String {
+        format!(
+            "Research for my Petri oracle workspace as the agent \"{name}\". Run this command \
+             and follow what it prints. Keep researching until it says nothing needs research:\n{command}",
+            name = agent.name,
+            command = self.agent_command(vec![
+                "work".into(),
+                "next".into(),
+                "--agent".into(),
+                agent.name.clone(),
+            ]),
+        )
+    }
+    /// What agent `id` is researching right now, if anything.
+    pub fn activity_of(&self, id: &str) -> Option<&Activity> {
+        self.snapshot.activity.iter().find(|a| a.agent_id == id)
+    }
+    /// The agent's research command line with these arguments.
+    fn agent_command(&self, rest: Vec<String>) -> String {
+        let mut args = vec![self.cli_path.clone()];
+        args.extend(rest);
         #[cfg(not(windows))]
         let quote = |value: &str| format!("'{}'", value.replace('\'', "'\"'\"'"));
         #[cfg(windows)]

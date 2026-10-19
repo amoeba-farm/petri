@@ -50,6 +50,11 @@ export function createDatabase(path) {
     ['work','objective_json','TEXT'], ['work','discovery_key','TEXT'],
     ['work','availability','TEXT'], ['work','valid_until','INTEGER'],
     ['work','guidance_json','TEXT'], ['runs','context_json','TEXT'],
+    // The owner's "Research this": focused objectives come first for agents.
+    ['work','focused_at','INTEGER'],
+    // When discovery archived the work because the oracle stopped listing
+    // its series (undone if the series is listed again).
+    ['work','retired_at','INTEGER'],
   ]) if (!db.prepare(`PRAGMA table_info(${table})`).all().some(row => row.name === column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS work_discovery ON work(discovery_key) WHERE discovery_key IS NOT NULL;');
   // An interrupted non-financial registration or submission may be retried explicitly.

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "1e0f20cefc360ddf82365eff55bb2e58ba231252",
+  "sourceCommit": "55a369952131107fce792a063f46d6a3be8b561f",
   "component": "cli",
-  "cliVersion": "0.1.12",
-  "publicationType": "source of the signed petri v0.1.12 release and of ameba-sdk 0.4.0 on npm",
+  "cliVersion": "0.1.13",
+  "publicationType": "source of the signed petri v0.1.13 release and of ameba-sdk 0.4.0 on npm",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
-  "deployedContractSourceCommit": "315cae4d2ab23d0a54dd7a6717503349bb3fd9c4",
-  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from 315cae4d, the oracle from 4caf83f0); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
+  "deployedContractSourceCommit": "c723db776e9d0c639565d89ac761703731b37fb4",
+  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from c723db77, the oracle from 4caf83f0); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
   "retainedPublicLegalFiles": [
     ".gitattributes",
     ".gitignore",
@@ -35,7 +35,7 @@
     },
     {
       "path": "api/API.md",
-      "sha256": "2f448adf45814c1bdb3f539e7cef600d43f34f1e447101136ed3a712030724fb",
+      "sha256": "9bf4898660582eed4efab960f90195607fced5867cb09cba3c45a97a8bcde567",
       "executable": false
     },
     {
@@ -50,17 +50,17 @@
     },
     {
       "path": "cli/AGENTS.md",
-      "sha256": "395ef105d32c50135135e91af045eb854a6faa56c0f4584eec5cb08881a9e144",
+      "sha256": "9d1d22e43a83003286364399dad161cd1a43be72d7d61fc1512c4f9dcb27952e",
       "executable": false
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "d4b8d0b2943f1e2112927b4986145c6d0420b1fcc663cc996fab7e722b879298",
+      "sha256": "580d4333887e77615fc7ea9b3100e973b9c560fb29f5d89540efee374a45dfd2",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "605c59110a4fa6699d3e97834a2c60956276e34fae3812e2ee66a7d0e7cf0f5c",
+      "sha256": "4f70cc1f3a523d1d98c49a579237b11b0129493102d82ddac53d0836b5e2a851",
       "executable": false
     },
     {
@@ -105,7 +105,7 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "963f477218037e1f7cf73c88db7ca946a81d9f14b806234f604a5731b7f32369",
+      "sha256": "8a1f7a50e27f9fe37dc35233d592387253b781bdf061238774fe48fa895f93d2",
       "executable": false
     },
     {
@@ -150,7 +150,7 @@
     },
     {
       "path": "cli/assets/gitbook/docs/developer/01-api.md",
-      "sha256": "5517ca07349fcc53d06a2aad606b0ca2a5f59820f92b0f0eb5192e24f6c1ea36",
+      "sha256": "a3cf86a8b1f336f2dc9d021127a19a29fe2c352c86ec0c56ce464891ef35e53e",
       "executable": false
     },
     {
@@ -245,7 +245,7 @@
     },
     {
       "path": "cli/docs/amoeba-cli-command-guide.md",
-      "sha256": "f2487da6c6791ac60cdb42d79625a5c87ff6905a51c8f24967d4369161828b51",
+      "sha256": "9da5db7886172be3a1394e1de104b375b5e26a4d6b884ae99d02de0d3eb065b0",
       "executable": false
     },
     {
@@ -265,7 +265,7 @@
     },
     {
       "path": "cli/docs/html/source-map.html",
-      "sha256": "34acbb9f42fd559af3340cd54379a532f9bd1b8da3077fc1428d4a9c336c010d",
+      "sha256": "2c64489877912fdee4bf665eeca8d7bdd8b95634bd8a7fdd78d0b81164b2dcc0",
       "executable": false
     },
     {
@@ -280,7 +280,7 @@
     },
     {
       "path": "cli/docs/oracle-research.md",
-      "sha256": "9ef7e0f5eabd49c9ed5377a40fb5e889e112ccb785b9ea6577aa1548ed9eeb30",
+      "sha256": "c4be2595de3b70ad6af1ad7dc45bb551f21ed3f8fda705d274fcf10856f3669c",
       "executable": false
     },
     {
@@ -300,7 +300,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "aa2f9a0a574d65f4acecb2d9e5da46c475f86781878eb2c6ff8b69d3eb46e940",
+      "sha256": "017333dd475ce442495c31c953a577cd6588796e0d9d46f0675af68951711111",
       "executable": false
     },
     {
@@ -315,12 +315,12 @@
     },
     {
       "path": "cli/research/bin/petri.mjs",
-      "sha256": "ed20b10231511eaabbfb809f6c2b3479c4b6adf850ebff757a5fc9ca86fa51cf",
+      "sha256": "70e10cbe66d7c1ee40d43e6cbb28eae186711b190f5fd1a38a8626a226aeb17a",
       "executable": false
     },
     {
       "path": "cli/research/client/agent.mjs",
-      "sha256": "26dd8a68c60fa7fa812bc3941267fcefb9abe276afcd3e06c94af06394b8de70",
+      "sha256": "f0dec8c7593bdd9d5d69f0e1a7596a7edec8bbd6df9f2f7978f15119f11b3378",
       "executable": false
     },
     {
@@ -330,12 +330,12 @@
     },
     {
       "path": "cli/research/client/mcp.mjs",
-      "sha256": "2d0fd8ece9e5516f60883170171d0afaf66f1b766bf1340eca04b7444c9f21cc",
+      "sha256": "973b68fe2a6111fd5fa2b883f09075e6c9044c7048d6d1053273507573abcda5",
       "executable": false
     },
     {
       "path": "cli/research/service/application.mjs",
-      "sha256": "60212b190bdbb5a0ec51c7b8f87f7928a5e9d10f212429ae90b300a2687bbf84",
+      "sha256": "34f62055f7f40002b52df069f6c0ea7b05147ca1f4442fd0c769c3b4dad74e11",
       "executable": false
     },
     {
@@ -345,17 +345,17 @@
     },
     {
       "path": "cli/research/service/coverage-policy.mjs",
-      "sha256": "93707b0b9b80d79d41d7d737539f92c1355dcf5e664198f3f2b2178334b3f7b1",
+      "sha256": "bcd55afff475afa373ea6b52fbd276d999166f44fa1722009e95e5818f010395",
       "executable": false
     },
     {
       "path": "cli/research/service/database.mjs",
-      "sha256": "9dfac2cbd1de3325c5357eada96c5f06381607987f099e2cfbe97c84d6b2e748",
+      "sha256": "8dd1e78072d8f0ba334aa188bd61a0940024f1c7d6a288a7c7006219afc9d57c",
       "executable": false
     },
     {
       "path": "cli/research/service/directive-store.mjs",
-      "sha256": "828ee3051540d3cdd080de3720c2d29cd55c13cb356f701a5111802966fc0444",
+      "sha256": "7426ab21eceb0dc464c664025b6fc97ddd8ba2f6d6f02e1c36cbfcaacbf01c47",
       "executable": false
     },
     {
@@ -380,22 +380,27 @@
     },
     {
       "path": "cli/research/service/upstream.mjs",
-      "sha256": "078fda1b1f854fbd85488c9e2f858f41eb8b7c8237d4d59ff3cbfd94a24f62f7",
+      "sha256": "eb1fc2f3902366fa77ecf8d8fcd3ef60ef5de5e4f83f79c0655aaecde97b21a8",
       "executable": false
     },
     {
       "path": "cli/research/service/work-store.mjs",
-      "sha256": "57f9702939546725bdf204b0381733772a0524b818e991f3fe7a0cb84a14533d",
+      "sha256": "dc4ce4b028be91d2af344b16b82581f2c986da234043094ad9a36c619e0a1da3",
       "executable": false
     },
     {
       "path": "cli/research/test/coverage-fixture.mjs",
-      "sha256": "d13be851788b6feb9f45079d0b6f70f5a47458879204d3847aa71c636a4fc2f6",
+      "sha256": "bb0f6e5aa9605fcd64ba939aa477f36d9d047969d25e10805d9469271e38c9ef",
       "executable": false
     },
     {
       "path": "cli/research/test/discovery.test.mjs",
-      "sha256": "c40828fffdf906ce6752178b20131ecb761757b6198c15a1805df363e498be6d",
+      "sha256": "fdc214ab2a8cf1400ea84827bbc324b7cd5c6afdcc422b542d2532a89f638c0b",
+      "executable": false
+    },
+    {
+      "path": "cli/research/test/feed.test.mjs",
+      "sha256": "a66a4ef08e59834a286564fcaf2bbc926521dc8537a926667128e57edf00c9bb",
       "executable": false
     },
     {
@@ -405,12 +410,12 @@
     },
     {
       "path": "cli/research/test/transport.test.mjs",
-      "sha256": "2d154c37e22302490af6b537b9b9d42f3d4bbfcc790c842ab21e1f3442c9ffff",
+      "sha256": "00707f7346b045ed448192e05b107e40ab8333ca03e164b515d53fba633ff16b",
       "executable": false
     },
     {
       "path": "cli/research/test/workspace.test.mjs",
-      "sha256": "f77b8c55de3fc57889f875ad64aed8a8380ed6cf9a7ed36bcac2e06f1cb01f06",
+      "sha256": "af31032cda1528acf06cd2530b3fb943927f9a09bb3843cd7f3f57098de4f205",
       "executable": false
     },
     {
@@ -450,7 +455,7 @@
     },
     {
       "path": "cli/scripts/check-petri-research.mjs",
-      "sha256": "1b9ea6477aa8811016322a9b7f1038ece264e190b6d1135eb9dc4d499b6eecf9",
+      "sha256": "fa5748176c0c21abb061a411b9d53984d02eb6940013f2b393ae228695755799",
       "executable": false
     },
     {
@@ -485,7 +490,7 @@
     },
     {
       "path": "cli/scripts/install-dev.sh",
-      "sha256": "5b585728e7c84b89513be205074b125b50afc544be150bad4ab196959b38fc32",
+      "sha256": "2c856ae48addc40d50b1a95b317fb055d4b91a2028e7f02e42bfc7e0479a952c",
       "executable": true
     },
     {
@@ -620,7 +625,7 @@
     },
     {
       "path": "cli/src/futures/market.rs",
-      "sha256": "a8938c29afc5fc7ddb1c91b5e66ccaee1a4376695a5141454fde31a46e2207d3",
+      "sha256": "17e566df5c3ec0b4def638131ea721b5a2504ad042fa9cb072e6ae171159c08c",
       "executable": false
     },
     {
@@ -630,7 +635,7 @@
     },
     {
       "path": "cli/src/futures/ops.rs",
-      "sha256": "6d4f80db9c0d6789144d1edb953de218b2dec5ad12d1c11f590b33783a1b731b",
+      "sha256": "771367c3d8a56d26388d726a8ecbb42ee31ab130b2e6999d276f6719d5ac4a84",
       "executable": false
     },
     {
@@ -640,12 +645,12 @@
     },
     {
       "path": "cli/src/futures/rpc.rs",
-      "sha256": "598bbde13a224dbf0206e75c89c16dafb1110c321001dbe7aa5dd0eb7759f358",
+      "sha256": "e09f98d747689ca63bd8f453f7fa228676c14431622404be30c9b894b5126b2b",
       "executable": false
     },
     {
       "path": "cli/src/futures/settings.rs",
-      "sha256": "d5a2525ba11012f8082db2a0982d5e1d6a37bdce66ab62121dfa1c744eb1e4f9",
+      "sha256": "3121794ba72c710243f5109d74f0af6fbdcce8b99f6804348bcdad91b60f8956",
       "executable": false
     },
     {
@@ -670,7 +675,7 @@
     },
     {
       "path": "cli/src/futures/view.rs",
-      "sha256": "a848e2fe55439910aa5c9090f360ba63f4a02dc0e7bb3eeac644abd5c3595b78",
+      "sha256": "75d5abeb459a5f959aa10197f04d6cca8139ba4ea044e700b4380486f1b876f8",
       "executable": false
     },
     {
@@ -695,7 +700,7 @@
     },
     {
       "path": "cli/src/mcp_setup.rs",
-      "sha256": "70e2e380dc5e5307b0ef814ffcc58ca3e41ee97825149036148e7efd4af12561",
+      "sha256": "25ba43d66ff342a5ea19fe71585a419f25e6c87fd859371611e48b617ed5b223",
       "executable": false
     },
     {
@@ -705,12 +710,12 @@
     },
     {
       "path": "cli/src/oracle/args.rs",
-      "sha256": "80f618167e06cc24a78de068e448da80318fd05bad99821bf189a537578b7b55",
+      "sha256": "3ae14cf878a2795050311f380531d749a1f4a56a3a7eb312e004ed1168633790",
       "executable": false
     },
     {
       "path": "cli/src/oracle/chain.rs",
-      "sha256": "31f530652613c6c1535d5a52bc04726b1664506427bd063cfecae872b8d734eb",
+      "sha256": "0d3def67516df054a2ad10f81407beefb548eed603eac28afaa62e40a15a69ca",
       "executable": false
     },
     {
@@ -730,17 +735,22 @@
     },
     {
       "path": "cli/src/oracle/mod.rs",
-      "sha256": "c01813884aacd9daf0421305cd7c120b5c1571dc186df66573095cb3dc59d94c",
+      "sha256": "0b3829cda70f38ec3fd35df917834b8403ffbb98fa6d9e372a4a721c4226f183",
       "executable": false
     },
     {
       "path": "cli/src/oracle/reads.rs",
-      "sha256": "de8f657b6269fd0a43c5e2f39c9101ae02a13a34ae30587149a12f8bfb60d9bd",
+      "sha256": "5f925f8f039cee38ecb65182bf6dd64d7f57ddaa31f2d2dff1cde6605886e43d",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/rewards.rs",
+      "sha256": "d69b0017d78a1cecf0aa2c3de3e5608d46ccf5c2eade444926aff090b5131ae4",
       "executable": false
     },
     {
       "path": "cli/src/oracle/send.rs",
-      "sha256": "9b0355f61b1636b680f44fb5c05257544837e9ede9829f6daf1bd962bd0015aa",
+      "sha256": "ab59b644c2c00ea311f4bce8d3d5c0f1cb3938451199648830069ddfb90fb649",
       "executable": false
     },
     {
@@ -749,13 +759,18 @@
       "executable": false
     },
     {
+      "path": "cli/src/oracle/sponsor.rs",
+      "sha256": "66b82041ae66fcdd727d8a784658fabb7270f1080eeec298bbcedccf28c03584",
+      "executable": false
+    },
+    {
       "path": "cli/src/oracle/writes.rs",
-      "sha256": "0cde723dcf65640eeba9834448f81015d20dced0fe9b41f6a531842650dac118",
+      "sha256": "b14a2d19fb5e1803a4062e22d57da992a1c4f6539532ad181f90513623ba47a0",
       "executable": false
     },
     {
       "path": "cli/src/petri_config.rs",
-      "sha256": "d15f6081ac0d1f74328c0322878a4155ca05ff25eb30f712c477afc3d44752f6",
+      "sha256": "c6dfe818eef5e43c2ac708ca2abbc77765286560df3a43414c88dbf89c6cbece",
       "executable": false
     },
     {
@@ -784,43 +799,68 @@
       "executable": false
     },
     {
+      "path": "cli/src/research/fund.rs",
+      "sha256": "e0f6692046b73618c2bb2a9b343b0ff7119737b13eac88bfc0842fd50c081cac",
+      "executable": false
+    },
+    {
       "path": "cli/src/research/http.rs",
-      "sha256": "56049af88df61731705d489421c2ef229ffa6d2e67a4682c499ffe17f803e98a",
+      "sha256": "df0ef5cc1598615226c2834f3f8488f1088c61b98ba17f1b47988af15197939d",
       "executable": false
     },
     {
       "path": "cli/src/research/input.rs",
-      "sha256": "ec250e6c5815eb25ede178616ad5c1a1ecaafa91d2e2729739e365c1184eaaec",
+      "sha256": "6f99b1ed6286c9eab9e246e3fdf780dfe5337350948d76fec80ff9a7583d5e66",
       "executable": false
     },
     {
       "path": "cli/src/research/markets.rs",
-      "sha256": "0c864d8bfc2049645eb95cee78c4cc4ed98a86b304918988fdca645478fde7f2",
+      "sha256": "d3196833184d1e9caad20bcf903380db604498b1f141e49916b48ff0b988e9d9",
       "executable": false
     },
     {
       "path": "cli/src/research/mod.rs",
-      "sha256": "c6d0b7d495b1a61dadb0efce8a7f3b88ba3d6dd44af9d1b7248ddd8434acf902",
+      "sha256": "cd0aca7dbe484a92ceb2cf89378bfdbf9bec3e8d6c670c267e3b22116b844e02",
       "executable": false
     },
     {
       "path": "cli/src/research/model.rs",
-      "sha256": "ee3ace74964d9519a8e31f56fe4ba378c2a5aa3ddba79a7b6ea8178fefb4ef85",
+      "sha256": "73bed88db21261519aa0299bffdfada0565f3796c6dd120a264f0286660bea55",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/nav.rs",
+      "sha256": "b5792c6ac61cf22f18760c91097dc2b6320faf07a15c1c22968c252b340e242e",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/phase.rs",
+      "sha256": "3c3c6b282ae3af95d4748b63cea0683b44c05fe79424a865f58e63a5f383299f",
       "executable": false
     },
     {
       "path": "cli/src/research/render.rs",
-      "sha256": "9ac1e8c94680c07ef608660497d15c1d1b1cc13a462f213d445d26303bd4d60c",
+      "sha256": "8838cf34fcaf22ea5354668b27d299a12e02348f336d68b19620cd96d8107b6e",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/research_page.rs",
+      "sha256": "794cf100dd98fcacb0d497a76553e001ffc78b5294222707a8bbdb42380e2176",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/rewards.rs",
+      "sha256": "6179bc9f7260ff9c4b3a817a0294597e80c2f5296d316369621838159bfb41fb",
       "executable": false
     },
     {
       "path": "cli/src/research/runtime.rs",
-      "sha256": "a3359f77cd60490a538ab085a3bd40e28174b995408b6f96ca2328f0bbb7e5ed",
+      "sha256": "bd596fb127217d25e112d15e3d7df1cb7a8cf5cc231a66c6713eb8271bebe214",
       "executable": false
     },
     {
       "path": "cli/src/research/tests.rs",
-      "sha256": "7756115d9a042e290afe0f7cf24d24b31ef088b7f7510b00f7b3bbe095988892",
+      "sha256": "7497002eb2363c6fcedafdd984fc9efd65ee3cd9f4ca5a23b430d73b9a5f5cc8",
       "executable": false
     },
     {
@@ -830,7 +870,7 @@
     },
     {
       "path": "cli/src/solana_config.rs",
-      "sha256": "9ba8a4ecfb804884fd674cadee33aec948780508f48ebe6545ccb2bba215b9c4",
+      "sha256": "f0f8233862ffa5be3d09f4c280f93422f9dab892629ebf008180fe261a289087",
       "executable": false
     },
     {
@@ -845,7 +885,7 @@
     },
     {
       "path": "cli/src/wallet_terms.rs",
-      "sha256": "45b8fc20db75c980e1b576e4f1750d764a50f4a6882c7802a27dc4d40360a209",
+      "sha256": "3175867fa80aa6269b6831b6588ab3b42b1b6120e4ce2ad395794b3944f29197",
       "executable": false
     },
     {
@@ -861,6 +901,11 @@
     {
       "path": "cli/tests/dependency_crypto_compat.rs",
       "sha256": "94061070b8171f90494bf17fad9b80c2f96bd4a7576a08389a318b55d0b4b180",
+      "executable": false
+    },
+    {
+      "path": "cli/tests/wallet_new.rs",
+      "sha256": "d87a625879e0023bb45dc1f69e493c9835fc009a44a11a354c6677b48b9c5053",
       "executable": false
     },
     {
@@ -1015,7 +1060,7 @@
     },
     {
       "path": "futures/crates/futures-client/src/lib.rs",
-      "sha256": "b761778d85fb513e3ee8bb1275b65e025b8a7779619e9854229b5ae40a1b8a1e",
+      "sha256": "c135bdb5c652b78a65e97ed1418d68b5df60476019c23724b92da9076cf15eb2",
       "executable": false
     },
     {
@@ -1080,17 +1125,17 @@
     },
     {
       "path": "futures/docs/futures.md",
-      "sha256": "debe0b59341baf392af819cf3c2b017d885ead7502719b53190d9028a31aae39",
+      "sha256": "99def9bafca2051496d8bcecb5447f1c2f9ea17f84899848f47ffec9d0ba6160",
       "executable": false
     },
     {
       "path": "futures/docs/interfaces.md",
-      "sha256": "7e3d78f62bcd586c838eaabbed94d7ac2013822b6f103ce770c03ed513ec52f4",
+      "sha256": "65b4c930176be62a16d1bd0c2fd8a031bb7550a092443e471638d06a265d79e9",
       "executable": false
     },
     {
       "path": "futures/programs/futures/Cargo.toml",
-      "sha256": "99f0833cb7dceccb581e5c0ed723f85fd5f86cec5c33b56cb22c55f2b0fe6e64",
+      "sha256": "04a02cdd7d870742312671c51a5a153bc807c2fc93b2b670ea9d956ddf921c17",
       "executable": false
     },
     {
@@ -1100,17 +1145,22 @@
     },
     {
       "path": "futures/programs/futures/src/lib.rs",
-      "sha256": "4d71a8544fcbe50e9d44126e1263324c3712ab6699a3bb6609f432fc30ed4268",
+      "sha256": "0f3fcb4ec9d1cf3aeae6a6ab26972ffc293e6cd425e438d4809060db4da79809",
+      "executable": false
+    },
+    {
+      "path": "futures/programs/futures/src/price_source.rs",
+      "sha256": "bb69f56d43c42568f13d5e5dc6229c3139ec138faf70ca80bba7860485ad5f73",
       "executable": false
     },
     {
       "path": "futures/programs/futures/src/processor.rs",
-      "sha256": "4b3c0092ada67316e41fee43c4130832a123453eab0dfd87c97ab8bbed959920",
+      "sha256": "8cb9cc9e95f333b3da2c393bedbc4378ba0c1b4a37a2622cdad8278199e3a747",
       "executable": false
     },
     {
       "path": "futures/programs/futures/src/state.rs",
-      "sha256": "ef35cdd6d6e698ffb809132e4e3f7c4b7e3314e263bd42083e3e917282ab142b",
+      "sha256": "236ee5cca33f00ffda44507963ce6e48d00e3e142dd818292779e308ec15bbe0",
       "executable": false
     },
     {
@@ -2435,7 +2485,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/sponsorship/custody.rs",
-      "sha256": "482e1d210c3fb4d7b79327d6607c836b0afb6ff4713823a9dcb5daba3374c6a4",
+      "sha256": "4a6f498509a50bf90cbc6c004ac7ca4800bbfe1ae8882b2ab5781ef6037f139d",
       "executable": false
     },
     {
@@ -2550,7 +2600,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/sponsorship.rs",
-      "sha256": "95907dfb7833c59ec32474fe216e9317c05f43014970217bbe0744483e966904",
+      "sha256": "2067ffe9f4219e9ab78a24bd6f98ad0f79626e1cdfc4550abe736b989df4509e",
       "executable": false
     },
     {
@@ -2660,7 +2710,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/common/settle.rs",
-      "sha256": "a662a5ff532ce51bf33ae9a5c577241f6853d4359594fbeab754a4b567e61620",
+      "sha256": "0da3e47ebce56195f9b350f0762b308a96c436c1c95c7baf73c277fd870d01f5",
       "executable": false
     },
     {
@@ -2800,7 +2850,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/sponsorship.rs",
-      "sha256": "6bf439639e41514e4b4b6cfedff91dc6ce050745755aeb8333b927c53f3e659a",
+      "sha256": "82c39348a2b751fa74803aa5693141475dcbe53a041634db7861e83794591186",
       "executable": false
     },
     {
@@ -2815,7 +2865,7 @@
     },
     {
       "path": "scripts/check.sh",
-      "sha256": "49baf4fbebe018308ce601c906547c0cc409cdac30f342d636e965a6a37baaa6",
+      "sha256": "c49478ca56705aaff4752e9fa8a0b6b951e1622a2507a5dddfc345ff9c860ae4",
       "executable": true
     },
     {
@@ -3075,22 +3125,22 @@
     },
     {
       "path": "sdk/dist/futures/program.d.ts",
-      "sha256": "d3245d9458d9ec1019f7108014408a976f640937e19fcf7f2c98a0912248efa9",
+      "sha256": "569dd10bd7e66b02f2f9395a197855b2c1fd056e88207bf19d004b79a77a7951",
       "executable": false
     },
     {
       "path": "sdk/dist/futures/program.d.ts.map",
-      "sha256": "05874f70d09552b2fac02240857a59ee281d0df6b1fd8dc89d5801760ca5ec96",
+      "sha256": "eab59f09020c0c01fd9f9813fc1becd0fd7895fd0e30639fb164f2599858d061",
       "executable": false
     },
     {
       "path": "sdk/dist/futures/program.js",
-      "sha256": "81bd9a913787997835a45d8ec96f68b143c9466853deccf64cee67330d8c67fb",
+      "sha256": "aa447afbaf16444bb635ba23a18570b96dfef3fe1bf1d6029fc88898d14fce6f",
       "executable": false
     },
     {
       "path": "sdk/dist/futures/program.js.map",
-      "sha256": "3c7031d295ca02f349bedc9b6c6de02b2ea99bddf9fcb413270427b876d1a1f2",
+      "sha256": "b061f3fea830707c14cdd422dda8f48a30198d7f7764e910e5552d4cce6ce42c",
       "executable": false
     },
     {
@@ -3210,7 +3260,7 @@
     },
     {
       "path": "sdk/src/futures/program.ts",
-      "sha256": "d1aa55486435908a97029b1786d2a172ae7cec5320e9e7280fe122329073f7c2",
+      "sha256": "a3392f9053704a12c1714a0e13f5a96615b38051dd6a50440ce71fb793f3d0d5",
       "executable": false
     },
     {
@@ -3230,7 +3280,7 @@
     },
     {
       "path": "sdk/test/fixtures/futures/futures.json",
-      "sha256": "1b356096fe6d94a5053d4db131e484babdeb8ca2d1e137d96e2f30ffede95134",
+      "sha256": "dee0d6e1e362960c50cf10182bda8bb189a020c5bbb327e45bf71d55ddd1a79e",
       "executable": false
     },
     {
@@ -3250,7 +3300,7 @@
     },
     {
       "path": "sdk/test/futures-vectors.test.mjs",
-      "sha256": "c1441e93046e20d257511534340e9272c4793b0df7b3855d51c39460bda76d12",
+      "sha256": "3cbd7b1eea7f339c59007fbe5712936e01928e90eedf65af8e8d334d2cc4dd33",
       "executable": false
     },
     {
@@ -3265,7 +3315,7 @@
     },
     {
       "path": "sdk/tools/futures-vectors/src/main.rs",
-      "sha256": "ea963d0f6c1544f166097a1e4fedf1da960bb597aae68fc79101ed8f52b98601",
+      "sha256": "9c0ae17a99486632ebae5fa3e953af9cedf30c0c36639aad3ef1a4a46fa57d33",
       "executable": false
     },
     {
@@ -3276,6 +3326,6 @@
   ],
   "lineEndingQualification": "0 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.0",
-  "sourceRelease": "1e0f20ce",
+  "sourceRelease": "release/2026-10-19-oracle-months",
   "deployedOracleSourceCommit": "4caf83f080f7541b1f741e63871c8d701b398e9b"
 }

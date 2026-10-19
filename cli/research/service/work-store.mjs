@@ -5,6 +5,7 @@ const job = (row, now) => row && ({ id: row.id, title: row.title, brief: row.bri
   archivedAt: row.archived_at, candidateScope: row.scope_json ? JSON.parse(row.scope_json) : null,
   objective: row.objective_json ? JSON.parse(row.objective_json) : null,
   guidance: row.guidance_json ? JSON.parse(row.guidance_json) : null,
+  focused: row.focused_at != null,
   availability: row.discovery_key && row.availability === 'available' && row.valid_until <= now ? 'unknown' : row.availability || 'available' });
 const runView = row => ({ id: row.id, workId: row.work_id, title: row.title, agentId: row.agent_id,
   sessionId: row.session_id, createdAt: row.created_at, finishedAt: row.finished_at, summary: row.summary,
@@ -14,7 +15,48 @@ const sessionView = row => ({ id: row.id, agentId: row.agent_id, harness: row.ha
 const eventView = row => ({ sequence: row.seq, runId: row.run_id, actor: row.actor, kind: row.kind,
   message: row.message, referenceUrl: row.reference_url, createdAt: row.created_at });
 
+// What an agent reports as it works, one short line each: the owner's live
+// feed in the TUI. search: the query; read: a page it opened (its URL);
+// value: a value read off a page; submit: a petri write it made.
+export const REPORT_KINDS = ['search', 'read', 'value', 'submit', 'note', 'source_found', 'blocked'];
+
+// An agent counts as researching for the owner's view while it has checked in
+// this recently: a display rule (the TUI's "researching"), never a limit on agents.
+const ACTIVE_MS = 20 * 60000;
+
+// How much of its targets a gap still lacks, 0 to 1 (the TUI's temperature).
+function need(work) {
+  const o = work.objective; if (!o?.targets) return 0;
+  const earns = atoms => BigInt(/^\d+$/u.test(atoms ?? '') ? atoms : '0') > 0n ? 0.5 : 0;
+  // An update earns from its month's remaining rewards, an opening from its
+  // product's opening budget, if any.
+  if (o.kind === 'update') return earns(o.rewardsRemainingAtomic);
+  if (o.kind === 'opening') return earns(o.openingBudgetAtomic);
+  if (o.kind === 'claims') return 1;
+  const short = (have, want) => want > 0 ? Math.min(1, Math.max(0, (want - (have || 0)) / want)) : 0;
+  return Math.max(short(o.activeSources, o.targets.activeSources), typeof o.distinctHosts === 'number' ? short(o.distinctHosts, o.targets.distinctHosts) : 0);
+}
+
 export function createWorkStore(db, clock = Date.now) {
+  // What the owner chose to research first, then the newest.
+  const listWork = (includeArchived = false, includeUnavailable = false) => db.all(`SELECT * FROM work ${includeArchived ? '' : 'WHERE archived_at IS NULL'} ORDER BY focused_at IS NULL, focused_at DESC, created_at DESC LIMIT 5000`)
+    .map(row => job(row, clock())).filter(row => includeUnavailable || row.availability === 'available').slice(0, 200);
+  // Each agent's newest open run, while its agent is still checking in.
+  function activeRuns() {
+    // A run outlives its session (a new session resumes it): the agent's
+    // newest open session says whether it is still at work.
+    return db.all(`SELECT runs.id,runs.work_id,runs.agent_id,runs.created_at,work.title,seen.heartbeat_at FROM runs
+      JOIN work ON work.id=runs.work_id
+      JOIN (SELECT agent_id,max(heartbeat_at) AS heartbeat_at FROM sessions WHERE closed_at IS NULL GROUP BY agent_id) AS seen ON seen.agent_id=runs.agent_id
+      WHERE runs.finished_at IS NULL AND seen.heartbeat_at>=?
+      ORDER BY runs.created_at DESC`, clock() - ACTIVE_MS)
+      .filter((row, index, rows) => rows.findIndex(other => other.agent_id === row.agent_id) === index)
+      .map(row => {
+        const last = db.get("SELECT message,created_at FROM events WHERE run_id=? AND actor='agent' ORDER BY seq DESC LIMIT 1", row.id);
+        return { agentId: row.agent_id, workId: row.work_id, runId: row.id, title: row.title, startedAt: row.created_at,
+          lastSeenAt: row.heartbeat_at, lastMessage: last?.message ?? null };
+      });
+  }
   function session(agentId, id) {
     const value = db.get('SELECT * FROM sessions WHERE id=? AND agent_id=? AND closed_at IS NULL', id, agentId);
     if (!value || value.heartbeat_at < clock() - 12 * 3600000 || value.created_at < clock() - 7 * 86400000) throw fail('SESSION_EXPIRED', 'Open a new agent session.', 401);
@@ -30,12 +72,78 @@ export function createWorkStore(db, clock = Date.now) {
     db.run('INSERT INTO events(run_id,actor,kind,message,reference_url,created_at,client_key) VALUES (?,?,?,?,?,?,?)',
       runId, actor, kind, message, reference, clock(), clientKey);
   }
+  // A new run opens with the run's work and the owner's directive for it, if any.
+  function started(runId, work) {
+    addEvent(runId, 'petri', 'run_started', `Started: ${work.title}`);
+    if (work.guidance?.instruction) addEvent(runId, 'owner', 'directive', work.guidance.instruction);
+  }
   return {
-    listWork: (includeArchived = false, includeUnavailable = false) => db.all(`SELECT * FROM work ${includeArchived ? '' : 'WHERE archived_at IS NULL'} ORDER BY created_at DESC LIMIT 5000`)
-      .map(row => job(row, clock())).filter(row => includeUnavailable || row.availability === 'available').slice(0, 200),
+    listWork,
+    activeRuns,
+    // The agent's next research run: the owner's picks first, then what
+    // needs the most, skipping what another agent is on while others are
+    // open. It resumes the agent's open run on the same work and closes its
+    // other open runs, so one agent researches one thing at a time.
+    next(agent, body) {
+      return db.atomic(() => {
+        const current = session(agent.id, body.sessionId);
+        const others = new Set(activeRuns().filter(run => run.agentId !== agent.id).map(run => run.workId));
+        const open = db.all('SELECT runs.*,work.title FROM runs JOIN work ON work.id=runs.work_id WHERE agent_id=? AND finished_at IS NULL ORDER BY runs.created_at DESC', agent.id);
+        // An opening or update stakes the owner's USDC: one that earns nothing
+        // (no rewards for it this month) comes up only when the owner picked it.
+        const staked = item => item.objective.kind === 'update' || item.objective.kind === 'opening';
+        // A month's claims come up once the workspace worked on that month,
+        // until a run on them finishes (again when the owner picks them).
+        const month = scope => scope && `${scope.marketId}:${scope.expiryId}`;
+        const worked = new Set(db.all('SELECT DISTINCT work.scope_json FROM runs JOIN work ON work.id=runs.work_id')
+          .map(row => month(row.scope_json ? JSON.parse(row.scope_json) : null)));
+        const due = item => {
+          if (item.objective.kind !== 'claims') return true;
+          const done = db.get('SELECT max(finished_at) AS t FROM runs WHERE work_id=?', item.id).t;
+          const picked = db.get('SELECT focused_at FROM work WHERE id=?', item.id).focused_at;
+          return worked.has(month(item.candidateScope)) && (done == null || picked != null && picked > done);
+        };
+        const work = listWork().filter(item => item.objective && (!staked(item) || item.focused || need(item) > 0) && due(item));
+        // Openings first after the owner's picks: the Opening lasts a day,
+        // and a source with no opening value by listing sits out the month.
+        const opening = item => item.objective.kind === 'opening' ? 1 : 0;
+        const ranked = work.map((item, index) => ({ item, index }))
+          .sort((a, b) => (b.item.focused - a.item.focused) || (opening(b.item) - opening(a.item)) || (need(b.item) - need(a.item)) || (a.index - b.index)).map(entry => entry.item);
+        const free = ranked.filter(item => !others.has(item.id));
+        const top = (free.length ? free : ranked)[0];
+        const resume = open.find(run => run.work_id === top?.id) || (!top?.focused && open.find(run => ranked.some(item => item.id === run.work_id)));
+        const chosen = resume ? ranked.find(item => item.id === resume.work_id) : top;
+        for (const run of open) if (run.id !== resume?.id) {
+          const summary = chosen ? `Moved on to ${chosen.title}.` : 'Nothing left to research.';
+          db.run('UPDATE runs SET finished_at=?,summary=? WHERE id=?', clock(), summary, run.id);
+          addEvent(run.id, 'petri', 'run_finished', summary);
+        }
+        if (!chosen) return { status: 'idle' };
+        if (resume) return { status: 'assigned', resumed: true, run: runView(ownedRun(agent.id, resume.id)), assignment: chosen };
+        const id = randomUUID();
+        db.run('INSERT INTO runs(id,work_id,agent_id,session_id,client_key,created_at,finished_at,summary,context_json) VALUES (?,?,?,?,?,?,NULL,NULL,?)',
+          id, chosen.id, agent.id, current.id, `next:${id}`, clock(), JSON.stringify(chosen));
+        started(id, chosen);
+        return { status: 'assigned', resumed: false, run: runView(ownedRun(agent.id, id)), assignment: chosen };
+      });
+    },
+    // The owner's new directive for a work item, in the feed of every agent
+    // on it as it is set (a run that starts later opens with it).
+    directed(workId, instruction) {
+      for (const run of db.all('SELECT id FROM runs WHERE work_id=? AND finished_at IS NULL', workId)) addEvent(run.id, 'owner', 'directive', instruction || 'Directive cleared.');
+    },
+    // The owner's "Research this" (or its undoing). Agents may still take any
+    // objective; focused ones come first in their list.
+    focusWork(id, focused) {
+      if (typeof focused !== 'boolean') throw fail('INVALID_INPUT', 'Say whether to focus this objective.');
+      if (!db.get('SELECT id FROM work WHERE id=? AND archived_at IS NULL', id)) throw fail('WORK_NOT_FOUND', 'Choose a discovered coverage gap.', 404);
+      db.run('UPDATE work SET focused_at=? WHERE id=?', focused ? clock() : null, id);
+      return focused;
+    },
     archiveWork(id) {
       if (!db.get('SELECT id FROM work WHERE id=?', id)) throw fail('WORK_NOT_FOUND', 'Assignment not found.', 404);
-      db.run('UPDATE work SET archived_at=coalesce(archived_at,?) WHERE id=?', clock(), id);
+      // The owner's archive stays, whatever discovery sees later.
+      db.run('UPDATE work SET archived_at=coalesce(archived_at,?),retired_at=NULL WHERE id=?', clock(), id);
     },
     openSession(agent, harness) {
       const id = randomUUID(), now = clock(); harness = text(harness || agent.harness, 60, 'harness name');
@@ -59,7 +167,7 @@ export function createWorkStore(db, clock = Date.now) {
         const id = randomUUID();
         db.run('INSERT INTO runs(id,work_id,agent_id,session_id,client_key,created_at,finished_at,summary,context_json) VALUES (?,?,?,?,?,?,NULL,NULL,?)',
           id, work.id, agent.id, body.sessionId, clientKey, clock(), JSON.stringify(job(work, clock())));
-        addEvent(id, 'petri', 'run_started', `Started: ${work.title}`);
+        started(id, job(work, clock()));
         return { ...runView(ownedRun(agent.id, id)), assignment: job(work, clock()) };
       });
     },
@@ -67,8 +175,9 @@ export function createWorkStore(db, clock = Date.now) {
       return db.atomic(() => {
         session(agent.id, body.sessionId); const run = ownedRun(agent.id, runId);
         const message = text(body.message, 4000, 'progress message'), clientKey = text(body.clientKey, 80, 'request key');
-        if (!['note', 'source_found', 'blocked'].includes(body.kind)) throw fail('INVALID_EVENT', 'Report a note, source_found, or blocked event.');
+        if (!REPORT_KINDS.includes(body.kind)) throw fail('INVALID_EVENT', `Report one of: ${REPORT_KINDS.join(', ')}.`);
         let reference = body.referenceUrl || null;
+        if (body.kind === 'read' && !reference) throw fail('INVALID_REFERENCE', 'Give the page you read as a public HTTPS reference.');
         if (reference) { reference = text(reference, 1024, 'source URL'); let url; try { url = new URL(reference); } catch { throw fail('INVALID_REFERENCE', 'Use a public HTTPS reference.'); }
           if (url.protocol !== 'https:' || url.username || url.password) throw fail('INVALID_REFERENCE', 'Use an HTTPS reference without credentials.'); }
         const previous = db.get('SELECT * FROM events WHERE run_id=? AND client_key=?', runId, clientKey);
@@ -126,6 +235,9 @@ export function createWorkStore(db, clock = Date.now) {
       });
     },
     failSubmission(id) { db.run("UPDATE submissions SET status='retryable' WHERE id=? AND status='pending'", id); },
+    // The agent's page in the TUI: its runs and its newest events, oldest
+    // first (its own reports, petri's run events, the backend's and the owner's
+    // directives). 300 events hold the current run's feed and several before it.
     snapshot(agentId) {
       return {
         sessions: db.all('SELECT * FROM sessions WHERE agent_id=? ORDER BY created_at DESC LIMIT 20', agentId).map(sessionView),

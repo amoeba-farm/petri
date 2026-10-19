@@ -10,11 +10,25 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
             MouseEventKind::Down(MouseButton::Left) => return app.hit(mouse.column, mouse.row),
             MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
                 let down = mouse.kind == MouseEventKind::ScrollDown;
-                if app.modal.is_none() && app.sidebar.contains((mouse.column, mouse.row).into()) {
+                let at = (mouse.column, mouse.row).into();
+                if app.modal.is_none() && app.sidebar.contains(at) {
                     app.agent_scroll = if down {
                         app.agent_scroll.saturating_add(1)
                     } else {
                         app.agent_scroll.saturating_sub(1)
+                    };
+                } else if app.modal.is_none()
+                    && app.view == View::Activity
+                    && app.feed_area.contains(at)
+                {
+                    // The feed keeps its newest in view until scrolled up.
+                    let max = app.feed_max;
+                    let nav = app.nav_mut();
+                    let top = nav.feed_top.unwrap_or(max).min(max);
+                    nav.feed_top = if down {
+                        Some(top + 3).filter(|t| *t < max)
+                    } else {
+                        Some(top.saturating_sub(3)).filter(|_| max > 0)
                     };
                 } else {
                     app.scroll = if down {
@@ -32,21 +46,50 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
                 return Some(Action::Quit);
             }
             if app.modal.is_some() {
-                if matches!(app.modal, Some(Modal::Revoke(_) | Modal::Assignment(_))) {
+                if matches!(app.modal, Some(Modal::Harness)) {
+                    let n = App::HARNESSES.len();
+                    match key.code {
+                        KeyCode::Up | KeyCode::BackTab => app.harness = (app.harness + n - 1) % n,
+                        KeyCode::Down | KeyCode::Tab => app.harness = (app.harness + 1) % n,
+                        KeyCode::Enter | KeyCode::Esc => return Some(Action::Cancel),
+                        _ => {}
+                    }
+                    return None;
+                }
+                if let Some(Modal::Find(find)) = &app.modal {
+                    // Sponsor it (when it can be), Close.
+                    let sponsor = app
+                        .find_sponsorable(find)
+                        .then(|| find.content_hash.clone());
+                    let controls = if sponsor.is_some() { 2 } else { 1 };
                     match key.code {
                         KeyCode::Esc => return Some(Action::Cancel),
-                        KeyCode::Tab | KeyCode::BackTab => {
-                            app.form_focus = (app.form_focus + 1) % 2
+                        KeyCode::Tab => app.form_focus = (app.form_focus + 1) % controls,
+                        KeyCode::BackTab => {
+                            app.form_focus = (app.form_focus + controls - 1) % controls
+                        }
+                        KeyCode::Enter => {
+                            return Some(match sponsor {
+                                Some(hash) if app.form_focus == 0 => Action::Sponsor(hash),
+                                _ => Action::Cancel,
+                            });
+                        }
+                        _ => {}
+                    }
+                    return None;
+                }
+                if matches!(app.modal, Some(Modal::Revoke(_))) {
+                    let controls = 2;
+                    match key.code {
+                        KeyCode::Esc => return Some(Action::Cancel),
+                        KeyCode::Tab => app.form_focus = (app.form_focus + 1) % controls,
+                        KeyCode::BackTab => {
+                            app.form_focus = (app.form_focus + controls - 1) % controls
                         }
                         KeyCode::Enter => {
                             return Some(match &app.modal {
                                 Some(Modal::Revoke(agent)) if app.form_focus == 0 => {
                                     Action::ConfirmRevoke(agent.id.clone())
-                                }
-                                Some(Modal::Assignment(work))
-                                    if app.form_focus == 0 && !work.objective.is_null() =>
-                                {
-                                    Action::Refine(work.id.clone())
                                 }
                                 _ => Action::Cancel,
                             });
@@ -66,9 +109,6 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
                         return Some(Action::Save);
                     }
                     KeyCode::Enter => {
-                        if matches!(app.modal, Some(Modal::Assignment(_))) {
-                            return Some(Action::Cancel);
-                        }
                         if let Some(Modal::Revoke(agent)) = &app.modal {
                             return Some(if app.form_focus == 0 {
                                 Action::ConfirmRevoke(agent.id.clone())
@@ -102,6 +142,10 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
                 }
                 return None;
             }
+            if app.view == View::Fund && app.fund.ticket.is_some() {
+                app.fund.key(key);
+                return None;
+            }
             if app.view == View::Markets {
                 if app.markets.ticket.is_some() {
                     if key.code == KeyCode::Char('q')
@@ -126,8 +170,16 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
                 KeyCode::Char('a') => return Some(Action::View(View::Activity)),
                 KeyCode::Char('e') => return Some(Action::View(View::Evidence)),
                 KeyCode::Char('r') => return Some(Action::View(View::Rewards)),
-                KeyCode::Char('n') => return Some(Action::NewDirective),
+                KeyCode::Char('f') => return Some(Action::View(View::Fund)),
+                KeyCode::Char('n') => return Some(Action::NewAgent),
                 KeyCode::Char('R') => return Some(Action::Refresh),
+                // Research's navigator: one level up.
+                KeyCode::Backspace if app.view == View::Activity => {
+                    let path = app.nav().path;
+                    if path.depth() > 0 {
+                        return Some(Action::Nav(path.up()));
+                    }
+                }
                 KeyCode::Tab if !app.hits.is_empty() => {
                     app.focus = (app.focus + 1) % app.hits.len()
                 }

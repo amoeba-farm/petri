@@ -409,6 +409,7 @@ test("futures error names match the client", () => {
   for (const c of v.errors) assert.equal(futuresErrorName(c.code), c.name, String(c.code));
   assert.equal(ERROR_CODES.MinFill, 0x46520012);
   assert.equal(ERROR_CODES.VaultCapacity, 0x46520000 + 31);
+  assert.equal(ERROR_CODES.NeedsRecovery, 0x46520000 + 33);
   assert.equal(transactionErrorName(0x46520007), "InsufficientFunds");
   assert.equal(transactionErrorName(3108), "GovernanceGateFrozen");
   assert.equal(transactionErrorName(7), null);

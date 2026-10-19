@@ -18,6 +18,37 @@ function host(source) {
   catch { return null; }
 }
 
+// Sources that hold a product's place while a month forms (proposed,
+// frozen, opening or live), against those that lost it.
+const placed = new Set(['Candidate','Frozen','OpeningPending','Active']);
+const DAY_MS = 86400000;
+
+const atomic = value => typeof value === 'string' && /^\d+$/u.test(value) ? value : null;
+// USDC atoms (six decimals) as petri takes them: '1000000' is '1', '2500000' is '2.5'.
+export function usdc(atoms) {
+  if (atomic(atoms) === null) return null;
+  const value = BigInt(atoms), whole = value / 1000000n, part = (value % 1000000n).toString().padStart(6, '0').replace(/0+$/u, '');
+  return part ? `${whole}.${part}` : `${whole}`;
+}
+
+// What a month takes now, by its phase's rules: new sources while it forms
+// and placement is open (SourceSubmission, Scramble days 1-4), opening values
+// for its frozen sources in Opening, updates to its live sources in Game,
+// its reward claims once Settled with its rewards frozen, otherwise nothing
+// (Scramble's challenge and freeze days, a settled month not frozen yet).
+// Opening follows the chain's phase, not this clock: the oracle takes
+// openings until listing on the chain's own clock, which can run behind.
+function stage(fact, now) {
+  if (fact.phase === 'SourceSubmission') return 'sources';
+  if (fact.phase === 'Scramble') {
+    const start = timestamp(fact.schedule?.scrambleStartUtc);
+    return start !== null && now < start + 4 * DAY_MS ? 'sources' : 'closed';
+  }
+  if (fact.phase === 'Opening') return 'openings';
+  if (fact.phase === 'Settled' && fact.rewards?.phase === 'EntitlementsFinalized') return 'claims';
+  return fact.phase === 'Game' ? 'updates' : 'closed';
+}
+
 export function assessCoverage({ snapshot, catalog }, directives, now) {
   if (!sameProtocol(snapshot?.protocol, catalog?.protocol) || !Array.isArray(snapshot?.state?.months) ||
       !Array.isArray(snapshot.sourceLinks) || !Array.isArray(catalog?.markets)) throw fail('ORACLE_DATA_INVALID', 'The oracle coverage response is incomplete.', 503);
@@ -53,16 +84,25 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
         targets: { activeSources: directive.minActiveSources, distinctHosts: directive.minDistinctHosts }, reasons: [], sources: [] };
       const unknown = reason => add({ ...base, status: 'unknown', reason });
       if (!fresh(snapshot.freshness, now, directive.maxObservationAgeMs) || !fresh(catalog.freshness, now, directive.maxObservationAgeMs)) { unknown('Oracle observations are stale or unavailable.'); continue; }
+      const fact = facts.get(key);
+      // Settled with its rewards frozen: one task to claim them.
+      if (fact?.oracleMonthAvailable === true && stage(fact, now) === 'claims') {
+        add({ ...base, kind: 'claims', phase: fact.phase, status: 'gap', reasons: ['claims'], reason: null,
+          validUntil: Math.min(timestamp(snapshot.freshness.observedAt), timestamp(catalog.freshness.observedAt)) + directive.maxObservationAgeMs });
+        continue;
+      }
       const settlement = timestamp(expiry.settlementUtc);
       if (settlement === null) { unknown('The exact settlement time is unavailable.'); continue; }
       if (settlement <= now) { add({ ...base, status: 'inactive', reason: 'This series has reached settlement.' }); continue; }
-      const fact = facts.get(key);
       if (expiry.onChainAvailable !== true || fact?.onChainAvailable !== true || fact?.oracleMonthAvailable !== true) { unknown('The oracle month is not initialized or its state is unavailable.'); continue; }
       if (['Finalized','Settled'].includes(fact.phase) || ['Settled','Finalized'].includes(fact.settlementStatus)) { add({ ...base, status: 'inactive', reason: 'The oracle series is finalized.' }); continue; }
       const inventory = inventories.get(key), observed = timestamp(inventory?.observedAt);
       if (!inventory || inventory.usage !== 'source-display-only' || inventory.oracleMonthAddress !== fact.oracleMonthAddress || inventory.phase !== fact.phase ||
           !Number.isInteger(inventory.sourceCount) || inventory.sourceCount < 0 ||
-          inventory.sourceCount !== fact.sourceCount || !Array.isArray(inventory.sources) || inventory.sources.length !== inventory.sourceCount ||
+          // While a month takes sources its count is its supported sources and
+          // the inventory lists every proposal; from the freeze on they match.
+          (stage(fact, now) === 'sources' ? inventory.sourceCount < fact.sourceCount : inventory.sourceCount !== fact.sourceCount) ||
+          !Array.isArray(inventory.sources) || inventory.sources.length !== inventory.sourceCount ||
           observed === null || observed > now || now - observed > directive.maxObservationAgeMs) { unknown('A fresh complete source inventory is unavailable for this exact series.'); continue; }
       const sourceIds = new Set(), buckets = new Map(); let invalid = false;
       for (const source of inventory.sources) {
@@ -72,20 +112,68 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
         bucket.push(source); buckets.set(source.bucketId, bucket);
       }
       if (invalid) { unknown('The source inventory has invalid or duplicate identities.'); continue; }
+      const validUntil = Math.min(observed + directive.maxObservationAgeMs, timestamp(snapshot.freshness.observedAt) + directive.maxObservationAgeMs,
+        timestamp(catalog.freshness.observedAt) + directive.maxObservationAgeMs, settlement);
+      const kind = stage(fact, now);
+      if (kind === 'closed') {
+        add({ ...base, status: 'inactive', phase: fact.phase, reason: fact.phase === 'Scramble' ? 'The month is past placement: its sources are set until Opening.'
+          : 'The month takes no research in its phase.' });
+        continue;
+      }
+      if (kind === 'openings') {
+        // Opening: each frozen source still without an opening value takes
+        // one (bonded with its product's opening bond, archived after the
+        // Opening's start); an opened or pending one takes nothing.
+        const skus = new Map((Array.isArray(fact.skus) ? fact.skus : []).filter(sku => hex(sku?.bucketId)).map(sku => [sku.bucketId, sku]));
+        // The oracle's calendar: Scramble's seven days, then the Opening's one
+        // until listing. Archive captures count from the Opening's start.
+        const scramble = timestamp(fact.schedule?.scrambleStartUtc);
+        const listing = timestamp(fact.schedule?.listingUtc) ?? (scramble !== null ? scramble + 8 * DAY_MS : null);
+        const start = listing !== null ? listing - DAY_MS : null;
+        for (const source of inventory.sources.filter(source => source.status === 'Frozen' && source.openingSubmitted !== true)) {
+          const sku = skus.get(source.bucketId);
+          add({ ...base, kind: 'opening', bucketId: source.bucketId,
+            bucketLabel: typeof source.bucketLabel === 'string' ? source.bucketLabel : typeof sku?.bucketLabel === 'string' ? sku.bucketLabel : null,
+            sourceId: source.sourceId, sourceAddress: typeof source.sourceAddress === 'string' ? source.sourceAddress : null,
+            url: host(source) ? source.canonicalLocator.url : null, phase: fact.phase, observedAt: inventory.observedAt, validUntil,
+            status: 'gap', reasons: ['opening_value'], reason: null,
+            openingBondAtomic: atomic(sku?.openingBondAtomic), openingBudgetAtomic: atomic(sku?.openingBudgetAtomic),
+            openingStartUtc: start !== null ? new Date(start).toISOString() : null, listingUtc: listing !== null ? new Date(listing).toISOString() : null,
+            sources: [] });
+        }
+        continue;
+      }
+      if (kind === 'updates') {
+        // Game: each live source takes updates (a staked, archived new value).
+        const rewards = fact.rewards && typeof fact.rewards.remainingAtomic === 'string' ? fact.rewards.remainingAtomic : '0';
+        for (const source of inventory.sources.filter(source => source.status === 'Active')) {
+          add({ ...base, kind: 'update', bucketId: source.bucketId, bucketLabel: typeof source.bucketLabel === 'string' ? source.bucketLabel : null,
+            sourceId: source.sourceId, sourceAddress: typeof source.sourceAddress === 'string' ? source.sourceAddress : null,
+            url: host(source) ? source.canonicalLocator.url : null, phase: fact.phase, observedAt: inventory.observedAt, validUntil,
+            status: 'gap', reasons: ['game_update'], reason: null, rewardsRemainingAtomic: rewards, sources: [] });
+        }
+        continue;
+      }
+      // Taking sources: every product the month lists (its SKU pools), and
+      // any bucket a source is in.
+      const labels = new Map();
+      for (const sku of Array.isArray(fact.skus) ? fact.skus : []) {
+        if (!hex(sku?.bucketId)) continue;
+        if (!buckets.has(sku.bucketId)) buckets.set(sku.bucketId, []);
+        if (typeof sku.bucketLabel === 'string') labels.set(sku.bucketId, sku.bucketLabel);
+      }
       // A truly empty inventory is a confirmed market-wide research gap; no
       // bucket identifier is synthesized from labels, dates or hashes.
       if (!buckets.size) buckets.set(null, []);
-      const validUntil = Math.min(observed + directive.maxObservationAgeMs, timestamp(snapshot.freshness.observedAt) + directive.maxObservationAgeMs,
-        timestamp(catalog.freshness.observedAt) + directive.maxObservationAgeMs, settlement);
       for (const [bucketId, sources] of buckets) {
-        const active = sources.filter(source => source.status === 'Active');
+        const active = sources.filter(source => placed.has(source.status));
         const hosts = [...new Set(active.map(host).filter(Boolean))].sort();
         const missingLocators = active.some(source => host(source) === null), reasons = [];
         if (active.length < directive.minActiveSources) reasons.push('insufficient_active_sources');
         if (!missingLocators && hosts.length < directive.minDistinctHosts) reasons.push('insufficient_distinct_hosts');
         const hostsUncertain = missingLocators && hosts.length < directive.minDistinctHosts;
         const status = reasons.length ? 'gap' : hostsUncertain ? 'unknown' : 'covered';
-        add({ ...base, bucketId, bucketLabel: sources.find(s => typeof s.bucketLabel === 'string')?.bucketLabel ?? null,
+        add({ ...base, kind: 'source', bucketId, bucketLabel: sources.find(s => typeof s.bucketLabel === 'string')?.bucketLabel ?? labels.get(bucketId) ?? null,
           phase: fact.phase, observedAt: inventory.observedAt, validUntil, status, reasons,
           reason: hostsUncertain ? 'Some active sources lack verified locators; host coverage is unknown.' : null,
           activeSources: active.length, distinctHosts: missingLocators ? null : hosts.length, knownHosts: hosts,
@@ -93,11 +181,31 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
       }
     }
   }
-  return { assessedAt: now, protocol: snapshot.protocol, assessments };
+  // Every series the catalog lists, assessed or not (a directive may leave
+  // some out): what the workspace's work may still be about.
+  const series = [...expiries.values()].map(({ marketId, expiryId }) => ({ marketId, expiryId }));
+  return { assessedAt: now, protocol: snapshot.protocol, series, assessments };
 }
 
 export function describeGap(assessment) {
+  if (assessment.kind === 'claims') {
+    return { title: `${assessment.marketId.toUpperCase()} · ${assessment.expiryId} · claims`,
+      brief: `${assessment.expiryId} settled and its rewards are frozen: claim what the owner's wallet earned.` };
+  }
   const product = assessment.bucketLabel || (assessment.bucketId ? `product ${assessment.bucketId.slice(0, 10)}` : 'source coverage');
+  if (assessment.kind === 'opening') {
+    const bond = usdc(assessment.openingBondAtomic) === null ? 'its product\'s opening bond' : `its product's opening bond (${usdc(assessment.openingBondAtomic)} USDC)`;
+    return { title: `${assessment.marketId.toUpperCase()} · ${product} · opening`,
+      brief: [`Give this frozen source of ${assessment.expiryId} its opening value: ${assessment.url ?? `source ${assessment.sourceId}`} (source address ${assessment.sourceAddress ?? 'unknown'}, product ${product}).`,
+        `Read the value the page publishes for this exact product and field. Archive the page in the Wayback Machine; the capture time must be at or after the Opening's start${assessment.openingStartUtc ? ` (${assessment.openingStartUtc})` : ''} and not after the chain's clock.`,
+        `Submit it with petri, staking ${bond}; after its challenge window (300 slots) accept it before listing${assessment.listingUtc ? ` (${assessment.listingUtc})` : ''}. A wrong one can be challenged and loses its bond; a source with no opening value by listing sits out the month.`].join('\n') };
+  }
+  if (assessment.kind === 'update') {
+    return { title: `${assessment.marketId.toUpperCase()} · ${product} · update`,
+      brief: [`Update this live source of ${assessment.expiryId} with its current value: ${assessment.url ?? `source ${assessment.sourceId}`} (source address ${assessment.sourceAddress ?? 'unknown'}, product ${product}).`,
+        'Read the value the page publishes for this exact product and field. Archive the page in the Wayback Machine first; the archived time must be after the month\'s listing.',
+        'Submit it as a Game update with petri: commit it with its stake, then reveal it with the archived URL. An update that does not change the value earns nothing; a wrong one can be challenged and loses its stake.'].join('\n') };
+  }
   return { title: `${assessment.marketId.toUpperCase()} · ${product}`,
     brief: [`Research additional public sources for ${assessment.expiryId}${assessment.bucketId ? ` / bucket ${assessment.bucketId}` : '. Establish the governed product group before submitting a candidate'}.`,
       `Observed active sources: ${assessment.activeSources}; target: ${assessment.targets.activeSources}.`,

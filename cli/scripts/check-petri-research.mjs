@@ -44,7 +44,7 @@ try {
   await assert.rejects(run(['tui', 'ramx']));
   assert.match((await run(['research', '--help'])).stdout, /research work submit/);
   const view = (await run(['tui', '--no-update-check', '--render', '100x32', '--view', 'connect'])).stdout;
-  for (const label of ['Connect', 'Activity', 'Evidence', 'Rewards']) assert(view.toLowerCase().includes(label.toLowerCase()), label);
+  for (const label of ['Connect', 'Research', 'Evidence', 'Rewards']) assert(view.toLowerCase().includes(label.toLowerCase()), label);
   assert.doesNotMatch(view, /Lab Bench|Wallet Ledger|Buy\/Sell/);
   const snapshot = JSON.parse((await run(['--json', 'tui'])).stdout);
   assert.equal(snapshot.ok, true);

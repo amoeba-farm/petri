@@ -27,6 +27,23 @@ pub fn expand_tilde(raw: &str) -> String {
     raw.to_string()
 }
 
+/// `std::fs::canonicalize` on Windows returns the verbatim form `\\?\C:\…`,
+/// which `preopen_keypair_file_security_label` refuses as a device or
+/// verbatim path. The plain drive path names the same local file. Any other
+/// path, a verbatim network path included, comes back as it is.
+pub(crate) fn plain_disk_path(path: &str) -> String {
+    #[cfg(windows)]
+    {
+        use std::path::{Component, Prefix};
+        if let Some(Component::Prefix(prefix)) = Path::new(path).components().next()
+            && matches!(prefix.kind(), Prefix::VerbatimDisk(_))
+        {
+            return path[r"\\?\".len()..].to_string();
+        }
+    }
+    path.to_string()
+}
+
 pub fn default_solana_config_path() -> PathBuf {
     let home = user_home_dir();
     PathBuf::from(home).join(".config/solana/cli/config.yml")
@@ -1140,6 +1157,30 @@ mod tests {
         assert_eq!(opened_keypair_file_security_label(&opened), "ok");
 
         fs::remove_file(path).ok();
+    }
+
+    #[test]
+    fn plain_disk_path_leaves_ordinary_paths_alone() {
+        for path in ["/home/a/id.json", "id.json", "~/x/id.json"] {
+            assert_eq!(plain_disk_path(path), path);
+        }
+    }
+
+    /// What `std::fs::canonicalize` gives `petri wallet new` on Windows.
+    #[cfg(windows)]
+    #[test]
+    fn plain_disk_path_drops_only_a_local_disk_paths_verbatim_prefix() {
+        assert_eq!(
+            plain_disk_path(r"\\?\C:\Users\a\id.json"),
+            r"C:\Users\a\id.json"
+        );
+        assert_eq!(
+            plain_disk_path(r"C:\Users\a\id.json"),
+            r"C:\Users\a\id.json"
+        );
+        for kept in [r"\\?\UNC\server\share\id.json", r"\\.\pipe\petri-keypair"] {
+            assert_eq!(plain_disk_path(kept), kept);
+        }
     }
 
     #[cfg(windows)]

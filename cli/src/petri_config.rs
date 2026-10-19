@@ -1544,6 +1544,26 @@ pub(crate) fn open_private_lock_file(path: &Path) -> Result<File, String> {
     Ok(file)
 }
 
+/// Creates `path` and any missing parents for the owner alone (0700 on Unix),
+/// as `write_private_file` makes the folders it needs. A folder made with the
+/// umask's mode (`fs::create_dir_all`) is later refused as the non-private,
+/// pre-existing parent of Petri's own files. On Windows a new folder inherits
+/// its parent's ACL, as before.
+pub(crate) fn create_private_dir_all(path: &Path) -> io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(path)
+    }
+    #[cfg(not(unix))]
+    {
+        fs::create_dir_all(path)
+    }
+}
+
 pub(crate) fn write_private_file(path: &Path, bytes: &[u8]) -> Result<(), String> {
     let path = normalize_config_write_path(path)?;
     let parent = path
@@ -1630,6 +1650,24 @@ mod tests {
             env::temp_dir().canonicalize().unwrap()
         );
         fs::remove_dir_all(&resolved).unwrap();
+    }
+
+    /// The wallet terms cache and MCP setup make folders in Petri's own
+    /// config folder; Petri's private files must still go there afterwards.
+    #[cfg(unix)]
+    #[test]
+    fn folders_from_create_private_dir_all_take_private_files() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let root = temp_directory("private-dir-all");
+        let petri = root.join("amoeba").join("petri");
+        create_private_dir_all(&petri).expect("create private folders");
+        for directory in [root.clone(), root.join("amoeba"), petri.clone()] {
+            let mode = fs::metadata(&directory).unwrap().permissions().mode() & 0o777;
+            assert_eq!(mode & 0o077, 0, "{} is {mode:o}", directory.display());
+        }
+        write_private_file(&petri.join("config.json"), b"{}").expect("a private file there");
+        fs::remove_dir_all(&root).unwrap();
     }
 
     fn create_private_fixture_directory(path: &Path) {

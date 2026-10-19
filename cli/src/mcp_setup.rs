@@ -1095,7 +1095,9 @@ fn ensure_private_directory(path: &Path) -> Result<(), McpSetupError> {
     if path.exists() {
         return Ok(());
     }
-    fs::create_dir_all(path)
+    // Every folder it makes is private: the runtime's parent is Petri's own
+    // config folder, which Petri refuses once others can read it.
+    crate::petri_config::create_private_dir_all(path)
         .map_err(|error| McpSetupError::io("Cannot create directory", path, error))?;
     #[cfg(unix)]
     {

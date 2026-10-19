@@ -406,7 +406,11 @@ wallet.
 `ameba_oracle` crate, from the monorepo's `oracle/`, the source the deployment runs)
 against the deployment's oracle program id, reviewed, confirmed (or `--yes`)
 and signed by the attached wallet as fee payer. `--simulate` runs the same
-transactions through `simulateTransaction` without loading a signer. Before
+transactions through `simulateTransaction` without loading a signer. A
+transaction that needs an earlier one on chain first (a sponsorship or
+proposal needs its evidence uploaded) is not simulated: it reads "checked
+when sent, once the evidence above is on chain", and the send checks it
+after the evidence lands. Before
 anything is signed, Petri checks that the RPC's genesis hash is the
 deployment's, that the oracle and futures programs are deployed there, and
 that the oracle's config bonds in the deployment's USDC mint. Months and
@@ -436,6 +440,7 @@ oracle evidence close <OBJECT>
 oracle sources propose MARKET --bucket SKU --url URL --source-type T
                        (--definition T | --definition-file F) --bond USDC [--source-id HEX]
 oracle sources support MARKET --source ID --stake USDC
+oracle sources close MARKET
 oracle sources challenge MARKET --source ID --reason N --bond USDC --evidence-hash HEX
                          [--comparison ID] [--challenge-id HEX]
 oracle prints opening MARKET --source ID --value V --archive-url URL --stake USDC
@@ -447,6 +452,11 @@ oracle updates reveal <CLAIM>
 oracle updates challenge MARKET --claim CLAIM --value V --archive-url URL --bond USDC
 oracle updates expire MARKET --claim CLAIM
 oracle stakes settle MARKET --kind KIND --source ID [--owner PUBKEY] [--claim CLAIM] [--challenge ADDRESS]
+oracle rewards [MARKET] [--expiry E] [--owner PUBKEY]   your rewards, month by month
+oracle rewards claim MARKET [--kind proposer|supporter|opening|update]
+oracle sponsor <CANDIDATE>                your collateral posts a research candidate's listing bond
+oracle sponsorships [settle|claim <SOURCE>]
+oracle reserve withdraw --agent ID <USDC> a researcher's held-back bounty share, to collateral
 oracle emergency propose|apply|recover MARKET --kind K --target ADDRESS --target-id HEX [--account A …]
 oracle emergency vote MARKET --kind K --target ADDRESS --target-id HEX --choice N [--account A …]
 ```
@@ -483,15 +493,25 @@ or against the bucket set the month's sources carry when that is what the
 month's coverage manifest commits to (dev bootstrap months); it refuses when
 neither reproduces the committed root. `sources support` stakes on a source;
 `sources challenge` bonds a challenge (reason codes are the program's).
+`sources close` closes a month's source window (it finalizes the SKU
+coverage, which anyone may send) once every product has a supported source;
+it refuses before that, saying how many are covered. Scramble's challenge
+days, its freeze, Opening and Game then follow on the calendar.
 
 ### Opening prints
 
 `prints opening` submits a bonded opening value for a frozen source with its
 Wayback archive URL; the source time is the archive's capture time, and the
-archive object is written first. `prints challenge` bonds an alternative.
-`prints finalize` accepts an unchallenged print after its window, `prints
-expire` marks an unclaimed frozen source inactive, and `prints finalize-phase`
-moves the month into Game and the period to Live.
+archive object is written first. Before sending anything it checks the
+oracle's rules and names what fails: the month is in Opening on the chain's
+clock (from the end of Scramble's seven days to listing), the capture time is
+from the Opening's start up to the chain's clock, the archive is of the
+source's own URL, and `--stake` is the product's opening bond exactly.
+`prints challenge` bonds an alternative. `prints finalize` accepts an
+unchallenged print 300 slots after it landed (before listing), `prints
+expire` marks an unclaimed frozen source inactive (from listing), and `prints
+finalize-phase` moves the month into Game and the period to Live, once every
+frozen source is resolved and the oracle has weighted them.
 
 ### Game updates
 
@@ -511,6 +531,34 @@ by the dev bootstrap do not have one, so commits there fail with
 (permissionless): `listing-bond`, `support-stake` and `source-challenge`
 (before listing), `opening-claim`, `opening-challenge`, `update-claim` and
 `update-challenge`. Claimants and challengers are read from chain.
+
+### Rewards
+
+Once a month is Settled, its operator registers every reward and freezes
+them; each recipient then claims its own (tag 174). `rewards [MARKET]` lists
+the wallet's rewards by month and kind, read from chain: `proposer`,
+`supporter` (paid by the source a supported one merged into), `opening` and
+`update`. Each shows its amount once frozen, `claimed` once paid, `after
+settlement` or `not frozen yet` before. Sponsored sources the wallet funded
+or found show as `sponsored`, with its share: `sponsorships claim <SOURCE>`
+claims them. Without MARKET it lists every month where the wallet has a
+reward, a bare symbol that product's months; months without rewards are left
+out.
+
+`rewards claim MONTH [--kind K]` claims each frozen, unclaimed reward of the
+month into the wallet's oracle collateral, a few to a transaction
+(`collateral withdraw` takes it out). It refuses before the month settles,
+before its rewards are frozen, and when nothing is left.
+
+### Sponsorship
+
+`sponsor <CANDIDATE>` (a content hash from `oracle candidates`) puts a research
+agent's find on the oracle with your collateral posting the product's exact
+listing bond, while the month takes sources; the bond comes back when the
+source settles (`sponsorships settle`), and its reward splits with the
+researcher (`sponsorships claim`). `reserve withdraw --agent ID <USDC>` moves
+what sponsored bounties held back for one of your agents (its 64-hex id) into
+your collateral.
 
 ### Council disputes
 
@@ -591,7 +639,7 @@ list complete):
 | --- | --- | --- |
 | `getAccountInfo` | accounts: markets, the oracle, gates, the Clock sysvar | yes |
 | `getMultipleAccounts` | accounts, up to 100 at a time | yes |
-| `getProgramAccounts` | the oracle's periods and sources | no |
+| `getProgramAccounts` | the oracle's periods, sources, sponsorships and a wallet's reward claims | no |
 | `getBalance` | a wallet's SOL | yes |
 | `getSlot` | `petri status` | yes |
 | `getGenesisHash` | the deployment identity gate | yes |
@@ -603,6 +651,13 @@ list complete):
 | `getSignatureStatuses` | confirming them | yes |
 | `getTransaction` | a landed transaction's logs | yes |
 | `requestAirdrop` | `petri faucet --sol` (dev builds; a local validator only) | no |
+
+The oracle commands, and the TUI's Fund and Rewards views, read with
+`getProgramAccounts`, which Solana's public RPC rate-limits per caller
+(`rewards` sends several at once; the views read every few seconds). Pass
+`--rpc <provider URL>` or set `PETRI_RPC_URL` to an RPC provider's node. When
+an RPC turns a call away for its rate, Petri says so and names `--rpc`; it
+doesn't retry.
 
 The signing wallet is `--keypair` (a keypair file or hardware-wallet URL), else the saved
 `keypair` setting, else the Solana CLI config's keypair. `petri wallet new`
@@ -651,7 +706,7 @@ These are accepted but not listed in `--help`:
 
 `petri` prints the CLI front door. `petri tui` opens the terminal interface,
 including the oracle research and data submission workspace: Connect,
-Activity, Evidence, and Rewards.
+Research, Evidence, and Rewards.
 
 ```bash
 petri tui
@@ -661,8 +716,9 @@ petri research agent login --name cedar --harness Codex
 petri research mcp --agent cedar --harness Codex
 ```
 
-Approve agent pairings and set a public reward address in Connect. Activity owns
-coverage directives and research guidance; Evidence shows submitted sources;
+Approve agent pairings and connect the wallet rewards go to in Connect. Research
+lists the products that need price pages (pick one to put it first for your
+agents, add hints) and the research goals; Evidence shows submitted sources;
 Rewards shows the upstream validation and reward result. No wallet key or model
 API key is needed by this workspace. See [Oracle research](oracle-research.md)
 for commands, local state, service configuration, and keyboard controls.

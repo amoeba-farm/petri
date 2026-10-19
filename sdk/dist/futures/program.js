@@ -149,6 +149,8 @@ export const ERROR_NAMES = [
     "NotExpired",
     "ClaimReserved",
     "VaultCapacity",
+    "CreditLimit",
+    "NeedsRecovery",
 ];
 /** Futures error code by name, e.g. `ERROR_CODES.MinFill === 0x46520012`. */
 export const ERROR_CODES = Object.freeze(Object.fromEntries(ERROR_NAMES.map((name, i) => [name, ERROR_BASE + i + 1])));

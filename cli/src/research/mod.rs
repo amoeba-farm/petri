@@ -1,8 +1,13 @@
+pub mod fund;
 mod http;
 mod input;
 pub mod markets;
 mod model;
+mod nav;
+pub mod phase;
 mod render;
+mod research_page;
+pub mod rewards;
 mod runtime;
 #[cfg(test)]
 mod tests;
@@ -116,8 +121,11 @@ pub fn run(
         );
     }
     let view = view.map(parse_view).transpose()?;
-    let markets_render = render_size.is_some() && view == Some(View::Markets);
-    let (api, mut app) = if markets_render {
+    // Markets and Fund render without the research workspace. The TUI
+    // itself opens at once and connects to the workspace in the background
+    // (below): starting it can take seconds.
+    let markets_render = render_size.is_some() && matches!(view, Some(View::Markets | View::Fund));
+    let (api, mut app) = if markets_render || render_size.is_none() {
         (None, App::new(String::new(), String::new(), String::new()))
     } else {
         match research_session(&futures.api_url.0) {
@@ -146,7 +154,15 @@ pub fn run(
             let ctx = crate::futures::ctx::Ctx::new(futures);
             app.markets.snap = markets::fetch(&ctx, None);
             app.markets.loaded = true;
+        } else if app.view == View::Fund {
+            let ctx = crate::futures::ctx::Ctx::new(futures);
+            app.fund.take_snapshot(fund::fetch(&ctx));
         } else if let Some(api) = &api {
+            // Research's products are the oracle's months (nav.rs).
+            if app.view == View::Activity {
+                let ctx = crate::futures::ctx::Ctx::new(futures);
+                app.fund.take_snapshot(fund::fetch(&ctx));
+            }
             app.update(api.snapshot(None)?);
         }
         let mut terminal =
@@ -162,14 +178,18 @@ pub fn run(
         }
         return Ok(());
     }
+    let (session_tx, session) = std::sync::mpsc::channel();
+    let api_url = futures.api_url.0.clone();
+    std::thread::spawn(move || {
+        let _ = session_tx.send(research_session(&api_url));
+    });
+    app.fund.start(futures.clone());
+    app.rewards.start(futures.clone());
     app.markets.start(futures);
-    let (commands, replies) = match api {
-        Some(api) => {
-            let (commands, replies) = http::worker(api);
-            (Some(commands), Some(replies))
-        }
-        None => (None, None),
-    };
+    let (mut commands, mut replies) = (None, None);
+    // Agents whose last read was asked for in the background, so switching
+    // to one draws at once.
+    let mut prefetched = std::collections::HashSet::new();
     enable_raw_mode().map_err(|e| e.to_string())?;
     let _guard = TerminalGuard;
     execute!(
@@ -186,7 +206,23 @@ pub fn run(
     let mut last_input = Instant::now();
     let mut updates = updates::Updates::new(check_updates);
     while !app.quit {
-        app.markets.tick(&mut app.status, app.view == View::Markets);
+        if let Ok(result) = session.try_recv() {
+            match result {
+                Ok((api, node, entry, base_url)) => {
+                    app.node_path = node;
+                    app.cli_path = entry;
+                    app.base_url = base_url;
+                    let (c, r) = http::worker(api);
+                    commands = Some(c);
+                    replies = Some(r);
+                }
+                Err(error) => app.research_error = Some(error),
+            }
+        }
+        app.markets.tick(app.view == View::Markets);
+        app.fund.tick(app.view == View::Fund);
+        app.rewards
+            .tick(app.view == View::Rewards, &app.snapshot.agents);
         while let Some(Ok(reply)) = replies.as_ref().map(|r| r.try_recv()) {
             app.busy = false;
             match reply {
@@ -219,16 +255,14 @@ pub fn run(
             Some(updates::Action::Error(error)) => app.status = model::safe(&error),
             None => {}
         }
-        if updates.installing() {
-            app.status = "Updating Petri…".into();
-        }
+        // While an update installs, input is set aside (below) and nothing
+        // is said: no loading text.
         if let Some(commands) = commands
             .as_ref()
             .filter(|_| !app.busy && !updates.installing())
         {
             if let Some(post) = app.pending.take() {
                 app.mutation_inflight = true;
-                app.status = "Saving…".into();
                 commands
                     .send(http::Command::Post(post))
                     .map_err(|_| "Workspace worker stopped.")?;
@@ -238,6 +272,18 @@ pub fn run(
                 last_refresh = Instant::now();
                 commands
                     .send(http::Command::Snapshot(app.selected_agent.clone()))
+                    .map_err(|_| "Workspace worker stopped.")?;
+                app.busy = true;
+            } else if let Some(id) = app
+                .snapshot
+                .agents
+                .iter()
+                .map(|a| a.id.clone())
+                .find(|id| !app.details.contains_key(id) && !prefetched.contains(id))
+            {
+                prefetched.insert(id.clone());
+                commands
+                    .send(http::Command::Snapshot(Some(id)))
                     .map_err(|_| "Workspace worker stopped.")?;
                 app.busy = true;
             }
@@ -255,11 +301,19 @@ pub fn run(
             if let Some(action) = input::handle(&mut app, event::read().map_err(|e| e.to_string())?)
             {
                 match action {
-                    Action::CopyCommand | Action::CopyMcp => {
-                        app.status = match clipboard(&app.command(action == Action::CopyMcp)) {
+                    Action::CopyCommand => {
+                        app.status = match clipboard(&app.agent_setup()) {
                             Ok(()) => "Copied.".into(),
                             Err(error) => error,
                         };
+                    }
+                    Action::CopyStart(id) => {
+                        if let Some(agent) = app.snapshot.agents.iter().find(|a| a.id == id) {
+                            app.status = match clipboard(&app.start_message(agent)) {
+                                Ok(()) => "Copied.".into(),
+                                Err(error) => error,
+                            };
+                        }
                     }
                     other => app.activate(other),
                 }

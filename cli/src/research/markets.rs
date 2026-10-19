@@ -3,10 +3,11 @@
 //! and runs tickets through the same paths as `petri long`, `petri close` and
 //! `petri cancel` (`futures::trade`); the view draws the market list
 //! (sidebar), the book of the market's suggested range, trades, the index
-//! and price with a sparkline, your positions and orders, and a key-driven
+//! and price with a price chart, your positions and orders, and a key-driven
 //! ticket.
 
 use std::{
+    collections::HashMap,
     sync::mpsc::{self, Receiver, Sender},
     thread,
     time::{Duration, Instant},
@@ -23,7 +24,7 @@ use ratatui::{
 };
 
 use crate::{
-    chart::{fill_candles, num},
+    chart::fill_candles,
     futures::{
         api::{self, Account, AccountMarket, Depth, MarketView, Trade},
         args::{CancelArgs, CloseArgs, MarketArg, OrderArgs, Pick, SideArg},
@@ -35,7 +36,7 @@ use crate::{
         shape::{self, Grid, Shape},
         signed_money,
         trade::{self, CancelPlan, ClosePlan, Opening},
-        view::{Paint, sparkline},
+        view::{Paint, area_chart},
     },
 };
 
@@ -61,12 +62,33 @@ pub struct Snapshot {
     pub account: Option<Account>,
     pub owner: Option<String>,
     pub error: Option<String>,
+    /// The market the book, trades, closes and index are of.
+    pub detail_for: Option<String>,
 }
+
+/// A market's book, trades, closes and index, kept so that showing it
+/// again draws at once (Markets::details).
+#[derive(Clone, Debug, Default)]
+struct Detail {
+    book: Option<Depth>,
+    trades: Vec<Trade>,
+    closes: Vec<f64>,
+    index: Vec<f64>,
+}
+
+/// How often the shown market is read again while the view is open, and
+/// everything else is, in the background, so any view or market opens with
+/// its data already there.
+const SHOWN: Duration = Duration::from_secs(2);
+const BACKGROUND: Duration = Duration::from_secs(10);
+/// The markets not shown, each read this often.
+const OTHERS: Duration = Duration::from_secs(30);
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Stage {
     Edit,
-    Working(String),
+    /// Quoting or sending: nothing to say until it is back.
+    Working,
     Quoted(Vec<String>),
     Done(Vec<String>),
     Failed(String),
@@ -97,12 +119,15 @@ pub struct Ticket {
 
 enum Command {
     Refresh(Option<String>),
+    /// Only this market's book, trades and chart (Markets::details).
+    Detail(String),
     Quote(Ticket),
     Send,
 }
 
 enum Reply {
     Snapshot(Box<Snapshot>),
+    Detail(String, Box<Detail>),
     Quoted(Result<Vec<String>, String>),
     Sent(Result<Vec<String>, String>),
 }
@@ -115,14 +140,28 @@ pub struct Markets {
     pub order: usize,
     pub ticket: Option<Ticket>,
     pub loaded: bool,
+    /// The last read failed: what is shown is the read before it.
+    pub offline: bool,
     busy: bool,
     last_refresh: Option<Instant>,
+    /// Every market read so far, by address, and when.
+    details: HashMap<String, (Detail, Instant)>,
     commands: Option<Sender<Command>>,
     replies: Option<Receiver<Reply>>,
 }
 
 fn err(e: crate::futures::error::Error) -> String {
     e.message.replace('\n', " · ")
+}
+
+/// An error as a person reads it: an unreachable API or RPC is one plain
+/// phrase, not its address and transport error.
+pub(crate) fn plain(error: String) -> String {
+    if error.contains(" is unreachable") {
+        "Couldn't reach Amoeba.".into()
+    } else {
+        error
+    }
 }
 
 /// Reads the markets, the selected market's book, trades, candles and
@@ -150,20 +189,46 @@ pub fn fetch(ctx: &Ctx, market: Option<&str>) -> Snapshot {
         .and_then(|a| snap.markets.iter().find(|m| m.market == a))
         .or_else(|| snap.markets.first())
         .map(|m| m.market.clone());
-    if let Some(market) = selected {
-        snap.book = api::depth(&ctx.api, &market, None, 1_000_000_000).ok();
-        snap.trades = api::trades(&ctx.api, &market, 30).unwrap_or_default();
-        let candles = api::candles(&ctx.api, &market, 300, None).unwrap_or_default();
-        snap.closes = fill_candles(&candles, 300).iter().map(|c| c.c).collect();
-        snap.index = api::index(&ctx.api, &market, 2_000)
-            .map(|p| p.iter().map(|p| p.value).collect())
-            .unwrap_or_default();
-    }
-    if let Ok(owner) = ctx.wallet_pubkey() {
-        snap.owner = Some(owner.to_string());
-        snap.account = api::account(&ctx.api, &owner.to_string()).ok();
-    }
+    let owner = ctx.wallet_pubkey().ok().map(|o| o.to_string());
+    // The account alongside the market: each read is a round trip.
+    let api = &ctx.api;
+    thread::scope(|s| {
+        let account = owner
+            .as_deref()
+            .map(|owner| s.spawn(move || api::account(api, owner).ok()));
+        if let Some(market) = selected {
+            let d = detail(api, &market);
+            snap.book = d.book;
+            snap.trades = d.trades;
+            snap.closes = d.closes;
+            snap.index = d.index;
+            snap.detail_for = Some(market);
+        }
+        snap.account = account.and_then(|a| a.join().ok().flatten());
+    });
+    snap.owner = owner;
     snap
+}
+
+/// A market's book, trades, candles and index, read at once.
+fn detail(api: &api::Api, market: &str) -> Detail {
+    thread::scope(|s| {
+        let book = s.spawn(move || api::depth(api, market, None, 1_000_000_000).ok());
+        let trades = s.spawn(move || api::trades(api, market, 30).unwrap_or_default());
+        let candles = s.spawn(move || api::candles(api, market, 300, None).unwrap_or_default());
+        let index = s.spawn(move || {
+            api::index(api, market, 2_000)
+                .map(|p| p.iter().map(|p| p.value).collect())
+                .unwrap_or_default()
+        });
+        let candles = candles.join().unwrap_or_default();
+        Detail {
+            book: book.join().unwrap_or_default(),
+            trades: trades.join().unwrap_or_default(),
+            closes: fill_candles(&candles, 300).iter().map(|c| c.c).collect(),
+            index: index.join().unwrap_or_default(),
+        }
+    })
 }
 
 /// A quoted ticket, waiting for `y`.
@@ -185,6 +250,10 @@ fn worker(settings: Settings) -> (Sender<Command>, Receiver<Reply>) {
             let reply = match command {
                 Command::Refresh(market) => {
                     Reply::Snapshot(Box::new(fetch(&ctx, market.as_deref())))
+                }
+                Command::Detail(market) => {
+                    let read = Box::new(detail(&ctx.api, &market));
+                    Reply::Detail(market, read)
                 }
                 Command::Quote(ticket) => {
                     let ticket_ctx = Ctx::new(settings.clone());
@@ -328,8 +397,60 @@ impl Markets {
         }
     }
 
-    /// Applies worker replies and schedules refreshes (every 2 s).
-    pub fn tick(&mut self, status: &mut String, active: bool) {
+    /// A new read of the markets. One that failed keeps what is shown,
+    /// marked offline, while the reads go on; with nothing shown yet,
+    /// content() says plainly that the markets aren't available.
+    pub(crate) fn take_snapshot(&mut self, snap: Snapshot) {
+        self.offline = snap.error.is_some();
+        if self.offline && !self.snap.markets.is_empty() {
+            return;
+        }
+        let market = self.selected_market().map(|m| m.market.clone());
+        let mut snap = snap;
+        if let Some(read) = snap.detail_for.take() {
+            let detail = Detail {
+                book: snap.book.take(),
+                trades: std::mem::take(&mut snap.trades),
+                closes: std::mem::take(&mut snap.closes),
+                index: std::mem::take(&mut snap.index),
+            };
+            self.keep_detail(read, detail);
+        }
+        self.snap = snap;
+        self.loaded = true;
+        if let Some(a) = market
+            && let Some(at) = self.snap.markets.iter().position(|m| m.market == a)
+        {
+            self.selected = at;
+        }
+        self.show_detail();
+    }
+
+    /// Keeps a market's read. One whose book failed keeps the read before.
+    fn keep_detail(&mut self, market: String, detail: Detail) {
+        let detail = match self.details.remove(&market) {
+            Some((old, _)) if detail.book.is_none() => old,
+            _ => detail,
+        };
+        self.details.insert(market, (detail, Instant::now()));
+    }
+
+    /// The shown market's book, trades and chart, from the last read of it.
+    fn show_detail(&mut self) {
+        let detail = self
+            .selected_market()
+            .and_then(|m| self.details.get(&m.market))
+            .map(|(d, _)| d.clone())
+            .unwrap_or_default();
+        self.snap.book = detail.book;
+        self.snap.trades = detail.trades;
+        self.snap.closes = detail.closes;
+        self.snap.index = detail.index;
+    }
+
+    /// Applies worker replies and schedules refreshes (`SHOWN`, `BACKGROUND`,
+    /// `OTHERS`).
+    pub fn tick(&mut self, active: bool) {
         let mut replies = Vec::new();
         if let Some(rx) = &self.replies {
             while let Ok(reply) = rx.try_recv() {
@@ -339,24 +460,16 @@ impl Markets {
         for reply in replies {
             self.busy = false;
             match reply {
-                Reply::Snapshot(snap) => {
-                    let market = self.selected_market().map(|m| m.market.clone());
-                    self.snap = *snap;
-                    self.loaded = true;
-                    if let Some(a) = market
-                        && let Some(at) = self.snap.markets.iter().position(|m| m.market == a)
-                    {
-                        self.selected = at;
-                    }
-                    if let Some(e) = &self.snap.error {
-                        *status = format!("Futures: {e}");
-                    }
+                Reply::Snapshot(snap) => self.take_snapshot(*snap),
+                Reply::Detail(market, detail) => {
+                    self.keep_detail(market, *detail);
+                    self.show_detail();
                 }
                 Reply::Quoted(result) => {
                     if let Some(t) = &mut self.ticket {
                         t.stage = match result {
                             Ok(lines) => Stage::Quoted(lines),
-                            Err(e) => Stage::Failed(e),
+                            Err(e) => Stage::Failed(plain(e)),
                         };
                     }
                 }
@@ -364,20 +477,48 @@ impl Markets {
                     if let Some(t) = &mut self.ticket {
                         t.stage = match result {
                             Ok(lines) => Stage::Done(lines),
-                            Err(e) => Stage::Failed(e),
+                            Err(e) => Stage::Failed(plain(e)),
                         };
                     }
                     self.last_refresh = None;
                 }
             }
         }
-        let due = self
-            .last_refresh
-            .is_none_or(|t| t.elapsed() >= Duration::from_secs(2));
-        if active && !self.busy && due && self.commands.is_some() {
+        if self.busy || self.commands.is_none() {
+            return;
+        }
+        let every = if active { SHOWN } else { BACKGROUND };
+        if self.last_refresh.is_none_or(|t| t.elapsed() >= every) {
             self.last_refresh = Some(Instant::now());
             let market = self.selected_market().map(|m| m.market.clone());
             self.send_command(Command::Refresh(market));
+            return;
+        }
+        // Between those, the other markets, one at a time, so clicking one
+        // shows it at once. Not while a ticket waits on the worker.
+        if self.ticket.is_some() {
+            return;
+        }
+        let stale = self
+            .snap
+            .markets
+            .iter()
+            .map(|m| m.market.clone())
+            .find(|m| {
+                self.details
+                    .get(m)
+                    .is_none_or(|(_, at)| at.elapsed() >= OTHERS)
+            });
+        if let Some(market) = stale {
+            // Marked read now, so a failing one waits its turn.
+            let detail = self
+                .details
+                .remove(&market)
+                .map(|(d, _)| d)
+                .unwrap_or_default();
+            self.details
+                .insert(market.clone(), (detail, Instant::now()));
+            self.send_command(Command::Detail(market));
         }
     }
 
@@ -386,13 +527,19 @@ impl Markets {
         if n == 0 {
             return;
         }
-        self.selected = ((self.selected as isize + step).rem_euclid(n as isize)) as usize;
+        self.show(((self.selected as isize + step).rem_euclid(n as isize)) as usize);
+    }
+
+    /// Shows the market at `index` in the list (↑/↓, or a click on it). Not
+    /// while a ticket is open: the ticket is for the market it was opened on.
+    pub fn show(&mut self, index: usize) {
+        if index >= self.snap.markets.len() || self.ticket.is_some() {
+            return;
+        }
+        self.selected = index;
         self.position = 0;
         self.order = 0;
-        self.snap.book = None;
-        self.snap.trades.clear();
-        self.snap.closes.clear();
-        self.snap.index.clear();
+        self.show_detail();
         self.last_refresh = None;
     }
 
@@ -496,15 +643,15 @@ impl Markets {
                 self.ticket = None;
                 return true;
             }
-            (Stage::Working(_), _) => return true,
+            (Stage::Working, _) => return true,
             (Stage::Quoted(_), KeyCode::Char('y')) => {
-                ticket.stage = Stage::Working("Sending…".into());
+                ticket.stage = Stage::Working;
                 self.ticket = Some(ticket);
                 self.send_command(Command::Send);
                 return true;
             }
             (Stage::Edit, KeyCode::Enter) => {
-                ticket.stage = Stage::Working("Quoting…".into());
+                ticket.stage = Stage::Working;
                 self.ticket = Some(ticket.clone());
                 self.send_command(Command::Quote(ticket));
                 return true;
@@ -622,22 +769,22 @@ fn last_price(m: &MarketView) -> String {
     )
 }
 
-/// The market list in the sidebar slot.
-pub fn sidebar(frame: &mut Frame, m: &Markets, area: Rect) {
+/// The market list in the sidebar slot; returns each shown market's area,
+/// in order, for clicks.
+pub fn sidebar(frame: &mut Frame, m: &Markets, area: Rect) -> Vec<Rect> {
     let inner = panel(frame, area, "MARKETS");
+    let mut shown = Vec::new();
     if m.snap.markets.is_empty() {
-        let text = if m.loaded {
-            "No markets."
-        } else {
-            "Loading…"
-        };
-        put(
-            frame,
-            inner,
-            inner.y + 1,
-            Line::styled(format!(" {text}"), muted()),
-        );
-        return;
+        // Nothing while the first read is out, or failed (content says so).
+        if m.loaded && m.snap.error.is_none() {
+            put(
+                frame,
+                inner,
+                inner.y + 1,
+                Line::styled(" No markets.", muted()),
+            );
+        }
+        return shown;
     }
     for (i, market) in m.snap.markets.iter().enumerate() {
         let y = inner.y + 1 + i as u16 * 3;
@@ -676,24 +823,28 @@ pub fn sidebar(frame: &mut Frame, m: &Markets, area: Rect) {
             .style(Style::default().bg(bg)),
             Rect::new(inner.x, y, inner.width, 2),
         );
+        shown.push(Rect::new(inner.x, y, inner.width, 2));
     }
+    shown
 }
 
-/// The selected market: header, sparkline, book, trades, positions, orders.
-pub fn content(frame: &mut Frame, m: &Markets, area: Rect) {
+/// The selected market: header, price chart, book, trades, positions, orders.
+/// Returns the open ticket's box, if there is one.
+/// The shown market, with its oracle month's place in its life (phase.rs)
+/// from `months` at `now` (the chain's clock).
+pub fn content(
+    frame: &mut Frame,
+    m: &Markets,
+    area: Rect,
+    months: &[super::phase::Month],
+    now: i64,
+) -> Option<Rect> {
     let Some(market) = m.selected_market() else {
-        let text = m
-            .snap
-            .error
-            .clone()
-            .unwrap_or_else(|| "Loading futures markets…".into());
-        frame.render_widget(
-            Paragraph::new(text)
-                .style(muted())
-                .wrap(Wrap { trim: true }),
-            area,
-        );
-        return;
+        // Nothing while the first read is out; offline if it failed.
+        if m.snap.error.is_some() {
+            put(frame, area, area.y, Line::styled("offline", muted()));
+        }
+        return None;
     };
     let mut y = area.y;
     put(
@@ -703,6 +854,7 @@ pub fn content(frame: &mut Frame, m: &Markets, area: Rect) {
         Line::from(vec![
             Span::styled(market.label.clone(), strong()),
             Span::styled(format!("  {}", status(market)), muted()),
+            Span::styled(if m.offline { "  offline" } else { "" }, muted()),
             Span::styled("  index ", muted()),
             Span::styled(
                 opt_price(market.index.as_ref().map(|i| i.value.as_str())),
@@ -719,30 +871,58 @@ pub fn content(frame: &mut Frame, m: &Markets, area: Rect) {
         ]),
     );
     y += 1;
-    let width = usize::from(area.width.saturating_sub(24)).max(8);
+    // Its oracle month: the map, and the day it settles.
+    let expiry = super::phase::expiry_id(&market.symbol, market.expiry_ts);
+    if let Some(month) = months.iter().find(|o| o.expiry == expiry) {
+        let mut line = vec![Span::styled("Oracle  ", muted())];
+        line.extend(month.map(now).spans);
+        if month.step() < 4
+            && let Some(day) = chrono::DateTime::from_timestamp(market.expiry_ts as i64, 0)
+        {
+            line.push(Span::styled(
+                format!("  settles {}", day.format("%b %-d")),
+                muted(),
+            ));
+        }
+        put(frame, area, y, Line::from(line));
+        y += 1;
+    }
+    let width = usize::from(area.width.saturating_sub(16)).max(8);
     let (series, name) = if m.snap.closes.len() >= 12 || m.snap.index.len() < 2 {
         (&m.snap.closes, "5m")
     } else {
         (&m.snap.index, "index")
     };
-    let range = if series.is_empty() {
-        String::new()
-    } else {
-        let lo = series.iter().copied().fold(f64::MAX, f64::min);
-        let hi = series.iter().copied().fold(f64::MIN, f64::max);
-        format!("  {}–{}", num(lo), num(hi))
+    // The chart's high and low, on its right; taller in a taller window.
+    let shown = &series[series.len().saturating_sub(width)..];
+    let lo = shown.iter().copied().fold(f64::MAX, f64::min);
+    let hi = shown.iter().copied().fold(f64::MIN, f64::max);
+    let rows = match area.height {
+        h if h >= 30 => 4,
+        h if h >= 24 => 3,
+        _ => 2,
     };
-    put(
-        frame,
-        area,
-        y,
-        Line::from(vec![
-            Span::styled(format!("{name:>5} "), muted()),
-            Span::styled(sparkline(series, width), Style::default().fg(ACCENT)),
-            Span::styled(range, muted()),
-        ]),
-    );
-    y += 2;
+    for (i, line) in area_chart(series, width, rows).into_iter().enumerate() {
+        let label = if i == 0 { name } else { "" };
+        let axis = match i {
+            _ if shown.is_empty() => String::new(),
+            0 => format!(" {hi:.2}"),
+            i if i + 1 == rows => format!(" {lo:.2}"),
+            _ => String::new(),
+        };
+        put(
+            frame,
+            area,
+            y,
+            Line::from(vec![
+                Span::styled(format!("{label:>5} "), muted()),
+                Span::styled(line, Style::default().fg(ACCENT)),
+                Span::styled(axis, muted()),
+            ]),
+        );
+        y += 1;
+    }
+    y += 1;
     let account = m.account_market();
     let positions = account.map(|a| a.claims.len()).unwrap_or(0);
     let orders = account.map(|a| a.orders.len()).unwrap_or(0);
@@ -765,9 +945,9 @@ pub fn content(frame: &mut Frame, m: &Markets, area: Rect) {
         area.bottom().saturating_sub(y + upper_height + 1),
     );
     draw_account(frame, m, lower_area);
-    if let Some(ticket) = &m.ticket {
-        draw_ticket(frame, m, ticket, area);
-    }
+    m.ticket
+        .as_ref()
+        .map(|ticket| draw_ticket(frame, m, ticket, area))
 }
 
 /// The suggested range's book: sell offers (where you buy the range) above,
@@ -782,8 +962,8 @@ fn draw_book(frame: &mut Frame, m: &Markets, area: Rect) {
             muted(),
         ),
     );
+    // Nothing until it is read.
     let Some(book) = &m.snap.book else {
-        put(frame, area, area.y + 1, Line::styled("loading…", muted()));
         return;
     };
     let rows = usize::from(area.height.saturating_sub(2));
@@ -855,12 +1035,7 @@ fn draw_trades(frame: &mut Frame, m: &Markets, area: Rect) {
         ),
     );
     if m.snap.trades.is_empty() {
-        put(
-            frame,
-            area,
-            area.y + 1,
-            Line::styled("no trades yet", muted()),
-        );
+        put(frame, area, area.y + 1, Line::styled("none", muted()));
     }
     for (i, t) in m
         .snap
@@ -907,10 +1082,8 @@ fn draw_account(frame: &mut Frame, m: &Markets, area: Rect) {
     let mut y = area.y;
     let Some(account) = m.account_market() else {
         let text = match &m.snap.owner {
-            None => "No wallet attached: pass --keypair to trade.".to_string(),
-            Some(_) => {
-                "No positions or orders here yet. Press b to go long or s to go short.".to_string()
-            }
+            None => "No wallet",
+            Some(_) => "No positions",
         };
         put(frame, area, y, Line::styled(text, muted()));
         return;
@@ -924,7 +1097,7 @@ fn draw_account(frame: &mut Frame, m: &Markets, area: Rect) {
             Span::styled("POSITIONS", muted()),
             Span::styled(
                 format!(
-                    "   free {} · reserved {} · token account {}",
+                    "   free {} · reserved {} · wallet {}",
                     money(atoms(&account.trader.free)),
                     money(atoms(&account.trader.reserved)),
                     m.snap
@@ -1043,7 +1216,8 @@ fn rows(lines: &[Line], width: u16) -> u16 {
         .sum()
 }
 
-fn draw_ticket(frame: &mut Frame, m: &Markets, ticket: &Ticket, area: Rect) {
+/// Draws the ticket; returns its box.
+fn draw_ticket(frame: &mut Frame, m: &Markets, ticket: &Ticket, area: Rect) -> Rect {
     let title = match &ticket.kind {
         Kind::Take {
             side: SideArg::Long,
@@ -1090,33 +1264,23 @@ fn draw_ticket(frame: &mut Frame, m: &Markets, ticket: &Ticket, area: Rect) {
         ])),
         Kind::Cancel { text, .. } => lines.push(Line::styled(text.clone(), strong())),
     }
-    lines.push(Line::raw(""));
     let hint = match &ticket.stage {
-        Stage::Edit => {
-            lines.push(Line::styled(
-                "Enter quotes this trade; nothing is sent yet.",
-                muted(),
-            ));
-            match ticket.kind {
-                Kind::Take { .. } => {
-                    "↑/↓ or digits lots · ←/→ leverage · Tab side · Enter quote · Esc close"
-                }
-                Kind::Close { .. } => "↑/↓ lots · Enter quote · Esc close",
-                Kind::Cancel { .. } => "Enter review · Esc close",
-            }
-        }
-        Stage::Working(text) => {
-            lines.push(Line::styled(text.clone(), Style::default().fg(ACCENT)));
-            ""
-        }
+        Stage::Edit => match ticket.kind {
+            Kind::Take { .. } => "↑/↓ 0-9 lots · ←/→ leverage · Tab side · Enter quote · Esc",
+            Kind::Close { .. } => "↑/↓ lots · Enter quote · Esc",
+            Kind::Cancel { .. } => "Enter review · Esc",
+        },
+        Stage::Working => "",
         Stage::Quoted(q) => {
+            lines.push(Line::raw(""));
             lines.extend(
                 q.iter()
                     .map(|l| Line::styled(l.clone(), Style::default().fg(TEXT))),
             );
-            "y send · n or Esc close · edit to quote again"
+            "y send · n/Esc close"
         }
         Stage::Done(d) => {
+            lines.push(Line::raw(""));
             lines.extend(
                 d.iter()
                     .map(|l| Line::styled(l.clone(), Style::default().fg(GREEN))),
@@ -1124,6 +1288,7 @@ fn draw_ticket(frame: &mut Frame, m: &Markets, ticket: &Ticket, area: Rect) {
             "any key closes"
         }
         Stage::Failed(e) => {
+            lines.push(Line::raw(""));
             lines.push(Line::styled(e.clone(), Style::default().fg(ALERT)));
             "any key closes"
         }
@@ -1131,7 +1296,7 @@ fn draw_ticket(frame: &mut Frame, m: &Markets, ticket: &Ticket, area: Rect) {
     let width = area.width.min(64);
     // Borders, the hint row, and the text wrapped inside the borders.
     let height = (rows(&lines, width.saturating_sub(4)) + 3)
-        .max(10)
+        .max(5)
         .min(area.height);
     let rect = Rect::new(
         area.x + (area.width - width) / 2,
@@ -1157,6 +1322,7 @@ fn draw_ticket(frame: &mut Frame, m: &Markets, ticket: &Ticket, area: Rect) {
         inner.bottom().saturating_sub(1),
         Line::styled(format!(" {hint}"), Style::default().fg(DIM)),
     );
+    rect
 }
 
 /// Footer key hints for the Markets view.
@@ -1167,7 +1333,6 @@ pub fn footer_hint() -> Vec<(&'static str, &'static str)> {
         ("x", " Close"),
         ("d", " Cancel"),
         ("p/o", " Select"),
-        ("c/a/e/r", ""),
         ("q", " Quit"),
     ]
 }

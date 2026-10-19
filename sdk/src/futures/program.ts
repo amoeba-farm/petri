@@ -163,6 +163,8 @@ export const ERROR_NAMES = [
   "NotExpired",
   "ClaimReserved",
   "VaultCapacity",
+  "CreditLimit",
+  "NeedsRecovery",
 ] as const;
 export type FuturesErrorName = (typeof ERROR_NAMES)[number];
 
