@@ -450,13 +450,39 @@ position's part never exceeds what the stream released (`distributed`).
 settles the position and pays its `pending` from the reward account into the
 position owner's own token account of the mint (a checked transfer, signed
 by the vault; the transfer fee comes out of what arrives). Leaving Earn keeps
-what was earned; it is paid all the same. The keeper pays every position
-once the stream has ended (`rewards::pay_all`, once per ended stream: an
-idempotent associated-account create and a claim per depositor, the keeper
-paying the fees and rent), and `futures-ops vault-rewards-pay` does the same at any
-time. `VaultRewardsWithdraw` (tag 27) lets the operator take back only the
+what was earned; it is paid all the same. Depositors claim whenever they
+like: the AMBA streams in by the second and nothing waits for the end of a
+month (the user, 2026-10-20: "I don't want it to pay at the end of every
+month. I want it to like stream the tokens in, like show their earnings so
+they can cash out early"). Unclaimed AMBA stays theirs across streams: a new
+stream only adds to `acc`. Until 2026-10-20 the keeper paid every position
+once a stream had ended; it no longer does. `futures-ops vault-rewards-pay`
+pays everyone on demand (`rewards::pay_all`: an idempotent
+associated-account create and a claim per depositor, the payer paying the
+fees and rent). `VaultRewardsWithdraw` (tag 27) lets the operator take back only the
 surplus: the reward account's balance less what depositors are owed
 (`distributed − paid`) and what the stream still releases.
+
+**The next month.** On 2026-10-19 the user chose one stream per calendar
+month, 100,000 AMBA each (October from then to Nov 1, then Nov 1 to Dec 1,
+Dec 1 to Jan 1), funded by the user ahead of time. The program holds one
+stream at a time and needs no change for this: the maker, which holds the
+operator's key, rolls the stream over (`futures-maker`,
+`MAKER_EARN_ROLLOVER=on`, `MAKER_EARN_ROLLOVER_AMBA`; off by default). Once
+the stream has ended, and only while the reward account holds what
+depositors are still owed (everything they haven't claimed, which the
+account already holds from the months before) plus the month's amount, it
+sends `VaultRewards` with the same mint, account and house, from
+that moment by the chain's clock to the next month's 1st. Starting at the
+reset rather than the 1st matters: a reset accrues the old stream and
+releases nothing of the new one from before itself, so a stream back-dated
+to the 1st would leave the part between the 1st and the reset to nobody. A
+month funded late still runs to its 1st at the full amount. Nothing starts
+unfunded: until the AMBA is there the maker logs once what it waits for and
+how much to send (the transfer fee added). The seconds between the
+maker's clock read and its transaction landing release nothing to anyone;
+that sliver (about 0.04 AMBA a second at 100,000 a month) stays in the
+reward account and counts toward the next month's funding.
 
 **Events.** `ARVRWD01` [vault, mint, start, end, amount], `ARVRCL01` [vault,
 owner, amount paid], `ARVRWX01` [vault, destination, amount].
@@ -776,10 +802,36 @@ rent (a 792-byte pool too).
 `StakeClaim` (33, permissionless, into the owner's own accounts) pays the
 position's USDC (`usdc_acc`, at a finer scale than Earn's, since shares are
 AMBA atoms) and its AMBA subsidy. The subsidy is a stream like Earn's
-(`StakeRewards`, 34, no house): the user funds it with the AMBA transfer-fee
-tax they receive. `StakeRewardsWithdraw` (35) takes back only its surplus.
-The keeper pays every staker after each credit settlement and once a
-stream ends.
+(`StakeRewards`, 34, no house), funded by AMBA's transfer fees ("remmeber
+it also comes from token transfer etc", the user, 2026-10-20).
+`StakeRewardsWithdraw` (35) takes back only its surplus. Stakers claim their
+AMBA whenever they like (the user, 2026-10-20, as for Earn: no payout at
+the end of a month); the keeper pays stakers only after a credit settlement
+paid them USDC, and `StakeClaim` then pays their streamed AMBA with it.
+
+**The stakers' monthly rewards.** `MAKER_STAKE_ROLLOVER=on` creates a
+separate reward token account owned by the pool, then starts or rolls a
+stream once that account holds tokens beyond what stakers are already
+owed. The budget is that available balance (net of any incoming transfer
+fee), from now to the next month's 1st. A running stream is left alone;
+funding received during it stays for the next month. Unclaimed AMBA remains
+reserved. The first run registers the account with a zero-amount stream
+that ends at once; the owner funds that same account whenever ready.
+`futures-ops stake-rollover` runs this by hand. The maker signs as the
+operator and needs no fee key. No program change is required.
+
+**Optional fee collection.** AMBA's 0.25% fee is withheld in each transfer's
+destination account (and, once harvested, on the mint). Only the mint's
+withheld-withdraw authority can collect it, using
+`WithdrawWithheldTokensFromAccounts` or `WithdrawWithheldTokensFromMint`.
+The user keeps that authority and can withdraw fees into the reward account
+personally. `MAKER_STAKE_SWEEP=off` disables automatic collection entirely.
+If enabled, `MAKER_STAKE_SWEEP=on` also enables monthly rewards and attempts
+to collect fees first with the treasury key. A different or inaccessible
+fee key skips collection; it does not block manually funded rewards.
+Finding the fees is one `getProgramAccounts` with a 64-byte slice per token
+account each month; batches fit the packet limit. `futures-ops stake-sweep`
+runs collection by hand and requires the correct fee authority.
 
 **Epochs.** A shortfall can take every staked atom while shares are still
 out, leaving them worth nothing, or leave a few atoms against many shares
@@ -881,6 +933,12 @@ covered, shortfall, AMBA], `ARRCVR01` [market, owner, payout, USDC, AMBA].
 - `s3`: unstaking keeps what backs credit, the price's average moves the
   capacity, an offset repays the debt, nothing new is borrowed near expiry,
   and the subsidy stream pays.
+- `s5`: the stakers' month: the fees swept (the holders' accounts and the
+  mint) and streamed, a claim mid-month, the next month's fees and the
+  unclaimed AMBA still owed.
+- `s6`: manual funding without a fee key: reusable account, net transfer
+  amount streamed, mid-month claims, no active-stream reset, next-month
+  rollover preserving owed rewards, and no new stream without new funding.
 - `s4`: the keeper's settlement and payments.
 - `e1`: a near-total wipe-out, then a stake whose shares used to overflow
   starts a new epoch; the old staker unstakes its residual (on a pool of

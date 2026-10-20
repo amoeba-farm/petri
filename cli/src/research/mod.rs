@@ -1,6 +1,7 @@
 pub mod fund;
 mod http;
 mod input;
+mod intro;
 pub mod markets;
 mod model;
 mod nav;
@@ -18,12 +19,16 @@ use crossterm::{
         self, DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture,
     },
     execute,
-    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+    terminal::{
+        BeginSynchronizedUpdate, EndSynchronizedUpdate, EnterAlternateScreen, LeaveAlternateScreen,
+        disable_raw_mode, enable_raw_mode,
+    },
 };
 use model::{Action, App, View};
 use ratatui::{
     Terminal,
     backend::{CrosstermBackend, TestBackend},
+    buffer::Buffer,
 };
 use std::{
     io::{self, Write},
@@ -108,10 +113,42 @@ fn parse_view(view: &str) -> Result<View, String> {
         })
 }
 
+/// Whether this start shows the introduction (intro.rs): every interactive
+/// start, and a `--render` snapshot only with `--view intro`.
+fn shows_intro(render: bool, view: Option<&str>) -> bool {
+    !render || view.is_some_and(|v| v.eq_ignore_ascii_case("intro"))
+}
+
+fn render_dimensions(size: &str) -> Result<(u16, u16), String> {
+    let (width, height) = size.split_once('x').ok_or("Use --render 100x32.")?;
+    let width = width
+        .parse::<u16>()
+        .map_err(|_| "Invalid width.")?
+        .clamp(20, 240);
+    let height = height
+        .parse::<u16>()
+        .map_err(|_| "Invalid height.")?
+        .clamp(10, 100);
+    Ok((width, height))
+}
+
+fn print_buffer(buffer: &Buffer) {
+    let area = buffer.area;
+    for y in area.top()..area.bottom() {
+        let row = (area.left()..area.right())
+            .map(|x| buffer[(x, y)].symbol())
+            .collect::<String>();
+        println!("{}", row.trim_end());
+    }
+}
+
+/// `at` is the introduction's time in seconds for `--render ... --view
+/// intro`.
 pub fn run(
     check_updates: bool,
     render_size: Option<&str>,
     view: Option<&str>,
+    at: Option<f32>,
     futures: crate::futures::settings::Settings,
 ) -> Result<(), String> {
     use std::io::IsTerminal;
@@ -120,7 +157,17 @@ pub fn run(
             "Open petri tui in a terminal, or use petri research --help for commands.".into(),
         );
     }
-    let view = view.map(parse_view).transpose()?;
+    if let Some(size) = render_size.filter(|_| shows_intro(true, view)) {
+        let (width, height) = render_dimensions(size)?;
+        let buffer = intro::frame(intro::RENDER_SEED, width, height, at.unwrap_or(0.0));
+        print_buffer(&buffer);
+        return Ok(());
+    }
+    // Interactive starts show the introduction anyway.
+    let view = view
+        .filter(|v| !v.eq_ignore_ascii_case("intro"))
+        .map(parse_view)
+        .transpose()?;
     // Markets and Fund render without the research workspace. The TUI
     // itself opens at once and connects to the workspace in the background
     // (below): starting it can take seconds.
@@ -141,15 +188,7 @@ pub fn run(
         app.view = view;
     }
     if let Some(size) = render_size {
-        let (width, height) = size.split_once('x').ok_or("Use --render 100x32.")?;
-        let width = width
-            .parse::<u16>()
-            .map_err(|_| "Invalid width.")?
-            .clamp(20, 240);
-        let height = height
-            .parse::<u16>()
-            .map_err(|_| "Invalid height.")?
-            .clamp(10, 100);
+        let (width, height) = render_dimensions(size)?;
         if app.view == View::Markets {
             let ctx = crate::futures::ctx::Ctx::new(futures);
             app.markets.snap = markets::fetch(&ctx, None);
@@ -170,12 +209,7 @@ pub fn run(
         terminal
             .draw(|frame| render::draw(frame, &mut app))
             .map_err(|e| e.to_string())?;
-        for y in 0..height {
-            let row = (0..width)
-                .map(|x| terminal.backend().buffer()[(x, y)].symbol())
-                .collect::<String>();
-            println!("{}", row.trim_end());
-        }
+        print_buffer(terminal.backend().buffer());
         return Ok(());
     }
     let (session_tx, session) = std::sync::mpsc::channel();
@@ -199,12 +233,20 @@ pub fn run(
         EnableBracketedPaste
     )
     .map_err(|e| e.to_string())?;
-    let mut terminal =
-        Terminal::new(CrosstermBackend::new(io::stdout())).map_err(|e| e.to_string())?;
+    // One write per frame, not one per kilobyte: large screens send a lot.
+    let mut terminal = Terminal::new(CrosstermBackend::new(io::BufWriter::with_capacity(
+        1 << 16,
+        io::stdout(),
+    )))
+    .map_err(|e| e.to_string())?;
     let mut last_refresh = Instant::now() - Duration::from_secs(3);
     let mut fetch_error = false;
     let mut last_input = Instant::now();
     let mut updates = updates::Updates::new(check_updates);
+    // The introduction covers the first reads, which run as usual below: a
+    // click, Enter or Space turns the program on, and it opens with its data.
+    let mut intro = Some((intro::Intro::new(intro::seed()), Instant::now()));
+    let mut next_frame = Instant::now();
     while !app.quit {
         if let Ok(result) = session.try_recv() {
             match result {
@@ -288,6 +330,43 @@ pub fn run(
                 app.busy = true;
             }
         }
+        if let Some((show, opened)) = intro.as_mut() {
+            let now = Instant::now();
+            if now >= next_frame {
+                let t = opened.elapsed().as_secs_f32();
+                // One synchronized update per frame: no tearing or flicker
+                // (terminals without it ignore it).
+                let _ = execute!(terminal.backend_mut(), BeginSynchronizedUpdate);
+                terminal
+                    .draw(|frame| {
+                        let area = frame.area();
+                        show.draw(frame.buffer_mut(), area, t)
+                    })
+                    .map_err(|e| e.to_string())?;
+                let _ = execute!(terminal.backend_mut(), EndSynchronizedUpdate);
+                // Behind (a slow console)? Skip ahead rather than draw
+                // back to back.
+                next_frame += intro::FRAME;
+                if next_frame < Instant::now() {
+                    next_frame = Instant::now() + intro::FRAME;
+                }
+            }
+            if event::poll(next_frame.saturating_duration_since(Instant::now()))
+                .map_err(|e| e.to_string())?
+            {
+                let event = event::read().map_err(|e| e.to_string())?;
+                if updates.installing() {
+                    continue;
+                }
+                last_input = Instant::now();
+                match intro::handle(&event) {
+                    Some(intro::Outcome::Start) => intro = None,
+                    Some(intro::Outcome::Quit) => app.quit = true,
+                    None => {}
+                }
+            }
+            continue;
+        }
         terminal
             .draw(|frame| render::draw(frame, &mut app))
             .map_err(|e| e.to_string())?;
@@ -301,18 +380,16 @@ pub fn run(
             if let Some(action) = input::handle(&mut app, event::read().map_err(|e| e.to_string())?)
             {
                 match action {
-                    Action::CopyCommand => {
-                        app.status = match clipboard(&app.agent_setup()) {
-                            Ok(()) => "Copied.".into(),
-                            Err(error) => error,
-                        };
-                    }
+                    Action::CopyCommand => match clipboard(&app.agent_setup()) {
+                        Ok(()) => app.pasting(None),
+                        Err(error) => app.status = error,
+                    },
                     Action::CopyStart(id) => {
                         if let Some(agent) = app.snapshot.agents.iter().find(|a| a.id == id) {
-                            app.status = match clipboard(&app.start_message(agent)) {
-                                Ok(()) => "Copied.".into(),
-                                Err(error) => error,
-                            };
+                            match clipboard(&app.start_message(agent)) {
+                                Ok(()) => app.pasting(Some(id)),
+                                Err(error) => app.status = error,
+                            }
                         }
                     }
                     other => app.activate(other),

@@ -4,7 +4,7 @@ This file is generated from the exact `Cargo.lock` package set and the legal fil
 
 An **SPDX-text fallback** is used only when an upstream `.crate` archive contains no `LICENSE`, `LICENCE`, `COPYING`, `NOTICE`, `COPYRIGHT`, or `UNLICENSE` file, or when a reviewed packaged file conflicts with the manifest's declared license expression. The fallback is explicitly labeled, preserves the package's declared authors and repository, and supplies pinned standard license text; it is not represented as an upstream-packaged file.
 
-- Cargo.lock SHA-256: `580d4333887e77615fc7ea9b3100e973b9c560fb29f5d89540efee374a45dfd2`
+- Cargo.lock SHA-256: `3de47c6f9295a39fadae9ba6b03ab1b792976cf135a3d5d28391a54b9b11943f`
 - Locked packages: 414
 - Registry packages: 403
 - Git packages: 0
@@ -27,7 +27,7 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 | ameba-oracle-interface | 0.2.0 | monorepo path package: oracle/crates/oracle-interface/Cargo.toml | — | — | — | first-party Amoeba crate; no third-party license applies |  |
 | ameba-sdk | 0.4.0 | monorepo path package: sdk/Cargo.toml | Apache-2.0 | — | — | first-party Amoeba crate; no third-party license applies |  |
 | ameba_oracle | 0.1.0 | monorepo path package: oracle/programs/ameba_oracle/Cargo.toml | — | — | — | first-party Amoeba crate; no third-party license applies |  |
-| amoeba | 0.1.13 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0130</code> |
+| amoeba | 0.1.14 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0130</code> |
 | android_system_properties | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Nicolas Silva &lt;nical@fastmail.com&gt; | https://github.com/nical/android_system_properties | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0037</code><br><code>LICENSE-MIT</code> → <code>L0121</code> |
 | anstream | 0.6.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
 | anstyle | 1.0.13 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
@@ -8999,7 +8999,7 @@ DEALINGS IN THE SOFTWARE.
 
 - SHA-256: `8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb`
 - Provenance class: local-package, upstream-package
-- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>amoeba@0.1.13/LICENSE</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, <code>proc-macro-crate@3.5.0/LICENSE-APACHE</code>, <code>solana-ed25519-program@2.2.3/vendor/LICENSE-APACHE-2.0</code>, plus 2 more mapped package file(s)
+- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>amoeba@0.1.14/LICENSE</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, <code>proc-macro-crate@3.5.0/LICENSE-APACHE</code>, <code>solana-ed25519-program@2.2.3/vendor/LICENSE-APACHE-2.0</code>, plus 2 more mapped package file(s)
 
 <!-- legal-text-begin sha256=8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb -->
 ```text

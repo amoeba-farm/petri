@@ -706,7 +706,9 @@ These are accepted but not listed in `--help`:
 
 `petri` prints the CLI front door. `petri tui` opens the terminal interface,
 including the oracle research and data submission workspace: Connect,
-Research, Evidence, and Rewards.
+Research, Evidence, and Rewards. It opens on an introduction while it reads
+the markets; click anywhere, or press Enter or Space, to start (q or Esc
+quits).
 
 ```bash
 petri tui

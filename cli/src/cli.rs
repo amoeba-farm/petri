@@ -399,10 +399,23 @@ pub enum Command {
     Tui {
         #[arg(long, help = "Don't check for updates in this session")]
         no_update_check: bool,
-        #[arg(long, hide = true, value_name = "WIDTHxHEIGHT")]
+        /// Prints one frame instead (`--render 100x32`, or `--render --size
+        /// 100x32`).
+        #[arg(
+            long,
+            hide = true,
+            value_name = "WIDTHxHEIGHT",
+            num_args = 0..=1,
+            default_missing_value = ""
+        )]
         render: Option<String>,
+        #[arg(long, hide = true, value_name = "WIDTHxHEIGHT", requires = "render")]
+        size: Option<String>,
         #[arg(long, hide = true, value_name = "VIEW")]
         view: Option<String>,
+        /// The introduction's time for `--render --view intro`.
+        #[arg(long, hide = true, value_name = "SECONDS", requires = "render")]
+        at: Option<f32>,
     },
     #[command(about = "Show or change saved settings")]
     Config {
@@ -860,6 +873,27 @@ mod tests {
             })
         ));
         assert!(refused(&["petri", "tui", "ramx"]));
+        for args in [
+            &[
+                "petri", "tui", "--render", "--view", "intro", "--at", "2.5", "--size", "100x30",
+            ][..],
+            &[
+                "petri", "tui", "--render", "100x30", "--view", "intro", "--at", "2.5",
+            ],
+        ] {
+            let Some(Command::Tui {
+                render, size, at, ..
+            }) = parse(args).command
+            else {
+                panic!("{args:?}");
+            };
+            assert_eq!(
+                size.or(render.filter(|r| !r.is_empty())),
+                Some("100x30".into())
+            );
+            assert_eq!(at, Some(2.5));
+        }
+        assert!(refused(&["petri", "tui", "--at", "2"]));
         let parsed = parse(&[
             "petri",
             "research",

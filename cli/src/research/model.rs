@@ -221,6 +221,10 @@ pub enum Modal {
         instruction: String,
     },
     Revoke(Agent),
+    /// Just copied, for the person to paste into their agent's chat: how,
+    /// in three steps, with Copy again. A connected agent's start message
+    /// (its id), or the new agent's setup.
+    Paste(Option<String>),
 }
 #[derive(Clone, Debug)]
 pub struct Post {
@@ -555,7 +559,12 @@ impl App {
                 self.post("/v1/owner/agents/revoke", serde_json::json!({"agentId":id}));
             }
             Action::FormFocus(index) => self.form_focus = index,
-            Action::Cancel => self.modal = None,
+            Action::Cancel => {
+                if matches!(self.modal, Some(Modal::Paste(_))) {
+                    self.status.clear();
+                }
+                self.modal = None;
+            }
             Action::Save => self.save(),
             Action::Refresh => self.refresh = true,
             Action::Quit => self.quit = true,
@@ -651,6 +660,18 @@ impl App {
 
     pub fn form_fields(&self) -> usize {
         1
+    }
+    /// After a copy: the steps to paste it into the agent's chat. Copy
+    /// again keeps them open and says it copied.
+    pub fn pasting(&mut self, start: Option<String>) {
+        let again = matches!(&self.modal, Some(Modal::Paste(open)) if *open == start);
+        self.status = if again {
+            "Copied again.".into()
+        } else {
+            String::new()
+        };
+        self.modal = Some(Modal::Paste(start));
+        self.form_focus = 0;
     }
     /// What to paste into the agent's terminal: the agent connects itself
     /// with the command in it, the person approves its code in Connect, and

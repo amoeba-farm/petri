@@ -744,7 +744,7 @@ pub fn balance_line(f: &Fund) -> String {
 }
 
 /// Rows `text` takes when word-wrapped at `width`.
-fn wrapped_rows(text: &str, width: usize) -> usize {
+pub(super) fn wrapped_rows(text: &str, width: usize) -> usize {
     if width == 0 {
         return 1;
     }

@@ -703,6 +703,76 @@ fn the_sidebar_shows_each_agent_as_one_block_harness_over_name() {
 }
 
 #[test]
+fn copying_the_setup_shows_how_to_paste_it_into_the_agent() {
+    let mut app = app();
+    app.activate(Action::NewAgent);
+    app.activate(Action::Harness(1));
+    // mod.rs copies the setup, then shows the steps.
+    app.pasting(None);
+    for (width, height) in [(80, 24), (100, 32), (120, 48)] {
+        let screen = draw(&mut app, width, height);
+        for text in [
+            "PASTE INTO YOUR AGENT",
+            "Copied to your clipboard.",
+            "1  Open a chat with Codex.",
+            "2  Paste it (",
+            "3  Codex shows a pairing code. Approve the same code here.",
+            "[Done]",
+            "[Copy again]",
+        ] {
+            assert!(screen.contains(text), "missing {text}:\n{screen}");
+        }
+    }
+    // Copy again copies it again: the steps stay and say so.
+    draw(&mut app, 100, 32);
+    click(&mut app, &Action::CopyCommand);
+    app.pasting(None);
+    let screen = draw(&mut app, 100, 32);
+    assert!(screen.contains("Copied again."), "{screen}");
+    // Enter is Done, and what it said goes with it.
+    let key = |code| Event::Key(KeyEvent::new(code, KeyModifiers::NONE));
+    let action = input::handle(&mut app, key(KeyCode::Enter)).expect("closes");
+    assert_eq!(action, Action::Cancel);
+    app.activate(action);
+    assert!(app.modal.is_none());
+    assert!(app.status.is_empty());
+    // Tab, then Enter, is Copy again.
+    app.pasting(None);
+    assert!(input::handle(&mut app, key(KeyCode::Tab)).is_none());
+    assert_eq!(
+        input::handle(&mut app, key(KeyCode::Enter)),
+        Some(Action::CopyCommand)
+    );
+    // A click outside closes it.
+    draw(&mut app, 100, 32);
+    assert_eq!(click_at(&mut app, 0, 0), Some(Action::Cancel));
+    assert!(app.modal.is_none());
+}
+
+#[test]
+fn copying_the_start_message_shows_how_to_paste_it() {
+    let mut app = app();
+    let id = "ab".repeat(32);
+    app.pasting(Some(id.clone()));
+    let screen = draw(&mut app, 100, 32);
+    for text in [
+        "PASTE INTO YOUR AGENT",
+        "1  Open your chat with cedar in Claude Code.",
+        "2  Paste it (",
+        "3  It starts researching.",
+    ] {
+        assert!(screen.contains(text), "missing {text}:\n{screen}");
+    }
+    assert!(!screen.contains("pairing code"), "{screen}");
+    let key = |code| Event::Key(KeyEvent::new(code, KeyModifiers::NONE));
+    assert!(input::handle(&mut app, key(KeyCode::Tab)).is_none());
+    assert_eq!(
+        input::handle(&mut app, key(KeyCode::Enter)),
+        Some(Action::CopyStart(id))
+    );
+}
+
+#[test]
 fn the_agent_is_chosen_in_a_pop_up_by_click_or_keys() {
     let mut app = app();
     app.activate(Action::NewAgent);
@@ -2277,4 +2347,20 @@ fn an_owner_action_while_another_is_out_is_quietly_ignored() {
     );
     assert_eq!(app.status, "");
     assert!(app.pending.is_none());
+}
+
+#[test]
+fn render_snapshots_show_the_intro_only_when_asked() {
+    use super::{intro, shows_intro};
+    assert!(shows_intro(false, None));
+    assert!(shows_intro(false, Some("markets")));
+    assert!(shows_intro(true, Some("intro")));
+    assert!(shows_intro(true, Some("Intro")));
+    assert!(!shows_intro(true, None));
+    assert!(!shows_intro(true, Some("markets")));
+    let mut app = app();
+    for view in View::ALL {
+        app.view = view;
+        assert!(!draw(&mut app, 100, 30).contains(intro::HINT), "{view:?}");
+    }
 }

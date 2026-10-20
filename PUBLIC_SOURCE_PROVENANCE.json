@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "55a369952131107fce792a063f46d6a3be8b561f",
+  "sourceCommit": "f112170081c322dc6f506cea51ed9d22f881fca8",
   "component": "cli",
-  "cliVersion": "0.1.13",
-  "publicationType": "source of the signed petri v0.1.13 release and of ameba-sdk 0.4.0 on npm",
+  "cliVersion": "0.1.14",
+  "publicationType": "source of the signed petri v0.1.14 release and of ameba-sdk 0.4.0 on npm",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
   "deployedContractSourceCommit": "c723db776e9d0c639565d89ac761703731b37fb4",
   "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from c723db77, the oracle from 4caf83f0); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
@@ -35,7 +35,7 @@
     },
     {
       "path": "api/API.md",
-      "sha256": "9bf4898660582eed4efab960f90195607fced5867cb09cba3c45a97a8bcde567",
+      "sha256": "cb616f30b72b7e7e7cd1b81e4d4940add3cfdf1ddbd75b21ccca5a259cc55388",
       "executable": false
     },
     {
@@ -55,12 +55,12 @@
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "580d4333887e77615fc7ea9b3100e973b9c560fb29f5d89540efee374a45dfd2",
+      "sha256": "3de47c6f9295a39fadae9ba6b03ab1b792976cf135a3d5d28391a54b9b11943f",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "4f70cc1f3a523d1d98c49a579237b11b0129493102d82ddac53d0836b5e2a851",
+      "sha256": "5a59a917d909ade00c28aa492593bf558457a9ae20b61cda0979e7b4bc799483",
       "executable": false
     },
     {
@@ -105,7 +105,7 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "8a1f7a50e27f9fe37dc35233d592387253b781bdf061238774fe48fa895f93d2",
+      "sha256": "34a27e5f20f193f33b2f5e5f6ff3ed522e838982fa6c66908e6b507f9148ee9f",
       "executable": false
     },
     {
@@ -245,7 +245,7 @@
     },
     {
       "path": "cli/docs/amoeba-cli-command-guide.md",
-      "sha256": "9da5db7886172be3a1394e1de104b375b5e26a4d6b884ae99d02de0d3eb065b0",
+      "sha256": "cc40d0f188eb20f75708a37994406c1b27661644b71289f49f9cb5875693fd55",
       "executable": false
     },
     {
@@ -265,7 +265,7 @@
     },
     {
       "path": "cli/docs/html/source-map.html",
-      "sha256": "2c64489877912fdee4bf665eeca8d7bdd8b95634bd8a7fdd78d0b81164b2dcc0",
+      "sha256": "d3038ae97851c72b6e6ada9800c4a31ae6abe02645650e4f06f3453497ea41a3",
       "executable": false
     },
     {
@@ -280,7 +280,7 @@
     },
     {
       "path": "cli/docs/oracle-research.md",
-      "sha256": "c4be2595de3b70ad6af1ad7dc45bb551f21ed3f8fda705d274fcf10856f3669c",
+      "sha256": "99a78e72c2836dbd59ccc83664396c7771ebd56f434fd0da575349327826cf77",
       "executable": false
     },
     {
@@ -300,7 +300,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "017333dd475ce442495c31c953a577cd6588796e0d9d46f0675af68951711111",
+      "sha256": "9930374e4d3268626de8e928291333cca164d129d2260a6df0f26e437c4bd06c",
       "executable": false
     },
     {
@@ -570,7 +570,7 @@
     },
     {
       "path": "cli/src/cli.rs",
-      "sha256": "564b8e97b517314aac999c64a38e2b879c13e01c35050962df3f77687cff9327",
+      "sha256": "ee4e4b99ba6714be259541e701a1890cc89bab1315bc5c68f9331b04d735254a",
       "executable": false
     },
     {
@@ -685,7 +685,7 @@
     },
     {
       "path": "cli/src/main.rs",
-      "sha256": "22882bba3a1d062ce77dea65a59a74cb369f4a20e7d8d5bb9d812c966a23aeaf",
+      "sha256": "bdc05e8beb39d89df82969546ca3ae0f5955b1de33482b416121c3831fee400e",
       "executable": false
     },
     {
@@ -800,7 +800,7 @@
     },
     {
       "path": "cli/src/research/fund.rs",
-      "sha256": "e0f6692046b73618c2bb2a9b343b0ff7119737b13eac88bfc0842fd50c081cac",
+      "sha256": "a50a1a5fcc3341cb2e6186db440b10f13622e478f87ce5f8dfec2985733d8fa0",
       "executable": false
     },
     {
@@ -810,7 +810,12 @@
     },
     {
       "path": "cli/src/research/input.rs",
-      "sha256": "6f99b1ed6286c9eab9e246e3fdf780dfe5337350948d76fec80ff9a7583d5e66",
+      "sha256": "7fc931d6b6b629d7ad4d8741ab0077e8eb56b3fd6ce8bb4eaa3bea877126dd5c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/intro.rs",
+      "sha256": "8624f26b532b0729e36e2bb6a76a13c1058e62f90833e6ea5656b93763ebb3c3",
       "executable": false
     },
     {
@@ -820,12 +825,12 @@
     },
     {
       "path": "cli/src/research/mod.rs",
-      "sha256": "cd0aca7dbe484a92ceb2cf89378bfdbf9bec3e8d6c670c267e3b22116b844e02",
+      "sha256": "06cc4f7033ee3c8cdc8c0527a74b439240cd3f1aee3b4da442d8a48a083436d7",
       "executable": false
     },
     {
       "path": "cli/src/research/model.rs",
-      "sha256": "73bed88db21261519aa0299bffdfada0565f3796c6dd120a264f0286660bea55",
+      "sha256": "c9f48cbb39b11090c574181b14292d04b7840ad3337946cd27caa9b99e10309c",
       "executable": false
     },
     {
@@ -840,7 +845,7 @@
     },
     {
       "path": "cli/src/research/render.rs",
-      "sha256": "8838cf34fcaf22ea5354668b27d299a12e02348f336d68b19620cd96d8107b6e",
+      "sha256": "df98b31ca426efc52ceceb0bc6aefa3b1de652529838065bb80b9d486006fb35",
       "executable": false
     },
     {
@@ -860,7 +865,7 @@
     },
     {
       "path": "cli/src/research/tests.rs",
-      "sha256": "7497002eb2363c6fcedafdd984fc9efd65ee3cd9f4ca5a23b430d73b9a5f5cc8",
+      "sha256": "eb272a6b42e5b2a5a70af6a4cbb08c300d809d22ac34070bbffe52f63a8c4f39",
       "executable": false
     },
     {
@@ -1125,7 +1130,7 @@
     },
     {
       "path": "futures/docs/futures.md",
-      "sha256": "99def9bafca2051496d8bcecb5447f1c2f9ea17f84899848f47ffec9d0ba6160",
+      "sha256": "d03ffd4867aa9ebd77a61de945b674df77824ca83e4e029986d2faf0b6946f10",
       "executable": false
     },
     {
@@ -3326,6 +3331,6 @@
   ],
   "lineEndingQualification": "0 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.0",
-  "sourceRelease": "release/2026-10-19-oracle-months",
+  "sourceRelease": "release/2026-10-20-petri-0114",
   "deployedOracleSourceCommit": "4caf83f080f7541b1f741e63871c8d701b398e9b"
 }

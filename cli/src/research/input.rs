@@ -78,6 +78,28 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
                     }
                     return None;
                 }
+                if let Some(Modal::Paste(start)) = &app.modal {
+                    // Done, Copy again.
+                    let again = match start {
+                        Some(id) => Action::CopyStart(id.clone()),
+                        None => Action::CopyCommand,
+                    };
+                    match key.code {
+                        KeyCode::Esc => return Some(Action::Cancel),
+                        KeyCode::Tab | KeyCode::BackTab | KeyCode::Left | KeyCode::Right => {
+                            app.form_focus = 1 - app.form_focus.min(1)
+                        }
+                        KeyCode::Enter => {
+                            return Some(if app.form_focus == 1 {
+                                again
+                            } else {
+                                Action::Cancel
+                            });
+                        }
+                        _ => {}
+                    }
+                    return None;
+                }
                 if matches!(app.modal, Some(Modal::Revoke(_))) {
                     let controls = 2;
                     match key.code {

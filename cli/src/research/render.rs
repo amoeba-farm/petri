@@ -1228,13 +1228,11 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
     let screen = frame.area();
     scrim(frame.buffer_mut(), screen);
     let width = parent.width.saturating_sub(4).min(80);
-    let height = parent.height.saturating_sub(2).min(
-        if matches!(modal, Modal::Refine { .. } | Modal::Find(_)) {
-            21
-        } else {
-            13
-        },
-    );
+    let height = parent.height.saturating_sub(2).min(match modal {
+        Modal::Refine { .. } | Modal::Find(_) => 21,
+        Modal::Paste(_) => 14,
+        _ => 13,
+    });
     let area = Rect::new(
         parent.x + (parent.width - width) / 2,
         parent.y + (parent.height - height) / 2,
@@ -1250,6 +1248,7 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
         Modal::Find(_) => " FOUND BY A RESEARCHER ",
         Modal::Refine { .. } => " DIRECTIVE FOR YOUR AGENT ",
         Modal::Revoke(_) => " DISCONNECT AGENT ",
+        Modal::Paste(_) => " PASTE INTO YOUR AGENT ",
     };
     let block = Block::default()
         .borders(Borders::ALL)
@@ -1397,6 +1396,61 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
                 0,
             );
         }
+        Modal::Paste(start) => {
+            // For a connected agent (its start message) or the new one.
+            let agent = start
+                .as_ref()
+                .and_then(|id| app.snapshot.agents.iter().find(|a| &a.id == id))
+                .cloned();
+            let harness = safe(
+                agent
+                    .as_ref()
+                    .map_or(App::HARNESSES[app.harness], |a| a.harness.as_str()),
+            );
+            let keys = if cfg!(target_os = "macos") {
+                "⌘V"
+            } else if cfg!(windows) {
+                "Ctrl+V"
+            } else {
+                "Ctrl+Shift+V"
+            };
+            let steps = match &agent {
+                Some(agent) => [
+                    format!("Open your chat with {} in {harness}.", safe(&agent.name)),
+                    format!("Paste it ({keys}) and send it."),
+                    "It starts researching. Its page here shows what it does.".into(),
+                ],
+                None => [
+                    format!("Open a chat with {harness}."),
+                    format!("Paste it ({keys}) and send it."),
+                    format!("{harness} shows a pairing code. Approve the same code here."),
+                ],
+            };
+            label(
+                frame,
+                within(body, body.y, 1),
+                "Copied to your clipboard.",
+                strong(),
+            );
+            // Each step's number, its words beside it (wrapped under them).
+            let text = body.width.saturating_sub(3);
+            let mut y = body.y + 2;
+            for (index, step) in steps.into_iter().enumerate() {
+                if y >= body.bottom() {
+                    break;
+                }
+                label(
+                    frame,
+                    within(body, y, 1),
+                    format!("{}", index + 1),
+                    accent().add_modifier(Modifier::BOLD),
+                );
+                let rows = crate::research::fund::wrapped_rows(&step, usize::from(text)) as u16;
+                let area = Rect::new(body.x + 3, y, text, rows).intersection(body);
+                label(frame, area, step, Style::default().fg(TEXT));
+                y += rows;
+            }
+        }
         Modal::Revoke(agent) => {
             frame.render_widget(
                 Paragraph::new(format!("Disconnect {}?", safe(&agent.name))),
@@ -1429,6 +1483,15 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
                 app.form_focus == 0,
             ),
             ("Close", Action::Cancel, app.form_focus == 1),
+        ]
+    } else if let Some(Modal::Paste(start)) = &app.modal {
+        let again = match start {
+            Some(id) => Action::CopyStart(id.clone()),
+            None => Action::CopyCommand,
+        };
+        vec![
+            ("Done", Action::Cancel, app.form_focus == 0),
+            ("Copy again", again, app.form_focus == 1),
         ]
     } else if matches!(app.modal, Some(Modal::Find(_) | Modal::Harness)) {
         vec![("Close", Action::Cancel, true)]

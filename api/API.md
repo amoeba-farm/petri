@@ -362,6 +362,9 @@ moves). Sign them with the main transaction, then submit them in order,
 waiting until each lands (`/v1/tx/:sig/wait?commitment=processed`), before
 submitting the main one. The first one also creates the account it fills
 when that does not exist yet. Each is co-signed under the usual rules.
+**[added 2026-10-19]** Owner-paid (`payer: "owner"`), each is owner-paid
+too and the owner sends them in the same order (see "Owner-paid
+transactions").
 
 Photon is read only on these paths and only when the ATA falls short: an
 order the ATA covers makes no compressed read, and an owner whose last
@@ -374,10 +377,13 @@ again once Photon has indexed it, and `walletCompressed` follows.
 ### `POST /v1/tx/quote-prepare` [added]
 
 Request: the `/v1/quote` body plus `owner` (required) and the order's
-`mode`, `minFill` and `withdraw` (see "Futures").
+`mode`, `minFill` and `withdraw` (see "Futures"), and **[added
+2026-10-19]** `payer` (`"sponsor"`, the default, or `"owner"`) beside them
+at the top level of the body: the order's fields are quote-prepare's
+`params`.
 
 ```json
-{ "market": "RAMX", "owner": "…", "side": "long", "lo": 98, "hi": 120, "lots": 1 }
+{ "market": "RAMX", "owner": "…", "side": "long", "lo": 98, "hi": 120, "lots": 1, "payer": "owner" }
 ```
 
 Response:
@@ -387,7 +393,9 @@ Response:
 ```
 
 * `prepared` is the `submit` for this quote (`[deposit]`, `submit`,
-  `[withdraw]`). It is null when `quote.error` is set, and **[added]** when
+  `[withdraw]`); **[added 2026-10-19]** with `payer: "owner"` it is the
+  owner-paid prepare response (no `id`; see "Owner-paid transactions").
+  It is null when `quote.error` is set, and **[added]** when
   the order needs the owner's compressed USDC (`quote.decompress` is set):
   `/v1/tx/prepare` builds that one (see "Spending compressed USDC").
 * A retired market (see "Retired markets") is refused with 400
@@ -430,16 +438,19 @@ must land first, in order (see "Spending compressed USDC").
 * The owner signs the message (`transaction.message.serialize()`), for
   example with `wallet.signTransaction`. The service adds the sponsor
   signature at submit time.
-* Every transaction starts with `SetComputeUnitLimit(1_400_000)`.
-  **[added 2026-10-19]** The stake actions with `params.payer: "owner"` are
-  built for the owner to pay and send instead (see "Owner-paid stake
-  transactions").
+* Every transaction starts with `SetComputeUnitLimit(1_400_000)`
+  (**[added 2026-10-20]** `earnClaim`'s with `SetComputeUnitLimit(200_000)`,
+  see "Earn transactions").
+* **[adjusted 2026-10-19]** Every action takes `params.payer: "owner"`
+  (`"sponsor"` or none: sponsored, as above), and is then built for the
+  owner to pay and send instead (see "Owner-paid transactions").
 * `summary` is
   `{ action, owner, feePayer, instructions: [step names], expiresAt, …action fields }`.
   The step names are `computeBudget`, `heapFrame`, `createAta`, `deposit`,
   `withdraw`, `submit`, `cancel`, `poolWithdraw`, `finalize`, `settle`,
-  `settleMaker`, `prune`, `vaultDeposit`, `vaultWithdraw`, for
-  `cashOut` `createDestinationAta` and `cashOut`, and **[added]**
+  `settleMaker`, `prune`, `vaultDeposit`, `vaultWithdraw`,
+  **[added 2026-10-20]** `createAmbaAta` and `vaultRewardsClaim`
+  (`earnClaim`), for `cashOut` `createDestinationAta` and `cashOut`, and **[added]**
   `decompress` and `decompressLightAta` (see "Spending compressed USDC"). Market actions' summaries
   carry `market`, `symbol` and `label`; `cashOut`'s and the Earn actions'
   do not (the Earn actions' carry `vault`).
@@ -450,6 +461,7 @@ Actions and their `params`:
 |---|---|---|
 | `deposit`, `withdraw`, `submit`, `close`, `cancel`, `poolWithdraw`, `finalize`, `settle` **[added]** | `market, …` | see "Futures", Market transactions |
 | `earnDeposit`, `earnWithdraw` **[added]** | `amount` (no `market`) | see "Earn" |
+| `earnClaim` **[added 2026-10-20]** | none | see "Earn" |
 | `stake`, `startUnstake`, `cancelUnstake`, `unstake`, `stakeClaim` **[added]** | `amount` (`startUnstake`, `unstake`: or `"all"`/omitted; `cancelUnstake`, `stakeClaim`: none) | see "Stake" |
 | `cashOut` **[added]** | `destination, amount` (no `market`) | [createDestinationAta], [decompressLightAta], [decompress], [cashOut]: a `TransferChecked` of up to `amount` USDC atoms from the owner's ATA to the destination's ATA, the rest decompressed from the owner's compressed USDC into it |
 
@@ -462,11 +474,12 @@ Actions and their `params`:
   `poolDeposit` went with the per-market Earn pools (2026-10-16): it is
   refused with 400 `unknown action`; Earn is `earnDeposit`.
 * Steps in brackets are added only when needed. `createAta` is an
-  idempotent creation of the owner's USDC ATA, paid by the sponsor, added
-  when the ATA does not exist.
+  idempotent creation of the owner's USDC ATA, paid by the sponsor (the
+  owner, owner-paid), added when the ATA does not exist.
 * **[added]** `cashOut` sends USDC from the owner's wallet to another
-  wallet. The sponsor pays the fee and, when the destination's ATA does not
-  exist yet, its rent (`createDestinationAta`, an idempotent creation).
+  wallet. The sponsor (the owner, owner-paid) pays the fee and, when the
+  destination's ATA does not exist yet, its rent (`createDestinationAta`,
+  an idempotent creation).
   **[adjusted]** Past the ATA's balance, the owner's compressed USDC pays
   the rest, decompressed straight into the destination's ATA (see
   "Spending compressed USDC"); without a part from the ATA there is no
@@ -487,8 +500,65 @@ Actions and their `params`:
   `balance` is the ATA's, `usdcAmount` the part it pays, `compressedAmount`
   the part compressed USDC pays and `transactionAmount` what this
   transaction moves (the rest moves in `before`). Submit it with
-  `/v1/tx/submit` as usual.
+  `/v1/tx/submit` as usual (owner-paid: the owner sends it).
 * A transaction larger than 1232 bytes is refused with 400.
+
+### Owner-paid transactions [added 2026-10-19]
+
+Wallets such as Phantom, Solflare and Backpack change the transactions
+they sign (Lighthouse assertions, priority fees), so a sponsored one fails
+("Your wallet changed the transaction while signing, so it was not sent").
+The user decided (2026-10-19, "Unsponsored staking now", then for every
+action) that wallet-adapter wallets pay for and send their own
+transactions; Magic (Google) wallets stay sponsored. Every `/v1/tx/prepare`
+action (the market, Earn and stake actions and `cashOut`) takes
+`params.payer`, and `/v1/tx/quote-prepare` takes `payer` at the top level
+of its body, beside the order's fields:
+
+* `"sponsor"` or none: the sponsored transaction, unchanged.
+* `"owner"`: owner-paid, below.
+* Anything else: 400 `` `payer` must be "owner" or "sponsor" ``.
+
+With `"payer": "owner"` the instructions are the sponsored ones with the
+owner in the sponsor's place:
+
+* the owner is the fee payer and the only signer of the transaction and of
+  every `before` one, and pays every rent the sponsor would: `createAta`,
+  `createAmbaAta`, `createDestinationAta` (`cashOut`), the Earn position
+  (`earnDeposit`'s first), the stake position and its growth (`stake`,
+  `startUnstake`), and, as the payer named by `decompress` and
+  `decompressLightAta`, any rent top-up the Light ATA asks for;
+* the sponsor is not among any of the transactions' accounts;
+* the compute limit is the sponsored one, `SetComputeUnitLimit(1_400_000)`,
+  except for the stake actions: `SetComputeUnitLimit(200_000)` (a stake
+  measured about 32,000 CU on mainnet; a wallet's priority fee is priced
+  per unit of the limit, so the lower limit keeps it small), and
+  **[added 2026-10-20]** `earnClaim`, whose limit is 200,000 either way. The
+  API adds no `SetComputeUnitPrice`;
+* with one signer fewer, an owner-paid transaction is at least 96 bytes
+  smaller than the sponsored one of the same steps, so the API splits off
+  `before` transactions exactly where it would for the sponsored one.
+
+Response:
+
+```text
+{ transaction (base64 legacy transaction, unsigned), blockhash, lastValidBlockHeight, summary, before? }
+```
+
+Each `before` entry is an owner-paid response of its own (`summary.action`
+`"decompress"`); quote-prepare's `prepared` is the owner-paid response for
+`submit`. No `id` and nothing stored: the sponsor never signs them and
+`/v1/tx/submit` does not take them. The owner's wallet signs them, may
+change them, and sends them itself (for example `sendTransaction` of the
+wallet adapter, or signed and relayed through `/rpc/sendTransaction`, which
+refuses only sponsor-paid packets): the `before` ones first, in order, each
+landed (`/v1/tx/:sig/wait?commitment=processed`) before the next. Follow
+each with `/v1/tx/:sig/wait`. `summary` is the sponsored one's with
+`feePayer` the owner and no `expiresAt` (the blockhash's
+`lastValidBlockHeight` is the limit). Compressed USDC an owner-paid
+transaction spends counts as spent once Photon indexes it (a sponsored
+submit counts it as soon as it is confirmed), so prepare a further spend
+only after the earlier one has landed.
 
 ### `POST /v1/tx/submit`
 
@@ -986,7 +1056,8 @@ Response:
 `params` name the market as `market` (address or symbol). Every transaction
 starts with `SetComputeUnitLimit(1_400_000)`; `submit` steps also request a
 256 KiB heap frame (`heapFrame`), which `Submit` needs. The sponsor pays the
-fee; the 1232-byte limit applies.
+fee (the owner with `payer: "owner"`, see "Owner-paid transactions"); the
+1232-byte limit applies.
 
 | action | params | instructions |
 |---|---|---|
@@ -1253,7 +1324,7 @@ EarnRewards = { mint, decimals, account, house | null, startTs, endTs, amount, d
 { owner, usdc, vault: EarnVault | null, chainTime,
   position: null | { address, exists, shares, valueLow, valueHigh, deposited, withdrawn,
                      earningsLow, earningsHigh, share, withdrawable,
-                     rewards: null | { pending, paid, earned } } }
+                     rewards: null | { pending, paid, earned, perSecond, asOf } } }
 ```
 
 * `position` is `null` while the vault does not exist; otherwise the
@@ -1275,7 +1346,20 @@ EarnRewards = { mint, decimals, account, house | null, startTs, endTs, amount, d
   reward mint: `pending` accrued to `chainTime` and not paid yet, `paid`
   ever paid into their AMBA account, `earned` both. Once the stream ends
   the keeper pays everyone's `pending`; the token's transfer fee comes out
-  of what arrives.
+  of what arrives. **[added 2026-10-20]** The owner may also claim it at any
+  time (`earnClaim`, below).
+  **[added 2026-10-20]** `asOf` is the chain time (unix seconds) the
+  figures are for, the response's `chainTime`; `perSecond` (atoms, a
+  decimal string) is what the position earns each second from then: the
+  stream's release rate, `amount / (endTs - startTs)`, times the
+  position's `shares` over the vault's earning shares (its `shares` less the house's), rounded down once:
+  `floor(amount × shares / ((endTs - startTs) × earning shares))`. It is
+  `"0"` before `startTs`, from `endTs` on, without shares, and for the
+  house. While the shares stay as they are, `pending + perSecond × (t -
+  asOf)` for `t` up to `endTs` counts the rewards up live (the program
+  rounds each accrual down, so what it owes may differ by a few atoms);
+  read the position again after a deposit, withdrawal or claim, or when
+  the vault's shares change.
 
 ### `GET /v1/accounts/:owner/earn/activity?limit=100&before=<signature>`
 
@@ -1294,10 +1378,11 @@ as there).
 |---|---|---|
 | `earnDeposit` | `amount` (atoms) | vaultDeposit from the owner's USDC ATA |
 | `earnWithdraw` | `amount` (atoms, or `"all"`) | [createAta], vaultWithdraw |
+| `earnClaim` **[added 2026-10-20]** | none | [createAmbaAta], vaultRewardsClaim |
 
 * **`earnDeposit`**: `amount` is `1..=` the ATA balance, else 400. The
-  sponsor pays the fee and, on the first deposit, the position account's
-  rent. The instruction names every market of the vault in its order (the
+  sponsor (the owner, owner-paid) pays the fee and, on the first deposit,
+  the position account's rent. The instruction names every market of the vault in its order (the
   program values the vault in each). 400 `InsufficientFunds` when `amount`
   buys no share at the vault's value now. Summary: `vault`, `amount` and
   `shares`, the shares it mints at the cached value (`amount` into an
@@ -1313,9 +1398,27 @@ as there).
   pay more, `InsufficientFunds` beyond `withdrawable`. Summary: `vault`,
   `shares`, `all`, `amount` (the payout at the cached value) and `draws`
   (the markets drawn on).
-* Both fit one legacy transaction for up to the vault's 13 markets (two
-  drawn, the ATA created); the 1,232-byte check applies as for every
-  action.
+* **`earnClaim`** **[added 2026-10-20]**: pays the position's AMBA rewards
+  (`rewards.pending`) now, before the stream ends, into the owner's own
+  associated account of the stream's `mint` under the mint's token program
+  (Token-2022 for AMBA; the token's transfer fee comes out of what
+  arrives). `createAmbaAta` is an idempotent creation of that account,
+  added when it does not exist, its rent paid by the sponsor (the owner,
+  owner-paid). `vaultRewardsClaim` is the program's `VaultRewardsClaim`
+  (tag 26) with the owner as an extra read-only signer after its six
+  accounts (the program asks no signature; the owner signs so that the
+  sponsor pays only for claims their owners sign). The transaction starts
+  with `SetComputeUnitLimit(200_000)`, sponsored or owner-paid (simulated
+  on the dev chain, a claim took about 24,300 CU, about 43,800 with the
+  account created). Refused
+  with 400 `Nothing to claim: Earn has no AMBA rewards` without a stream
+  and `Nothing to claim yet` when `pending` is 0 now (no position, the
+  house, or everything already paid). Summary: `vault`, `amba` (the
+  pending atoms now; the claim pays what is pending when it lands, at
+  least this) and `ambaAccount` (the account paid into).
+* `earnDeposit` and `earnWithdraw` fit one legacy transaction for up to
+  the vault's 13 markets (two drawn, the ATA created); the 1,232-byte check
+  applies as for every action.
 * `poolWithdraw` remains for the legacy per-market pools' shares (dev);
   `poolDeposit` is gone.
 
@@ -1374,12 +1477,34 @@ StakePosition = {
   claimable (AMBA atoms `unstake` pays now: finished, not backing lent credit, and no market it backs
     in its last day or settling; 0 while one is),
   stakedIn, unstaked,
-  pending: { amba, usdc }, paid: { amba, usdc }
+  pending: { amba, usdc }, paid: { amba, usdc },
+  perSecond: { amba }, asOf      [added 2026-10-20]
 }
 ```
 
 **[adjusted 2026-10-18]** `unstakeable` is gone: `claimable` is what may
 leave now, `active` what `startUnstake` may take.
+
+* `pending` is what `stakeClaim` pays now, accrued to `chainTime`: `amba`
+  from the pool's AMBA stream (`rewards`), `usdc` the stakers' share of the
+  maker's profit; `paid` is what was ever paid into the owner's accounts.
+* **[added 2026-10-20]** `asOf` is the chain time (unix seconds) the
+  figures are for, the response's `chainTime`. `perSecond.amba` (atoms, a
+  decimal string) is what the position earns each second from then from
+  the AMBA stream: its release rate, `amount / (endTs - startTs)`, times
+  the position's `shares` over the pool's `shares`, rounded down once:
+  `floor(amount × shares / ((endTs - startTs) × pool shares))`. Every share
+  earns, unstaking ones included, and the stream has no house; a position
+  of an earlier share epoch counts its converted `shares` (as this read
+  reports them). It is `"0"` before `startTs`, from `endTs` on, without a
+  stream and without shares. While the shares stay as they are,
+  `pending.amba + perSecond.amba × (t - asOf)` for `t` up to `endTs` counts
+  the AMBA up live (the program rounds each accrual down, so what it owes
+  may differ by a few atoms); read the position again after a stake,
+  unstake or claim, or when the pool's shares change. The USDC profit
+  share has no rate: it arrives when a market's credit settles
+  (`CreditSettle`), so `pending.usdc` moves only then. `stakeClaim` pays
+  both at any time.
 
 ### Stake transactions (`POST /v1/tx/prepare`)
 
@@ -1421,38 +1546,12 @@ leave now, `active` what `startUnstake` may take.
 
 ### Owner-paid stake transactions [added 2026-10-19]
 
-Wallets such as Phantom change the transactions they sign (Lighthouse
-assertions, priority fees), so the user decided (2026-10-19, "Unsponsored
-staking now") that wallet-adapter wallets pay for their own stake actions;
-Magic (Google) wallets stay sponsored. Any stake action takes
-`params.payer`: `"sponsor"` (the default, unchanged) or `"owner"`. Any
-other value is refused with 400, and `"owner"` on an action that is not a
-stake action too (`` `payer: "owner"` is for the stake actions only ``).
-
-With `"payer": "owner"` the instructions are the sponsored ones with the
-owner in the sponsor's place:
-
-* the owner is the fee payer and the only signer, and pays every rent the
-  sponsor would: the position account (`stake`), an older pool's or
-  position's growth (`startUnstake`), `createAmbaAta` and `createAta`;
-* the sponsor is not among the transaction's accounts at all;
-* it starts with `SetComputeUnitLimit(200_000)` instead of 1,400,000 (a
-  stake measured about 32,000 CU on mainnet; a wallet's priority fee is
-  priced per unit of the limit, so the lower limit keeps it small). The
-  API adds no `SetComputeUnitPrice`.
-
-Response:
-
-```text
-{ transaction (base64 legacy transaction, unsigned), blockhash, lastValidBlockHeight, summary }
-```
-
-No `id` and nothing stored: the sponsor never signs it and `/v1/tx/submit`
-does not take it. The owner's wallet signs it, may change it, and sends it
-itself (for example `sendTransaction` of the wallet adapter); follow it
-with `/v1/tx/:sig/wait`. `summary` is the sponsored one's with `feePayer`
-the owner and no `expiresAt` (the blockhash's `lastValidBlockHeight` is
-the limit).
+**[adjusted 2026-10-19]** The stake actions take `params.payer: "owner"`
+as every action does (see "Owner-paid transactions"; until this change
+they were the only ones): the owner pays the fee, the position account
+(`stake`), an older pool's or position's growth (`startUnstake`),
+`createAmbaAta` and `createAta`, and the transaction starts with
+`SetComputeUnitLimit(200_000)` instead of 1,400,000.
 
 ## Stream [added]
 
@@ -1660,6 +1759,10 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
   provided the product's on-chain SKU manifest is absent or commits to the
   same root; for a product with no governed label set, `bucketId`'s own
   zero-padded printable ASCII; else `null`. `status` is the source status name (`Active`, …).
+* A source has no proposal time: the oracle program stores no creation
+  slot or timestamp in a source, its evidence links (a proposal's link time
+  is 0) or a sponsorship agreement. Off-chain candidates have `createdAt`
+  (`GET /oracle/source-candidates/recent`).
 
 ### `GET /v1/oracle/catalog`
 
@@ -1769,6 +1872,50 @@ nothing (an empty `after` is no cursor); `expiryId` maps a
 per-strike id like submission does. Other parameters, or an `agentId` or
 `after` that is not 64 lowercase hex, are 400 `ORACLE_CANDIDATE_QUERY_INVALID`;
 a bad `limit` is 400 `ORACLE_CANDIDATE_PAGE_INVALID`.
+
+### `GET /oracle/source-candidates/recent?limit&before` [added]
+
+The live feed of what researchers submit: every stored candidate, newest
+first, for a page that polls the first page and pages back with the cursor.
+
+```text
+200 { candidates: FeedItem[], nextCursor (string|null), onChainObservedAt (ms|null) }
+FeedItem = Candidate & {
+  expired,                                   // expiresAt <= now; listed until deleted (90 days later)
+  sponsorship: Sponsorship | null,           // as GET /oracle/sponsorships lists it
+  onChain: { sourceAddress, sourceId (hex), expiryId, status, proposer } | null }
+```
+
+* **Order and paging.** By `createdAt` descending, then `contentHash`
+  descending; expired candidates are included (`expired: true`; the list
+  above leaves them out). `limit` 1-100 (default 50; JavaScript `Number`
+  rules, as in the list). `before` is a cursor, `<createdAt>-<contentHash>`
+  (decimal ms, `-`, 64 lowercase hex): the page starts after that candidate.
+  `nextCursor` is the last item's cursor when the page is full, else `null`
+  (a full last page is followed by an empty one). New candidates join at the
+  front, so a cursor never skips or repeats one. A repeated parameter takes
+  its last value; an empty `before` is no cursor. Any other parameter, or a
+  malformed `before`, is 400 `ORACLE_CANDIDATE_QUERY_INVALID`; a bad `limit`
+  is 400 `ORACLE_CANDIDATE_PAGE_INVALID`. Any other method is 405.
+* **The chain join** costs no RPC per request: it is the last oracle read
+  (the one behind `/v1/oracle/public-snapshot`, every 30 s; its time is
+  `onChainObservedAt`, `null` before the first, when every `sponsorship` and
+  `onChain` is `null`). `onChain` is the served months' verified source
+  (any status, a proposal left out of a month's recipe too) whose source id is
+  the content hash (how sponsorship and `petri oracle sponsor` propose it),
+  else one of the candidate's series (`details.expiryId`, compared as
+  upper-case letters and digits) with its `bucketId` and
+  `canonicalLocatorHash` (the same find proposed directly under another id).
+  `status` is the source status name. `sponsorship` is the candidate's
+  agreement (`candidate` = its content hash): the read takes the agreements
+  of the sources whose proposer is their agreement PDA (a
+  `SponsoredActivate` proposes for its agreement) by key, one
+  `getMultipleAccounts` per 100, none while no source is sponsored; a failed
+  read keeps the last ones. An agreement whose source is outside the served
+  months, or was closed, is not found (`null`); a sponsorship prepared but
+  not yet landed has none either.
+* One indexed query (`oracle_candidates_recent`, `(created_at,
+  content_hash)`), read-only and without a credential, like the list.
 
 ### `GET /oracle/source-candidates/:contentHash`
 

@@ -105,19 +105,21 @@ fn dispatch_cli(cli: Cli) -> Result<(), CliError> {
         Command::Tui {
             no_update_check,
             render,
+            size,
             view,
+            at,
         } => {
+            // `--render` alone takes its size from `--size`.
+            let render = render.as_deref().map(|r| match r {
+                "" => size.as_deref().unwrap_or("100x32"),
+                r => r,
+            });
             let settings = futures::settings::Settings::from_cli(&cli).map_err(CliError::new)?;
             if cli.resolved_output() == OutputFormat::Json {
                 research::command(&["owner".into(), "snapshot".into()], &settings.api_url.0)?;
             } else {
-                research::run(
-                    !no_update_check,
-                    render.as_deref(),
-                    view.as_deref(),
-                    settings,
-                )
-                .map_err(CliError::new)?;
+                research::run(!no_update_check, render, view.as_deref(), *at, settings)
+                    .map_err(CliError::new)?;
             }
         }
         Command::Research { args } => {

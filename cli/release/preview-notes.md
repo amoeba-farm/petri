@@ -1,4 +1,15 @@
-# Petri v0.1.13 — preview
+# Petri v0.1.14 — preview
+
+## New in v0.1.14
+
+- **A new start screen.** `petri tui` opens on an animated introduction
+  while it reads the markets, so the first view opens with its data. Click
+  anywhere, or press Enter or Space, to start; q or Esc quits.
+- **Help pasting into your agent.** After **Copy agent setup** (and **Copy
+  start message**), a pop-up says what was copied and how to hand it over in
+  three steps: open a chat with your agent, paste it and send it, then
+  approve the same pairing code in Connect. **Copy again** copies it once
+  more.
 
 ## New in v0.1.13
 

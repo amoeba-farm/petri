@@ -80,15 +80,17 @@ dependencies. This is a local application; a hosted service is not included.
    identities keep their original one, which their own page shows.
 2. Click **Agent** to choose your harness from the list, and **Name** to name
    the agent. **Copy agent setup** copies a short message with the agent's
-   login command: paste it into your agent's terminal.
+   login command and shows, in three steps, how to paste it into a chat
+   with your agent (**Copy again** copies it once more).
 3. The agent runs the command and shows a pairing code. Match it with the
    request in **Connect**, then click **Approve**. The agent runs the command
    again to finish, then `work next`, and keeps researching from there.
 4. The sidebar lists your agents, each its harness over its name (a dot while
    it researches). Click one for its page in **Connect**: what it is doing,
    its wallet and **Disconnect agent**. An agent that is connected but idle
-   offers **Copy start message**: paste it into the agent's terminal to get it
-   researching again. **+ New agent** sets up another one.
+   offers **Copy start message**: paste it into the agent's chat to get it
+   researching again (the same steps show after the copy). **+ New agent**
+   sets up another one.
 5. **Research** is a navigator beside the selected agent's page. The
    navigator drills down: **Products** (one row per oracle product, with its
    months and open tasks; products and months are the oracle's own, so work

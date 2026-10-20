@@ -187,6 +187,11 @@
             <td>Rendering stays free of network and storage effects.</td>
           </tr>
           <tr>
+            <td><a href="../../src/research/intro.rs">src/research/intro.rs</a></td>
+            <td>The TUI's introduction: amoebas crawling as ASCII tiles on a light page, a frosted glow, the wordmark and "click to start". Shown on every interactive start while the first reads run; a click, Enter or Space starts. Amoebas crawl by pseudopods and steer clear of each other.</td>
+            <td>Draws only, deterministic for a seed and time: <code>petri tui --render 100x30 --view intro --at 3</code> prints a frame. No loading text. Each frame starts from a cached still layer and quantized shades, so the terminal is sent only what moved (the ignored test <code>bench_frames</code> measures it).</td>
+          </tr>
+          <tr>
             <td><a href="../../src/research/markets.rs">src/research/markets.rs</a></td>
             <td>TUI Markets view: the market list, the book of the suggested range (as <code>petri book</code>), trades, the index and price, the account's positions and orders, and long, short, close and cancel tickets.</td>
             <td>Owns no trading logic: tickets call <code>futures::trade</code>'s prepare and send steps, quote before <code>y</code> sends, and use the CLI's 2% slippage default. The leverage keys step through the site's leverages that fit the market's price.</td>
