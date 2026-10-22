@@ -1,5 +1,5 @@
 //! RAMX and NANDX commodity buckets and submission routing, from
-//! `governance/commodity_submission_spec.v1.json`, and BATX's battery-cell categories, from
+//! `governance/commodity_submission_spec.v2.json`, and BATX's battery-cell categories, from
 //! `governance/batx_basket_spec.v1.json` (the user's BATX brief of 2026-10-20).
 //!
 //! The spec has three layers, which map onto the oracle as:
@@ -15,8 +15,10 @@
 //! is deterministic and off chain: petri runs it before it sends, the API runs it on every
 //! submission. The program needs no change.
 //!
-//! The user moved RAMX and NANDX from modules and SSDs to these chip and wafer buckets on
-//! 2026-10-20, for every month expiring after 2026-11-01. BATX starts with the months
+//! The user moved RAMX and NANDX from modules and SSDs to these chip buckets on 2026-10-20, for
+//! every month expiring after 2026-11-01. NANDX's were fabricated-wafer assessments until
+//! 2026-10-22, when the user made them packaged NAND chips like RAMX's (spec v2; same bucket
+//! labels, so the same on-chain SKU list). BATX starts with the months
 //! expiring 2026-12-01 ([`BATX_FIRST_EXPIRY`]); [`index`] is its brief's fixed-base index.
 
 mod buckets;

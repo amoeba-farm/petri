@@ -44,7 +44,7 @@ Rules v2 changes one item on this list, for login-only pages only: such a page c
 
 ## Comparison series
 
-From the months expiring after 2026-11-01, RAMX and NANDX settle on chip and wafer buckets, and BATX settles on battery-cell buckets from its first month (see [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/)). A source for one of those months is a **comparison series**: one repeatable priced object or published assessment, with its terms and statistic fixed before it reports. Its definition (`amoeba.comparison-series.v1`) is stored on chain with the source and must state:
+From the months expiring after 2026-11-01, RAMX and NANDX settle on memory chip buckets, and BATX settles on battery-cell buckets from its first month (see [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/)). A source for one of those months is a **comparison series**: one repeatable priced object or published assessment, with its terms and statistic fixed before it reports. Its definition (`amoeba.comparison-series.v1`) is stored on chain with the source and must state:
 
 - its series ID, definition version and bucket;
 - where it comes from: the publisher, the page and the exact row;
@@ -65,7 +65,7 @@ Petri's `petri oracle series template`, `check`, `propose` and `show` commands a
 | Published assessment | A recurring contract-price assessment, such as one row of a publisher's monthly contract price table. | The exact assessment and row. It can take its scope from the publisher's methodology; it need not name each underlying customer, part number or order size. |
 | Direct price | A recurring contract price for one exact part. | The manufacturer, exact part number and specification revision, quantity tier, delivery and pricing period, market, tax and freight, and payment, rebate or bundling terms. |
 
-NANDX uses published assessments only. A listing or a firm offer is not an agreed contract price.
+RAMX and NANDX take both, for chips. A listing or a firm offer is not an agreed contract price, and a wafer assessment is not a NANDX chip price.
 
 For BATX, a direct price is a seller's recurring quote for one exact cell. Its model, capacity, voltage, performance class and terms must be exact. A BATX series keeps one price basis; a change reads **Definition changed**.
 
@@ -73,7 +73,7 @@ For BATX, a direct price is a seller's recurring quote for one exact cell. Its m
 
 Each scope field says whether it is `exact`, a `documented_mix`, `not_disclosed` or `not_applicable`. A documented mix, such as an assessment that covers several speed bins or layer generations, is a defined scope. What keeps a series from counting is unresolved core information: the product, the contract basis, what the price unit means, the period or the statistic. Undisclosed details of the underlying transactions do not, by themselves.
 
-Nothing is assumed. An unknown condition is not new, an unknown grade is not standard production, and an unknown unit is not USD per chip. Never guess a unit, or turn a wafer price into a price per chip. For BATX, a price per cell becomes CNY per Wh only with the exact cell's documented rated energy. Never guess a cell's voltage or capacity.
+Nothing is assumed. An unknown condition is not new, an unknown grade is not standard production, and an unknown unit is not USD per chip. Never guess a unit, or turn a wafer or die price into a price per chip. For BATX, a price per cell becomes CNY per Wh only with the exact cell's documented rated energy. Never guess a cell's voltage or capacity.
 
 ### Observations
 

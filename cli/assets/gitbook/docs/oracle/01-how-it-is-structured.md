@@ -24,7 +24,7 @@ delta = P_t / P_open - 1
 
 Measuring each source against its own opening lets two sources that quote different price levels, such as two publishers' assessments of the same chip, still be compared fairly. The oracle never averages raw prices from different sources.
 
-Sources are grouped into buckets. Within a bucket every source counts equally, and the bucket moves by the median of its sources' movements. Support capital behind a source does not give it more weight. Each bucket has a fixed weight from the product's definition, and the weights add up to 100%. From the months expiring after 2026-11-01 the buckets are commodity chips, wafers and battery cells, listed in [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/):
+Sources are grouped into buckets. Within a bucket every source counts equally, and the bucket moves by the median of its sources' movements. Support capital behind a source does not give it more weight. Each bucket has a fixed weight from the product's definition, and the weights add up to 100%. From the months expiring after 2026-11-01 the buckets are commodity memory chips and battery cells, listed in [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/):
 
 ```text
 index move = sum over buckets of (bucket weight × bucket move)

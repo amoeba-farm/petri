@@ -12,7 +12,7 @@ A displayed chart or product page is not one of these. Only the oracle recipe, t
 
 ## Product definitions
 
-From the months expiring after 2026-11-01, RAMX and NANDX price commodity chips and wafers, not modules or drives. BATX prices battery cells from its first month. Each product has a fixed set of buckets with fixed weights.
+From the months expiring after 2026-11-01, RAMX and NANDX price commodity memory chips, not modules or drives. BATX prices battery cells from its first month. Each product has a fixed set of buckets with fixed weights.
 
 **RAMX** prices new, unused, standard-production DDR4 and DDR5 SDRAM chips with one die per package, on a contract-price basis:
 
@@ -27,7 +27,7 @@ The density is the single die's: a package holding two 8Gb dies is not a 16Gb ch
 
 DDR5 32Gb chips are a research candidate at 0%, not a RAMX bucket: a DDR5 32Gb series reads **Research only**. It is evidence for a later decision, not a settlement input.
 
-**NANDX** prices published contract-price assessments of fabricated 3D NAND flash wafers, by cell type and die density. It uses assessments only:
+**NANDX** prices new, unused, standard-production 3D NAND flash chips with one die per package, by cell type and die density, on a contract-price basis, as RAMX prices DRAM chips:
 
 | Bucket | Weight |
 |---|---|
@@ -36,9 +36,9 @@ DDR5 32Gb chips are a research candidate at 0%, not a RAMX bucket: a DDR5 32Gb s
 | 512Gb TLC | 20% |
 | 256Gb TLC | 10% |
 
-An assessment can cover several manufacturers and layer generations. It measures that defined market, not a constant-quality transaction price. NANDX does not include SSD, eMMC or UFS prices, quotes for single packaged chips or dies, whole-wafer offers converted with an assumed yield, SLC, MLC or planar NAND, blank silicon wafers, spot prices or forecasts.
+The density is the single die's: a package holding four 1Tb dies is not a 1Tb chip. Different interfaces and I/O speeds, packages, manufacturers, layer generations and quantity tiers can all count, each as its own comparison series; an assessment can cover several manufacturers and layer generations. NANDX does not include NAND wafers or wafer assessments, bare dies, stacked or multi-die packages, SSD, eMMC, UFS or memory card prices, SLC, MLC or planar NAND, engineering samples, or reclaimed, refurbished, downgraded, white-label or untested parts. Until 2026-10-22 NANDX's buckets were fabricated-wafer assessments; no month was formed on them on mainnet.
 
-These definitions are new. The comparison series in each bucket come from open submissions and are still being filled in, and published contract-price coverage is thin for some buckets, especially DDR5 24Gb.
+These definitions are new. The comparison series in each bucket come from open submissions and are still being filled in, and published contract-price coverage is thin for some buckets, especially DDR5 24Gb and the NANDX chips.
 
 **BATX** prices new manufactured lithium-ion battery cells. It uses China domestic industrial prices in Chinese yuan (CNY), per Wh where possible. Its first month is BATX Nov 26, expiring 2026-12-01 00:00 UTC. It has no launch month: its sources form through the [ordinary monthly process](https://docs.amoeba.farm/oracle/01-how-it-is-structured/#the-ordinary-monthly-process) from its first month.
 

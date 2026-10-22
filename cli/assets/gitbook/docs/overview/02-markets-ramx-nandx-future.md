@@ -1,6 +1,6 @@
 # RAMX, NANDX, and BATX markets
 
-Amoeba Farm has three indexes. **RAMX** tracks DRAM memory chip prices. **NANDX** tracks NAND flash wafer prices. **BATX** tracks lithium-ion battery cell prices in China. Each index has one capped futures market per monthly expiry, paid in USDC on Solana mainnet. BATX is a prototype, and its first month is BATX Nov 26.
+Amoeba Farm has three indexes. **RAMX** tracks DRAM memory chip prices. **NANDX** tracks NAND flash chip prices. **BATX** tracks lithium-ion battery cell prices in China. Each index has one capped futures market per monthly expiry, paid in USDC on Solana mainnet. BATX is a prototype, and its first month is BATX Nov 26.
 
 ## What each index tracks
 
@@ -11,7 +11,7 @@ From the months expiring after 2026-11-01:
 | Market | What it prices | Buckets and weights |
 |---|---|---|
 | RAMX | Contract prices of new, standard-production DDR5 and DDR4 memory chips, one die per package | DDR5 16Gb 40%, DDR5 24Gb 20%, DDR4 16Gb 25%, DDR4 8Gb 15% |
-| NANDX | Published contract-price assessments of 3D NAND flash wafers | 1Tb TLC 40%, 1Tb QLC 30%, 512Gb TLC 20%, 256Gb TLC 10% |
+| NANDX | Contract prices of new, standard-production 3D NAND flash chips, one die per package | 1Tb TLC 40%, 1Tb QLC 30%, 512Gb TLC 20%, 256Gb TLC 10% |
 | BATX | China domestic industrial prices of new lithium-ion battery cells, in Chinese yuan | LFP storage 40%, LFP EV 30%, Ternary prismatic EV 20%, Ternary pouch EV 10% |
 
 Each bucket's weight is fixed for the whole oracle month and shown on the **Oracle** page. The launch month, RAMX Oct 26 and NANDX Oct 26, uses the first definitions: 13 rows of memory modules (RDIMM 68%, UDIMM 23%, SODIMM 9%) and 22 rows of storage (channel SSD 30%, OEM SSD 25%, flash wafer 25%, eMMC 10%, UFS 10%). [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/) lists every bucket and row.

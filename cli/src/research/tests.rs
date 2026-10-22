@@ -922,7 +922,7 @@ fn feed_app() -> App {
             "Started: NANDX · TLC 512Gb",
             None
         ),
-        event(2, "agent", "search", "tlc 512gb wafer spot price", None),
+        event(2, "agent", "search", "tlc 512gb chip contract price", None),
         event(
             3,
             "agent",
@@ -985,7 +985,7 @@ fn the_feed_shows_each_step_as_one_line_by_kind_newest_last() {
     let screen = draw(&mut app, 120, 40);
     for text in [
         "▸ NANDX Nov 2026 · TLC 512Gb",
-        "⌕ tlc 512gb wafer spot price",
+        "⌕ tlc 512gb chip contract price",
         "↗ memorymarket.com/price/tlc",
         "$ 2.95 USD, TLC 512Gb",
         "you: Check the vendor page first.",

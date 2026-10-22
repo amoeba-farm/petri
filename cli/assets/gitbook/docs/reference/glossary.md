@@ -4,7 +4,7 @@ Plain definitions of the terms used in Amoeba Farm, using the web app’s own la
 
 ## RAMX / NANDX / BATX
 
-The three indexes. RAMX follows a DRAM memory chip contract-price benchmark. NANDX follows a NAND flash wafer contract-price benchmark. Their launch month, Oct 26, follows memory module and storage prices instead. BATX, a prototype, follows China domestic industrial prices of new lithium-ion battery cells in yuan. Its first month is Nov 26. All three settle in USDC.
+The three indexes. RAMX follows a DRAM memory chip contract-price benchmark. NANDX follows a NAND flash chip contract-price benchmark. Their launch month, Oct 26, follows memory module and storage prices instead. BATX, a prototype, follows China domestic industrial prices of new lithium-ion battery cells in yuan. Its first month is Nov 26. All three settle in USDC.
 
 ## Index
 
@@ -188,7 +188,7 @@ One exact product identity in a market's governed manifest. From the months expi
 
 ## Bucket
 
-A product with a fixed weight in the index: a commodity such as DDR5 16Gb chips, 1Tb TLC wafers or LFP storage cells, or in the launch month a row of part numbers. Every eligible source in a bucket counts equally, and the bucket moves by their median. See [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/).
+A product with a fixed weight in the index: a commodity such as DDR5 16Gb chips, 1Tb TLC NAND chips or LFP storage cells, or in the launch month a row of part numbers. Every eligible source in a bucket counts equally, and the bucket moves by their median. See [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/).
 
 ## Source
 
@@ -196,7 +196,7 @@ A public price admitted for a bucket. Its movement is measured from its opening 
 
 ## Comparison series
 
-A source of a month on chip, wafer or battery-cell buckets: one defined price-assessment row, or one recurring direct quote, with its price basis, statistic, unit, currency, period and terms fixed before it reports. RAMX and NANDX count contract prices only. It is compared only with its own opening value.
+A source of a month on chip or battery-cell buckets: one defined price-assessment row, or one recurring direct quote, with its price basis, statistic, unit, currency, period and terms fixed before it reports. RAMX and NANDX count contract prices only. It is compared only with its own opening value.
 
 ## Observation
 

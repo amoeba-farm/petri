@@ -1,6 +1,6 @@
 [package]
 name = "amoeba"
-version = "0.1.16"
+version = "0.1.17"
 edition = "2024"
 description = "Petri, the open-source Rust CLI and terminal interface for Amoeba markets"
 license = "Apache-2.0"
@@ -39,7 +39,7 @@ hex = "0.4"
 tokio = { version = "1", features = ["rt-multi-thread", "net", "time"] }
 # The commodity buckets of the chip months (RAMX and NANDX expiring after
 # 2026-11-01), their comparison series and observations, and the routing of
-# oracle/governance/commodity_submission_spec.v1.json (pure serde, `../oracle`
+# oracle/governance/commodity_submission_spec.v2.json (pure serde, `../oracle`
 # by path, as the API uses it).
 ameba-commodity-spec = { path = "../oracle/crates/commodity-spec" }
 ratatui = "0.29.0"

@@ -1,4 +1,16 @@
-# Petri v0.1.16 — preview
+# Petri v0.1.17 — preview
+
+## New in v0.1.17
+
+- **NANDX is packaged chips.** From the months after November 1, 2026, NANDX
+  prices new, single-die packaged 3D NAND flash chips on a contract basis,
+  as RAMX prices DRAM chips; its four buckets and weights stay the same
+  (1Tb TLC, 1Tb QLC, 512Gb TLC, 256Gb TLC). `petri oracle series template
+  --bucket tlc_1tb` writes a packaged-chip series (die count, condition,
+  grade, interface, package), and `petri oracle series check` routes NANDX
+  as it routes RAMX: a direct contract price of one exact chip counts, and a
+  wafer assessment, an SSD or a multi-die package is the wrong product. The
+  bundled guide says the same.
 
 ## New in v0.1.16
 

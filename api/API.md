@@ -1812,11 +1812,16 @@ Routing   = { status (a spec status: "ELIGIBLE_FOR_CONTRACT", …), reasons: [{ 
 ### Commodity buckets [added]
 
 On 2026-10-20 the user moved RAMX and NANDX from module and SSD part
-numbers to commodity chip and wafer buckets for every month expiring after
-2026-11-01 (`oracle/governance/commodity_submission_spec.v1.json`; the crate
-`oracle/crates/commodity-spec` is its code, compiled in). A bucket is an
-on-chain SKU (id: its label, zero-padded to 32 bytes) of the product's
-bucket manifest (`governance/*_product_sku_manifest.v2.json`); a
+numbers to commodity chip buckets for every month expiring after 2026-11-01
+(`oracle/governance/commodity_submission_spec.v2.json`; the crate
+`oracle/crates/commodity-spec` is its code, compiled in). NANDX's buckets
+were 3D NAND wafer assessments until 2026-10-22, when the user made them
+packaged NAND chips like RAMX's (spec v2; same labels, so the same SKU
+list). A bucket is an on-chain SKU (id: its label, zero-padded to 32 bytes)
+of the product's bucket manifest (`governance/ramx_product_sku_manifest.v2.json`,
+`nandx_product_sku_manifest.v3.json`, `batx_product_sku_manifest.v1.json`);
+its `group` is the manifest group it is in (RAMX `DDR5`/`DDR4`, NANDX
+`TLC`/`QLC`); a
 comparison series is one source, whose definition object holds the series'
 definition text; an observation is one opening or update print of that
 source ("Oracle observations"). Months formed on part numbers keep them

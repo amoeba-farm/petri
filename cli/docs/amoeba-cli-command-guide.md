@@ -498,11 +498,13 @@ bytes. Each product has two governed SKU sets, compiled in from the monorepo
 oracle's `governance/`: its part-number list
 (`*_product_sku_manifest.v1.json`, RAMX's 52 modules and NANDX's 48 SSDs),
 which every month up to the launch months commits to, and its commodity chip
-buckets (`*_product_sku_manifest.v2.json`, through `ameba-commodity-spec`),
+buckets (RAMX's `ramx_product_sku_manifest.v2.json`, NANDX's
+`nandx_product_sku_manifest.v3.json`, through `ameba-commodity-spec`),
 which every month expiring after 2026-11-01 commits to: RAMX `DDR5_16GBIT`,
 `DDR5_24GBIT`, `DDR4_16GBIT`, `DDR4_8GBIT` (40/20/25/15%, the user's weights
 of 2026-10-21; `DDR5_32GBIT` is a research candidate, not registered); NANDX
-`tlc_1tb`, `qlc_1tb`, `tlc_512gb`, `tlc_256gb`. Petri proves membership against the set
+`tlc_1tb`, `qlc_1tb`, `tlc_512gb`, `tlc_256gb` (packaged single-die 3D NAND
+chips since 2026-10-22, under the labels its wafer buckets had). Petri proves membership against the set
 whose root the month's coverage manifest commits to, or against the bucket set
 the month's sources carry when that is what it commits to (dev bootstrap
 months); it refuses when none reproduces the committed root. `--bucket` takes
@@ -519,7 +521,7 @@ days, its freeze, Opening and Game then follow on the calendar.
 On 2026-10-20 RAMX and NANDX moved from module and SSD part numbers to
 commodity chip buckets, for every month expiring after 2026-11-01. A chip
 month's source is one comparison series of the commodity spec
-(`oracle/governance/commodity_submission_spec.v1.json`): a repeatable
+(`oracle/governance/commodity_submission_spec.v2.json`): a repeatable
 contract price, a published assessment or a direct contract price of one exact
 part, with its terms, unit and statistic fixed before any observation. Its
 source carries the series' canonical JSON as its definition, its page

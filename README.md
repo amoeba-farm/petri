@@ -6,8 +6,8 @@ source dependencies they build against. Start with [Petri's guide](cli/README.md
 or [the SDK](sdk/README.md).
 
 The source is mirrored from Amoeba monorepo commit
-`da0e9143f44635dcbce7288ea6510ddf042de215` (release `2026-10-22-oracle-upgrade`);
-its CLI version is `0.1.16` and its SDK version `0.4.0`. Unsigned v0.1.16 preview
+`454426daa6e6fa64e46803f0db721f3794408e85` (release `2026-10-22-nandx-chips`);
+its CLI version is `0.1.17` and its SDK version `0.4.0`. Unsigned v0.1.17 preview
 packages for Windows and macOS are built from this commit by the Preview binaries
 workflow and published on this repository's Releases page. The v0.1.9 and earlier previews contain older code
 for a retired deployment.

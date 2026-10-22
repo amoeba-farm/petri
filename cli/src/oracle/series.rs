@@ -1,7 +1,8 @@
 //! Comparison series of the chip months. RAMX and NANDX months expiring after
 //! 2026-11-01 are on commodity chip buckets (the user moved them from modules
 //! and SSDs to chips on 2026-10-20), and each of their sources is one
-//! comparison series of the spec, `oracle/governance/commodity_submission_spec.v1.json`.
+//! comparison series of the spec, `oracle/governance/commodity_submission_spec.v2.json`
+//! (NANDX's buckets are packaged NAND chips, like RAMX's DRAM chips, since 2026-10-22).
 //! A series' source carries [`SeriesDefinition::definition_text`] as its
 //! definition, its page (`origin.locator`) as its locator and
 //! [`SeriesDefinition::source_type`] as its source type; nothing changes on

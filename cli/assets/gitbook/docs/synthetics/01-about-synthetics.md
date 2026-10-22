@@ -4,7 +4,7 @@ Amoeba futures are synthetic. They pay USDC based on a hardware price index. You
 
 ## What the exposure is
 
-Each market references the RAMX, NANDX, or BATX index for one month. RAMX follows DRAM memory chip contract prices; NANDX follows NAND flash wafer contract prices. BATX, a prototype, follows China domestic industrial prices of new lithium-ion battery cells, in yuan. Each index starts the month at 100 and moves with a fixed, weighted basket of buckets. See [RAMX, NANDX, and BATX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/).
+Each market references the RAMX, NANDX, or BATX index for one month. RAMX follows DRAM memory chip contract prices; NANDX follows NAND flash chip contract prices. BATX, a prototype, follows China domestic industrial prices of new lithium-ion battery cells, in yuan. Each index starts the month at 100 and moves with a fixed, weighted basket of buckets. See [RAMX, NANDX, and BATX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/).
 
 This is a view on component prices, not on companies. A memory maker's shares also depend on its costs, debt, product mix, and other business results. The index does not.
 

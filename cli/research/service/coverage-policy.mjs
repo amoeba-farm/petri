@@ -27,7 +27,7 @@ const atomic = value => typeof value === 'string' && /^\d+$/u.test(value) ? valu
 // A chip month (RAMX and NANDX expiring after 2026-11-01): the API lists its
 // commodity buckets (`buckets`) and names them (`bucketName`, "DDR5 16Gb").
 // Its sources are comparison series and its prints observations of them
-// (oracle/governance/commodity_submission_spec.v1.json).
+// (oracle/governance/commodity_submission_spec.v2.json).
 export const chipMonth = fact => (Array.isArray(fact?.buckets) && fact.buckets.length > 0) ||
   (Array.isArray(fact?.skus) && fact.skus.some(sku => typeof sku?.bucketName === 'string' && sku.bucketName));
 const named = (...items) => items.map(item => item?.bucketName).find(name => typeof name === 'string' && name) ?? null;
