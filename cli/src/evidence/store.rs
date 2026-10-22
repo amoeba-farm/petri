@@ -115,8 +115,8 @@ pub fn record_in(dir: &Path, digest: &str, event: Event) -> Result<()> {
     Ok(())
 }
 
-/// A bundle by file path, or by digest (or a unique prefix of at least 8
-/// characters) in the folder: its path and text.
+/// A bundle by file path, or by digest (or any prefix that names just one)
+/// in the folder: its path and text.
 pub fn resolve_in(dir: &Path, arg: &str) -> Result<(PathBuf, String)> {
     let path = Path::new(arg);
     if path.is_file() {
@@ -125,7 +125,7 @@ pub fn resolve_in(dir: &Path, arg: &str) -> Result<(PathBuf, String)> {
         return Ok((path.to_path_buf(), text));
     }
     let lower = arg.to_ascii_lowercase();
-    if lower.len() >= 8 && lower.bytes().all(|b| b.is_ascii_hexdigit()) {
+    if !lower.is_empty() && lower.bytes().all(|b| b.is_ascii_hexdigit()) {
         let index = load_index(dir)?;
         let hits: Vec<&Entry> = index
             .values()
@@ -140,8 +140,10 @@ pub fn resolve_in(dir: &Path, arg: &str) -> Result<(PathBuf, String)> {
             }
             [] => {}
             _ => {
+                let digests: Vec<&str> = hits.iter().map(|e| e.digest.as_str()).collect();
                 return Err(Error::msg(format!(
-                    "`{arg}` matches several proofs; give more of the digest"
+                    "`{arg}` matches several proofs; give more of the digest: {}",
+                    digests.join(", ")
                 )));
             }
         }
@@ -183,6 +185,25 @@ mod tests {
         .unwrap();
         assert_eq!(load_index(&dir).unwrap()[&digest].events.len(), 1);
         assert!(resolve_in(&dir, "zzzz").is_err());
+        // Any prefix names a proof, while it names just one.
+        assert_eq!(resolve_in(&dir, "a").unwrap().0, saved.file);
+        let other = "ac".repeat(32);
+        let entry = Entry {
+            digest: other.clone(),
+            origin: "imported".into(),
+            ..Default::default()
+        };
+        save_in(&dir, entry, "{\"y\":2}", None).unwrap();
+        let e = resolve_in(&dir, "a").unwrap_err();
+        assert!(
+            e.message.contains("matches several proofs"),
+            "{}",
+            e.message
+        );
+        assert!(e.message.contains(&digest) && e.message.contains(&other));
+        assert_eq!(resolve_in(&dir, "ab").unwrap().0, saved.file);
+        assert_eq!(resolve_in(&dir, "AC").unwrap().1, "{\"y\":2}");
+        assert!(resolve_in(&dir, "ad").is_err());
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;

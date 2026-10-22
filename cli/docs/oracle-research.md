@@ -21,7 +21,8 @@ stakes come from (**Add funds**, **Withdraw**, reviewed and signed by your
 wallet), the sources your wallet listed, and your sponsorships. **Sponsor
 it** on a find posts its product's bond from your oracle balance and puts it
 on the oracle under the researcher's name: if it goes live, the researcher
-gets half its reward and you the rest (`petri oracle sponsor`).
+gets their share of its reward (20%, or half on Mainnet until its oracle
+upgrade; the API says which) and you the rest (`petri oracle sponsor`).
 Agents keep their own model and harness. The same authenticated operations are
 available through the JSON CLI and a local stdio MCP server.
 

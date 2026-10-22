@@ -114,7 +114,8 @@ pub fn upload(ctx: &Ctx, dir: &Path, digest: &str, json_text: &str) -> Result<Va
     Ok(reply)
 }
 
-/// The ten detail fields a candidate names (the API refuses others).
+/// The ten detail fields a candidate names, and with them its comparison
+/// `series` (the API refuses others).
 const CANDIDATE_FIELDS: &[&str] = &[
     "marketId",
     "expiryId",
@@ -128,6 +129,31 @@ const CANDIDATE_FIELDS: &[&str] = &[
     "evidence",
 ];
 
+/// What a series candidate must name itself; the API derives the rest of
+/// its details from the series (a field given anyway must agree).
+const SERIES_FIELDS: &[&str] = &["marketId", "expiryId", "evidence"];
+
+/// The fields of `candidate` the API takes: a research-workspace candidate
+/// may carry its own bookkeeping, and one without a series (`null` there
+/// too) names all ten details.
+fn submission(
+    mut candidate: serde_json::Map<String, Value>,
+) -> Result<serde_json::Map<String, Value>> {
+    if candidate.get("series") == Some(&Value::Null) {
+        candidate.remove("series");
+    }
+    candidate.retain(|k, _| k == "series" || CANDIDATE_FIELDS.contains(&k.as_str()));
+    let required = if candidate.contains_key("series") {
+        SERIES_FIELDS
+    } else {
+        CANDIDATE_FIELDS
+    };
+    if let Some(missing) = required.iter().find(|f| !candidate.contains_key(**f)) {
+        return Err(Error::msg(format!("the candidate has no `{missing}`")));
+    }
+    Ok(candidate)
+}
+
 pub fn candidate(ctx: &Ctx, dir: &Path, digest: &str, file: &Path) -> Result<Value> {
     let text = std::fs::read_to_string(file)
         .map_err(|e| Error::msg(format!("cannot read {}: {e}", file.display())))?;
@@ -140,21 +166,15 @@ pub fn candidate(ctx: &Ctx, dir: &Path, digest: &str, file: &Path) -> Result<Val
     candidate_map(ctx, dir, digest, candidate)
 }
 
-/// Submits `candidate` (its ten detail fields) with the proof attached.
+/// Submits `candidate` (its ten detail fields, or its series and the
+/// fields the series doesn't give) with the proof attached.
 pub fn candidate_map(
     ctx: &Ctx,
     dir: &Path,
     digest: &str,
-    mut candidate: serde_json::Map<String, Value>,
+    candidate: serde_json::Map<String, Value>,
 ) -> Result<Value> {
-    // A research-workspace candidate may carry its own bookkeeping.
-    candidate.retain(|k, _| CANDIDATE_FIELDS.contains(&k.as_str()));
-    if let Some(missing) = CANDIDATE_FIELDS
-        .iter()
-        .find(|f| !candidate.contains_key(**f))
-    {
-        return Err(Error::msg(format!("the candidate has no `{missing}`")));
-    }
+    let mut candidate = submission(candidate)?;
     candidate.insert("authentication".into(), json!({ "bundleDigest": digest }));
     let who = submitter(ctx, dir)?;
     let reply = data(ctx.api.post_bearer(
@@ -193,5 +213,48 @@ mod tests {
     fn unwraps_oracle_envelopes() {
         assert_eq!(data(json!({"ok": true, "data": {"a": 1}})), json!({"a": 1}));
         assert_eq!(data(json!({"a": 1})), json!({"a": 1}));
+    }
+
+    fn map(v: Value) -> serde_json::Map<String, Value> {
+        v.as_object().unwrap().clone()
+    }
+
+    #[test]
+    fn a_candidate_keeps_its_details_and_its_series() {
+        let mut classic = json!({"workId": "w1", "series": null});
+        for f in CANDIDATE_FIELDS {
+            classic[*f] = json!(format!("{f} text"));
+        }
+        // A classic candidate: its ten details, without the bookkeeping.
+        let sent = submission(map(classic.clone())).unwrap();
+        assert_eq!(sent.len(), 10);
+        assert!(!sent.contains_key("workId") && !sent.contains_key("series"));
+        let mut short = map(classic.clone());
+        short.remove("region");
+        assert_eq!(
+            submission(short).unwrap_err().message,
+            "the candidate has no `region`"
+        );
+        // A series candidate: the series goes too, and the API derives the
+        // details it leaves out.
+        let series = json!({"seriesId": "s1", "bucket": "DDR5_16GBIT"});
+        let found = json!({
+            "marketId": "ramx", "expiryId": "RAMX-202701", "evidence": "e",
+            "series": series, "contentHash": "aa",
+        });
+        let sent = submission(map(found.clone())).unwrap();
+        assert_eq!(
+            Value::Object(sent),
+            json!({"marketId": "ramx", "expiryId": "RAMX-202701", "evidence": "e", "series": series})
+        );
+        let mut details = classic;
+        details["series"] = series.clone();
+        assert_eq!(submission(map(details)).unwrap().len(), 11);
+        let mut no_evidence = map(found);
+        no_evidence.remove("evidence");
+        assert_eq!(
+            submission(no_evidence).unwrap_err().message,
+            "the candidate has no `evidence`"
+        );
     }
 }

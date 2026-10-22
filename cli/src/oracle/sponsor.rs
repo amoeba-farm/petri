@@ -6,14 +6,16 @@
 //! (Reconcile); once the month's rewards are frozen, its proposer reward is
 //! split: 20% to the researcher (a fifth of that held in their reserve), the
 //! rest to the sponsor (ClaimBounty). Mainnet's oracle predates that split
-//! and takes the researcher's half (`researcher_bps`). A challenger who proves the source wrong
+//! and takes the researcher's half until its upgrade; the API's config says
+//! which (`researcher_bps`). A challenger who proves the source wrong
 //! takes the bond, as with any listing.
 
 use ameba_commodity_spec::{Product, SeriesDefinition};
 use ameba_oracle::{
     instruction::{self as ix, ProposeOracleSourceV3Params, SponsoredAccounts},
     sponsorship::{
-        DEFAULT_RETENTION_BPS, SourceSponsorship, SponsorTerms, exposure_address, reserve_address,
+        DEFAULT_RESEARCHER_BPS, DEFAULT_RETENTION_BPS, LEGACY_RESEARCHER_BPS, SourceSponsorship,
+        SponsorTerms, exposure_address, reserve_address,
     },
     state::OraclePhase,
 };
@@ -351,11 +353,31 @@ pub fn sponsor(ctx: &Ctx, p: Paint, hash: &str, send: &SendArgs) -> Result<Repor
 }
 
 /// The researcher's share a new sponsorship must name on this deployment:
-/// mainnet's oracle predates the 80/20 split and takes the legacy half.
+/// the API's `/v1/config` `sponsorship.researcherBps` when it serves one (so
+/// Mainnet's switch to 80/20 with its oracle upgrade needs no petri release),
+/// else by genesis: mainnet's oracle predates the 80/20 split and takes the
+/// legacy half.
 fn researcher_bps(ctx: &Ctx) -> Result<u16> {
     let mainnet = ctx.deployment()?.genesis_hash.as_deref()
         == Some(crate::futures::settings::MAINNET_GENESIS);
-    Ok(ameba_oracle::sponsorship::researcher_bps_for(mainnet))
+    researcher_bps_in(ctx.api.config().ok().as_ref(), mainnet)
+}
+
+fn researcher_bps_in(
+    config: Option<&crate::futures::api::ApiConfig>,
+    mainnet: bool,
+) -> Result<u16> {
+    match config
+        .and_then(|c| c.sponsorship.as_ref())
+        .and_then(|s| s.researcher_bps)
+    {
+        None => Ok(ameba_oracle::sponsorship::researcher_bps_for(mainnet)),
+        Some(bps) if bps == u64::from(DEFAULT_RESEARCHER_BPS) => Ok(DEFAULT_RESEARCHER_BPS),
+        Some(bps) if bps == u64::from(LEGACY_RESEARCHER_BPS) => Ok(LEGACY_RESEARCHER_BPS),
+        Some(bps) => bail(format!(
+            "the API's sponsorship terms give the researcher {bps} basis points, and the oracle's split is 2000 (20%) or 5000 (half): petri won't sponsor on other terms"
+        )),
+    }
 }
 
 /// What became of a sponsorship, in words.
@@ -605,6 +627,45 @@ mod tests {
         let older: crate::futures::api::ApiConfig =
             serde_json::from_value(json!({"sponsorship": {"researcherBps": 2000}})).unwrap();
         assert!(lookup_table_in(&older, "RAMX-1798761600").is_err());
+    }
+
+    #[test]
+    fn the_researchers_share_follows_the_apis_config_else_the_genesis() {
+        let config = |v: Value| -> crate::futures::api::ApiConfig {
+            serde_json::from_value(json!({ "sponsorship": v })).unwrap()
+        };
+        // The API names the split: Mainnet's switch to 80/20 is the API's.
+        for mainnet in [true, false] {
+            let split = config(json!({"researcherBps": 2000, "retentionBps": 2000}));
+            assert_eq!(researcher_bps_in(Some(&split), mainnet).unwrap(), 2_000);
+            let legacy = config(json!({"researcherBps": 5000, "retentionBps": 2000}));
+            assert_eq!(researcher_bps_in(Some(&legacy), mainnet).unwrap(), 5_000);
+        }
+        // Any other share is refused, in plain words.
+        for bps in [json!(0), json!(3000), json!(10_000), json!(70_000)] {
+            let other = config(json!({ "researcherBps": bps }));
+            let e = researcher_bps_in(Some(&other), false).unwrap_err();
+            assert!(
+                e.message.contains("won't sponsor on other terms"),
+                "{}",
+                e.message
+            );
+        }
+        // An API that serves none (or isn't reachable): by genesis.
+        for none in [
+            Some(config(json!({"lookupTables": {}}))),
+            Some(serde_json::from_value(json!({})).unwrap()),
+            None,
+        ] {
+            assert_eq!(
+                researcher_bps_in(none.as_ref(), true).unwrap(),
+                LEGACY_RESEARCHER_BPS
+            );
+            assert_eq!(
+                researcher_bps_in(none.as_ref(), false).unwrap(),
+                DEFAULT_RESEARCHER_BPS
+            );
+        }
     }
 
     #[test]

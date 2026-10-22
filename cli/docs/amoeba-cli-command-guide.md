@@ -648,7 +648,10 @@ before its rewards are frozen, and when nothing is left.
 agent's find on the oracle with your collateral posting the product's exact
 listing bond, while the month takes sources; the bond comes back when the
 source settles (`sponsorships settle`), and its reward splits with the
-researcher (`sponsorships claim`). A sponsorship onto a multi-SKU month is
+researcher (`sponsorships claim`). The researcher's share is the one the
+API's `/v1/config` names (`sponsorship.researcherBps`: 2,000, the 80/20
+split, or Mainnet's legacy 5,000 until its oracle upgrade; Petri refuses any
+other), else by genesis when the API names none. A sponsorship onto a multi-SKU month is
 over the 1,232-byte packet as a legacy transaction, so Petri sends the
 activation as a v0 transaction through the month's lookup table, which the
 API's `/v1/config` names (`sponsorship.lookupTables`, by the month's series key
@@ -845,7 +848,13 @@ petri evidence email quote.eml --manifest email-manifest.json --disclose
   stages (`received`, `provenance`, `extraction`, `eligibility`); the
   oracle's own outcome is read from chain, never inferred locally.
 - The TUI's Evidence view does the same by hand: Sign in to a site, Prove
-  a page, Import a proof, then Submit as a source or as an update.
+  a page, Import a proof, then Submit as a source (while a month takes
+  sources or is in Scramble) or as an update. Its list of your proofs
+  scrolls (▴/▾, or the wheel over it).
+- A proof in the evidence folder can be named by any prefix of its digest
+  that names just one. `submit --candidate` takes the research workspace's
+  candidate (its ten details) or a find with its comparison `series`
+  (`marketId`, `expiryId` and `evidence` with it; the API derives the rest).
 
 ## Oracle Research Workspace
 

@@ -59,6 +59,9 @@ pub struct ApiConfig {
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(default, rename_all = "camelCase")]
 pub struct SponsorshipConfig {
+    /// The researcher's share a new sponsorship names (basis points): the
+    /// deployment's oracle's, so it follows that oracle's upgrades.
+    pub researcher_bps: Option<u64>,
     /// Each month's sponsorship lookup table (base58), by its series key
     /// (`RAMX-1798761600`, as the deployment manifest's `oracle.periods`).
     pub lookup_tables: std::collections::BTreeMap<String, String>,

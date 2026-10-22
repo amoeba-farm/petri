@@ -1,4 +1,25 @@
-# Petri v0.1.15 — preview
+# Petri v0.1.16 — preview
+
+## New in v0.1.16
+
+- **Every proof in reach.** The TUI's Evidence view scrolls through all your
+  proofs: click ▾ or ▴ (or Tab to it and press Enter), or turn the mouse
+  wheel over the list. Each one opens and submits as before.
+- **Submit as a source during Scramble.** The Evidence view's **Submit as a
+  source** lists Scramble's months too, not just the months taking sources,
+  as sponsoring does.
+- **Finds with a series.** `petri evidence submit --candidate` sends a
+  find's comparison series with it; the futures API fills in the details
+  the series gives. A find without one works as before.
+- **Shorter proof names.** Name a proof by any start of its digest, a
+  single character too, as long as it names just one; when it names
+  several, Petri lists them.
+- **Long entries.** The Evidence view's fields no longer stop at 1,024
+  characters, typed or pasted; the futures API's own rules answer.
+- **Sponsorship split from the API.** A sponsorship gives the researcher
+  the share the futures API names, so Mainnet's switch to 80/20 with its
+  oracle update needs no Petri update. Without one, Petri keeps today's
+  rule: half on Mainnet, 20% elsewhere.
 
 ## New in v0.1.15
 

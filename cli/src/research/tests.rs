@@ -2436,16 +2436,23 @@ fn the_evidence_view_lets_you_prove_and_submit_by_hand() {
         )],
         Some("ab".repeat(32)),
     );
-    app.fund.snap.months = vec![super::phase::Month {
+    let month = |expiry: &str, phase: &str| super::phase::Month {
         market: "ramx".into(),
-        expiry: "RAMX-202612".into(),
-        phase: "SourceSubmission".into(),
+        expiry: expiry.into(),
+        phase: phase.into(),
         skus: vec![super::phase::Sku {
             bucket: "cd".repeat(32),
             label: Some("DDR5 16Gb".into()),
         }],
         ..Default::default()
-    }];
+    };
+    // Scramble's months take sources too (sponsored on its placement days);
+    // a Game month does not.
+    app.fund.snap.months = vec![
+        month("RAMX-202612", "SourceSubmission"),
+        month("RAMX-202611", "Scramble"),
+        month("RAMX-202610", "Game"),
+    ];
     let screen = draw(&mut app, 110, 32);
     assert!(screen.contains("[ Submit as a source ]"), "{screen}");
     assert!(screen.contains("[ Submit as an update ]"), "{screen}");
@@ -2456,6 +2463,8 @@ fn the_evidence_view_lets_you_prove_and_submit_by_hand() {
         "{screen}"
     );
     assert!(screen.contains("RAMX · Dec 2026 · DDR5 16Gb"), "{screen}");
+    assert!(screen.contains("RAMX · Nov 2026 · DDR5 16Gb"), "{screen}");
+    assert!(!screen.contains("RAMX · Oct 2026"), "{screen}");
     assert!(matches!(
         app.proofs.ticket.as_ref().unwrap().stage,
         Stage::Choose(..)
@@ -2474,6 +2483,101 @@ fn the_evidence_view_lets_you_prove_and_submit_by_hand() {
         Some(Action::ProofClick(Click::Nothing))
     );
     assert_eq!(click_at(&mut app, 0, 0), Some(Action::CloseProof));
+}
+
+#[test]
+fn every_proof_can_be_reached_by_scrolling_the_list() {
+    use super::proofs::Stage;
+    let mut app = app();
+    app.view = View::Evidence;
+    app.loaded = true;
+    app.proofs.list = (0..10)
+        .map(|i| crate::evidence::store::Entry {
+            digest: format!("{i:02x}").repeat(32),
+            price: format!("{i}.00 USD"),
+            ..proof_entry()
+        })
+        .collect();
+    let screen = draw(&mut app, 110, 32);
+    // Six rows, the agent's finds below; the rest a ▾ away.
+    assert!(
+        screen.contains("0.00 USD") && screen.contains("4.00 USD"),
+        "{screen}"
+    );
+    assert!(!screen.contains("5.00 USD"), "{screen}");
+    assert!(screen.contains("[▾ 5 more]"), "{screen}");
+    assert!(screen.contains("Your agent's finds"), "{screen}");
+    // A click (or Tab and Enter) on ▾ scrolls on.
+    click(&mut app, &Action::ProofScroll(5));
+    let screen = draw(&mut app, 110, 32);
+    assert!(screen.contains("[▴ 5 more]"), "{screen}");
+    assert!(screen.contains("9.00 USD"), "{screen}");
+    assert!(!screen.contains("4.00 USD"), "{screen}");
+    // The last proof opens like the first.
+    click(&mut app, &Action::ShowProof(9));
+    assert_eq!(
+        app.proofs.ticket.as_ref().unwrap().kind,
+        super::proofs::Kind::Show("09".repeat(32))
+    );
+    assert_eq!(app.proofs.ticket.as_ref().unwrap().stage, Stage::Working);
+    app.proofs.ticket = None;
+    // The wheel over the list scrolls it a row at a time; elsewhere it
+    // scrolls what it did before.
+    let wheel = |app: &mut App, kind, row| {
+        let at = app.proofs.area;
+        input::handle(
+            app,
+            Event::Mouse(MouseEvent {
+                kind,
+                column: at.x + 1,
+                row,
+                modifiers: KeyModifiers::NONE,
+            }),
+        );
+    };
+    for _ in 0..20 {
+        let row = app.proofs.area.y + 1;
+        wheel(&mut app, MouseEventKind::ScrollUp, row);
+    }
+    let screen = draw(&mut app, 110, 32);
+    assert_eq!(app.proofs.scroll, 0);
+    assert!(
+        screen.contains("0.00 USD") && !screen.contains("▴"),
+        "{screen}"
+    );
+    let row = app.proofs.area.y + 1;
+    wheel(&mut app, MouseEventKind::ScrollDown, row);
+    let screen = draw(&mut app, 110, 32);
+    assert!(
+        screen.contains("[▴ 1 more]") && screen.contains("[▾ 5 more]"),
+        "{screen}"
+    );
+    assert!(
+        !screen.contains("0.00 USD") && screen.contains("4.00 USD"),
+        "{screen}"
+    );
+    let below = app.proofs.area.bottom() + 3;
+    wheel(&mut app, MouseEventKind::ScrollDown, below);
+    assert_eq!(app.proofs.scroll, 1);
+    // Scrolled past the end, it shows the last ones.
+    for _ in 0..20 {
+        let row = app.proofs.area.y + 1;
+        wheel(&mut app, MouseEventKind::ScrollDown, row);
+    }
+    let screen = draw(&mut app, 110, 32);
+    assert!(
+        screen.contains("9.00 USD") && !screen.contains("▾"),
+        "{screen}"
+    );
+    // A short list doesn't scroll.
+    app.proofs.list.truncate(6);
+    let screen = draw(&mut app, 110, 32);
+    assert_eq!(app.proofs.scroll, 0);
+    assert!(
+        screen.contains("0.00 USD") && screen.contains("5.00 USD"),
+        "{screen}"
+    );
+    assert!(!screen.contains("more]"), "{screen}");
 }
 
 #[test]

@@ -104,6 +104,9 @@ enum Reply {
 #[derive(Default)]
 pub struct Proofs {
     pub list: Vec<Entry>,
+    /// The list's first row shown, and where it was drawn (for the wheel).
+    pub scroll: usize,
+    pub area: Rect,
     pub ticket: Option<Ticket>,
     busy: bool,
     last_refresh: Option<Instant>,
@@ -633,7 +636,9 @@ impl Proofs {
         });
     }
 
-    /// Submit the previewed proof: choose the month and product.
+    /// Submit the previewed proof: choose the month and product, of the
+    /// months taking sources (Scramble's too: it sponsors on its placement
+    /// days, as `petri oracle sponsor` does).
     pub fn choose(&mut self, months: &[super::phase::Month]) {
         let Some(t) = &mut self.ticket else { return };
         let Stage::Preview(_, Some(digest)) = &t.stage else {
@@ -641,7 +646,7 @@ impl Proofs {
         };
         let slots: Vec<Slot> = months
             .iter()
-            .filter(|m| m.phase == "SourceSubmission")
+            .filter(|m| matches!(m.phase.as_str(), "SourceSubmission" | "Scramble"))
             .flat_map(|m| {
                 m.skus.iter().map(move |s| Slot {
                     market: m.market.clone(),
@@ -731,7 +736,7 @@ impl Proofs {
             && t.stage == Stage::Edit
             && let Some(field) = t.fields.get_mut(t.focus)
         {
-            field.extend(text.chars().filter(|c| !c.is_control()).take(1024));
+            field.extend(text.chars().filter(|c| !c.is_control()));
         }
     }
 
@@ -772,7 +777,6 @@ impl Proofs {
             (Stage::Edit, KeyCode::Char(c)) => {
                 if let Some(t) = &mut self.ticket
                     && let Some(f) = t.fields.get_mut(t.focus)
-                    && f.len() < 1024
                 {
                     f.push(c);
                 }

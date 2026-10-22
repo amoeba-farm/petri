@@ -182,7 +182,7 @@ pub enum EvidenceCommand {
     List,
     #[command(
         about = "Upload a proof, and submit it with a source candidate",
-        long_about = "Uploads the bundle to the futures API, which checks it itself. With --candidate, also submits that source candidate (the research workspace's candidate JSON: marketId, expiryId, bucketId, canonicalUrl, sourceType, productDefinition, priceField, region, currency, evidence) with the proof attached, as you: rewards go to your wallet. The proof must be for the candidate's canonicalUrl."
+        long_about = "Uploads the bundle to the futures API, which checks it itself. With --candidate, also submits that source candidate (the research workspace's candidate JSON: marketId, expiryId, bucketId, canonicalUrl, sourceType, productDefinition, priceField, region, currency, evidence; or a find's comparison series with marketId, expiryId and evidence, the API deriving the rest) with the proof attached, as you: rewards go to your wallet. The proof must be for the candidate's canonicalUrl."
     )]
     Submit {
         #[arg(value_name = "BUNDLE")]

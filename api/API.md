@@ -143,6 +143,9 @@ researcher (`researcherBps`) and how much of that their reserve holds
 80%, the researcher 16% and their reserve 4%) on every cluster but
 `mainnet-beta`, whose deployed oracle predates that split and still takes
 the researcher's half (5,000 and 2,000) until it is upgraded.
+`FUTURES_SPONSOR_RESEARCHER_BPS` (2,000 or 5,000) overrides the cluster's
+share: Mainnet's API sets 2,000 once its oracle runs the 80/20 build, and
+petri (from v0.1.16) and the web follow this field.
 **[added 2026-10-21]** `sponsorship.lookupTables`: each month's sponsorship
 address lookup table, by series key (`<SYMBOL>-<expiry>`), as the manifest's
 `oracle.sponsorLookupTables` names it (`{}` without any). A prepared

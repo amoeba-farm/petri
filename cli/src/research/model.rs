@@ -163,6 +163,8 @@ pub enum Action {
     ProofTicket(crate::research::proofs::Kind),
     /// One of your proofs, by its place in the list.
     ShowProof(usize),
+    /// Scrolls your proofs' list to this one.
+    ProofScroll(usize),
     /// A click inside the proof pop-up.
     ProofClick(crate::research::proofs::Click),
     /// Closes the proof pop-up (a click outside it).
@@ -433,6 +435,7 @@ impl App {
                     | Action::CloseFundTicket
                     | Action::ProofTicket(_)
                     | Action::ShowProof(_)
+                    | Action::ProofScroll(_)
                     | Action::ProofClick(_)
                     | Action::CloseProof
                     | Action::Sponsor(_)
@@ -479,6 +482,7 @@ impl App {
                         .open(crate::research::proofs::Kind::Show(digest));
                 }
             }
+            Action::ProofScroll(row) => self.proofs.scroll = row,
             Action::CloseProof => self.proofs.ticket = None,
             Action::ProofClick(click) => {
                 use crate::research::proofs::Click;

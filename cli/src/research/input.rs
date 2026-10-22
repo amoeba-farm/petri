@@ -18,6 +18,17 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
                         app.agent_scroll.saturating_sub(1)
                     };
                 } else if app.modal.is_none()
+                    && app.view == View::Evidence
+                    && app.proofs.ticket.is_none()
+                    && app.proofs.area.contains(at)
+                {
+                    // Your proofs' list scrolls on its own, a row at a time.
+                    app.proofs.scroll = if down {
+                        app.proofs.scroll.saturating_add(1)
+                    } else {
+                        app.proofs.scroll.saturating_sub(1)
+                    };
+                } else if app.modal.is_none()
                     && app.view == View::Activity
                     && app.feed_area.contains(at)
                 {

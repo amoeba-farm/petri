@@ -1078,11 +1078,48 @@ fn proofs_section(frame: &mut Frame, app: &mut App, area: Rect) -> u16 {
         );
         y += 1;
     }
-    // Room for the agent's finds below: at most six of yours.
-    for (index, entry) in list.iter().take(6).enumerate() {
-        if y >= area.bottom() {
-            break;
+    // Six rows of yours, leaving room for the agent's finds below: ▴/▾ rows
+    // (a click, or Tab and Enter) and the wheel over the list scroll through
+    // the rest, as the navigator's list does.
+    let h = usize::from(area.bottom().saturating_sub(y).min(6));
+    let n = list.len();
+    let start = if n <= h {
+        0
+    } else {
+        app.proofs.scroll.min(n - h.saturating_sub(1).max(1))
+    };
+    app.proofs.scroll = start;
+    app.proofs.area = Rect::new(area.x, y, area.width, h.min(n) as u16);
+    let above = start > 0;
+    let mut rows = h.saturating_sub(usize::from(above));
+    let below = n - start > rows;
+    if below {
+        rows = rows.saturating_sub(1);
+    }
+    let more = |frame: &mut Frame, app: &mut App, y: u16, text: String, to: usize| {
+        if y < area.bottom() {
+            let width = (text.chars().count() as u16 + 2).min(area.width);
+            button(
+                frame,
+                app,
+                Rect::new(area.x, y, width, 1),
+                &text,
+                Action::ProofScroll(to),
+                false,
+            );
         }
+    };
+    if above {
+        more(
+            frame,
+            app,
+            y,
+            format!("▴ {start} more"),
+            start.saturating_sub(rows.max(1)),
+        );
+        y += 1;
+    }
+    for (index, entry) in list.iter().enumerate().skip(start).take(rows) {
         let text = safe(&row_text(entry));
         let width = (text.chars().count() as u16 + 2).min(area.width);
         button(
@@ -1092,6 +1129,16 @@ fn proofs_section(frame: &mut Frame, app: &mut App, area: Rect) -> u16 {
             &text,
             Action::ShowProof(index),
             false,
+        );
+        y += 1;
+    }
+    if below {
+        more(
+            frame,
+            app,
+            y,
+            format!("▾ {} more", n - start - rows),
+            start + rows,
         );
         y += 1;
     }
