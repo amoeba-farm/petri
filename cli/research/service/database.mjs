@@ -55,6 +55,8 @@ export function createDatabase(path) {
     // When discovery archived the work because the oracle stopped listing
     // its series (undone if the series is listed again).
     ['work','retired_at','INTEGER'],
+    // The web proof bundle a submission came with (its API digest).
+    ['submissions','bundle_digest','TEXT'],
   ]) if (!db.prepare(`PRAGMA table_info(${table})`).all().some(row => row.name === column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS work_discovery ON work(discovery_key) WHERE discovery_key IS NOT NULL;');
   // An interrupted non-financial registration or submission may be retried explicitly.

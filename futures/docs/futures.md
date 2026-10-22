@@ -618,6 +618,23 @@ final the credit stays for `CreditSettle` (`NotTradable`). A falling price
 lends nothing new and lets no stake leave that backs lent credit. Credit
 already lent stays: covering a price drop is what the haircut is for.
 
+**The creator's rate** (the user, 2026-10-21: "I want it to stay 50% for
+everyone, besides me as creator, I want a special path", the creator's AMBA
+at 90%, which they lower if the price moves). The program keeps one
+`haircut_bps` per pool, so the maker sets it (`StakeConfig`) to the blend of
+the creator's active shares at `MAKER_STAKE_CREATOR_BPS` and everyone else's
+at `MAKER_STAKE_BASE_BPS` (default 5000), rounded down, whenever the pool's
+shares or its rate move (`ops::stake_creator`). The capacity is then the
+creator's AMBA at its rate plus everyone else's at theirs. A shortfall still
+takes all staked AMBA in proportion, so the other stakers' AMBA also covers
+part of the creator's extra credit. The user chose that for now ("blend
+now, upgrade later"); a creator slot in the program, with its own rate and
+covering its extra credit first, waits for the next mainnet upgrade. The
+creator's wallet is the `creator` role (Cloud KMS on mainnet, the user's
+ask). The maker stakes the AMBA sent to it every pass, except what the
+creator's own `Unstake` paid back (counted in the maker's state), so that
+can leave. The Earn page shows the pool's rate, which is the blend.
+
 **Borrowing.** In a market with credit, the vault's trader may escrow more
 than its free cash: `Quote` and the vault's own `Submit` borrow what its
 free cash lacks, raising `debt` (virtual cash in its free balance that custody

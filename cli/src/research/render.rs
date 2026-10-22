@@ -494,6 +494,40 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             content.height = content.height.saturating_sub(2);
         }
     }
+    // Evidence: your own proofs first (they need no research workspace),
+    // then the agent's finds below them.
+    if app.view == View::Evidence {
+        let used = proofs_section(frame, app, content);
+        let rest = Rect::new(
+            content.x,
+            content.y + used,
+            content.width,
+            content.height.saturating_sub(used),
+        );
+        if app.research_error.is_none() && app.loaded && rest.height > 3 {
+            evidence(frame, app, rest);
+        }
+        if let Some(ticket) = app.proofs.ticket.clone() {
+            use crate::research::proofs::Click;
+            let drawn = crate::research::proofs::draw_ticket(frame, &ticket, body);
+            if let Some(r) = drawn.ticket {
+                outside(app, area, r, Action::CloseProof);
+                register(app, r, Action::ProofClick(Click::Nothing));
+            }
+            for (at, click) in drawn.buttons {
+                register(app, at, Action::ProofClick(click));
+            }
+        }
+        footer(frame, app, rows[6]);
+        if let Some(modal) = app.modal.clone() {
+            let parent = Rect::new(area.x + 1, area.y + 1, area.width - 2, area.height - 2);
+            modal_view(frame, app, parent, modal);
+        }
+        if app.focus >= app.hits.len() {
+            app.focus = 0;
+        }
+        return;
+    }
     if let Some(error) = app.research_error.clone() {
         frame.render_widget(
             Paragraph::new(vec![
@@ -516,7 +550,8 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         View::Markets | View::Fund => {}
         View::Connect => connect(frame, app, content),
         View::Activity => activity(frame, app, content),
-        View::Evidence => evidence(frame, app, content),
+        // Drawn above, with your proofs.
+        View::Evidence => {}
         View::Rewards => rewards(frame, app, content),
     }
     footer(frame, app, rows[6]);
@@ -1009,6 +1044,65 @@ pub(crate) fn chain_now(app: &App) -> i64 {
     })
 }
 
+/// "Your proofs": Sign in to a site, Prove a page, Import a proof, then
+/// each proof here as a button that opens it (proofs.rs). Returns the rows
+/// it took.
+fn proofs_section(frame: &mut Frame, app: &mut App, area: Rect) -> u16 {
+    use crate::research::proofs::{Kind, row_text};
+    label(frame, within(area, area.y, 1), "Your proofs", strong());
+    let actions = vec![
+        (
+            "Sign in to a site",
+            Action::ProofTicket(Kind::SignIn),
+            false,
+        ),
+        ("Prove a page", Action::ProofTicket(Kind::Prove), false),
+        ("Import a proof", Action::ProofTicket(Kind::Import), false),
+    ];
+    let mut y = area.y;
+    let x = area.x + 13;
+    if x + 54 <= area.right() {
+        buttons(frame, app, Rect::new(x, y, area.right() - x, 1), actions);
+    } else {
+        y += 1;
+        buttons(frame, app, within(area, y, 1), actions);
+    }
+    y += 2;
+    let list = app.proofs.list.clone();
+    if list.is_empty() {
+        label(
+            frame,
+            within(area, y, 1),
+            "None yet. A web proof shows what a site showed you, signed-in pages too.",
+            muted(),
+        );
+        y += 1;
+    }
+    // Room for the agent's finds below: at most six of yours.
+    for (index, entry) in list.iter().take(6).enumerate() {
+        if y >= area.bottom() {
+            break;
+        }
+        let text = safe(&row_text(entry));
+        let width = (text.chars().count() as u16 + 2).min(area.width);
+        button(
+            frame,
+            app,
+            Rect::new(area.x, y, width, 1),
+            &text,
+            Action::ShowProof(index),
+            false,
+        );
+        y += 1;
+    }
+    y += 1;
+    if !app.snapshot.agents.is_empty() && y < area.bottom() {
+        label(frame, within(area, y, 1), "Your agent's finds", strong());
+        y += 2;
+    }
+    y.saturating_sub(area.y).min(area.height)
+}
+
 fn evidence(frame: &mut Frame, app: &mut App, area: Rect) {
     let Some(detail) = app.selected().cloned() else {
         label(frame, area, "No agents yet.", muted());
@@ -1334,6 +1428,15 @@ fn modal_view(frame: &mut Frame, app: &mut App, parent: Rect, modal: Modal) {
                         .map_or("not yet".into(), str::to_lowercase),
                 ),
             ];
+            // On a chip month: what the spec makes of its series.
+            let mut lines = lines;
+            if let Some(checked) = &find.checked {
+                let words = match &checked.reason {
+                    Some(reason) => format!("{}: {reason}", checked.status.summary()),
+                    None => checked.status.summary().to_string(),
+                };
+                lines.push(field("Checked", &words));
+            }
             label(
                 frame,
                 within(body, body.y, 1),

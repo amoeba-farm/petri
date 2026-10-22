@@ -210,6 +210,116 @@ test('MCP supports initialization, bounded schemas and structured tools without 
   assert.equal((await send(6, 'tools/call', { name: 'petri_work_start', arguments: { workId: {}, clientKey: 'x' } })).error.code, -32602);
 });
 
+test('MCP tells the agent to use browser use for signed-in pages and takes a web proof bundle with a candidate', async () => {
+  const submitted = [];
+  const handler = createMcpHandler({ submit: async (...args) => { submitted.push(args); return { duplicate: false }; },
+    next: async () => ({ status: 'idle' }) }, { agent: 'cedar' });
+  const send = (id, method, params) => handler({ jsonrpc: '2.0', id, method, params });
+  const { instructions } = (await send(1, 'initialize', { protocolVersion: '2025-06-18' })).result;
+  for (const text of ['follow its nextStep', 'use browser use so the owner signs in themselves', 'petri evidence browser <url>', 'chrome-devtools-mcp --browserUrl',
+    'Never ask for, type or store their password.', 'petri evidence check-manifest', 'petri evidence prove <JSON URL> --manifest <manifest> --browser', 'preview of what is disclosed', 'evidenceBundle']) {
+    assert(instructions.includes(text), text);
+  }
+  assert.doesNotMatch(instructions, /login/iu);
+  const tools = (await send(2, 'tools/list')).result.tools, tool = tools.find(t => t.name === 'petri_submit_candidate');
+  assert.equal(tools.length, 11);
+  assert.deepEqual(tool.inputSchema.required, ['runId', 'clientKey', 'candidate']);
+  assert.equal(tool.inputSchema.properties.evidenceBundle.type, 'string');
+  assert.match(tool.inputSchema.properties.evidenceBundle.description, /petri evidence prove wrote \(--out\).*at most 2 MiB/u);
+  assert.match(tools.find(t => t.name === 'petri_work_next').description, /nextStep/u);
+  // Every classic field (a series candidate is the next test's).
+  const candidate = Object.fromEntries(Object.keys(tool.inputSchema.properties.candidate.properties).filter(key => key !== 'series').map(key => [key, 'x']));
+  const call = args => send(3, 'tools/call', { name: 'petri_submit_candidate', arguments: { runId: 'r', clientKey: 'k', candidate, ...args } });
+  assert.equal((await call({ evidenceBundle: '/tmp/bundle.json' })).result.isError, false);
+  assert.equal((await call({})).result.isError, false);
+  assert.deepEqual(submitted, [['r', candidate, 'k', '/tmp/bundle.json'], ['r', candidate, 'k', undefined]]);
+  assert.equal((await call({ evidenceBundle: { path: 'x' } })).error.code, -32602);
+  // petri_work_next carries the steps the CLI prints.
+  assert.match((await send(4, 'tools/call', { name: 'petri_work_next', arguments: {} })).result.structuredContent.nextStep, /^Nothing needs research right now\./u);
+});
+
+test('an evidence upload sends the bundle\u2019s exact bytes and never echoes the API\u2019s refusal text', async () => {
+  const seen = [];
+  let status = 200;
+  const api = http.createServer(async (request, response) => {
+    const chunks = []; for await (const chunk of request) chunks.push(chunk);
+    seen.push({ method: request.method, url: request.url, type: request.headers['content-type'], authorization: request.headers.authorization, body: Buffer.concat(chunks) });
+    response.writeHead(status, { 'content-type': 'application/json' });
+    response.end(JSON.stringify(status === 200 ? { ok: true, data: { bundleDigest: 'cd'.repeat(32), trust: 'development', stored: true, duplicate: false } }
+      : { ok: false, code: 'EVIDENCE_UNVERIFIED', message: 'secret transport detail', verification: { stage: 'provenance' } }));
+  });
+  await new Promise(resolve => api.listen(0, '127.0.0.1', resolve));
+  try {
+    const upstream = createUpstream(`http://127.0.0.1:${api.address().port}`), credential = token();
+    const bytes = Buffer.from('{\n  "format": "amoeba-evidence-bundle-v1",\n  "manifest": { "assume": { "unit": "1.0" } }\n}\n');
+    assert.equal((await upstream.uploadEvidence(bytes, credential)).bundleDigest, 'cd'.repeat(32));
+    assert.deepEqual([seen[0].method, seen[0].url, seen[0].type, seen[0].authorization], ['POST', '/oracle/evidence', 'application/json', `Bearer ${credential}`]);
+    assert(seen[0].body.equals(bytes));
+    status = 422;
+    const failure = await upstream.uploadEvidence(bytes, credential).then(() => null, error => error);
+    assert.equal(failure.code, 'EVIDENCE_REJECTED'); assert.equal(failure.status, 422);
+    assert(!failure.message.includes('secret transport detail'));
+    assert.match(failure.message, /petri evidence verify/u);
+  } finally { await new Promise(resolve => api.close(resolve)); }
+});
+
+test('a near-2 MiB bundle goes from the agent\u2019s file through the loopback workspace to the API', { timeout: 30000 }, async () => {
+  const root = mkdtempSync(join(tmpdir(), 'petri-research-test-'));
+  const uploads = [], submissions = [];
+  const upstream = { async register(payoutAuthority) { return { agent: { agentId: 'ef'.repeat(32), payoutAuthority }, credential: token() }; },
+    async candidates() { return { candidates: [], complete: true }; },
+    async uploadEvidence(bundle) { uploads.push(Buffer.from(bundle)); return { bundleDigest: '12'.repeat(32), trust: 'development' }; },
+    async submit(details) { submissions.push(details); return { duplicate: false, candidate: { contentHash: '34'.repeat(32), agentId: 'ef'.repeat(32), details } }; } };
+  const config = { directory: root, port: 0, ownerToken: token(), masterKey: token(), upstream: 'http://127.0.0.1:4500' };
+  const server = await startServer(config, { upstream, clock: () => coverageNow, oracleReader: async () => coverageFixture() });
+  try {
+    const owner = (method, path, body) => createHttpClient(server.baseUrl)(method, `/v1/owner/${path}`, body, config.ownerToken);
+    const client = createAgentClient({ name: 'cedar', harness: 'Codex', baseUrl: server.baseUrl, profileDirectory: join(root, 'profiles') });
+    await client.login(); await owner('POST', 'settings', { payoutAuthority: payout });
+    await owner('POST', 'pairings/approve', { pairingId: (await owner('GET', 'snapshot')).pairings[0].id });
+    await client.login(); await owner('POST', 'discovery/refresh', {});
+    const work = (await owner('GET', 'snapshot')).work[0], run = (await client.startWork(work.id, 'run-1')).run;
+    const head = Buffer.from('{"format":"amoeba-evidence-bundle-v1","presentation":"'), tail = Buffer.from('"}\n');
+    const bytes = Buffer.concat([head, Buffer.alloc(2 * 1024 * 1024 - head.length - tail.length, 'A'), tail]), file = join(root, 'bundle.json');
+    writeFileSync(file, bytes);
+    const candidate = { ...work.candidateScope, canonicalUrl: 'https://portal.distributor.example/api/prices', sourceType: 'distributor price list', productDefinition: '32GB DDR5-5600 kit',
+      priceField: 'USD unit price', region: 'United States', currency: 'USD', evidence: 'Signed-in distributor price list, proven with a web proof.' };
+    const result = await client.submit(run.id, candidate, 'proven', file);
+    assert.equal(result.evidence.bundleDigest, '12'.repeat(32));
+    assert.equal(uploads.length, 1); assert(uploads[0].equals(bytes));
+    assert.deepEqual(submissions[0].authentication, { bundleDigest: '12'.repeat(32) });
+    // One byte more is refused in the agent's own process, before any request.
+    writeFileSync(file, Buffer.concat([bytes, Buffer.from(' ')]));
+    await assert.rejects(client.submit(run.id, candidate, 'too-large', file), { code: 'BUNDLE_TOO_LARGE' });
+    assert.equal(uploads.length, 1);
+    // Other routes keep the ordinary 32 KiB bound.
+    const tooLarge = await fetch(`${server.baseUrl}/v1/sessions`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ harness: 'a'.repeat(40000) }) });
+    assert.equal(tooLarge.status, 413);
+  } finally { await server.close(); cleanup(root); }
+});
+
+test('MCP takes a classic candidate with every field, or a series candidate with its scope, evidence and series', async () => {
+  const submitted = [];
+  const handler = createMcpHandler({ submit: async (runId, candidate) => { submitted.push(candidate); return { duplicate: false }; } });
+  const send = (id, method, params) => handler({ jsonrpc: '2.0', id, method, params });
+  await send(1, 'initialize', { protocolVersion: '2025-06-18' });
+  const tool = (await send(2, 'tools/list')).result.tools.find(t => t.name === 'petri_submit_candidate');
+  assert.equal(tool.inputSchema.properties.candidate.properties.series.type, 'object');
+  const scope = { marketId: 'ramx', expiryId: 'RAMX-202612', bucketId: '44'.repeat(32), evidence: 'The contract table row' };
+  const classic = { ...scope, canonicalUrl: 'https://example.com/p', sourceType: 'retailer listing', productDefinition: 'DDR5', priceField: 'price', region: 'US', currency: 'USD' };
+  const series = { schema: 'amoeba.comparison-series.v1', bucket: 'DDR5_16GBIT', origin: { locator: 'https://example.com/p' } };
+  const call = (id, candidate) => send(id, 'tools/call', { name: 'petri_submit_candidate', arguments: { runId: 'r', clientKey: `k${id}`, candidate } });
+  assert.equal((await call(3, classic)).result.isError, false);
+  assert.equal((await call(4, { ...scope, series })).result.isError, false);
+  assert.deepEqual(submitted.at(-1).series, series);
+  // Neither every field nor a series; a series that is not an object; no evidence.
+  assert.equal((await call(5, { ...scope, canonicalUrl: 'https://example.com/p' })).error.code, -32602);
+  assert.equal((await call(6, { ...scope, series: 'DDR5' })).error.code, -32602);
+  const { evidence, ...noEvidence } = scope;
+  assert.equal((await call(7, { ...noEvidence, series })).error.code, -32602);
+  assert.equal(submitted.length, 2);
+});
+
 test('MCP framing rejects an oversized line and continues with the next request', async () => {
   let output = ''; const sink = new Writable({ write(chunk, encoding, callback) { output += chunk; callback(); } });
   const input = Readable.from(['x'.repeat(70000), '\n', JSON.stringify({ jsonrpc: '2.0', id: 7, method: 'ping' }), '\n']);
@@ -245,6 +355,11 @@ test('the launched MCP process pairs, resumes and completes a research run over 
     await server.owner('POST', 'discovery/refresh', {});
     const work = (await server.owner('GET', 'snapshot')).work[0];
     assert.equal((await call('petri_work_list')).work[0].id, work.id);
+    // The steps come with the run over MCP too, the sign-in path included.
+    const next = await call('petri_work_next');
+    assert.equal(next.assignment.id, work.id);
+    assert.match(next.nextStep, /evidence browser <page URL>/u); assert.match(next.nextStep, /--evidence-bundle <bundle file>/u);
+    await call('petri_run_finish', { runId: next.run.id, summary: 'Looked at the gap.' });
     const run = (await call('petri_work_start', { workId: work.id, clientKey: 'first-run' })).run;
     await call('petri_report_progress', { runId: run.id, clientKey: 'first-report', kind: 'note', message: 'Read the exact source.' });
     await call('petri_run_finish', { runId: run.id, summary: 'Research complete.' });

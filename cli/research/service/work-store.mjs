@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { fail, text, digest } from './security.mjs';
+import { fail, text, digest, secretInUrl } from './security.mjs';
 
 const job = (row, now) => row && ({ id: row.id, title: row.title, brief: row.brief, createdAt: row.created_at,
   archivedAt: row.archived_at, candidateScope: row.scope_json ? JSON.parse(row.scope_json) : null,
@@ -176,10 +176,14 @@ export function createWorkStore(db, clock = Date.now) {
         session(agent.id, body.sessionId); const run = ownedRun(agent.id, runId);
         const message = text(body.message, 4000, 'progress message'), clientKey = text(body.clientKey, 80, 'request key');
         if (!REPORT_KINDS.includes(body.kind)) throw fail('INVALID_EVENT', `Report one of: ${REPORT_KINDS.join(', ')}.`);
+        // A page may be public or behind the owner's sign-in (read in the
+        // signed-in browser): either way an HTTPS URL that carries no
+        // credentials, so no sign-in reaches the feed.
         let reference = body.referenceUrl || null;
-        if (body.kind === 'read' && !reference) throw fail('INVALID_REFERENCE', 'Give the page you read as a public HTTPS reference.');
-        if (reference) { reference = text(reference, 1024, 'source URL'); let url; try { url = new URL(reference); } catch { throw fail('INVALID_REFERENCE', 'Use a public HTTPS reference.'); }
-          if (url.protocol !== 'https:' || url.username || url.password) throw fail('INVALID_REFERENCE', 'Use an HTTPS reference without credentials.'); }
+        if (body.kind === 'read' && !reference) throw fail('INVALID_REFERENCE', 'Give the page you read as an HTTPS reference.');
+        if (reference) { reference = text(reference, 1024, 'source URL'); let url; try { url = new URL(reference); } catch { throw fail('INVALID_REFERENCE', 'Use an HTTPS reference.'); }
+          if (url.protocol !== 'https:' || url.username || url.password) throw fail('INVALID_REFERENCE', 'Use an HTTPS reference without credentials.');
+          if (secretInUrl(reference)) throw fail('INVALID_REFERENCE', 'Give the page URL without any token, key or session id in it.'); }
         const previous = db.get('SELECT * FROM events WHERE run_id=? AND client_key=?', runId, clientKey);
         if (previous) {
           if (previous.kind !== body.kind || previous.message !== message || previous.reference_url !== reference) throw fail('REQUEST_CONFLICT', 'This event key has different content.', 409);
@@ -203,14 +207,18 @@ export function createWorkStore(db, clock = Date.now) {
         return runView(ownedRun(agent.id, runId));
       });
     },
-    beginSubmission(agent, runId, body) {
+    // `bundleSha`: the SHA-256 of the web proof bundle that comes with the
+    // candidate, if any. Its bytes fix the bundle's digest, so a retry with
+    // the same key must bring the same bundle.
+    beginSubmission(agent, runId, body, bundleSha = null) {
       return db.atomic(() => {
         session(agent.id, body.sessionId); const run = ownedRun(agent.id, runId);
         const scope = run.context_json ? JSON.parse(run.context_json).candidateScope : JSON.parse(db.get('SELECT scope_json FROM work WHERE id=?', run.work_id).scope_json || 'null');
         if (scope && Object.entries(scope).some(([key, value]) => body.candidate?.[key] !== value)) {
           throw fail('ASSIGNMENT_MISMATCH', 'The candidate does not match this assignment’s requested scope.');
         }
-        const clientKey = text(body.clientKey, 80, 'request key'), inputHash = digest(JSON.stringify(body.candidate));
+        const clientKey = text(body.clientKey, 80, 'request key');
+        const inputHash = digest(JSON.stringify(bundleSha ? { candidate: body.candidate, bundleSha } : body.candidate));
         const previous = db.get('SELECT * FROM submissions WHERE run_id=? AND client_key=?', runId, clientKey);
         if (previous) {
           if (previous.input_hash !== inputHash) throw fail('REQUEST_CONFLICT', 'This submission key has different content.', 409);
@@ -225,12 +233,15 @@ export function createWorkStore(db, clock = Date.now) {
         return { id: Number(result.lastInsertRowid) };
       });
     },
+    // A candidate with a web proof keeps the bundle's digest (the API's
+    // address for it, GET /oracle/evidence/:digest), in its row and its result.
     completeSubmission(id, result) {
       return db.atomic(() => {
-        const row = db.get('SELECT * FROM submissions WHERE id=?', id);
-        db.run("UPDATE submissions SET status='complete',result_json=? WHERE id=?", JSON.stringify(result), id);
+        const row = db.get('SELECT * FROM submissions WHERE id=?', id), bundle = result.evidence?.bundleDigest ?? null;
+        db.run("UPDATE submissions SET status='complete',result_json=?,bundle_digest=? WHERE id=?", JSON.stringify(result), bundle, id);
+        const proof = bundle ? ` Web proof: bundle ${bundle}.` : '';
         addEvent(row.run_id, 'backend', result.duplicate ? 'candidate_duplicate' : 'candidate_received',
-          result.duplicate ? 'This source already exists; original attribution is preserved.' : 'Source candidate received and attributed. Oracle acceptance is pending.', result.candidate?.details?.canonicalUrl || null);
+          (result.duplicate ? 'This source already exists; original attribution is preserved.' : 'Source candidate received and attributed. Oracle acceptance is pending.') + proof, result.candidate?.details?.canonicalUrl || null);
         return result;
       });
     },

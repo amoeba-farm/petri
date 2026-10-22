@@ -159,6 +159,14 @@ pub enum Action {
     CloseTicket,
     /// A find in the Fund view's list, by its place there.
     ShowFind(usize),
+    /// The Evidence view's own proofs: open a pop-up (proofs.rs).
+    ProofTicket(crate::research::proofs::Kind),
+    /// One of your proofs, by its place in the list.
+    ShowProof(usize),
+    /// A click inside the proof pop-up.
+    ProofClick(crate::research::proofs::Click),
+    /// Closes the proof pop-up (a click outside it).
+    CloseProof,
     /// Add funds or Withdraw in the Fund view.
     FundTicket(crate::research::fund::Kind),
     /// Closes the Fund view's ticket (a click outside it).
@@ -274,6 +282,8 @@ pub struct App {
     pub base_url: String,
     pub markets: crate::research::markets::Markets,
     pub fund: crate::research::fund::Fund,
+    /// Your own web proofs in the Evidence view (proofs.rs).
+    pub proofs: crate::research::proofs::Proofs,
     pub rewards: crate::research::rewards::Rewards,
     /// Why the oracle research workspace could not start, if it could not.
     pub research_error: Option<String>,
@@ -320,6 +330,7 @@ impl App {
             base_url,
             markets: Default::default(),
             fund: Default::default(),
+            proofs: Default::default(),
             rewards: Default::default(),
             research_error: None,
         }
@@ -420,6 +431,10 @@ impl App {
                     | Action::ShowFind(_)
                     | Action::FundTicket(_)
                     | Action::CloseFundTicket
+                    | Action::ProofTicket(_)
+                    | Action::ShowProof(_)
+                    | Action::ProofClick(_)
+                    | Action::CloseProof
                     | Action::Sponsor(_)
                     | Action::Agent(_)
                     | Action::Source(_)
@@ -457,6 +472,36 @@ impl App {
                     .map(|find| Modal::Find(Box::new(find)));
             }
             Action::FundTicket(kind) => self.fund.open(kind),
+            Action::ProofTicket(kind) => self.proofs.open(kind),
+            Action::ShowProof(index) => {
+                if let Some(digest) = self.proofs.list.get(index).map(|e| e.digest.clone()) {
+                    self.proofs
+                        .open(crate::research::proofs::Kind::Show(digest));
+                }
+            }
+            Action::CloseProof => self.proofs.ticket = None,
+            Action::ProofClick(click) => {
+                use crate::research::proofs::Click;
+                match click {
+                    Click::Field(i) => {
+                        if let Some(t) = &mut self.proofs.ticket {
+                            t.focus = i;
+                        }
+                    }
+                    Click::Go => self.proofs.go(),
+                    Click::Nothing => {}
+                    Click::Submit => {
+                        let months = self.fund.snap.months.clone();
+                        self.proofs.choose(&months);
+                    }
+                    Click::Pick(i) => self.proofs.pick(i),
+                    Click::Confirm => self.proofs.confirm(),
+                    Click::SubmitUpdate => {
+                        let months = self.fund.snap.months.clone();
+                        self.proofs.choose_update(&months);
+                    }
+                }
+            }
             Action::CloseFundTicket => self.fund.ticket = None,
             Action::Sponsor(hash) => {
                 self.modal = None;
@@ -673,6 +718,10 @@ impl App {
         self.modal = Some(Modal::Paste(start));
         self.form_focus = 0;
     }
+    /// The pasted messages' line on sites behind a sign-in: browser use,
+    /// with the person signing in themselves (`petri evidence`).
+    pub const SIGN_IN: &'static str = "When a price page needs a sign-in, use browser use and let me \
+         sign in there myself (what it prints shows how). Never ask me for a password.";
     /// What to paste into the agent's terminal: the agent connects itself
     /// with the command in it, the person approves its code in Connect, and
     /// it researches from then on.
@@ -681,7 +730,8 @@ impl App {
             "Connect to my Petri oracle research workspace as the agent \"{name}\" and research for it. \
              Run this command, tell me the pairing code it shows, and once I approve it \
              in Petri, run it again and follow what it prints. Keep researching until it says \
-             nothing needs research:\n{command}",
+             nothing needs research. {sign_in}\n{command}",
+            sign_in = Self::SIGN_IN,
             name = self.name,
             command = self.command(),
         )
@@ -704,7 +754,9 @@ impl App {
     pub fn start_message(&self, agent: &Agent) -> String {
         format!(
             "Research for my Petri oracle workspace as the agent \"{name}\". Run this command \
-             and follow what it prints. Keep researching until it says nothing needs research:\n{command}",
+             and follow what it prints. Keep researching until it says nothing needs research. \
+             {sign_in}\n{command}",
+            sign_in = Self::SIGN_IN,
             name = agent.name,
             command = self.agent_command(vec![
                 "work".into(),

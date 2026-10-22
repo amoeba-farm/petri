@@ -166,6 +166,7 @@ petri research work list --agent cedar
 petri research work start <work-id> --agent cedar --key research-1
 petri research work report <run-id> --agent cedar --kind read --source https://example.com/ram --message 'Crucial 64GB DDR5 RDIMM'
 petri research work submit <run-id> --agent cedar --key source-1 --file candidate.json
+petri research work submit <run-id> --agent cedar --key source-2 --file candidate.json --evidence-bundle prices.bundle.json
 petri research work finish <run-id> --agent cedar --summary 'Submitted the matching public source.'
 petri research rewards --agent cedar
 ```
@@ -173,7 +174,8 @@ petri research rewards --agent cedar
 `work next` starts (or resumes) the agent's next run: your picks first, then
 what needs the most, skipping what another agent is on while there is other
 work. It prints the run, its assignment with your directive, and the exact
-commands to report, submit and finish; then the agent runs `work next` again.
+commands to report, submit and finish (`nextStep`; `petri_work_next` returns
+the same); then the agent runs `work next` again.
 An agent counts as researching while it has checked in within 20 minutes.
 
 Agents report each step as they go, one short line each (`--kind`, default
@@ -187,7 +189,9 @@ Agents report each step as they go, one short line each (`--kind`, default
 | `submit` | a petri write, e.g. `update committed` | optional |
 | `note`, `source_found`, `blocked` | anything else, a price page, a blocker | optional |
 
-References are public HTTPS URLs. When you add or change a directive for a
+References are HTTPS URLs without credentials, tokens, keys or session ids
+(`token=`, `api_key=`, `sessionid=`, a signed link's `signature=` and the
+like are refused); a page read in your signed-in browser counts too. When you add or change a directive for a
 product, each agent on it gets it in its feed (`owner`, `directive`), and a
 run that starts later opens with it.
 
@@ -201,6 +205,55 @@ The eleven MCP tools are `petri_login`, `petri_work_next`, `petri_work_list`, `p
 `petri_activity`, `petri_rewards`, `petri_session_open`, and `petri_session_close`.
 Start the server with `petri research mcp --agent cedar --harness 'Claude Code'`.
 It uses newline-delimited JSON-RPC over stdio and protocol version `2025-06-18`.
+`petri_work_next` returns the run with its `nextStep`, and `petri_submit_candidate`
+takes an optional `evidenceBundle` (a bundle file's path) for a page behind a
+sign-in.
+
+## Pages behind a sign-in
+
+A price page behind your sign-in (a subscription, a distributor portal) can
+be a source too, proven with a web proof (TLSNotary, `../../evidence/README.md`).
+The agent does it with browser use, and you sign in yourself:
+
+1. `petri evidence browser <page URL>` opens your own Chrome, Edge, Brave or
+   Chromium with petri's own profile and prints its DevTools address
+   (`http://127.0.0.1:<port>`). The agent's browser tool can drive that
+   window (chrome-devtools-mcp `--browserUrl`, Playwright `connectOverCDP`).
+2. You sign in there. The agent never asks for, types or stores your
+   password; the session stays in that browser.
+3. The agent finds the JSON the page loads (the network panel), saves a
+   response, writes an extraction manifest for its row (the README's
+   "Extraction manifests") and tests it:
+   `petri evidence check-manifest <manifest> --body <saved response>`.
+4. `petri evidence prove <JSON URL> --manifest <manifest> --browser --out <bundle> --json`
+   proves it with that session (`--cdp http://127.0.0.1:<port>` for another
+   browser) and prints a preview and a local verification. Your cookies are
+   used only inside the TLS session to the source, never disclosed.
+5. The agent shows you the preview. The request line and `Host`, the other
+   headers' names, the response's status, headers and **whole body** are
+   disclosed, so it picks an endpoint whose body holds nothing you would not
+   share. Only JSON responses can be proven for now.
+6. It submits the candidate with the bundle, the proven URL as its
+   `canonicalUrl`: `work submit … --evidence-bundle <bundle>`, or
+   `evidenceBundle` over MCP.
+
+The agent's process reads the bundle (at most 2 MiB, the verifier's bound:
+`evidence/crates/evidence/src/policy.rs`, `DEFAULT_LIMITS`). The workspace
+uploads its exact bytes to the futures API (`POST /oracle/evidence`, which
+verifies it and answers with its `bundleDigest`), then submits the candidate
+with `authentication: { bundleDigest }`; the API checks the proof is for its
+`canonicalUrl`. The workspace keeps only that digest, on the submission, in
+its result (`evidence.bundleDigest`) and in the feed's received line; never
+the bundle, a cookie or a password. A retry with the same `--key` must bring
+the same bundle.
+
+A proof does not change what a record is. As a source it must read a
+`catalog_price` or a `published_benchmark`; a `quotation` or a
+`transaction_record` is recorded but is not a public series, so it cannot be
+a source. Public pages keep their Wayback captures. For an opening or update
+of a source behind a sign-in, the proof is of the source's own URL, given
+with `--evidence <bundle>` in place of `--archive-url`
+(`petri oracle updates commit`).
 
 A candidate file contains the backend's source fields:
 
@@ -218,6 +271,16 @@ A candidate file contains the backend's source fields:
   "evidence": "Concrete product, price and source evidence"
 }
 ```
+
+On a chip month (RAMX and NANDX expiring after 2026-11-01, on commodity chip
+buckets), a candidate is a comparison series instead: `marketId`, `expiryId`,
+`bucketId` and `evidence` as above, and `series`, the series object
+(`petri oracle series template --bucket DDR5_16GBIT`, filled in, then checked
+with `petri oracle series check series.json RAMX-202612`). The API takes the
+page, source type and definition from the series, and returns its routing.
+Work on a chip month says so (`chip: true`, with the bucket's `bucketName`),
+and `work next` prints the series steps; its openings and updates are
+observations of the source's series, sent with `petri oracle observe`.
 
 These placeholders are not a valid submission. Work generated for a product
 group binds the exact market, expiry and bucket on every submission. For a
@@ -349,7 +412,8 @@ an ephemeral local candidate service and in-memory database.
 Tests cover coverage discovery, unknown versus confirmed shortage, stable work
 identity, resolution/reopening, directive scope and pause, immutable run context,
 human guidance, agent isolation, revocation, session recovery, submission retries,
-duplicate attribution, private storage, the HTTP boundary, a launched MCP
+duplicate attribution, web proof submissions (the upload, the 2 MiB bound, no
+cookie or password in stored events), private storage, the HTTP boundary, a launched MCP
 process, and mouse/keyboard interaction at several terminal sizes. Individual
 vendor harness connections have not been exercised in those applications.
 Reward display depends on real backend observations; this app does not activate

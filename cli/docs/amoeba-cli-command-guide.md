@@ -437,6 +437,13 @@ oracle collateral withdraw <USDC|all>
 oracle evidence write --kind locator|definition|archive (--text T | --file F)
 oracle evidence show [OBJECT] [--kind K --text T] [--payer PUBKEY]
 oracle evidence close <OBJECT>
+oracle series template --bucket BUCKET [--direct] [--out FILE]   a blank comparison series (chip months)
+oracle series check FILE [MONTH]          the spec's routing of a series, on its own or in a month
+oracle series propose MONTH --file FILE [--bond USDC]   a series as a source (only one the spec admits)
+oracle series show MONTH                  a chip month's sources, their series and whether each counts
+oracle observe template MONTH --source ID [--out FILE]  a blank observation of a source's series
+oracle observe MONTH --source ID --file OBS.json [--stake USDC]   its opening print or a Game update
+oracle observe record MONTH --source ID --claim CLAIM [--file OBS.json]   store a print's record again
 oracle sources propose MARKET --bucket SKU --url URL --source-type T
                        (--definition T | --definition-file F) --bond USDC [--source-id HEX]
 oracle sources support MARKET --source ID --stake USDC
@@ -487,16 +494,101 @@ already-sealed object without sending. `evidence show` reads one back;
 `sources propose` writes the locator and definition evidence it needs, then
 proposes the source with a listing bond and the SKU Merkle proof of its bucket.
 A bucket is one SKU: its id is the SKU label's ASCII bytes, zero-padded to 32
-bytes. Petri proves membership against the governed SKU set of the product
-(the monorepo oracle's `governance/*_product_sku_manifest.v1.json`, compiled in),
-or against the bucket set the month's sources carry when that is what the
-month's coverage manifest commits to (dev bootstrap months); it refuses when
-neither reproduces the committed root. `sources support` stakes on a source;
+bytes. Each product has two governed SKU sets, compiled in from the monorepo
+oracle's `governance/`: its part-number list
+(`*_product_sku_manifest.v1.json`, RAMX's 52 modules and NANDX's 48 SSDs),
+which every month up to the launch months commits to, and its commodity chip
+buckets (`*_product_sku_manifest.v2.json`, through `ameba-commodity-spec`),
+which every month expiring after 2026-11-01 commits to: RAMX `DDR5_16GBIT`,
+`DDR5_24GBIT`, `DDR4_16GBIT`, `DDR4_8GBIT` (40/20/25/15%, the user's weights
+of 2026-10-21; `DDR5_32GBIT` is a research candidate, not registered); NANDX
+`tlc_1tb`, `qlc_1tb`, `tlc_512gb`, `tlc_256gb`. Petri proves membership against the set
+whose root the month's coverage manifest commits to, or against the bucket set
+the month's sources carry when that is what it commits to (dev bootstrap
+months); it refuses when none reproduces the committed root. `--bucket` takes
+the label, the 64-hex id, or a chip bucket's name (`"DDR5 16Gb"`), and every
+view names a chip bucket by its name ("RAMX · Dec 2026 · DDR5 16Gb"). `sources support` stakes on a source;
 `sources challenge` bonds a challenge (reason codes are the program's).
 `sources close` closes a month's source window (it finalizes the SKU
 coverage, which anyone may send) once every product has a supported source;
 it refuses before that, saying how many are covered. Scramble's challenge
 days, its freeze, Opening and Game then follow on the calendar.
+
+### Comparison series (chip months)
+
+On 2026-10-20 RAMX and NANDX moved from module and SSD part numbers to
+commodity chip buckets, for every month expiring after 2026-11-01. A chip
+month's source is one comparison series of the commodity spec
+(`oracle/governance/commodity_submission_spec.v1.json`): a repeatable
+contract price, a published assessment or a direct contract price of one exact
+part, with its terms, unit and statistic fixed before any observation. Its
+source carries the series' canonical JSON as its definition, its page
+(`origin.locator`) as its locator and `comparison-series/v1:<evidenceClass>`
+as its source type; the program is unchanged. Routing is the spec's
+(`ameba-commodity-spec`), deterministic and off chain: each series gets one
+status, in plain words and its spec code: Fits the bucket
+(`CLASSIFIED_CANDIDATE`), Counts this month (`ELIGIBLE_FOR_CONTRACT`), Already
+counted, Missing details, Wrong product, Not a contract price, Research only,
+Not in this month, Definition changed, Wrong period.
+
+- `series template --bucket BUCKET [--direct] [--out FILE]` prints (or
+  writes) a blank series of a bucket with every field of the spec; `--direct`
+  adds a direct price's product identity and terms. A product's research
+  candidate (RAMX's `DDR5_32GBIT`) gets a template too, with a note: a series
+  of it routes as Research only, carries no settlement weight, and `series
+  propose` refuses it (the note goes to stderr when the template goes to
+  stdout).
+- `series check FILE [MONTH]` routes a series and prints its status and every
+  reason as `field: message`. Without a month it checks the series on its
+  own (Fits the bucket at best); with one it checks it against that month's
+  sources read from chain (their definitions decoded from their definition
+  evidence): before the freeze a new series can join, from the freeze on only
+  the recipe's sources count, and a repeat of a series or of one publisher's
+  row adds no weight.
+- `series propose MONTH --file FILE [--bond USDC]` proposes the series as
+  `sources propose` does (its evidence, the proposal, the SKU proof), with the
+  product's exact listing bond when `--bond` is left out. It refuses a series
+  the spec does not admit, saying why, so the bond never goes on one that
+  could not count, and one whose definition is over the 4,058 bytes a source
+  holds.
+- `series show MONTH` lists a chip month's sources with their bucket, their
+  series (publisher and row) and whether each counts; a free-text definition
+  on a chip month is Missing details ("not a comparison series"); a source
+  whose definition is not on chain (a dev bootstrap source links only its
+  locator) has no routing at all, here and in the TUI.
+
+`sources propose` still takes any definition; on a chip month its review
+says that a source counts only as a comparison series.
+
+### Observations
+
+An observation is one published price of a series: its period, publication,
+vintage, release and evidence (the spec's `observation_fields`). On chain it is
+one print of the series' source: its opening print in the month's Opening, a
+sealed update in Game. `observe template MONTH --source ID [--out FILE]`
+prints a blank observation of the source's series. `observe MONTH --source ID
+--file OBS.json [--stake USDC]` reads the source's series from chain, routes
+the observation (committed when the source is in the recipe; earlier
+observations from the API's records, when it can be read; the month's expiry
+date) and refuses one the spec does not admit. Its `evidenceReference` is what
+the print cites, as `prints opening` and `updates commit` take it: a Wayback
+archive URL (`--archive-url`), or a web proof (`--evidence`: its bundle
+digest, its bundle file, or its `amoeba-evidence-v1;…` record), cited as its
+evidence record and published with the print; a proof's price must be the
+observation's `rawPrice`. It then sends by phase: in Opening the opening print
+(value `price_atoms(rawPrice)`, held to the opening checks below), in Game a
+sealed update commit (reveal it with `updates reveal`). The stake defaults to the product's
+exact opening bond or update stake. Once the print is on chain (an update once
+revealed), Petri stores its observation record with the API
+(`POST /oracle/observations`), signed by the wallet that made the claim: the
+signature is a raw ed25519 signature over
+`ameba_commodity_spec::observation_record_message` (the domain
+`amoeba-observation-record-v1` and the record's compact JSON), sent as
+`signer` and `signature`, and the API keeps a record only from the claim's
+claimant. `observe record` signs the same way, with the claimant read from the
+claim on chain, and refuses when another wallet is attached. If the API cannot take it, the print still
+stands: Petri says so and prints the `observe record` command that stores it
+later (an update's observation stays in the private claims file until then).
 
 ### Opening prints
 
@@ -556,7 +648,16 @@ before its rewards are frozen, and when nothing is left.
 agent's find on the oracle with your collateral posting the product's exact
 listing bond, while the month takes sources; the bond comes back when the
 source settles (`sponsorships settle`), and its reward splits with the
-researcher (`sponsorships claim`). `reserve withdraw --agent ID <USDC>` moves
+researcher (`sponsorships claim`). A sponsorship onto a multi-SKU month is
+over the 1,232-byte packet as a legacy transaction, so Petri sends the
+activation as a v0 transaction through the month's lookup table, which the
+API's `/v1/config` names (`sponsorship.lookupTables`, by the month's series key
+such as `RAMX-1798761600`) and ops creates with the month (`futures-ops
+sponsor-table`). Petri reads the table from chain (owned by the lookup table
+program, not deactivated) and compiles the message through it; the evidence
+uploads stay legacy. Without a table (an older API, or none for the month) it
+sends legacy and says so; when that is over the packet it refuses before
+anything is sent, naming the missing table. `reserve withdraw --agent ID <USDC>` moves
 what sponsored bounties held back for one of your agents (its 64-hex id) into
 your collateral.
 
@@ -701,6 +802,50 @@ These are accepted but not listed in `--help`:
 | `--solana-config <PATH>` | `SOLANA_CONFIG` | `$HOME/.config/solana/cli/config.yml` | Solana CLI config to find the keypair in. |
 | `--allow-insecure-keypair` | `AMEBA_ALLOW_INSECURE_KEYPAIR` | false | Allow signing with group- or world-readable keypair files on Unix. |
 | `--output <plain|json>` | `AMEBA_OUTPUT` | `plain` | Output format; `--json` is the shortcut. |
+
+## Evidence (web proofs)
+
+Prove what an HTTPS source showed you, a page behind your own sign-in too,
+and submit the proof with a source candidate, an opening or an update
+(`../../evidence/README.md`). Petri never asks for a password: you sign in
+in your own browser, which Petri opens with its own profile.
+
+```bash
+petri evidence browser https://portal.example.com/        # sign in there yourself
+petri evidence check-manifest manifest.json --body saved-response.json
+petri evidence prove https://portal.example.com/api/prices --manifest manifest.json --browser
+petri evidence show <bundle file or digest>               # what it shows and discloses
+petri evidence verify <bundle>                            # every step but the oracle's
+petri evidence import <bundle file>                       # made on another computer
+petri evidence list
+petri evidence submit <bundle> --candidate candidate.json
+petri oracle updates commit ramx --source <S> --evidence <bundle> --stake 1
+petri oracle prints opening ramx --source <S> --evidence <bundle> --stake <bond>
+petri evidence email quote.eml --manifest email-manifest.json --disclose
+```
+
+- `prove` connects from this computer with the signed-in session's cookies
+  for that one URL, through a notary (TLSNotary, MPC mode; the futures
+  API's `/oracle/notary` by default, `--notary` otherwise). The cookies
+  stay hidden in the proof; the whole response is disclosed. `--cdp ADDR`
+  takes another browser's session (one an agent drives); `--header` adds a
+  header whose value stays hidden. The bundle is bound to your wallet
+  unless `--no-bind`.
+- Nothing is submitted by `prove`. `submit` uploads the exact bundle
+  (`POST /oracle/evidence`; the API verifies it itself and keeps it for
+  anyone to re-check) and, with `--candidate`, submits the candidate as
+  you. `--evidence` on openings, updates and challenges cites the proof's
+  on-chain evidence record (kind 4) instead of a Wayback URL; the value
+  defaults to the proven price, and the bundle is published when the
+  claim goes on chain.
+- `email` checks a DKIM-signed quote; its bundle discloses the whole
+  message, so nothing is written without `--disclose`. A quote stays a
+  quotation (not a source under the evidence rules).
+- `--json` gives every command's machine-readable form, including the
+  stages (`received`, `provenance`, `extraction`, `eligibility`); the
+  oracle's own outcome is read from chain, never inferred locally.
+- The TUI's Evidence view does the same by hand: Sign in to a site, Prove
+  a page, Import a proof, then Submit as a source or as an update.
 
 ## Oracle Research Workspace
 

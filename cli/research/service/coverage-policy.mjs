@@ -24,6 +24,14 @@ const placed = new Set(['Candidate','Frozen','OpeningPending','Active']);
 const DAY_MS = 86400000;
 
 const atomic = value => typeof value === 'string' && /^\d+$/u.test(value) ? value : null;
+// A chip month (RAMX and NANDX expiring after 2026-11-01): the API lists its
+// commodity buckets (`buckets`) and names them (`bucketName`, "DDR5 16Gb").
+// Its sources are comparison series and its prints observations of them
+// (oracle/governance/commodity_submission_spec.v1.json).
+export const chipMonth = fact => (Array.isArray(fact?.buckets) && fact.buckets.length > 0) ||
+  (Array.isArray(fact?.skus) && fact.skus.some(sku => typeof sku?.bucketName === 'string' && sku.bucketName));
+const named = (...items) => items.map(item => item?.bucketName).find(name => typeof name === 'string' && name) ?? null;
+const seriesId = source => typeof source?.series?.seriesId === 'string' ? source.series.seriesId : null;
 // USDC atoms (six decimals) as petri takes them: '1000000' is '1', '2500000' is '2.5'.
 export function usdc(atoms) {
   if (atomic(atoms) === null) return null;
@@ -79,7 +87,8 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
     for (const [key, expiry] of expiries) {
       if (directive.marketIds.length && !directive.marketIds.includes(expiry.marketId)) continue;
       const base = { directiveId: directive.id, directiveRevision: directive.revision, marketId: expiry.marketId, expiryId: expiry.expiryId,
-        oracleMonthAddress: facts.get(key)?.oracleMonthAddress ?? null, bucketId: null, bucketLabel: null,
+        oracleMonthAddress: facts.get(key)?.oracleMonthAddress ?? null, bucketId: null, bucketLabel: null, bucketName: null,
+        chip: chipMonth(facts.get(key)),
         protocol: snapshot.protocol, assessedAt: now, observedAt: snapshot.freshness?.observedAt ?? null,
         targets: { activeSources: directive.minActiveSources, distinctHosts: directive.minDistinctHosts }, reasons: [], sources: [] };
       const unknown = reason => add({ ...base, status: 'unknown', reason });
@@ -134,6 +143,7 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
           const sku = skus.get(source.bucketId);
           add({ ...base, kind: 'opening', bucketId: source.bucketId,
             bucketLabel: typeof source.bucketLabel === 'string' ? source.bucketLabel : typeof sku?.bucketLabel === 'string' ? sku.bucketLabel : null,
+            bucketName: named(source, sku), seriesId: seriesId(source),
             sourceId: source.sourceId, sourceAddress: typeof source.sourceAddress === 'string' ? source.sourceAddress : null,
             url: host(source) ? source.canonicalLocator.url : null, phase: fact.phase, observedAt: inventory.observedAt, validUntil,
             status: 'gap', reasons: ['opening_value'], reason: null,
@@ -148,6 +158,7 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
         const rewards = fact.rewards && typeof fact.rewards.remainingAtomic === 'string' ? fact.rewards.remainingAtomic : '0';
         for (const source of inventory.sources.filter(source => source.status === 'Active')) {
           add({ ...base, kind: 'update', bucketId: source.bucketId, bucketLabel: typeof source.bucketLabel === 'string' ? source.bucketLabel : null,
+            bucketName: named(source), seriesId: seriesId(source),
             sourceId: source.sourceId, sourceAddress: typeof source.sourceAddress === 'string' ? source.sourceAddress : null,
             url: host(source) ? source.canonicalLocator.url : null, phase: fact.phase, observedAt: inventory.observedAt, validUntil,
             status: 'gap', reasons: ['game_update'], reason: null, rewardsRemainingAtomic: rewards, sources: [] });
@@ -156,11 +167,12 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
       }
       // Taking sources: every product the month lists (its SKU pools), and
       // any bucket a source is in.
-      const labels = new Map();
+      const labels = new Map(), names = new Map();
       for (const sku of Array.isArray(fact.skus) ? fact.skus : []) {
         if (!hex(sku?.bucketId)) continue;
         if (!buckets.has(sku.bucketId)) buckets.set(sku.bucketId, []);
         if (typeof sku.bucketLabel === 'string') labels.set(sku.bucketId, sku.bucketLabel);
+        if (named(sku)) names.set(sku.bucketId, named(sku));
       }
       // A truly empty inventory is a confirmed market-wide research gap; no
       // bucket identifier is synthesized from labels, dates or hashes.
@@ -174,6 +186,7 @@ export function assessCoverage({ snapshot, catalog }, directives, now) {
         const hostsUncertain = missingLocators && hosts.length < directive.minDistinctHosts;
         const status = reasons.length ? 'gap' : hostsUncertain ? 'unknown' : 'covered';
         add({ ...base, kind: 'source', bucketId, bucketLabel: sources.find(s => typeof s.bucketLabel === 'string')?.bucketLabel ?? labels.get(bucketId) ?? null,
+          bucketName: named(...sources) ?? names.get(bucketId) ?? null,
           phase: fact.phase, observedAt: inventory.observedAt, validUntil, status, reasons,
           reason: hostsUncertain ? 'Some active sources lack verified locators; host coverage is unknown.' : null,
           activeSources: active.length, distinctHosts: missingLocators ? null : hosts.length, knownHosts: hosts,
@@ -192,24 +205,30 @@ export function describeGap(assessment) {
     return { title: `${assessment.marketId.toUpperCase()} · ${assessment.expiryId} · claims`,
       brief: `${assessment.expiryId} settled and its rewards are frozen: claim what the owner's wallet earned.` };
   }
-  const product = assessment.bucketLabel || (assessment.bucketId ? `product ${assessment.bucketId.slice(0, 10)}` : 'source coverage');
+  const product = assessment.bucketName || assessment.bucketLabel || (assessment.bucketId ? `product ${assessment.bucketId.slice(0, 10)}` : 'source coverage');
+  // On a chip month a source is a comparison series and a print one observation of it.
+  const chip = assessment.chip === true;
   if (assessment.kind === 'opening') {
     const bond = usdc(assessment.openingBondAtomic) === null ? 'its product\'s opening bond' : `its product's opening bond (${usdc(assessment.openingBondAtomic)} USDC)`;
     return { title: `${assessment.marketId.toUpperCase()} · ${product} · opening`,
       brief: [`Give this frozen source of ${assessment.expiryId} its opening value: ${assessment.url ?? `source ${assessment.sourceId}`} (source address ${assessment.sourceAddress ?? 'unknown'}, product ${product}).`,
         `Read the value the page publishes for this exact product and field. Archive the page in the Wayback Machine; the capture time must be at or after the Opening's start${assessment.openingStartUtc ? ` (${assessment.openingStartUtc})` : ''} and not after the chain's clock.`,
-        `Submit it with petri, staking ${bond}; after its challenge window (300 slots) accept it before listing${assessment.listingUtc ? ` (${assessment.listingUtc})` : ''}. A wrong one can be challenged and loses its bond; a source with no opening value by listing sits out the month.`].join('\n') };
+        `Submit it with petri, staking ${bond}; after its challenge window (300 slots) accept it before listing${assessment.listingUtc ? ` (${assessment.listingUtc})` : ''}. A wrong one can be challenged and loses its bond; a source with no opening value by listing sits out the month.`,
+        ...(chip ? [`This source is comparison series ${assessment.seriesId ?? '(see its definition)'}: its opening value is one observation of it, sent with petri oracle observe (the observation's details go with it).`] : [])].join('\n') };
   }
   if (assessment.kind === 'update') {
     return { title: `${assessment.marketId.toUpperCase()} · ${product} · update`,
       brief: [`Update this live source of ${assessment.expiryId} with its current value: ${assessment.url ?? `source ${assessment.sourceId}`} (source address ${assessment.sourceAddress ?? 'unknown'}, product ${product}).`,
         'Read the value the page publishes for this exact product and field. Archive the page in the Wayback Machine first; the archived time must be after the month\'s listing.',
-        'Submit it as a Game update with petri: commit it with its stake, then reveal it with the archived URL. An update that does not change the value earns nothing; a wrong one can be challenged and loses its stake.'].join('\n') };
+        'Submit it as a Game update with petri: commit it with its stake, then reveal it with the archived URL. An update that does not change the value earns nothing; a wrong one can be challenged and loses its stake.',
+        ...(chip ? [`This source is comparison series ${assessment.seriesId ?? '(see its definition)'}: each update is one observation of it, sent with petri oracle observe.`] : [])].join('\n') };
   }
   return { title: `${assessment.marketId.toUpperCase()} · ${product}`,
     brief: [`Research additional public sources for ${assessment.expiryId}${assessment.bucketId ? ` / bucket ${assessment.bucketId}` : '. Establish the governed product group before submitting a candidate'}.`,
+      'A page behind the owner\'s sign-in (a subscription, a distributor portal) counts too, proven with petri evidence prove after the owner signs in themselves.',
       `Observed active sources: ${assessment.activeSources}; target: ${assessment.targets.activeSources}.`,
       `Observed distinct hosts: ${assessment.distinctHosts ?? 'unknown'}; target: ${assessment.targets.distinctHosts}.`,
-      'Match the exact governed product, region and price definition. Avoid existing source URLs. Human guidance below refines the research scope.',
+      chip ? `This month is on commodity chip buckets: each source is a comparison series of ${product} (a published contract assessment, or a direct contract price), defined field by field as the commodity spec requires. Never guess a field: leave what the source doesn't say unset.`
+        : 'Match the exact governed product, region and price definition. Avoid existing source URLs. Human guidance below refines the research scope.',
       'Completion requires a later fresh oracle inventory meeting the coverage targets. Submitting candidates or finishing a run does not resolve this gap.'].join('\n') };
 }

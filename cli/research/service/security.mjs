@@ -16,6 +16,17 @@ export function text(value, maximum, label) {
   }
   return value.trim();
 }
+// Text in a URL that carries access (a token, a key, a signed link), the
+// futures API's candidate rule (SECRET_FRAGMENTS, api/api/src/candidates/
+// rules.rs) plus session ids, read percent-decoded and in any case.
+const SECRET_FRAGMENTS = ['access_token=', 'api_key=', 'apikey=', 'authorization=', 'password=', 'secret=', 'x-amz-signature=', 'token=',
+  'sessionid=', 'session_id=', 'signature='];
+export function secretInUrl(value) {
+  let decoded;
+  try { decoded = decodeURIComponent(value); } catch { return true; }
+  decoded = decoded.toLowerCase();
+  return SECRET_FRAGMENTS.some(fragment => decoded.includes(fragment));
+}
 export function object(body, keys, required = keys) {
   if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(key => !keys.includes(key)) || required.some(key => !(key in body))) {
     throw fail('INVALID_INPUT', 'Unexpected or missing request fields.');

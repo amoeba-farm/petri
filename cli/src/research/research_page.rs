@@ -788,16 +788,21 @@ fn category(
         });
         return;
     }
-    // The sources it has: its month's, else its gap's.
+    // The sources it has: its month's, else its gap's; on a chip month, with
+    // what the spec makes of each ("active · counts this month").
     let mut found: Vec<(String, String)> = nav::month_of(app, market, expiry)
         .map(|m| {
             m.sources
                 .iter()
                 .filter(|s| s.bucket == bucket || bucket == ALL)
                 .map(|s| {
+                    let status = s.status.to_lowercase();
                     (
                         s.url.as_deref().map(nav::short_url).unwrap_or_default(),
-                        s.status.to_lowercase(),
+                        match &s.checked {
+                            Some(checked) => format!("{status} · {}", checked.words()),
+                            None => status,
+                        },
                     )
                 })
                 .collect()

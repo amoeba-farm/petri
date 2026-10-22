@@ -97,6 +97,22 @@ const CACHED_STANDARD_TEXTS = new Map([
       file: "LICENSE-Apache-2.0_WITH_LLVM-exception",
     },
   ],
+  [
+    "Unlicense",
+    {
+      package: "memchr",
+      version: "2.8.0",
+      file: "UNLICENSE",
+    },
+  ],
+  [
+    "ISC",
+    {
+      package: "untrusted",
+      version: "0.9.0",
+      file: "LICENSE.txt",
+    },
+  ],
 ]);
 
 // Two locked crates declare standard licenses that no locked .crate archive
@@ -127,7 +143,10 @@ const FALLBACK_EXPRESSIONS = new Map([
   ["BSD-3-Clause", ["BSD-3-Clause"]],
   ["MIT OR Apache-2.0", ["MIT", "Apache-2.0"]],
   ["MIT/Apache-2.0", ["MIT", "Apache-2.0"]],
+  ["Apache-2.0/MIT", ["Apache-2.0", "MIT"]],
   ["MPL-2.0", ["MPL-2.0"]],
+  ["Unlicense", ["Unlicense"]],
+  ["Apache-2.0 OR ISC OR MIT", ["Apache-2.0", "ISC", "MIT"]],
   [
     "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
     ["MIT", "Apache-2.0", "LGPL-2.1-or-later"],
@@ -135,6 +154,28 @@ const FALLBACK_EXPRESSIONS = new Map([
   [
     "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
     ["Apache-2.0 WITH LLVM-exception", "Apache-2.0", "MIT"],
+  ],
+]);
+
+// Git repositories whose README licenses every crate in them while some of
+// those crates declare nothing and ship no legal file. Used only for such a
+// crate, with the standard texts, and labelled with the statement it rests on.
+const REPOSITORY_LICENSE_STATEMENTS = new Map([
+  [
+    "https://github.com/tlsnotary/mpz2",
+    {
+      expression: "MIT OR Apache-2.0",
+      basis:
+        "README.md at the locked revision: \"All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license\"",
+    },
+  ],
+  [
+    "https://github.com/tlsnotary/tlsn",
+    {
+      expression: "MIT OR Apache-2.0",
+      basis:
+        "README.md at the locked revision: \"All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license\"",
+    },
   ],
 ]);
 
@@ -674,6 +715,35 @@ async function main() {
         }),
       }));
       let resolution = "upstream Git legal file";
+      if (files.length === 0 && !FIRST_PARTY_PACKAGE.test(pkg.name)) {
+        // A crate of a multi-crate Git repository can carry no legal file of
+        // its own while the repository's root licenses all of it (e.g.
+        // tlsn-utils' LICENSE-APACHE and LICENSE-MIT): use the checkout's
+        // root, labelled as such.
+        const parts = packageRoot.split(path.sep);
+        const at = parts.lastIndexOf("checkouts");
+        if (at >= 0 && parts.length > at + 2) {
+          const repoRoot = parts.slice(0, at + 3).join(path.sep);
+          if (repoRoot !== packageRoot) {
+            // Only the root's own files: a sibling crate's license is not
+            // this crate's.
+            for (const file of legalFilesForDirectory(repoRoot, resolved.metadata).filter(
+              (f) => !f.relative.includes("/") && !f.relative.includes(path.sep),
+            )) {
+              files.push({
+                path: `repository root: ${file.relative}`,
+                hash: addLegalText(texts, file.bytes, {
+                  kind: "upstream-git-repository",
+                  label: `${key} repository root/${file.relative}`,
+                }),
+              });
+            }
+            if (files.length > 0) {
+              resolution = "upstream Git repository-root legal file (the crate has none of its own)";
+            }
+          }
+        }
+      }
       if (files.length === 0 && !resolved.metadata.license && FIRST_PARTY_PACKAGE.test(pkg.name)) {
         // Amoeba's own program and client crates (futures, oracle) pinned by
         // revision. They are not third-party components.
@@ -685,6 +755,17 @@ async function main() {
           files,
         });
         continue;
+      }
+      const repository = pkg.source.replace(/^git\+/, "").split(/[?#]/)[0];
+      const statement = REPOSITORY_LICENSE_STATEMENTS.get(repository);
+      if (files.length === 0 && !resolved.metadata.license && statement) {
+        resolution = `SPDX-text fallback per the repository's license statement (${statement.basis})`;
+        for (const fallback of await fallbackHashes(statement.expression, key)) {
+          files.push({
+            path: `SPDX fallback: ${fallback.spdxId}`,
+            hash: fallback.hash,
+          });
+        }
       }
       if (files.length === 0) {
         resolution = "SPDX-text fallback (upstream Git package contains no legal file)";

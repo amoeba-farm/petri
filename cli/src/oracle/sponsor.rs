@@ -9,6 +9,7 @@
 //! and takes the researcher's half (`researcher_bps`). A challenger who proves the source wrong
 //! takes the bond, as with any listing.
 
+use ameba_commodity_spec::{Product, SeriesDefinition};
 use ameba_oracle::{
     instruction::{self as ix, ProposeOracleSourceV3Params, SponsoredAccounts},
     sponsorship::{
@@ -33,6 +34,7 @@ use crate::futures::{
     Report,
     ctx::Ctx,
     error::{Error, Result, bail},
+    txbuild::PACKET_SIZE,
     units::{parse_usdc, usdc},
     view::{Paint, Table},
 };
@@ -47,8 +49,11 @@ pub struct Candidate {
     pub bucket_id: [u8; 32],
     pub url: String,
     pub source_type: String,
-    /// "Product: …; Price field: …; Region: …; Currency: …".
+    /// "Product: …; Price field: …; Region: …; Currency: …", or a comparison
+    /// series' definition text.
     pub source_definition: String,
+    /// The candidate's comparison series, on a chip month.
+    pub series: Option<SeriesDefinition>,
     raw: Value,
 }
 
@@ -63,8 +68,55 @@ fn field<'a>(v: &'a Value, key: &str) -> Result<&'a str> {
 pub fn candidate(ctx: &Ctx, hash: &str) -> Result<Candidate> {
     let hash = hex(&parse_hex32(hash, "candidate")?);
     let data = reads::document(ctx, &crate::endpoints::oracle_candidate(&hash))?;
-    let c = &data["candidate"];
+    candidate_from(&data["candidate"])
+}
+
+/// A candidate document as the source it becomes. A series candidate's
+/// source is its series, by the rule the API applied when it took it: the
+/// definition is `definition_text()` of the stored series, the source type
+/// `source_type()`, the page `origin.locator` and the bucket the series names.
+/// The commitments are checked against those in [`sponsor_write`].
+fn candidate_from(c: &Value) -> Result<Candidate> {
     let d = &c["details"];
+    let series = match &c["series"] {
+        Value::Null => None,
+        value => Some(
+            SeriesDefinition::parse(&value.to_string())
+                .map_err(|e| Error::msg(format!("the candidate's series: {e}")))?,
+        ),
+    };
+    let (url, source_type, source_definition, bucket_id) = match &series {
+        Some(series) => {
+            let bucket = series
+                .bucket
+                .as_deref()
+                .and_then(|id| Product::ALL.iter().find_map(|p| p.bucket(id)))
+                .ok_or_else(|| Error::msg("the candidate's series names no commodity bucket"))?;
+            let url = series
+                .origin
+                .locator
+                .clone()
+                .ok_or_else(|| Error::msg("the candidate's series names no page"))?;
+            // The details the API derived must be the series' own.
+            if d["bucketId"].as_str().map(str::to_ascii_lowercase) != Some(hex(&bucket.id32()))
+                || d["canonicalUrl"].as_str() != Some(url.as_str())
+            {
+                bail("the candidate's details are not its series'; it cannot be sponsored as is")?;
+            }
+            (
+                url,
+                series.source_type(),
+                series.definition_text(),
+                bucket.id32(),
+            )
+        }
+        None => (
+            field(d, "canonicalUrl")?.to_string(),
+            field(d, "sourceType")?.to_string(),
+            field(c, "sourceDefinition")?.to_string(),
+            parse_hex32(field(d, "bucketId")?, "bucket id")?,
+        ),
+    };
     Ok(Candidate {
         content_hash: parse_hex32(field(c, "contentHash")?, "content hash")?,
         agent_id: parse_hex32(field(c, "agentId")?, "agent id")?,
@@ -73,10 +125,11 @@ pub fn candidate(ctx: &Ctx, hash: &str) -> Result<Candidate> {
             .map_err(|_| Error::msg("the candidate's researcher address is not a public key"))?,
         market: field(d, "marketId")?.to_string(),
         expiry: field(d, "expiryId")?.to_string(),
-        bucket_id: parse_hex32(field(d, "bucketId")?, "bucket id")?,
-        url: field(d, "canonicalUrl")?.to_string(),
-        source_type: field(d, "sourceType")?.to_string(),
-        source_definition: field(c, "sourceDefinition")?.to_string(),
+        bucket_id,
+        url,
+        source_type,
+        source_definition,
+        series,
         raw: c.clone(),
     })
 }
@@ -110,7 +163,28 @@ pub fn sponsor_write(ctx: &Ctx, hash: &str) -> Result<Write> {
             month.phase_name()
         ))?;
     }
-    let product = skus::decode_label(&c.bucket_id).unwrap_or_else(|| hex(&c.bucket_id));
+    let product = skus::bucket_name(&c.bucket_id);
+    // A series the spec does not admit in this month never counts: refusing
+    // it keeps the sponsor's bond off a disqualified submission (as petri
+    // refuses an opening the oracle's rules would reject).
+    let checked = match &c.series {
+        Some(series) => {
+            let commodity = super::series::chip_product(&oracle, &month)?;
+            let read = super::series::month_entries(&oracle, &month)?;
+            let routing = super::series::route_against(
+                series,
+                commodity,
+                super::series::stage(month.state.phase),
+                &super::series::entries_of(&read),
+                None,
+            );
+            if !routing.status.admissible() {
+                return Err(super::series::refuse(&routing, "this find's series"));
+            }
+            Some(super::series::status_line(&routing))
+        }
+        None => None,
+    };
     // The candidate's commitments must be the ones this source will register.
     let (_, locator_bytes, locator_hash) = evidence_preimage(EvidenceKind::Locator, &c.url)?;
     let (_, definition_bytes, definition_hash) =
@@ -164,7 +238,7 @@ pub fn sponsor_write(ctx: &Ctx, hash: &str) -> Result<Write> {
         evidence_txs(&oracle, &sponsor, 2, &definition_bytes, definition_hash)?;
     txs.extend(locator_txs);
     txs.extend(definition_txs);
-    txs.push(Tx::one(
+    let activation = Tx::one(
         "sponsorSource",
         ix::sponsored_activate(
             &oracle.program,
@@ -185,7 +259,43 @@ pub fn sponsor_write(ctx: &Ctx, hash: &str) -> Result<Write> {
                 sku_proof,
             },
         ),
-    ));
+    );
+    // A multi-SKU month's activation is over the 1232-byte packet as a legacy
+    // transaction (its SKU proof and the month's accounts): it goes as v0
+    // through the month's lookup table, which the operator creates with the
+    // month (the user's decision, 2026-10-21).
+    let (activation, sent_as) = match lookup_table(ctx, &month) {
+        Ok(table) => (
+            activation.through(table),
+            format!("Sent as a v0 transaction through the month's lookup table {table}"),
+        ),
+        Err(why) => {
+            let size = send::legacy_size(ctx, &activation, &sponsor)?;
+            if size > PACKET_SIZE {
+                bail(format!(
+                    "{why}, and without one the sponsorship is a {size}-byte legacy transaction, over the {PACKET_SIZE}-byte limit: the month needs its lookup table (futures-ops sponsor-table {})",
+                    series_key(&month)
+                ))?;
+            }
+            (activation, format!("{why}: sent as a legacy transaction"))
+        }
+    };
+    txs.push(activation);
+    let mut review = vec![
+        month_line(&month),
+        format!("Page {}", c.url),
+        format!("Found by agent {} (pays {})", &hex(&c.agent_id)[..8], c.researcher),
+        "The bond comes from your oracle collateral and comes back when the source settles, unless a challenger proves it wrong".to_string(),
+        format!(
+            "If it goes live, the researcher gets {}% of its reward (a fifth of that held in their reserve) and you the rest",
+            researcher_bps / 100
+        ),
+        format!("Evidence: locator {locator_object}, definition {definition_object}"),
+    ];
+    if let Some(checked) = checked {
+        review.insert(2, format!("Checked: {checked}"));
+    }
+    review.push(sent_as);
     Ok(Write {
         action: "oracle.sponsor",
         title: format!(
@@ -193,17 +303,7 @@ pub fn sponsor_write(ctx: &Ctx, hash: &str) -> Result<Write> {
             month.period.expiry_id(),
             usdc(bond)
         ),
-        review: vec![
-            month_line(&month),
-            format!("Page {}", c.url),
-            format!("Found by agent {} (pays {})", &hex(&c.agent_id)[..8], c.researcher),
-            "The bond comes from your oracle collateral and comes back when the source settles, unless a challenger proves it wrong".to_string(),
-            format!(
-                "If it goes live, the researcher gets {}% of its reward (a fifth of that held in their reserve) and you the rest",
-                researcher_bps / 100
-            ),
-            format!("Evidence: locator {locator_object}, definition {definition_object}"),
-        ],
+        review,
         details: json!({
             "month": month_json(&month),
             "source": source.to_string(),
@@ -213,6 +313,36 @@ pub fn sponsor_write(ctx: &Ctx, hash: &str) -> Result<Write> {
         }),
         txs,
     })
+}
+
+/// A month's key in the deployment's `oracle.periods` and
+/// `sponsorship.lookupTables`: `RAMX-1798761600`.
+fn series_key(month: &MonthRef) -> String {
+    format!("{}-{}", month.period.symbol, month.period.period.expiry_ts)
+}
+
+/// The month's sponsorship lookup table, from the API's `/v1/config`
+/// (`sponsorship.lookupTables`), or why there is none to use.
+fn lookup_table(ctx: &Ctx, month: &MonthRef) -> std::result::Result<Pubkey, String> {
+    let key = series_key(month);
+    let config = ctx.api.config().map_err(|_| {
+        format!("the API's /v1/config is unreachable, so {key}'s lookup table is unknown")
+    })?;
+    lookup_table_in(&config, &key)
+}
+
+fn lookup_table_in(
+    config: &crate::futures::api::ApiConfig,
+    key: &str,
+) -> std::result::Result<Pubkey, String> {
+    let table = config
+        .sponsorship
+        .as_ref()
+        .and_then(|s| s.lookup_tables.get(key))
+        .ok_or_else(|| format!("the API names no sponsorship lookup table for {key}"))?;
+    table
+        .parse()
+        .map_err(|_| format!("the API's lookup table for {key} ({table}) is not an address"))
 }
 
 /// `petri oracle sponsor <CANDIDATE>`.
@@ -247,7 +377,7 @@ pub fn sponsorships(ctx: &Ctx, p: Paint) -> Result<Report> {
     let mut table = Table::new(&["Source", "Product", "Bond", "Outcome", "Reward paid"]);
     let mut items = Vec::new();
     for (agreement, a) in &list {
-        let product = skus::decode_label(&a.bucket_id).unwrap_or_else(|| hex(&a.bucket_id));
+        let product = skus::bucket_name(&a.bucket_id);
         table.row(vec![
             a.source.to_string(),
             product.clone(),
@@ -412,7 +542,7 @@ pub fn reserve_withdraw_write(ctx: &Ctx, agent: &str, amount: &str) -> Result<Wr
 
 #[cfg(test)]
 mod tests {
-    use super::maximum_outstanding;
+    use super::*;
 
     /// What the program checks: the outstanding with the new bond counted in.
     fn admits(outstanding: u64, available: u64, bond: u64) -> bool {
@@ -434,5 +564,78 @@ mod tests {
         assert!(admits(0, 1_000_000, 1_000_000));
         assert_eq!(maximum_outstanding(0, 0, 1_000_000), 1_000_000);
         assert_eq!(maximum_outstanding(u64::MAX, 1, 1), u64::MAX);
+    }
+
+    fn document(series: Option<&SeriesDefinition>) -> Value {
+        json!({
+            "contentHash": "aa".repeat(32),
+            "agentId": "bb".repeat(32),
+            "payoutAuthority": Pubkey::new_unique().to_string(),
+            "sourceDefinition": "Product: DDR5 16Gb; Price field: average; Region: global; Currency: USD",
+            "series": series,
+            "details": {
+                "marketId": "ramx",
+                "expiryId": "RAMX-202612",
+                "bucketId": hex(&Product::Ramx.bucket("DDR5_16GBIT").unwrap().id32()),
+                "canonicalUrl": "https://example.com/price/dram",
+                "sourceType": "assessment",
+            },
+        })
+    }
+
+    #[test]
+    fn a_months_lookup_table_comes_from_the_apis_config() {
+        let table = Pubkey::new_unique();
+        let config: crate::futures::api::ApiConfig = serde_json::from_value(json!({
+            "sponsorship": {"researcherBps": 2000, "lookupTables": {"RAMX-1798761600": table.to_string(), "NANDX-1798761600": "not an address"}},
+        }))
+        .unwrap();
+        assert_eq!(lookup_table_in(&config, "RAMX-1798761600"), Ok(table));
+        assert!(
+            lookup_table_in(&config, "RAMX-1801440000")
+                .unwrap_err()
+                .contains("names no sponsorship lookup table for RAMX-1801440000")
+        );
+        assert!(
+            lookup_table_in(&config, "NANDX-1798761600")
+                .unwrap_err()
+                .contains("is not an address")
+        );
+        // An API from before the tables: none.
+        let older: crate::futures::api::ApiConfig =
+            serde_json::from_value(json!({"sponsorship": {"researcherBps": 2000}})).unwrap();
+        assert!(lookup_table_in(&older, "RAMX-1798761600").is_err());
+    }
+
+    #[test]
+    fn a_series_candidate_becomes_its_series_source() {
+        let mut series: SeriesDefinition =
+            serde_json::from_value(ameba_commodity_spec::series_template(
+                Product::Ramx.bucket("DDR5_16GBIT").unwrap(),
+                false,
+            ))
+            .unwrap();
+        series.origin.locator = Some("https://example.com/price/dram".into());
+        let c = candidate_from(&document(Some(&series))).unwrap();
+        // Whatever the stored text fields say, the source is the series'.
+        assert_eq!(c.source_definition, series.definition_text());
+        assert_eq!(c.source_type, "comparison-series/v1:published_assessment");
+        assert_eq!(c.url, "https://example.com/price/dram");
+        assert_eq!(
+            c.bucket_id,
+            Product::Ramx.bucket("DDR5_16GBIT").unwrap().id32()
+        );
+        // A candidate without one keeps its own fields.
+        let plain = candidate_from(&document(None)).unwrap();
+        assert!(plain.series.is_none());
+        assert_eq!(plain.source_type, "assessment");
+        assert!(plain.source_definition.starts_with("Product: DDR5 16Gb"));
+        // Details that are not the series' are refused.
+        let mut other = series.clone();
+        other.origin.locator = Some("https://example.com/other".into());
+        assert!(candidate_from(&document(Some(&other))).is_err());
+        other.bucket = Some("DDR4_8GBIT".into());
+        other.origin.locator = series.origin.locator.clone();
+        assert!(candidate_from(&document(Some(&other))).is_err());
     }
 }

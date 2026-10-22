@@ -1,0 +1,19 @@
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=distributor.example; s=q1; t=1792404000; h=from:to:subject:date:message-id:content-type:from:subject:date:content-type; bh=SIbt0wgi+l5Q/XdWn+e3Sj4Tb4DD1tyqvr5w9Mbk9rE=; b=yqcOwCLmN+DbF/8HrQREKGRlTWEaEW86LoJ06U7bIb9J6jdL20kmQO5QPB2jc3/11J2cC/o/NEhSKcI8LlGQfP7HYoR3b86EMlN/5XIID56nkEMsMRnBHa5908jVVOFsokrye5WnGUYww9oHFW09XZKOV5wJ/s0uCwroOYQYkQb/ESyJ2ThgCc5KcNSFsv5QdYghB9T/kFbowJx4gX5ySQddJfm4nhAZCFjXZVqg2jDfq/g1EZSkgNDWuBYK4FmN62UROvDMH9PTpT9FmuiuvWQVgCFafsnjitjAf5bYujePy6acU2Tkz9ucNQNfPFim1AQqpdL55b1nMxj/7ADA6Q==
+From: Quotes <quotes@distributor.example>
+To: Buyer <buyer@example.net>
+Subject: Quote Q-1042: DDR5 16GB
+Date: Mon, 19 Oct 2026 10:00:00 +0000
+Message-ID: <q-1042@distributor.example>
+Content-Type: text/plain; charset=utf-8
+
+FIXTURE QUOTE FOR TESTS - NOT MARKET DATA
+Dear Buyer, thank you for your enquiry of 14 October.
+Quote number: Q-1042
+Part number: DDR5-16G-4800
+Quantity: 1000
+Unit price: 39.80
+Currency: USD
+Quote date: 2026-10-19
+Payment terms and your account details are attached separately.
+
+> Earlier: Unit price: 99.99

@@ -1,0 +1,55 @@
+[workspace]
+resolver = "2"
+members = ["crates/evidence", "crates/webproof", "crates/notary", "crates/fixture"]
+
+[workspace.package]
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+# TLSNotary, pinned to one commit of its main branch: v0.1.0-alpha.15 plus
+# PR #1196 (merged 2026-10-05), which stops a malicious prover from crashing a
+# verifier with an oversized commitment range. Prover and notary must run the
+# same revision. Not on crates.io (git only).
+tlsn = { git = "https://github.com/tlsnotary/tlsn", rev = "5f67389de3f8962227fddffd71d78a852acc9b01", features = ["mozilla-certs"] }
+tlsn-core = { git = "https://github.com/tlsnotary/tlsn", rev = "5f67389de3f8962227fddffd71d78a852acc9b01", features = ["mozilla-certs"] }
+tlsn-attestation = { git = "https://github.com/tlsnotary/tlsn", rev = "5f67389de3f8962227fddffd71d78a852acc9b01" }
+tlsn-formats = { git = "https://github.com/tlsnotary/tlsn", rev = "5f67389de3f8962227fddffd71d78a852acc9b01" }
+
+amoeba-evidence = { path = "crates/evidence" }
+amoeba-webproof = { path = "crates/webproof" }
+amoeba-evidence-fixture = { path = "crates/fixture" }
+
+anyhow = "1"
+base64 = "0.22"
+bincode = "1.3"
+futures = "0.3"
+hex = "0.4"
+http-body-util = "0.1"
+hyper = { version = "1", features = ["client", "server", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+k256 = { version = "0.13", features = ["ecdsa"] }
+rcgen = "0.13"
+rustls = { version = "0.23", default-features = false, features = ["std", "tls12", "ring"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+thiserror = "2"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "net", "io-util", "time", "sync", "signal"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["tls12", "ring"] }
+tokio-util = { version = "0.7", features = ["compat"] }
+async-tungstenite = { version = "0.29", features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
+ws_stream_tungstenite = "0.15"
+getrandom = "0.3"
+webpki-roots = "1"
+
+[profile.dev]
+# The MPC protocol is unusably slow without optimisation (TLSNotary FAQ).
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+debug = 0

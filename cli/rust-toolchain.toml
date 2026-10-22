@@ -1,4 +1,5 @@
 [toolchain]
-channel = "1.93.1"
+# 1.95: TLSNotary's prover (evidence/crates/webproof, `tlsn`) uses `cfg_select!`.
+channel = "1.95.0"
 components = ["rustfmt"]
 profile = "minimal"

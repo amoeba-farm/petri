@@ -611,6 +611,9 @@ fn the_start_message_gets_a_connected_agent_researching() {
         "{message}"
     );
     assert!(!message.contains("login"), "{message}");
+    // Agents use browser use for signed-in pages; the person signs in.
+    assert!(message.contains("use browser use"), "{message}");
+    assert!(app.agent_setup().contains("sign in there myself"));
 }
 
 #[test]
@@ -1739,6 +1742,7 @@ fn phases_app() -> App {
         label: Some(label.into()),
         url: Some(url.into()),
         status: "Active".into(),
+        ..Default::default()
     };
     app.fund.snap.months = vec![
         Month {
@@ -2363,4 +2367,315 @@ fn render_snapshots_show_the_intro_only_when_asked() {
         app.view = view;
         assert!(!draw(&mut app, 100, 30).contains(intro::HINT), "{view:?}");
     }
+}
+
+fn proof_entry() -> crate::evidence::store::Entry {
+    crate::evidence::store::Entry {
+        digest: "ab".repeat(32),
+        origin: "proved".into(),
+        locator: "https://portal.example.com/api/prices".into(),
+        price: "41.25 USD".into(),
+        product: "DDR5-16G-4800".into(),
+        ..Default::default()
+    }
+}
+
+#[test]
+fn the_evidence_view_lets_you_prove_and_submit_by_hand() {
+    use super::proofs::{Click, Kind, Stage};
+    let mut app = app();
+    app.view = View::Evidence;
+    app.loaded = true;
+    app.proofs.list = vec![proof_entry()];
+    let screen = draw(&mut app, 110, 32);
+    assert!(screen.contains("Your proofs"), "{screen}");
+    for button in ["[Sign in to a site]", "[Prove a page]", "[Import a proof]"] {
+        assert!(screen.contains(button), "{screen}");
+    }
+    assert!(screen.contains("41.25 USD · portal.example.com/api/prices · not submitted"));
+    // The agent's finds stay below.
+    assert!(screen.contains("Your agent's finds"));
+
+    click(&mut app, &Action::ProofTicket(Kind::Prove));
+    let screen = draw(&mut app, 110, 32);
+    assert!(
+        screen.contains("PROVE A PAGE")
+            && screen.contains("JSON address")
+            && screen.contains("Manifest file"),
+        "{screen}"
+    );
+    // Typing and pasting fill the focused field; Tab moves on.
+    input::handle(
+        &mut app,
+        Event::Paste("https://portal.example.com/api/prices".into()),
+    );
+    input::handle(&mut app, Event::Key(KeyEvent::from(KeyCode::Tab)));
+    for c in "m.json".chars() {
+        input::handle(&mut app, Event::Key(KeyEvent::from(KeyCode::Char(c))));
+    }
+    let t = app.proofs.ticket.clone().unwrap();
+    assert_eq!(
+        t.fields,
+        vec![
+            "https://portal.example.com/api/prices".to_string(),
+            "m.json".to_string()
+        ]
+    );
+    // No loading text while it works.
+    app.proofs.ticket.as_mut().unwrap().stage = Stage::Working;
+    let screen = draw(&mut app, 110, 32);
+    for word in ["Loading", "Proving", "Working", "Preparing", "…"] {
+        assert!(!screen.contains(word), "{word}: {screen}");
+    }
+
+    // A preview of a proof that verifies offers Submit; Submit asks which
+    // product of the months taking sources it is for.
+    app.proofs.ticket.as_mut().unwrap().stage = Stage::Preview(
+        vec![ratatui::text::Line::raw(
+            "Web proof  portal.example.com/api/prices",
+        )],
+        Some("ab".repeat(32)),
+    );
+    app.fund.snap.months = vec![super::phase::Month {
+        market: "ramx".into(),
+        expiry: "RAMX-202612".into(),
+        phase: "SourceSubmission".into(),
+        skus: vec![super::phase::Sku {
+            bucket: "cd".repeat(32),
+            label: Some("DDR5 16Gb".into()),
+        }],
+        ..Default::default()
+    }];
+    let screen = draw(&mut app, 110, 32);
+    assert!(screen.contains("[ Submit as a source ]"), "{screen}");
+    assert!(screen.contains("[ Submit as an update ]"), "{screen}");
+    click(&mut app, &Action::ProofClick(Click::Submit));
+    let screen = draw(&mut app, 110, 32);
+    assert!(
+        screen.contains("Which product is this a source for?"),
+        "{screen}"
+    );
+    assert!(screen.contains("RAMX · Dec 2026 · DDR5 16Gb"), "{screen}");
+    assert!(matches!(
+        app.proofs.ticket.as_ref().unwrap().stage,
+        Stage::Choose(..)
+    ));
+
+    // A click inside the pop-up on plain text does nothing behind it; a
+    // click outside closes it.
+    let r = app
+        .hits
+        .iter()
+        .find(|h| h.action == Action::ProofClick(Click::Nothing))
+        .unwrap()
+        .area;
+    assert_eq!(
+        click_at(&mut app, r.x + 1, r.y),
+        Some(Action::ProofClick(Click::Nothing))
+    );
+    assert_eq!(click_at(&mut app, 0, 0), Some(Action::CloseProof));
+}
+
+#[test]
+fn a_proof_that_does_not_verify_offers_no_submit() {
+    use super::proofs::{Kind, Stage};
+    let mut app = app();
+    app.view = View::Evidence;
+    app.proofs.open(Kind::Import);
+    app.proofs.ticket.as_mut().unwrap().stage = Stage::Preview(
+        vec![ratatui::text::Line::raw("Proof: the proof does not verify")],
+        None,
+    );
+    let screen = draw(&mut app, 110, 32);
+    assert!(!screen.contains("Submit as a source"), "{screen}");
+    assert!(screen.contains("any key closes"));
+}
+
+/// A complete published assessment of DDR5 16Gb chips: it fits its bucket.
+fn chip_series(id: &str, row: &str) -> ameba_commodity_spec::SeriesDefinition {
+    let bucket = ameba_commodity_spec::Product::Ramx
+        .bucket("DDR5_16GBIT")
+        .unwrap();
+    let mut v = ameba_commodity_spec::series_template(bucket, false);
+    v["seriesId"] = json!(id);
+    v["origin"] = json!({"publisher":"Example Research","locator":"https://example.com/price/dram","row":row});
+    v["nativeUnit"] = json!("USD per chip");
+    v["statistic"] = json!("average");
+    v["procurementSegment"] = json!({"state":"documented_mix","value":"OEM contract buyers"});
+    v["geography"] = json!({"state":"documented_mix","value":"global"});
+    v["referencePeriod"] = json!("month");
+    v["cadence"] = json!("monthly");
+    v["revisionPolicy"] = json!("corrections replace the release they correct");
+    v["missingDataPolicy"] = json!("carry the last accepted value forward");
+    v["dram"]["dieCount"] = json!(1);
+    v["dram"]["condition"] = json!("new_unused");
+    v["dram"]["grade"] = json!("standard_production");
+    v["dram"]["organization"] = json!({"state":"exact","value":"x8"});
+    v["dram"]["speed"] = json!({"state":"documented_mix","value":"4800 and 5600 MT/s"});
+    serde_json::from_value(v).unwrap()
+}
+
+fn chip_bucket() -> String {
+    crate::oracle::skus::hex(
+        &ameba_commodity_spec::Product::Ramx
+            .bucket("DDR5_16GBIT")
+            .unwrap()
+            .id32(),
+    )
+}
+
+#[test]
+fn a_chip_months_sources_say_whether_they_count_from_their_definitions_on_chain() {
+    use crate::research::fund::{Definitions, route_months};
+    use crate::research::phase::{Month, Source};
+    let bucket = chip_bucket();
+    let mut app = research_app();
+    let source = |id: &str, address: &str, url: &str| Source {
+        bucket: bucket.clone(),
+        label: Some("DDR5_16GBIT".into()),
+        url: Some(url.into()),
+        status: "Active".into(),
+        id: id.repeat(32),
+        address: Some(address.into()),
+        checked: None,
+    };
+    app.fund.snap.months = vec![Month {
+        market: "ramx".into(),
+        expiry: "RAMX-202612".into(),
+        phase: "Game".into(),
+        sources: vec![
+            source("aa", "SrcA", "https://example.com/price/dram"),
+            source("bb", "SrcB", "https://other.example/ddr5"),
+            source("cc", "SrcC", "https://example.com/price/dram?copy"),
+            // A dev bootstrap source: its locator is linked, its definition not.
+            source("dd", "SrcD", "https://bootstrap.example/ddr5"),
+        ],
+        ..Default::default()
+    }];
+    let series = chip_series("example-ddr5-16gb", "DDR5 16Gb (2Gx8) 4800/5600");
+    let mut known = Definitions::new();
+    known.insert("SrcA".into(), Some(series.definition_text()));
+    known.insert("SrcB".into(), Some("Product: DDR5 16GB module".into()));
+    // Not read yet: nothing is routed, since a repeat is judged against the others.
+    route_months(&mut app.fund.snap.months, &known);
+    assert!(
+        app.fund.snap.months[0]
+            .sources
+            .iter()
+            .all(|s| s.checked.is_none())
+    );
+    known.insert("SrcC".into(), Some(series.definition_text()));
+    known.insert("SrcD".into(), None);
+    route_months(&mut app.fund.snap.months, &known);
+    let words: Vec<Option<String>> = app.fund.snap.months[0]
+        .sources
+        .iter()
+        .map(|s| s.checked.as_ref().map(|c| c.words()))
+        .collect();
+    assert_eq!(
+        words,
+        [
+            Some("counts this month".to_string()),
+            Some("missing details".to_string()),
+            Some("already counted".to_string()),
+            // No definition on chain: no routing at all.
+            None,
+        ]
+    );
+    assert_eq!(
+        app.fund.snap.months[0].sources[1]
+            .checked
+            .as_ref()
+            .unwrap()
+            .reason
+            .as_deref(),
+        Some("not a comparison series")
+    );
+    // The category reads by the bucket's name, each source with whether it counts.
+    app.activate(Action::Nav(Path::category("ramx", "RAMX-202612", &bucket)));
+    let screen = draw(&mut app, 140, 40);
+    for text in [
+        "Products › RAMX › Dec 2026 › DDR5 16Gb",
+        "example.com/price/dram",
+        "active · counts this month",
+        "active · missing details",
+        "active · already counted",
+        "bootstrap.example/ddr5",
+    ] {
+        assert!(screen.contains(text), "missing {text}:\n{screen}");
+    }
+    assert!(!screen.contains("DDR5_16GBIT"), "{screen}");
+    // Its row: the page, then its status and nothing after it.
+    let line = screen
+        .lines()
+        .find(|l| l.contains("bootstrap.example/ddr5"))
+        .unwrap();
+    let after = line.split("bootstrap.example/ddr5").nth(1).unwrap();
+    assert_eq!(after.split('│').next().unwrap().trim(), "active", "{line}");
+}
+
+#[test]
+fn chip_finds_and_your_chip_sources_read_by_name_with_the_apis_routing() {
+    use crate::research::fund::{check_mine, snapshot_from};
+    let bucket = chip_bucket();
+    let mut app = app();
+    app.view = View::Fund;
+    let mut template = ameba_commodity_spec::series_template(
+        ameba_commodity_spec::Product::Ramx
+            .bucket("DDR5_16GBIT")
+            .unwrap(),
+        false,
+    );
+    template["origin"]["locator"] = json!("https://example.com/price/dram");
+    let candidates = json!({"candidates":[
+        {"contentHash":"c".repeat(64),"agentId":"ab".repeat(32),"canonicalLocatorHash":"aa11","createdAt":1_000_000u64,
+         "routing":{"status":"NEEDS_METADATA","reasons":[{"status":"NEEDS_METADATA","field":"statistic","message":"the price statistic is not set"}]},
+         "details":{"marketId":"ramx","expiryId":"RAMX-202612","bucketId":bucket,"canonicalUrl":"https://www.example.com/dram"}},
+        {"contentHash":"d".repeat(64),"agentId":"ab".repeat(32),"canonicalLocatorHash":"bb22","createdAt":1_000_000u64,
+         "series":chip_series("example-ddr5-16gb", "DDR5 16Gb"),
+         "details":{"marketId":"ramx","expiryId":"RAMX-202612","bucketId":bucket,"canonicalUrl":"https://www.trendforce.example/dram"}},
+        {"contentHash":"e".repeat(64),"agentId":"ab".repeat(32),"canonicalLocatorHash":"cc33","createdAt":1_000_000u64,
+         "series":template,
+         "details":{"marketId":"ramx","expiryId":"RAMX-202612","bucketId":bucket,"canonicalUrl":"https://www.example.org/dram"}}]});
+    let oracle = json!({"sourceLinks":[{"marketId":"ramx","expiryId":"RAMX-202612","sources":[
+        {"canonicalLocator":{"url":"https://vendor.com/ddr5","hash":"dd44"},"proposer":"me","status":"Active",
+         "sourceId":"ee".repeat(32),"bucketId":bucket,"bucketLabel":"DDR5_16GBIT","bucketName":"DDR5 16Gb",
+         "routing":{"status":"ELIGIBLE_FOR_CONTRACT","reasons":[]}}]}]});
+    let mut snap = snapshot_from(&candidates, &oracle, Some("me"));
+    snap.balance = Some((12_000_000, 0));
+    // The month's routing reaches your sources (fetch does this after its own).
+    snap.mine[0].checked = None;
+    snap.months = crate::research::phase::months(&json!({"state":{"months":[]}}));
+    check_mine(&mut snap.mine, &snap.months);
+    assert!(snap.mine[0].checked.is_none());
+    let mut snap = snapshot_from(&candidates, &oracle, Some("me"));
+    snap.balance = Some((12_000_000, 0));
+    assert_eq!(snap.finds[0].title, "RAMX · Dec 2026 · DDR5 16Gb");
+    assert_eq!(snap.mine[0].title, "RAMX · Dec 2026 · DDR5 16Gb");
+    // The API's routing, else the series' own.
+    let words: Vec<String> = snap
+        .finds
+        .iter()
+        .map(|f| f.checked.as_ref().unwrap().words())
+        .collect();
+    assert_eq!(
+        words,
+        ["missing details", "fits the bucket", "missing details"]
+    );
+    app.fund.take_snapshot(snap);
+    let screen = draw(&mut app, 120, 40);
+    for text in [
+        "RAMX · Dec 2026 · DDR5 16Gb · example.com",
+        "– missing details",
+        "– fits the bucket",
+        "RAMX · Dec 2026 · DDR5 16Gb · vendor.com  active · counts this month",
+    ] {
+        assert!(screen.contains(text), "missing {text}:\n{screen}");
+    }
+    click(&mut app, &Action::ShowFind(0));
+    let screen = draw(&mut app, 120, 40);
+    assert!(
+        screen.contains("Checked    Missing details: the price statistic is not set"),
+        "{screen}"
+    );
 }

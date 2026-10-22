@@ -12,9 +12,11 @@ pub mod chain;
 pub mod claims;
 pub mod council;
 pub mod errors;
+pub mod observe;
 pub mod reads;
 pub mod rewards;
 pub mod send;
+pub mod series;
 pub mod skus;
 pub mod sponsor;
 pub mod writes;
@@ -25,8 +27,9 @@ use crate::{
     futures::{self, Report, ctx::Ctx, error::Result, view::Paint},
 };
 use args::{
-    CandidateCommand, CollateralCommand, EvidenceCommand, OracleCommand, PrintCommand,
-    ReserveCommand, RewardCommand, SourceCommand, SponsorshipCommand, StakeCommand, UpdateCommand,
+    CandidateCommand, CollateralCommand, EvidenceCommand, ObserveCommand, OracleCommand,
+    PrintCommand, ReserveCommand, RewardCommand, SeriesCommand, SourceCommand, SponsorshipCommand,
+    StakeCommand, UpdateCommand,
 };
 
 /// Runs one oracle command with the futures connection settings (`--rpc`,
@@ -138,6 +141,73 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 challenge_id.as_deref(),
             ),
         },
+        O::Series { command } => match command {
+            SeriesCommand::Template {
+                bucket,
+                direct,
+                out,
+            } => series::template(bucket, *direct, out.as_deref()),
+            SeriesCommand::Check {
+                file,
+                market,
+                expiry,
+            } => series::check(ctx, p, file, market.as_deref(), expiry.as_deref()),
+            SeriesCommand::Propose {
+                target,
+                file,
+                bond,
+                source_id,
+            } => series::propose(ctx, p, target, file, bond.as_deref(), source_id.as_deref()),
+            SeriesCommand::Show { market, expiry } => {
+                series::show(ctx, p, market, expiry.as_deref())
+            }
+        },
+        O::Observe {
+            command: Some(command),
+            ..
+        } => match command {
+            ObserveCommand::Template {
+                market,
+                expiry,
+                source,
+                out,
+            } => observe::template(ctx, market, expiry.as_deref(), source, out.as_deref()),
+            ObserveCommand::Record {
+                market,
+                expiry,
+                source,
+                claim,
+                file,
+            } => observe::record(
+                ctx,
+                p,
+                market,
+                expiry.as_deref(),
+                source,
+                claim,
+                file.as_deref(),
+            ),
+        },
+        O::Observe {
+            command: None,
+            send: a,
+        } => {
+            let (Some(market), Some(source), Some(file)) = (&a.market, &a.source, &a.file) else {
+                return futures::error::bail(
+                    "give the month, --source and --file: petri oracle observe RAMX-202612 --source <SOURCE> --file obs.json",
+                );
+            };
+            observe::observe(
+                ctx,
+                p,
+                market,
+                a.expiry.as_deref(),
+                source,
+                file,
+                a.stake.as_deref(),
+                a.send.simulate,
+            )
+        }
         O::Candidates {
             command: None,
             filter,
@@ -195,13 +265,24 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 source,
                 value,
                 archive_url,
+                evidence,
                 stake,
-            } => writes::print_opening(ctx, p, target, source, value, archive_url, stake, None),
+            } => writes::print_opening(
+                ctx,
+                p,
+                target,
+                source,
+                value.as_deref(),
+                writes::Cite::of(archive_url, evidence),
+                stake,
+                None,
+            ),
             PrintCommand::Challenge {
                 target,
                 source,
                 value,
                 archive_url,
+                evidence,
                 bond,
                 challenge_id,
             } => writes::print_opening(
@@ -209,8 +290,8 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 p,
                 target,
                 source,
-                value,
-                archive_url,
+                value.as_deref(),
+                writes::Cite::of(archive_url, evidence),
                 bond,
                 Some(challenge_id.as_deref().unwrap_or("")),
             ),
@@ -226,14 +307,24 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 source,
                 value,
                 archive_url,
+                evidence,
                 stake,
-            } => writes::update_commit(ctx, p, target, source, value, archive_url, stake),
+            } => writes::update_commit(
+                ctx,
+                p,
+                target,
+                source,
+                value.as_deref(),
+                writes::Cite::of(archive_url, evidence),
+                stake,
+            ),
             UpdateCommand::Reveal { claim, send } => writes::update_reveal(ctx, p, claim, send),
             UpdateCommand::Challenge {
                 target,
                 claim,
                 value,
                 archive_url,
+                evidence,
                 bond,
                 challenge_id,
             } => writes::update_challenge(
@@ -241,8 +332,8 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 p,
                 target,
                 claim,
-                value,
-                archive_url,
+                value.as_deref(),
+                writes::Cite::of(archive_url, evidence),
                 bond,
                 challenge_id.as_deref(),
             ),

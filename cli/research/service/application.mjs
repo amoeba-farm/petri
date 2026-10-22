@@ -6,7 +6,8 @@ import { createWorkStore } from './work-store.mjs';
 import { createUpstream } from './upstream.mjs';
 import { createDirectiveStore } from './directive-store.mjs';
 import { createDiscovery, createOracleReader } from './discovery.mjs';
-import { fail, text, object, equalSecret, vault } from './security.mjs';
+import { fail, text, object, equalSecret, vault, digest } from './security.mjs';
+import { decodeBundle } from './evidence.mjs';
 
 export function createApplication(config, options = {}) {
   const db = createDatabase(options.databasePath || join(config.directory, 'workspace.sqlite'));
@@ -141,15 +142,27 @@ export function createApplication(config, options = {}) {
         if (match[2] === 'finish') {
           object(body, ['sessionId', 'summary']); return { run: work.finishRun(agent, match[1], body) };
         }
-        object(body, ['sessionId', 'clientKey', 'candidate']);
+        object(body, ['sessionId', 'clientKey', 'candidate', 'evidenceBundle'], ['sessionId', 'clientKey', 'candidate']);
         if (!body.candidate || typeof body.candidate !== 'object' || Array.isArray(body.candidate)) throw fail('INVALID_CANDIDATE', 'Provide the candidate fields.');
-        const attempt = work.beginSubmission(agent, match[1], body);
+        // A page behind the owner's sign-in comes with its web proof bundle.
+        // Only its digests are kept here: the bundle itself goes to the API.
+        const bundle = body.evidenceBundle === undefined ? null : decodeBundle(body.evidenceBundle);
+        const attempt = work.beginSubmission(agent, match[1], body, bundle && digest(bundle));
         if (attempt.result) return attempt.result;
         try {
-          const result = await upstream.submit(body.candidate, auth.upstreamCredential(agent.id));
+          const credential = auth.upstreamCredential(agent.id);
+          let evidence = null;
+          if (bundle) {
+            // The API verifies the bundle itself; the candidate then names it,
+            // and the API checks the proof is for its canonicalUrl.
+            const uploaded = await upstream.uploadEvidence(bundle, credential);
+            if (!/^[0-9a-f]{64}$/u.test(uploaded?.bundleDigest)) throw fail('UPSTREAM_INVALID', 'Invalid evidence response.', 502);
+            evidence = { bundleDigest: uploaded.bundleDigest, trust: typeof uploaded.trust === 'string' && /^[a-z_]{1,32}$/u.test(uploaded.trust) ? uploaded.trust : null };
+          }
+          const result = await upstream.submit(evidence ? { ...body.candidate, authentication: { bundleDigest: evidence.bundleDigest } } : body.candidate, credential);
           if (!/^[0-9a-f]{64}$/u.test(result.candidate?.contentHash) || typeof result.duplicate !== 'boolean' ||
               !result.duplicate && result.candidate.agentId !== agent.id) throw fail('UPSTREAM_INVALID', 'Invalid candidate response or attribution.', 502);
-          const saved = work.completeSubmission(attempt.id, result); candidateReads.delete(agent.id); return saved;
+          const saved = work.completeSubmission(attempt.id, evidence ? { ...result, evidence } : result); candidateReads.delete(agent.id); return saved;
         } catch (error) { work.failSubmission(attempt.id); throw error; }
       }
       throw fail('NOT_FOUND', 'Route not found.', 404);

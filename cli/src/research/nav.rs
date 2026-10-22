@@ -253,21 +253,18 @@ impl CategoryRow {
     }
 }
 
-/// A product's name for a bucket: its label, else the label its id spells,
-/// else "Unnamed product b0bf23".
+/// A product's name for a bucket: its label (a chip bucket's name, "DDR5
+/// 16Gb", for a chip bucket's label), else the name its id spells, else
+/// "Unnamed product b0bf23".
 pub fn bucket_label(bucket: &str, label: Option<&str>) -> String {
+    use crate::oracle::skus;
     if bucket == ALL {
         return "All products".into();
     }
     label
         .filter(|l| !l.is_empty())
-        .map(safe)
-        .or_else(|| {
-            crate::oracle::skus::parse_hex32(bucket, "bucket")
-                .ok()
-                .and_then(|b| crate::oracle::skus::decode_label(&b))
-                .map(|l| safe(&l))
-        })
+        .map(|l| safe(&skus::name_of(l).unwrap_or_else(|| l.to_string())))
+        .or_else(|| skus::id_name(bucket).map(|l| safe(&l)))
         .unwrap_or_else(|| format!("Unnamed product {}", &bucket[..bucket.len().min(6)]))
 }
 

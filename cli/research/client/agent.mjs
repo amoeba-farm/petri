@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { createHttpClient } from './http.mjs';
 import { endpoint, fail, privateDirectory, privateWrite, stateDirectory, token } from '../service/security.mjs';
 import { REPORT_KINDS } from '../service/work-store.mjs';
+import { readBundleFile, encodeBundle } from '../service/evidence.mjs';
 
 export function createAgentClient({ name = 'researcher', harness = 'Custom harness', baseUrl, profileDirectory } = {}) {
   if (!/^[a-z0-9][a-z0-9_-]{0,39}$/u.test(name)) throw fail('INVALID_NAME', 'Use lowercase letters, digits, hyphens or underscores for the agent name.');
@@ -17,10 +18,10 @@ export function createAgentClient({ name = 'researcher', harness = 'Custom harne
     endpoint(value.baseUrl); return value;
   }
   function save(profile) { privateWrite(path, profile); }
-  async function authorized(method, route, body) {
+  async function authorized(method, route, body, options) {
     const profile = read();
     if (!profile.credential) throw fail('LOGIN_REQUIRED', 'Log this agent into Petri first.', 401);
-    return createHttpClient(profile.baseUrl)(method, route, body, profile.credential);
+    return createHttpClient(profile.baseUrl, options)(method, route, body, profile.credential);
   }
   async function session(force = false) {
     const profile = read();
@@ -72,7 +73,18 @@ export function createAgentClient({ name = 'researcher', harness = 'Custom harne
       if (!REPORT_KINDS.includes(kind)) throw fail('INVALID_EVENT', `Report one of: ${REPORT_KINDS.join(', ')}.`);
       return authorized('POST', `/v1/runs/${encodeURIComponent(runId)}/events`, { sessionId: (await session()).id, clientKey, kind, message, ...(referenceUrl ? { referenceUrl } : {}) });
     },
-    async submit(runId, candidate, clientKey = randomUUID()) { return authorized('POST', `/v1/runs/${encodeURIComponent(runId)}/candidates`, { sessionId: (await session()).id, clientKey, candidate }); },
+    // A candidate, with the web proof bundle of a page behind the owner's
+    // sign-in when there is one (the file `petri evidence prove` wrote). The
+    // bundle is read here, in the agent's own process, and goes to the
+    // workspace as base64; the workspace uploads it to the API for
+    // verification (POST /oracle/evidence), then submits the candidate. That
+    // is two API calls of up to 15 s each (service/upstream.mjs), hence the
+    // longer wait.
+    async submit(runId, candidate, clientKey = randomUUID(), evidenceBundle) {
+      const bundle = evidenceBundle === undefined ? undefined : encodeBundle(readBundleFile(evidenceBundle));
+      return authorized('POST', `/v1/runs/${encodeURIComponent(runId)}/candidates`,
+        { sessionId: (await session()).id, clientKey, candidate, ...(bundle ? { evidenceBundle: bundle } : {}) }, bundle ? { timeoutMs: 40000 } : undefined);
+    },
     async finish(runId, summary) { return authorized('POST', `/v1/runs/${encodeURIComponent(runId)}/finish`, { sessionId: (await session()).id, summary }); },
   };
 }

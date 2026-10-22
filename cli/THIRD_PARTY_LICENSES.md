@@ -4,22 +4,29 @@ This file is generated from the exact `Cargo.lock` package set and the legal fil
 
 An **SPDX-text fallback** is used only when an upstream `.crate` archive contains no `LICENSE`, `LICENCE`, `COPYING`, `NOTICE`, `COPYRIGHT`, or `UNLICENSE` file, or when a reviewed packaged file conflicts with the manifest's declared license expression. The fallback is explicitly labeled, preserves the package's declared authors and repository, and supplies pinned standard license text; it is not represented as an upstream-packaged file.
 
-- Cargo.lock SHA-256: `3de47c6f9295a39fadae9ba6b03ab1b792976cf135a3d5d28391a54b9b11943f`
-- Locked packages: 414
-- Registry packages: 403
-- Git packages: 0
-- Workspace/path packages: 11
-- Packages requiring an SPDX-text fallback: 91
-- Discovered legal files: 621
-- Unique normalized legal texts: 218
+- Cargo.lock SHA-256: `3626963853ab4b5dc41f50567edd827d90b91ac64d9fadc632bd7da2d206e9ff`
+- Locked packages: 614
+- Registry packages: 559
+- Git packages: 41
+- Workspace/path packages: 14
+- Packages requiring an SPDX-text fallback: 129
+- Discovered legal files: 917
+- Unique normalized legal texts: 303
 
 ## Package-to-license mapping
 
 | Package | Version | Origin / locked source | Declared license | Authors | Repository | Resolution | Files and exact text IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| adler2 | 2.0.1 | registry+https://github.com/rust-lang/crates.io-index | 0BSD OR MIT OR Apache-2.0 | Jonas Schievink &lt;jonasschievink@gmail.com&gt;; oyvindln &lt;oyvindln@users.noreply.github.com&gt; | https://github.com/oyvindln/adler2 | upstream-packaged legal file | <code>LICENSE-0BSD</code> → <code>L0126</code><br><code>LICENSE-APACHE</code> → <code>L0130</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| ahash | 0.8.12 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Tom Kaitchuck &lt;Tom.Kaitchuck@gmail.com&gt; | https://github.com/tkaitchuck/ahash | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0010</code> |
-| allocator-api2 | 0.2.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Zakarum &lt;zaq.dev@icloud.com&gt; | https://github.com/zakarumych/allocator-api2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| adler2 | 2.0.1 | registry+https://github.com/rust-lang/crates.io-index | 0BSD OR MIT OR Apache-2.0 | Jonas Schievink &lt;jonasschievink@gmail.com&gt;; oyvindln &lt;oyvindln@users.noreply.github.com&gt; | https://github.com/oyvindln/adler2 | upstream-packaged legal file | <code>LICENSE-0BSD</code> → <code>L0165</code><br><code>LICENSE-APACHE</code> → <code>L0171</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| aead | 0.4.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0225</code><br><code>LICENSE-MIT</code> → <code>L0195</code> |
+| aes | 0.7.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/block-ciphers | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0294</code> |
+| aes | 0.8.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/block-ciphers | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0294</code> |
+| aes | 0.9.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/block-ciphers | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0051</code> |
+| aes-gcm | 0.9.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/AEADs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0073</code> |
+| ahash | 0.8.12 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Tom Kaitchuck &lt;Tom.Kaitchuck@gmail.com&gt; | https://github.com/tkaitchuck/ahash | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0011</code> |
+| aho-corasick | 1.1.5 | registry+https://github.com/rust-lang/crates.io-index | Unlicense OR MIT | Andrew Gallant &lt;jamslam@gmail.com&gt; | https://github.com/BurntSushi/aho-corasick | upstream-packaged legal file | <code>COPYING</code> → <code>L0006</code><br><code>LICENSE-MIT</code> → <code>L0028</code><br><code>UNLICENSE</code> → <code>L0157</code> |
+| allocator-api2 | 0.2.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Zakarum &lt;zaq.dev@icloud.com&gt; | https://github.com/zakarumych/allocator-api2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| ameba-commodity-spec | 0.1.0 | monorepo path package: oracle/crates/commodity-spec/Cargo.toml | — | — | — | first-party Amoeba crate; no third-party license applies |  |
 | ameba-futures | 0.1.0 | monorepo path package: futures/programs/futures/Cargo.toml | Apache-2.0 | — | — | first-party Amoeba crate; no third-party license applies |  |
 | ameba-futures-client | 0.2.0 | monorepo path package: futures/crates/futures-client/Cargo.toml | Apache-2.0 | — | — | first-party Amoeba crate; no third-party license applies |  |
 | ameba-futures-math | 0.1.0 | monorepo path package: futures/crates/futures-math/Cargo.toml | Apache-2.0 | — | — | first-party Amoeba crate; no third-party license applies |  |
@@ -27,410 +34,603 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 | ameba-oracle-interface | 0.2.0 | monorepo path package: oracle/crates/oracle-interface/Cargo.toml | — | — | — | first-party Amoeba crate; no third-party license applies |  |
 | ameba-sdk | 0.4.0 | monorepo path package: sdk/Cargo.toml | Apache-2.0 | — | — | first-party Amoeba crate; no third-party license applies |  |
 | ameba_oracle | 0.1.0 | monorepo path package: oracle/programs/ameba_oracle/Cargo.toml | — | — | — | first-party Amoeba crate; no third-party license applies |  |
-| amoeba | 0.1.14 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0130</code> |
-| android_system_properties | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Nicolas Silva &lt;nical@fastmail.com&gt; | https://github.com/nical/android_system_properties | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0037</code><br><code>LICENSE-MIT</code> → <code>L0121</code> |
-| anstream | 0.6.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| anstyle | 1.0.13 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| anstyle-parse | 0.2.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| anstyle-query | 1.1.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| anstyle-wincon | 3.0.11 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| anyhow | 1.0.102 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/anyhow | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| arraydeque | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | andylokandy | https://github.com/andylokandy/arraydeque | upstream-packaged legal file | <code>LICENSE</code> → <code>L0017</code> |
-| arrayref | 0.3.9 | registry+https://github.com/rust-lang/crates.io-index | BSD-2-Clause | David Roundy &lt;roundyd@physics.oregonstate.edu&gt; | https://github.com/droundy/arrayref | upstream-packaged legal file | <code>LICENSE</code> → <code>L0030</code> |
-| arrayvec | 0.7.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/bluss/arrayvec | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0078</code> |
-| atomic-waker | 1.1.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Stjepan Glavina &lt;stjepang@gmail.com&gt;; Contributors to futures-rs | https://github.com/smol-rs/atomic-waker | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0041</code><br><code>LICENSE-THIRD-PARTY</code> → <code>L0093</code> |
-| autocfg | 1.5.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Josh Stone &lt;cuviper@gmail.com&gt; | https://github.com/cuviper/autocfg | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0045</code> |
-| base64 | 0.12.3 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Alice Maz &lt;alice@alicemaz.com&gt;; Marshall Pierce &lt;marshall@mpierce.org&gt; | https://github.com/marshallpierce/rust-base64 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0024</code> |
-| base64 | 0.22.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Marshall Pierce &lt;marshall@mpierce.org&gt; | https://github.com/marshallpierce/rust-base64 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0024</code> |
-| base64ct | 1.8.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0048</code> |
-| bincode | 1.3.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ty Overby &lt;ty@pre-alpha.com&gt;; Francesco Mazzoli &lt;f@mazzo.li&gt;; David Tolnay &lt;dtolnay@gmail.com&gt;; Zoey Riordan &lt;zoey@dos.cafe&gt; | https://github.com/servo/bincode | upstream-packaged legal file | <code>LICENSE.md</code> → <code>L0139</code> |
-| bitflags | 2.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/bitflags/bitflags | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0095</code> |
-| blake3 | 1.8.3 | registry+https://github.com/rust-lang/crates.io-index | CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception | Jack O'Connor &lt;oconnor663@gmail.com&gt;; Samuel Neves | https://github.com/BLAKE3-team/BLAKE3 | upstream-packaged legal file | <code>LICENSE_A2</code> → <code>L0004</code><br><code>LICENSE_A2LLVM</code> → <code>L0152</code><br><code>LICENSE_CC0</code> → <code>L0150</code> |
-| block-buffer | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0192</code> |
-| block-buffer | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0192</code> |
-| borsh | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Near Inc &lt;hello@near.org&gt; | https://github.com/near/borsh-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| borsh | 1.6.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Near Inc &lt;hello@near.org&gt; | https://github.com/near/borsh-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0117</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| borsh-derive | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/nearprotocol/borsh | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| borsh-derive | 1.6.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/near/borsh-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0117</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| borsh-derive-internal | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/nearprotocol/borsh | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| borsh-schema-derive-internal | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/nearprotocol/borsh | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| bs58 | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | — | https://github.com/Nullus157/bs58-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0068</code> |
-| bumpalo | 3.20.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Nick Fitzgerald &lt;fitzgen@gmail.com&gt; | https://github.com/fitzgen/bumpalo | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0096</code> |
-| bv | 0.11.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Jesse A. Tov &lt;jesse.tov@gmail.com&gt; | https://github.com/tov/bv-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0168</code> |
-| bytemuck | 1.25.0 | registry+https://github.com/rust-lang/crates.io-index | Zlib OR Apache-2.0 OR MIT | Lokathor &lt;zefria@gmail.com&gt; | https://github.com/Lokathor/bytemuck | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0199</code><br><code>LICENSE-MIT</code> → <code>L0146</code><br><code>LICENSE-ZLIB</code> → <code>L0125</code> |
-| bytemuck_derive | 1.10.2 | registry+https://github.com/rust-lang/crates.io-index | Zlib OR Apache-2.0 OR MIT | Lokathor &lt;zefria@gmail.com&gt; | https://github.com/Lokathor/bytemuck | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0199</code><br><code>LICENSE-MIT</code> → <code>L0146</code><br><code>LICENSE-ZLIB</code> → <code>L0125</code> |
-| bytes | 1.11.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/tokio-rs/bytes | upstream-packaged legal file | <code>LICENSE</code> → <code>L0072</code> |
-| cassowary | 0.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT / Apache-2.0 | Dylan Ede &lt;dylanede@googlemail.com&gt; | https://github.com/dylanede/cassowary-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0001</code><br><code>LICENSE-MIT</code> → <code>L0216</code> |
-| castaway | 0.2.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Stephen M. Coakley &lt;me@stephencoakley.com&gt; | https://github.com/sagebind/castaway | upstream-packaged legal file | <code>LICENSE</code> → <code>L0212</code> |
-| cc | 1.2.56 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/rust-lang/cc-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| cfg-if | 1.0.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/rust-lang/cfg-if | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| cfg_aliases | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Zicklag &lt;zicklag@katharostech.com&gt; | https://github.com/katharostech/cfg_aliases | upstream-packaged legal file | <code>LICENSE</code> → <code>L0051</code> |
-| chrono | 0.4.44 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/chronotope/chrono | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0142</code> |
-| clap | 4.5.60 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| clap_builder | 4.5.60 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| clap_derive | 4.5.55 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| clap_lex | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| colorchoice | 1.0.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| compact_str | 0.8.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | Parker Timmerman &lt;parker@parkertimmerman.com&gt; | https://github.com/ParkMyCar/compact_str | upstream-packaged legal file | <code>LICENSE</code> → <code>L0022</code> |
-| console | 0.15.11 | registry+https://github.com/rust-lang/crates.io-index | MIT | Armin Ronacher &lt;armin.ronacher@active-4.com&gt; | https://github.com/console-rs/console | upstream-packaged legal file | <code>LICENSE</code> → <code>L0033</code> |
-| console_error_panic_hook | 0.1.7 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Nick Fitzgerald &lt;fitzgen@gmail.com&gt; | https://github.com/rustwasm/console_error_panic_hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0056</code><br><code>LICENSE-MIT</code> → <code>L0110</code> |
-| console_log | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Matthew Nicholson &lt;matt@matt-land.com&gt; | https://github.com/iamcodemaker/console_log | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0008</code> |
-| const-oid | 0.9.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/const-oid | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0172</code> |
-| constant_time_eq | 0.4.2 | registry+https://github.com/rust-lang/crates.io-index | CC0-1.0 OR MIT-0 OR Apache-2.0 | Cesar Eduardo Barros &lt;cesarb@cesarb.eti.br&gt; | https://github.com/cesarb/constant_time_eq | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-CC0</code> → <code>L0150</code><br><code>LICENSE-MIT0</code> → <code>L0144</code> |
-| core-foundation-sys | 0.8.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Servo Project Developers | https://github.com/servo/core-foundation-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0092</code> |
-| cpufeatures | 0.2.17 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0161</code> |
-| crc32fast | 1.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Sam Rijs &lt;srijs@airpost.net&gt;; Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/srijs/rust-crc32fast | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0091</code> |
-| crossterm | 0.28.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | T. Post | https://github.com/crossterm-rs/crossterm | upstream-packaged legal file | <code>LICENSE</code> → <code>L0063</code> |
-| crossterm_winapi | 0.9.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | T. Post | https://github.com/crossterm-rs/crossterm-winapi | upstream-packaged legal file | <code>LICENSE</code> → <code>L0063</code> |
-| crunchy | 0.2.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Eira Fransham &lt;jackefransham@gmail.com&gt; | https://github.com/eira-fransham/crunchy | upstream-packaged legal file | <code>LICENSE</code> → <code>L0061</code> |
-| crypto-common | 0.1.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0054</code> |
-| curve25519-dalek | 4.1.3 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Isis Lovecruft &lt;isis@patternsinthevoid.net&gt;; Henry de Valence &lt;hdevalence@hdevalence.ca&gt; | https://github.com/dalek-cryptography/curve25519-dalek/tree/main/curve25519-dalek | upstream-packaged legal file | <code>LICENSE</code> → <code>L0186</code> |
-| curve25519-dalek-derive | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | — | https://github.com/dalek-cryptography/curve25519-dalek | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| darling | 0.23.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0137</code> |
-| darling_core | 0.23.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0137</code> |
-| darling_macro | 0.23.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0137</code> |
-| der | 0.7.10 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/der | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0160</code> |
-| derivation-path | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Julian Popescu &lt;jpopesculian@gmail.com&gt; | https://github.com/jpopesculian/derivation-path | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| dialoguer | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Armin Ronacher &lt;armin.ronacher@active-4.com&gt;; Pavan Kumar Sunkara &lt;pavan.sss1991@gmail.com&gt; | https://github.com/mitsuhiko/dialoguer | upstream-packaged legal file | <code>LICENSE</code> → <code>L0033</code> |
-| digest | 0.10.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0148</code> |
-| digest | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0148</code> |
-| displaydoc | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Jane Lusby &lt;jlusby@yaah.dev&gt; | https://github.com/yaahc/displaydoc | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| ed25519 | 2.2.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/signatures/tree/master/ed25519 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0112</code><br><code>LICENSE-MIT</code> → <code>L0163</code> |
-| ed25519-dalek | 2.2.0 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | isis lovecruft &lt;isis@patternsinthevoid.net&gt;; Tony Arcieri &lt;bascule@gmail.com&gt;; Michael Rosenberg &lt;michael@mrosenberg.pub&gt; | https://github.com/dalek-cryptography/curve25519-dalek/tree/main/ed25519-dalek | upstream-packaged legal file | <code>LICENSE</code> → <code>L0114</code> |
-| either | 1.15.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/rayon-rs/either | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0109</code> |
-| encode_unicode | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Torbjørn Birch Moltu &lt;t.b.moltu@lyse.net&gt; | https://github.com/tormol/encode_unicode | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0189</code><br><code>LICENSE-MIT</code> → <code>L0193</code> |
-| encoding_rs | 0.8.35 | registry+https://github.com/rust-lang/crates.io-index | (Apache-2.0 OR MIT) AND BSD-3-Clause | Henri Sivonen &lt;hsivonen@hsivonen.fi&gt; | https://github.com/hsivonen/encoding_rs | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0026</code><br><code>LICENSE-APACHE</code> → <code>L0189</code><br><code>LICENSE-MIT</code> → <code>L0062</code><br><code>LICENSE-WHATWG</code> → <code>L0122</code> |
-| equivalent | 1.0.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/indexmap-rs/equivalent | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0107</code> |
-| errno | 0.3.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Chris Wong &lt;lambda.fairy@gmail.com&gt;; Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/lambda-fairy/rust-errno | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0127</code> |
-| fastrand | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Stjepan Glavina &lt;stjepang@gmail.com&gt; | https://github.com/smol-rs/fastrand | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| feature-probe | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Jesse A. Tov &lt;jesse.tov@gmail.com&gt; | https://github.com/tov/feature-probe-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0168</code> |
-| fiat-crypto | 0.2.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR BSD-1-Clause | Fiat Crypto library authors &lt;jgross@mit.edu&gt; | https://github.com/mit-plv/fiat-crypto | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0101</code><br><code>LICENSE-APACHE</code> → <code>L0149</code><br><code>LICENSE-BSD-1</code> → <code>L0021</code><br><code>LICENSE-MIT</code> → <code>L0002</code> |
-| find-msvc-tools | 0.1.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/cc-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| five8 | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/kevinheavey/five8 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| five8_const | 0.1.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/kevinheavey/five8 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| five8_core | 0.1.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/kevinheavey/five8 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| flate2 | 1.1.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt;; Josh Triplett &lt;josh@joshtriplett.org&gt; | https://github.com/rust-lang/flate2-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0007</code> |
-| fnv | 1.0.7 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 / MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/servo/rust-fnv | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0097</code> |
-| foldhash | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | Zlib | Orson Peters &lt;orsonpeters@gmail.com&gt; | https://github.com/orlp/foldhash | upstream-packaged legal file | <code>LICENSE</code> → <code>L0162</code> |
-| foldhash | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | Zlib | Orson Peters &lt;orsonpeters@gmail.com&gt; | https://github.com/orlp/foldhash | upstream-packaged legal file | <code>LICENSE</code> → <code>L0162</code> |
-| form_urlencoded | 1.2.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0035</code> |
-| futures-channel | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0044</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
-| futures-core | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0044</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
-| futures-io | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0044</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
-| futures-sink | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0044</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
-| futures-task | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0044</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
-| futures-util | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0044</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
-| generic-array | 0.14.7 | registry+https://github.com/rust-lang/crates.io-index | MIT | Bartłomiej Kamiński &lt;fizyk20@gmail.com&gt;; Aaron Trent &lt;novacrazy@gmail.com&gt; | https://github.com/fizyk20/generic-array.git | upstream-packaged legal file | <code>LICENSE</code> → <code>L0159</code> |
-| getrandom | 0.1.16 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| getrandom | 0.2.17 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
-| getrandom | 0.3.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0047</code> |
-| getrandom | 0.4.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0084</code> |
-| hashbrown | 0.13.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/rust-lang/hashbrown | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0218</code> |
-| hashbrown | 0.15.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/rust-lang/hashbrown | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0218</code> |
-| hashbrown | 0.16.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/rust-lang/hashbrown | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0218</code> |
-| hashlink | 0.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/kyren/hashlink | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0174</code><br><code>LICENSE-MIT</code> → <code>L0201</code> |
-| heck | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/withoutboats/heck | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0116</code> |
-| hidapi | 2.6.6 | registry+https://github.com/rust-lang/crates.io-index | MIT | Roland Ruckerbauer &lt;mail@ruabmbua.dev&gt;; Osspial &lt;osspial@gmail.com&gt;; Artyom Pavlov &lt;newpavlov@gmail.com&gt;; mberndt123; niklasad1; Stefan Kerkmann | https://github.com/ruabmbua/hidapi-rs | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0111</code><br><code>etc/hidapi/LICENSE-bsd.txt</code> → <code>L0049</code><br><code>etc/hidapi/LICENSE-gpl3.txt</code> → <code>L0136</code><br><code>etc/hidapi/LICENSE-orig.txt</code> → <code>L0214</code><br><code>etc/hidapi/LICENSE.txt</code> → <code>L0119</code> |
-| hmac | 0.12.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/MACs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0148</code> |
-| http | 1.4.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt;; Carl Lerche &lt;me@carllerche.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/http | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0133</code><br><code>LICENSE-MIT</code> → <code>L0196</code> |
-| http-body | 1.0.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Lucio Franco &lt;luciofranco14@gmail.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/http-body | upstream-packaged legal file | <code>LICENSE</code> → <code>L0187</code> |
-| http-body-util | 0.1.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Lucio Franco &lt;luciofranco14@gmail.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/http-body | upstream-packaged legal file | <code>LICENSE</code> → <code>L0170</code> |
-| httparse | 1.10.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/httparse | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0060</code> |
-| hyper | 1.8.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/hyper | upstream-packaged legal file | <code>LICENSE</code> → <code>L0138</code> |
-| hyper-rustls | 0.27.7 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR ISC OR MIT | — | https://github.com/rustls/hyper-rustls | upstream-packaged legal file | <code>LICENSE</code> → <code>L0190</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-ISC</code> → <code>L0118</code><br><code>LICENSE-MIT</code> → <code>L0106</code> |
-| hyper-util | 0.1.20 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/hyper-util | upstream-packaged legal file | <code>LICENSE</code> → <code>L0147</code> |
-| iana-time-zone | 0.1.65 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Andrew Straw &lt;strawman@astraw.com&gt;; René Kijewski &lt;rene.kijewski@fu-berlin.de&gt;; Ryan Lopopolo &lt;rjl@hyperbo.la&gt; | https://github.com/strawlab/iana-time-zone | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0099</code><br><code>LICENSE-MIT</code> → <code>L0194</code> |
-| iana-time-zone-haiku | 0.1.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | René Kijewski &lt;crates.io@k6i.de&gt; | https://github.com/strawlab/iana-time-zone | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0099</code><br><code>LICENSE-MIT</code> → <code>L0194</code> |
-| icu_collections | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| icu_locale_core | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| icu_normalizer | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| icu_normalizer_data | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| icu_properties | 2.1.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| icu_properties_data | 2.1.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| icu_provider | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| id-arena | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Nick Fitzgerald &lt;fitzgen@gmail.com&gt;; Aleksey Kladov &lt;aleksey.kladov@gmail.com&gt; | https://github.com/fitzgen/id-arena | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| ident_case | 1.0.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/ident_case | upstream-packaged legal file | <code>LICENSE</code> → <code>L0082</code> |
-| idna | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url/ | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0164</code> |
-| idna_adapter | 1.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | The rust-url developers | https://github.com/hsivonen/idna_adapter | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0132</code> |
-| indexmap | 2.13.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/indexmap-rs/indexmap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0203</code> |
-| indoc | 2.0.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/indoc | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| instability | 0.3.12 | registry+https://github.com/rust-lang/crates.io-index | MIT | Stephen M. Coakley &lt;me@stephencoakley.com&gt;; The Ratatui Developers | https://github.com/ratatui/instability | upstream-packaged legal file | <code>LICENSE.md</code> → <code>L0009</code> |
-| ipnet | 2.12.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Kris Price &lt;kris@krisprice.nz&gt; | https://github.com/krisprice/ipnet | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0128</code><br><code>LICENSE-MIT</code> → <code>L0075</code> |
-| iri-string | 0.7.10 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | YOSHIOKA Takuma &lt;nop_thread@nops.red&gt; | https://github.com/lo48576/iri-string | upstream-packaged legal file | <code>LICENSE-APACHE.txt</code> → <code>L0189</code><br><code>LICENSE-MIT.txt</code> → <code>L0039</code> |
-| is_terminal_polyfill | 1.70.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/polyfill-rs/is_terminal_polyfill | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| itertools | 0.13.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/rust-itertools/itertools | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0109</code> |
-| itoa | 1.0.17 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/itoa | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| js-sys | 0.3.91 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/js-sys | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| keccak | 0.1.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/sponges/tree/master/keccak | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0173</code> |
-| lazy_static | 1.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Marvin Löbel &lt;loebel.marvin@gmail.com&gt; | https://github.com/rust-lang-nursery/lazy-static.rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0012</code> |
-| leb128fmt | 0.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Bryant Luk &lt;code@bryantluk.com&gt; | https://github.com/bluk/leb128fmt | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| libc | 0.2.183 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-lang/libc | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0027</code> |
-| libsecp256k1 | 0.6.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | upstream-packaged legal file | <code>LICENSE</code> → <code>L0166</code> |
-| libsecp256k1-core | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| libsecp256k1-gen-ecmult | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| libsecp256k1-gen-genmult | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| linux-raw-sys | 0.12.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/sunfishcode/linux-raw-sys | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0053</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| linux-raw-sys | 0.4.15 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/sunfishcode/linux-raw-sys | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0053</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| litemap | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| lock_api | 0.4.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/Amanieu/parking_lot | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0182</code> |
-| log | 0.4.29 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-lang/log | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0095</code> |
-| lru | 0.12.5 | registry+https://github.com/rust-lang/crates.io-index | MIT | Jerome Froelich &lt;jeromefroelic@hotmail.com&gt; | https://github.com/jeromefroe/lru-rs.git | upstream-packaged legal file | <code>LICENSE</code> → <code>L0011</code> |
-| lru-slab | 0.1.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR Zlib | Benjamin Saunders &lt;ben.e.saunders@gmail.com&gt; | https://github.com/Ralith/lru-slab | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0189</code><br><code>LICENSE-MIT</code> → <code>L0028</code><br><code>LICENSE-ZLIB</code> → <code>L0015</code> |
-| memchr | 2.8.0 | registry+https://github.com/rust-lang/crates.io-index | Unlicense OR MIT | Andrew Gallant &lt;jamslam@gmail.com&gt;; bluss | https://github.com/BurntSushi/memchr | upstream-packaged legal file | <code>COPYING</code> → <code>L0005</code><br><code>LICENSE-MIT</code> → <code>L0025</code><br><code>UNLICENSE</code> → <code>L0120</code> |
-| memoffset | 0.9.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Gilad Naaman &lt;gilad.naaman@gmail.com&gt; | https://github.com/Gilnaa/memoffset | upstream-packaged legal file | <code>LICENSE</code> → <code>L0052</code> |
-| miniz_oxide | 0.8.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Zlib OR Apache-2.0 | Frommi &lt;daniil.liferenko@gmail.com&gt;; oyvindln &lt;oyvindln@users.noreply.github.com&gt;; Rich Geldreich richgel99@gmail.com | https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide | upstream-packaged legal file | <code>LICENSE</code> → <code>L0064</code><br><code>LICENSE-APACHE.md</code> → <code>L0023</code><br><code>LICENSE-MIT.md</code> → <code>L0113</code><br><code>LICENSE-ZLIB.md</code> → <code>L0016</code> |
-| mio | 1.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Thomas de Zeeuw &lt;thomasdezeeuw@gmail.com&gt;; Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/mio | upstream-packaged legal file | <code>LICENSE</code> → <code>L0013</code> |
-| num-bigint | 0.4.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-bigint | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0095</code> |
-| num-derive | 0.4.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-derive | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0095</code> |
-| num-integer | 0.1.46 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-integer | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0095</code> |
-| num-traits | 0.2.19 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0095</code> |
-| num_enum | 0.7.5 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause OR MIT OR Apache-2.0 | Daniel Wagner-Hall &lt;dawagner@gmail.com&gt;; Daniel Henry-Mantilla &lt;daniel.henry.mantilla@gmail.com&gt;; Vincent Esche &lt;regexident@gmail.com&gt; | https://github.com/illicitonion/num_enum | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-BSD</code> → <code>L0020</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| num_enum_derive | 0.7.5 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause OR MIT OR Apache-2.0 | Daniel Wagner-Hall &lt;dawagner@gmail.com&gt;; Daniel Henry-Mantilla &lt;daniel.henry.mantilla@gmail.com&gt;; Vincent Esche &lt;regexident@gmail.com&gt; | https://github.com/illicitonion/num_enum | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-BSD</code> → <code>L0020</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| once_cell | 1.21.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Aleksey Kladov &lt;aleksey.kladov@gmail.com&gt; | https://github.com/matklad/once_cell | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| once_cell_polyfill | 1.70.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/polyfill-rs/once_cell_polyfill | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| opaque-debug | 0.3.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0209</code> |
-| parking_lot | 0.12.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/Amanieu/parking_lot | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0182</code> |
-| parking_lot_core | 0.9.12 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/Amanieu/parking_lot | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0182</code> |
-| paste | 1.0.15 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/paste | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| pbkdf2 | 0.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/password-hashes/tree/master/pbkdf2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0014</code> |
-| percent-encoding | 2.3.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url/ | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0164</code> |
-| pin-project-lite | 0.2.17 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/taiki-e/pin-project-lite | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0023</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| pin-utils | 0.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Josef Brandl &lt;mail@josefbrandl.de&gt; | https://github.com/rust-lang-nursery/pin-utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0151</code><br><code>LICENSE-MIT</code> → <code>L0046</code> |
-| pkcs8 | 0.10.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/pkcs8 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0160</code> |
-| pkg-config | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/rust-lang/pkg-config-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| potential_utf | 0.1.4 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| ppv-lite86 | 0.2.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The CryptoCorrosion Contributors | https://github.com/cryptocorrosion/cryptocorrosion | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0006</code><br><code>LICENSE-MIT</code> → <code>L0077</code> |
-| prettyplease | 0.2.37 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/prettyplease | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| proc-macro-crate | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Bastian Köcher &lt;git@kchr.de&gt; | https://github.com/bkchr/proc-macro-crate | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0130</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| proc-macro-crate | 3.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Bastian Köcher &lt;git@kchr.de&gt; | https://github.com/bkchr/proc-macro-crate | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0130</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| proc-macro2 | 1.0.106 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt;; Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/dtolnay/proc-macro2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| qstring | 0.7.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | Martin Algesten &lt;martin@algesten.se&gt; | https://github.com/algesten/qstring | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| quinn | 0.11.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/quinn-rs/quinn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0179</code><br><code>LICENSE-MIT</code> → <code>L0076</code> |
-| quinn-proto | 0.11.15 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/quinn-rs/quinn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0179</code><br><code>LICENSE-MIT</code> → <code>L0076</code> |
-| quinn-udp | 0.5.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/quinn-rs/quinn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0179</code><br><code>LICENSE-MIT</code> → <code>L0076</code> |
-| quote | 1.0.45 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/quote | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| r-efi | 5.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR LGPL-2.1-or-later | — | https://github.com/r-efi/r-efi | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: LGPL-2.1-or-later</code> → <code>L0036</code> |
-| r-efi | 6.0.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR LGPL-2.1-or-later | — | https://github.com/r-efi/r-efi | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: LGPL-2.1-or-later</code> → <code>L0036</code> |
-| rand | 0.7.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand | 0.8.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0055</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand | 0.9.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0055</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand_chacha | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers; The CryptoCorrosion Contributors | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand_chacha | 0.3.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers; The CryptoCorrosion Contributors | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand_chacha | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers; The CryptoCorrosion Contributors | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0055</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand_core | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand_core | 0.6.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0103</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand_core | 0.9.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0103</code><br><code>LICENSE-MIT</code> → <code>L0034</code> |
-| rand_hc | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0140</code><br><code>LICENSE-APACHE</code> → <code>L0158</code><br><code>LICENSE-MIT</code> → <code>L0155</code> |
-| ratatui | 0.29.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Florian Dehau &lt;work@fdehau.com&gt;; The Ratatui Developers | https://github.com/ratatui/ratatui | upstream-packaged legal file | <code>LICENSE</code> → <code>L0102</code> |
-| redox_syscall | 0.5.18 | registry+https://github.com/rust-lang/crates.io-index | MIT | Jeremy Soller &lt;jackpot51@gmail.com&gt; | https://gitlab.redox-os.org/redox-os/syscall | upstream-packaged legal file | <code>LICENSE</code> → <code>L0204</code> |
-| reqwest | 0.12.28 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/reqwest | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0108</code><br><code>LICENSE-MIT</code> → <code>L0074</code> |
-| ring | 0.17.14 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 AND ISC | — | https://github.com/briansmith/ring | upstream-packaged legal file | <code>LICENSE</code> → <code>L0165</code><br><code>LICENSE-BoringSSL</code> → <code>L0003</code><br><code>LICENSE-other-bits</code> → <code>L0205</code><br><code>src/polyfill/once_cell/LICENSE-APACHE</code> → <code>L0153</code><br><code>src/polyfill/once_cell/LICENSE-MIT</code> → <code>L0104</code><br><code>third_party/fiat/LICENSE</code> → <code>L0149</code> |
-| rustc-hash | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | The Rust Project Developers | https://github.com/rust-lang/rustc-hash | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0143</code><br><code>LICENSE-MIT</code> → <code>L0050</code> |
-| rustc_version | 0.4.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/djc/rustc-version-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0182</code> |
-| rustix | 0.38.44 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt;; Jakub Konka &lt;kubkon@jakubkonka.com&gt; | https://github.com/bytecodealliance/rustix | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0058</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| rustix | 1.1.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt;; Jakub Konka &lt;kubkon@jakubkonka.com&gt; | https://github.com/bytecodealliance/rustix | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0058</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| rustls | 0.23.37 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR ISC OR MIT | — | https://github.com/rustls/rustls | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-ISC</code> → <code>L0118</code><br><code>LICENSE-MIT</code> → <code>L0106</code> |
-| rustls-pki-types | 1.14.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rustls/pki-types | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0073</code><br><code>LICENSE-MIT</code> → <code>L0141</code> |
-| rustls-webpki | 0.103.13 | registry+https://github.com/rust-lang/crates.io-index | ISC | — | https://github.com/rustls/webpki | upstream-packaged legal file | <code>LICENSE</code> → <code>L0088</code> |
-| rustversion | 1.0.22 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/rustversion | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| ryu | 1.0.23 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR BSL-1.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/ryu | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-BOOST</code> → <code>L0183</code> |
-| scopeguard | 1.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/bluss/scopeguard | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0215</code> |
-| semver | 1.0.27 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/semver | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| serde | 1.0.228 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/serde | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| serde-big-array | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | est31 &lt;MTest31@outlook.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/est31/serde-big-array | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0090</code><br><code>LICENSE-MIT</code> → <code>L0069</code> |
-| serde_bytes | 0.11.19 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/bytes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| serde_core | 1.0.228 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/serde | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| serde_derive | 1.0.228 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/serde | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| serde_json | 1.0.149 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/json | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| serde_spanned | 1.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| serde_urlencoded | 0.7.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Anthony Ramine &lt;n.oxyde@gmail.com&gt; | https://github.com/nox/serde_urlencoded | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0171</code> |
-| sha2 | 0.10.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0167</code> |
-| sha2 | 0.9.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0167</code> |
-| sha3 | 0.10.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0206</code> |
-| shell-words | 1.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Tomasz Miąsko &lt;tomasz.miasko@gmail.com&gt; | https://github.com/tmiasko/shell-words | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0124</code><br><code>LICENSE-MIT</code> → <code>L0210</code> |
-| shlex | 1.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | comex &lt;comexk@gmail.com&gt;; Fenhl &lt;fenhl@fenhl.net&gt;; Adrian Taylor &lt;adetaylor@chromium.org&gt;; Alex Touchet &lt;alextouchet@outlook.com&gt;; Daniel Parks &lt;dp+git@oxidized.org&gt;; Garrett Berg &lt;googberg@gmail.com&gt; | https://github.com/comex/rust-shlex | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0086</code><br><code>LICENSE-MIT</code> → <code>L0071</code> |
-| signal-hook | 0.3.18 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Michal 'vorner' Vaner &lt;vorner@vorner.cz&gt;; Thomas Himmelstoss &lt;thimm@posteo.de&gt; | https://github.com/vorner/signal-hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0080</code> |
-| signal-hook-mio | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Michal 'vorner' Vaner &lt;vorner@vorner.cz&gt;; Thomas Himmelstoss &lt;thimm@posteo.de&gt; | https://github.com/vorner/signal-hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0080</code> |
-| signal-hook-registry | 1.4.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Michal 'vorner' Vaner &lt;vorner@vorner.cz&gt;; Masaki Hara &lt;ackie.h.gmai@gmail.com&gt; | https://github.com/vorner/signal-hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0080</code> |
-| signature | 2.2.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/traits/tree/master/signature | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0163</code> |
-| simd-adler32 | 0.3.8 | registry+https://github.com/rust-lang/crates.io-index | MIT | Marvin Countryman &lt;me@maar.vin&gt; | https://github.com/mcountryman/simd-adler32 | upstream-packaged legal file | <code>LICENSE.md</code> → <code>L0067</code> |
-| slab | 0.4.12 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt; | https://github.com/tokio-rs/slab | upstream-packaged legal file | <code>LICENSE</code> → <code>L0135</code> |
-| smallvec | 1.15.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Servo Project Developers | https://github.com/servo/rust-smallvec | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0019</code> |
-| socket2 | 0.6.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt;; Thomas de Zeeuw &lt;thomasdezeeuw@gmail.com&gt; | https://github.com/rust-lang/socket2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| solana-account | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-account-info | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-address-lookup-table-interface | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-atomic-u64 | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-big-mod-exp | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-bincode | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-blake3-hasher | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-borsh | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-clock | 2.2.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-cpi | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-decode-error | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-define-syscall | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-derivation-path | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-ed25519-program | 2.2.3 | vendored crates.io patch: vendor/solana-ed25519-program-2.2.3/Cargo.toml | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | vendored patch legal file + SPDX-text fallback | <code>vendor/LICENSE-APACHE-2.0</code> → <code>L0130</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-epoch-rewards | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-epoch-schedule | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-example-mocks | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-feature-gate-interface | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-feature-set | 2.2.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-fee-calculator | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-hash | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-instruction | 2.3.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-instructions-sysvar | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-keccak-hasher | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-keypair | 2.2.3 | vendored crates.io patch: vendor/solana-keypair-2.2.3/Cargo.toml | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | vendored patch legal file + SPDX-text fallback | <code>vendor/LICENSE-APACHE-2.0</code> → <code>L0130</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-last-restart-slot | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-loader-v2-interface | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-loader-v3-interface | 5.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-loader-v4-interface | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-message | 2.4.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-msg | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-native-token | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-nonce | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-offchain-message | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-packet | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-precompile-error | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-program | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-program-entrypoint | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-program-error | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-program-memory | 2.3.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-program-option | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-program-pack | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-pubkey | 2.4.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-remote-wallet | 2.3.13 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-rent | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-sanitize | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-sdk-ids | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-sdk-macro | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-secp256k1-recover | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-seed-phrase | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-serde-varint | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-serialize-utils | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-sha256-hasher | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-short-vec | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-signature | 2.3.0 | vendored crates.io patch: vendor/solana-signature-2.3.0/Cargo.toml | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | vendored patch legal file + SPDX-text fallback | <code>vendor/LICENSE-APACHE-2.0</code> → <code>L0130</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-signer | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-slot-hashes | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-slot-history | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-stable-layout | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-stake-interface | 1.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/solana-program/stake | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-system-interface | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/solana-program/system | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-sysvar | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-sysvar-id | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-transaction | 2.2.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-transaction-error | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| solana-vote-interface | 2.2.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| spki | 0.7.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/spki | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0157</code><br><code>LICENSE-MIT</code> → <code>L0181</code> |
-| spl-token | 7.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Solana Labs Maintainers &lt;maintainers@solanalabs.com&gt; | https://github.com/solana-labs/solana-program-library | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| stable_deref_trait | 1.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Robert Grosse &lt;n210241048576@gmail.com&gt; | https://github.com/storyyeller/stable_deref_trait | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0089</code> |
-| static_assertions | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Nikolai Vazquez | https://github.com/nvzqz/static-assertions-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0189</code><br><code>LICENSE-MIT</code> → <code>L0202</code> |
-| strsim | 0.11.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Danny Guo &lt;danny@dannyguo.com&gt;; maxbachmann &lt;oss@maxbachmann.de&gt; | https://github.com/rapidfuzz/strsim-rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0032</code> |
-| strum | 0.26.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Peter Glotfelty &lt;peter.glotfelty@microsoft.com&gt; | https://github.com/Peternator7/strum | upstream-packaged legal file | <code>LICENSE</code> → <code>L0134</code> |
-| strum_macros | 0.26.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Peter Glotfelty &lt;peter.glotfelty@microsoft.com&gt; | https://github.com/Peternator7/strum | upstream-packaged legal file | <code>LICENSE</code> → <code>L0134</code> |
-| subtle | 2.6.1 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Isis Lovecruft &lt;isis@patternsinthevoid.net&gt;; Henry de Valence &lt;hdevalence@hdevalence.ca&gt; | https://github.com/dalek-cryptography/subtle | upstream-packaged legal file | <code>LICENSE</code> → <code>L0191</code> |
-| syn | 1.0.109 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/syn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| syn | 2.0.117 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/syn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| sync_wrapper | 1.0.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Actyx AG &lt;developer@actyx.io&gt; | https://github.com/Actyx/sync_wrapper | upstream-packaged legal file | <code>LICENSE</code> → <code>L0023</code> |
-| synstructure | 0.13.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | Nika Layzell &lt;nika@thelayzells.com&gt; | https://github.com/mystor/synstructure | upstream-packaged legal file | <code>LICENSE</code> → <code>L0038</code> |
-| tempfile | 3.27.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Steven Allen &lt;steven@stebalien.com&gt;; The Rust Project Developers; Ashley Mannix &lt;ashleymannix@live.com.au&gt;; Jason White &lt;me@jasonwhite.io&gt; | https://github.com/Stebalien/tempfile | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0131</code> |
-| thiserror | 1.0.69 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| thiserror | 2.0.18 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| thiserror-impl | 1.0.69 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| thiserror-impl | 2.0.18 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| tinystr | 0.8.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| tinyvec | 1.10.0 | registry+https://github.com/rust-lang/crates.io-index | Zlib OR Apache-2.0 OR MIT | Lokathor &lt;zefria@gmail.com&gt; | https://github.com/Lokathor/tinyvec | upstream-packaged legal file | <code>LICENSE-APACHE.md</code> → <code>L0189</code><br><code>LICENSE-MIT.md</code> → <code>L0217</code><br><code>LICENSE-ZLIB.md</code> → <code>L0125</code> |
-| tinyvec_macros | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR Zlib | Soveu &lt;marx.tomasz@gmail.com&gt; | https://github.com/Soveu/tinyvec_macros | upstream-packaged legal file | <code>LICENSE-APACHE.md</code> → <code>L0079</code><br><code>LICENSE-MIT.md</code> → <code>L0031</code><br><code>LICENSE-ZLIB.md</code> → <code>L0065</code> |
-| tokio | 1.50.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tokio | upstream-packaged legal file | <code>LICENSE</code> → <code>L0042</code> |
-| tokio-rustls | 0.26.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rustls/tokio-rustls | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0185</code><br><code>LICENSE-MIT</code> → <code>L0197</code> |
-| toml | 0.5.11 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| toml | 1.0.6+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| toml_datetime | 1.0.0+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| toml_edit | 0.25.4+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| toml_parser | 1.0.9+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| toml_writer | 1.1.1+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0178</code><br><code>LICENSE-MIT</code> → <code>L0105</code> |
-| tower | 0.5.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower | upstream-packaged legal file | <code>LICENSE</code> → <code>L0066</code> |
-| tower-http | 0.6.8 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower-http | upstream-packaged legal file | <code>LICENSE</code> → <code>L0081</code> |
-| tower-layer | 0.3.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower | upstream-packaged legal file | <code>LICENSE</code> → <code>L0066</code> |
-| tower-service | 0.3.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower | upstream-packaged legal file | <code>LICENSE</code> → <code>L0066</code> |
-| tracing | 0.1.44 | registry+https://github.com/rust-lang/crates.io-index | MIT | Eliza Weisman &lt;eliza@buoyant.io&gt;; Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tracing | upstream-packaged legal file | <code>LICENSE</code> → <code>L0129</code> |
-| tracing-core | 0.1.36 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tracing | upstream-packaged legal file | <code>LICENSE</code> → <code>L0129</code><br><code>src/spin/LICENSE</code> → <code>L0087</code> |
-| try-lock | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/try-lock | upstream-packaged legal file | <code>LICENSE</code> → <code>L0180</code> |
-| typed-path | 0.12.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Chip Senkbeil &lt;chip@senkbeil.org&gt; | https://github.com/chipsenkbeil/typed-path | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| typenum | 1.19.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Paho Lurie-Gregg &lt;paho@paholg.com&gt;; Andre Bogus &lt;bogusandre@gmail.com&gt; | https://github.com/paholg/typenum | upstream-packaged legal file | <code>LICENSE</code> → <code>L0195</code><br><code>LICENSE-APACHE</code> → <code>L0083</code><br><code>LICENSE-MIT</code> → <code>L0156</code> |
-| unicode-ident | 1.0.24 | registry+https://github.com/rust-lang/crates.io-index | (MIT OR Apache-2.0) AND Unicode-3.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/unicode-ident | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0041</code><br><code>LICENSE-UNICODE</code> → <code>L0211</code> |
-| unicode-segmentation | 1.13.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-segmentation | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0040</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0116</code> |
-| unicode-truncate | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Aetf &lt;aetf@unlimitedcodeworks.xyz&gt; | https://github.com/Aetf/unicode-truncate | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0040</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0213</code> |
-| unicode-width | 0.1.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-width | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0040</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0116</code> |
-| unicode-width | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-width | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0040</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0116</code> |
-| unicode-xid | 0.2.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | erick.tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-xid | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0040</code><br><code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0116</code> |
-| untrusted | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | ISC | Brian Smith &lt;brian@briansmith.org&gt; | https://github.com/briansmith/untrusted | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0115</code> |
-| uriparse | 0.6.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Scott Godwin &lt;sgodwincs@gmail.com&gt; | https://github.com/sgodwincs/uriparse-rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0100</code> |
-| url | 2.5.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0164</code> |
-| utf8_iter | 1.0.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Henri Sivonen &lt;hsivonen@hsivonen.fi&gt; | https://github.com/hsivonen/utf8_iter | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0177</code><br><code>LICENSE-APACHE</code> → <code>L0189</code><br><code>LICENSE-MIT</code> → <code>L0062</code> |
-| utf8parse | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Joe Wilm &lt;joe@jwilm.com&gt;; Christian Duerr &lt;contact@christianduerr.com&gt; | https://github.com/alacritty/vte | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0094</code><br><code>LICENSE-MIT</code> → <code>L0200</code> |
-| version_check | 0.9.5 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Sergio Benitez &lt;sb@sergio.bz&gt; | https://github.com/SergioBenitez/version_check | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0169</code> |
-| want | 0.3.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/want | upstream-packaged legal file | <code>LICENSE</code> → <code>L0154</code> |
-| wasi | 0.11.1+wasi-snapshot-preview1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | The Cranelift Project Developers | https://github.com/bytecodealliance/wasi | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| wasi | 0.9.0+wasi-snapshot-preview1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | The Cranelift Project Developers | https://github.com/bytecodealliance/wasi | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| wasip2 | 1.0.2+wasi-0.2.9 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | — | https://github.com/bytecodealliance/wasi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0043</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| wasip3 | 0.4.0+wasi-0.3.0-rc-2026-01-06 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | — | https://github.com/bytecodealliance/wasi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0043</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| wasm-bindgen | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| wasm-bindgen-futures | 0.4.64 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/futures | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| wasm-bindgen-macro | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/macro | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| wasm-bindgen-macro-support | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/macro-support | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| wasm-bindgen-shared | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/shared | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| wasm-encoder | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Nick Fitzgerald &lt;fitzgen@gmail.com&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-encoder | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0043</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| wasm-metadata | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | — | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-metadata | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0043</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| wasmparser | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Yury Delendik &lt;ydelendik@mozilla.com&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmparser | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0043</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| web-sys | 0.3.91 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/web-sys | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-MIT</code> → <code>L0059</code> |
-| web-time | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/daxpedda/web-time | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0085</code><br><code>LICENSE-MIT</code> → <code>L0208</code> |
-| webpki-roots | 1.0.6 | registry+https://github.com/rust-lang/crates.io-index | CDLA-Permissive-2.0 | — | https://github.com/rustls/webpki-roots | upstream-packaged legal file | <code>LICENSE</code> → <code>L0198</code> |
-| winapi | 0.3.9 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Peter Atashian &lt;retep998@gmail.com&gt; | https://github.com/retep998/winapi-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0166</code><br><code>LICENSE-MIT</code> → <code>L0188</code> |
-| winapi-i686-pc-windows-gnu | 0.4.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Peter Atashian &lt;retep998@gmail.com&gt; | https://github.com/retep998/winapi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| winapi-x86_64-pc-windows-gnu | 0.4.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Peter Atashian &lt;retep998@gmail.com&gt; | https://github.com/retep998/winapi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| windows-core | 0.62.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-implement | 0.60.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-interface | 0.59.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-link | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-result | 0.4.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-strings | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-sys | 0.52.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-sys | 0.59.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-sys | 0.61.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows-targets | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_aarch64_gnullvm | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_aarch64_msvc | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_i686_gnu | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_i686_gnullvm | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_i686_msvc | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_x86_64_gnu | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_x86_64_gnullvm | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| windows_x86_64_msvc | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0175</code><br><code>license-mit</code> → <code>L0176</code> |
-| winnow | 0.7.15 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/winnow-rs/winnow | upstream-packaged legal file | <code>LICENSE-MIT</code> → <code>L0184</code> |
-| winresource | 0.1.31 | registry+https://github.com/rust-lang/crates.io-index | MIT | Max Resch &lt;resch.max@gmail.com&gt; | https://github.com/BenjaminRi/winresource | upstream-packaged legal file | <code>LICENSE</code> → <code>L0057</code> |
-| wit-bindgen | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| wit-bindgen-core | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| wit-bindgen-rust | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| wit-bindgen-rust-macro | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0153</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0043</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
-| wit-component | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Peter Huene &lt;peter@huene.dev&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-component | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0043</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| wit-parser | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-parser | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0043</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code><br><code>SPDX fallback: MIT</code> → <code>L0041</code> |
-| writeable | 0.6.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| yaml-rust2 | 0.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Yuheng Chen &lt;yuhengchen@sensetime.com&gt;; Ethiraric &lt;ethiraric@gmail.com&gt;; David Aguilar &lt;davvid@gmail.com&gt; | https://github.com/Ethiraric/yaml-rust2 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0041</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0158</code> |
-| yoke | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| yoke-derive | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| zerocopy | 0.8.42 | registry+https://github.com/rust-lang/crates.io-index | BSD-2-Clause OR Apache-2.0 OR MIT | Joshua Liebow-Feeser &lt;joshlf@google.com&gt;; Jack Wrenn &lt;jswrenn@amazon.com&gt; | https://github.com/google/zerocopy | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0145</code><br><code>LICENSE-BSD</code> → <code>L0123</code><br><code>LICENSE-MIT</code> → <code>L0029</code> |
-| zerocopy-derive | 0.8.42 | registry+https://github.com/rust-lang/crates.io-index | BSD-2-Clause OR Apache-2.0 OR MIT | Joshua Liebow-Feeser &lt;joshlf@google.com&gt;; Jack Wrenn &lt;jswrenn@amazon.com&gt; | https://github.com/google/zerocopy | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0145</code><br><code>LICENSE-BSD</code> → <code>L0123</code><br><code>LICENSE-MIT</code> → <code>L0029</code> |
-| zerofrom | 0.1.6 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| zerofrom-derive | 0.1.6 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| zeroize | 1.8.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | The RustCrypto Project Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0189</code><br><code>LICENSE-MIT</code> → <code>L0018</code> |
-| zerotrie | 0.2.3 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| zerovec | 0.11.5 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| zerovec-derive | 0.11.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0207</code> |
-| zip | 8.6.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Mathijs van de Nes &lt;git@mathijs.vd-nes.nl&gt;; Marli Frost &lt;marli@frost.red&gt;; Ryan Levick &lt;ryan.levick@gmail.com&gt;; Chris Hennick &lt;hennickc@amazon.com&gt; | https://github.com/zip-rs/zip2 | upstream-packaged legal file | <code>LICENSE</code> → <code>L0087</code> |
-| zmij | 1.0.21 | registry+https://github.com/rust-lang/crates.io-index | MIT | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/zmij | upstream-packaged legal file | <code>LICENSE-MIT</code> → <code>L0041</code> |
+| amoeba | 0.1.15 | workspace package: Cargo.toml | Apache-2.0 | — | — | declared workspace legal file | <code>LICENSE</code> → <code>L0171</code> |
+| amoeba-evidence | 0.1.0 | monorepo path package: evidence/crates/evidence/Cargo.toml | Apache-2.0 | — | — | first-party Amoeba crate; no third-party license applies |  |
+| amoeba-webproof | 0.1.0 | monorepo path package: evidence/crates/webproof/Cargo.toml | Apache-2.0 | — | — | first-party Amoeba crate; no third-party license applies |  |
+| android_system_properties | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Nicolas Silva &lt;nical@fastmail.com&gt; | https://github.com/nical/android_system_properties | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0044</code><br><code>LICENSE-MIT</code> → <code>L0159</code> |
+| anstream | 0.6.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| anstyle | 1.0.13 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| anstyle-parse | 0.2.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| anstyle-query | 1.1.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| anstyle-wincon | 3.0.11 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| anyhow | 1.0.102 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/anyhow | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| ark-bn254 | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-bn254-ext | 0.6.0 | git+https://github.com/zkVerify/accelerated-bn-cryptography.git?tag=v0.6.0#6249e3a8e5f7d679af483339dfbcb391ac78450a | MIT/Apache-2.0 | Horizen Labs &lt;admin@horizenlabs.io&gt; | https://github.com/zkVerify/accelerated-bn-cryptography | upstream Git legal file | <code>LICENSE-APACHE</code> → <code>L0201</code><br><code>LICENSE-MIT</code> → <code>L0194</code> |
+| ark-ec | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-ff | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-ff-asm | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-ff-macros | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-models-ext | 0.6.0 | git+https://github.com/zkVerify/accelerated-bn-cryptography.git?tag=v0.6.0#6249e3a8e5f7d679af483339dfbcb391ac78450a | MIT/Apache-2.0 | Horizen Labs &lt;admin@horizenlabs.io&gt; | https://github.com/zkVerify/accelerated-bn-cryptography | upstream Git legal file | <code>LICENSE-APACHE</code> → <code>L0034</code><br><code>LICENSE-MIT</code> → <code>L0138</code> |
+| ark-poly | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-scale | 0.0.13 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Jeff Burdges &lt;jeff@web3.foundation&gt; | https://github.com/w3f/ark-scale | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| ark-serialize | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-serialize-derive | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/algebra | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0279</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| ark-std | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | arkworks contributors | https://github.com/arkworks-rs/std | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0185</code> |
+| arraydeque | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | andylokandy | https://github.com/andylokandy/arraydeque | upstream-packaged legal file | <code>LICENSE</code> → <code>L0019</code> |
+| arrayref | 0.3.9 | registry+https://github.com/rust-lang/crates.io-index | BSD-2-Clause | David Roundy &lt;roundyd@physics.oregonstate.edu&gt; | https://github.com/droundy/arrayref | upstream-packaged legal file | <code>LICENSE</code> → <code>L0036</code> |
+| arrayvec | 0.7.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/bluss/arrayvec | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0096</code> |
+| async-task | 4.7.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Stjepan Glavina &lt;stjepang@gmail.com&gt; | https://github.com/smol-rs/async-task | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| async-trait | 0.1.92 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/async-trait | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| async-tungstenite | 0.29.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sebastian Dröge &lt;sebastian@centricular.com&gt; | https://github.com/sdroege/async-tungstenite | upstream-packaged legal file | <code>LICENSE</code> → <code>L0209</code> |
+| async_io_stream | 0.3.3 | registry+https://github.com/rust-lang/crates.io-index | Unlicense | Naja Melan &lt;najamelan@autistici.org&gt; | https://github.com/najamelan/async_io_stream | upstream-packaged legal file | <code>LICENSE</code> → <code>L0168</code> |
+| atomic-waker | 1.1.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Stjepan Glavina &lt;stjepang@gmail.com&gt;; Contributors to futures-rs | https://github.com/smol-rs/atomic-waker | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code><br><code>LICENSE-THIRD-PARTY</code> → <code>L0118</code> |
+| autocfg | 1.5.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Josh Stone &lt;cuviper@gmail.com&gt; | https://github.com/cuviper/autocfg | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0054</code> |
+| base16ct | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/base16ct | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0018</code> |
+| base64 | 0.12.3 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Alice Maz &lt;alice@alicemaz.com&gt;; Marshall Pierce &lt;marshall@mpierce.org&gt; | https://github.com/marshallpierce/rust-base64 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0027</code> |
+| base64 | 0.21.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alice Maz &lt;alice@alicemaz.com&gt;; Marshall Pierce &lt;marshall@mpierce.org&gt; | https://github.com/marshallpierce/rust-base64 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0027</code> |
+| base64 | 0.22.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Marshall Pierce &lt;marshall@mpierce.org&gt; | https://github.com/marshallpierce/rust-base64 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0027</code> |
+| base64ct | 1.8.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0057</code> |
+| bcs | 0.1.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | — | https://github.com/zefchain/bcs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0250</code> |
+| bcs | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | — | https://github.com/zefchain/bcs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0250</code> |
+| bimap | 0.6.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Billy Rieger &lt;wrieger@protonmail.com&gt; | https://github.com/billyrieger/bimap-rs/ | upstream-packaged legal file | <code>LICENSE_APACHE</code> → <code>L0213</code><br><code>LICENSE_MIT</code> → <code>L0049</code> |
+| bincode | 1.3.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ty Overby &lt;ty@pre-alpha.com&gt;; Francesco Mazzoli &lt;f@mazzo.li&gt;; David Tolnay &lt;dtolnay@gmail.com&gt;; Zoey Riordan &lt;zoey@dos.cafe&gt; | https://github.com/servo/bincode | upstream-packaged legal file | <code>LICENSE.md</code> → <code>L0187</code> |
+| bitflags | 2.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/bitflags/bitflags | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| bitvec | 1.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/bitvecto-rs/bitvec | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0080</code> |
+| blake3 | 1.8.3 | registry+https://github.com/rust-lang/crates.io-index | CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception | Jack O'Connor &lt;oconnor663@gmail.com&gt;; Samuel Neves | https://github.com/BLAKE3-team/BLAKE3 | upstream-packaged legal file | <code>LICENSE_A2</code> → <code>L0005</code><br><code>LICENSE_A2LLVM</code> → <code>L0212</code><br><code>LICENSE_CC0</code> → <code>L0208</code> |
+| block-buffer | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0268</code> |
+| block-buffer | 0.12.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0199</code> |
+| block-buffer | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0268</code> |
+| borsh | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Near Inc &lt;hello@near.org&gt; | https://github.com/near/borsh-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| borsh | 1.6.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Near Inc &lt;hello@near.org&gt; | https://github.com/near/borsh-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0154</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| borsh-derive | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/nearprotocol/borsh | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| borsh-derive | 1.6.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/near/borsh-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0154</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| borsh-derive-internal | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/nearprotocol/borsh | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| borsh-schema-derive-internal | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Near Inc &lt;hello@nearprotocol.com&gt; | https://github.com/nearprotocol/borsh | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| bs58 | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | — | https://github.com/Nullus157/bs58-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0084</code> |
+| bumpalo | 3.20.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Nick Fitzgerald &lt;fitzgen@gmail.com&gt; | https://github.com/fitzgen/bumpalo | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0123</code> |
+| bv | 0.11.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Jesse A. Tov &lt;jesse.tov@gmail.com&gt; | https://github.com/tov/bv-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0233</code> |
+| byte-slice-cast | 1.2.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sebastian Dröge &lt;sebastian@centricular.com&gt; | https://github.com/sdroege/bytes-num-slice-cast | upstream-packaged legal file | <code>LICENSE</code> → <code>L0247</code> |
+| bytemuck | 1.25.0 | registry+https://github.com/rust-lang/crates.io-index | Zlib OR Apache-2.0 OR MIT | Lokathor &lt;zefria@gmail.com&gt; | https://github.com/Lokathor/bytemuck | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0277</code><br><code>LICENSE-MIT</code> → <code>L0203</code><br><code>LICENSE-ZLIB</code> → <code>L0163</code> |
+| bytemuck_derive | 1.10.2 | registry+https://github.com/rust-lang/crates.io-index | Zlib OR Apache-2.0 OR MIT | Lokathor &lt;zefria@gmail.com&gt; | https://github.com/Lokathor/bytemuck | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0277</code><br><code>LICENSE-MIT</code> → <code>L0203</code><br><code>LICENSE-ZLIB</code> → <code>L0163</code> |
+| bytes | 1.11.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/tokio-rs/bytes | upstream-packaged legal file | <code>LICENSE</code> → <code>L0088</code> |
+| cassowary | 0.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT / Apache-2.0 | Dylan Ede &lt;dylanede@googlemail.com&gt; | https://github.com/dylanede/cassowary-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0001</code><br><code>LICENSE-MIT</code> → <code>L0301</code> |
+| castaway | 0.2.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Stephen M. Coakley &lt;me@stephencoakley.com&gt; | https://github.com/sagebind/castaway | upstream-packaged legal file | <code>LICENSE</code> → <code>L0295</code> |
+| cc | 1.2.56 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/rust-lang/cc-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| cfg-if | 1.0.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/rust-lang/cfg-if | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| cfg_aliases | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Zicklag &lt;zicklag@katharostech.com&gt; | https://github.com/katharostech/cfg_aliases | upstream-packaged legal file | <code>LICENSE</code> → <code>L0061</code> |
+| chacha20 | 0.10.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/stream-ciphers | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0237</code> |
+| chrono | 0.4.44 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/chronotope/chrono | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0193</code> |
+| cipher | 0.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0113</code> |
+| cipher | 0.4.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0113</code> |
+| cipher | 0.5.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0196</code> |
+| clap | 4.5.60 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| clap_builder | 4.5.60 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| clap_derive | 4.5.55 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| clap_lex | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/clap-rs/clap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| clmul | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | upstream Git legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0300</code> |
+| cmov | 0.5.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0137</code> |
+| colorchoice | 1.0.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-cli/anstyle.git | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| compact_str | 0.8.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | Parker Timmerman &lt;parker@parkertimmerman.com&gt; | https://github.com/ParkMyCar/compact_str | upstream-packaged legal file | <code>LICENSE</code> → <code>L0025</code> |
+| console | 0.15.11 | registry+https://github.com/rust-lang/crates.io-index | MIT | Armin Ronacher &lt;armin.ronacher@active-4.com&gt; | https://github.com/console-rs/console | upstream-packaged legal file | <code>LICENSE</code> → <code>L0040</code> |
+| console_error_panic_hook | 0.1.7 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Nick Fitzgerald &lt;fitzgen@gmail.com&gt; | https://github.com/rustwasm/console_error_panic_hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0066</code><br><code>LICENSE-MIT</code> → <code>L0147</code> |
+| console_log | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Matthew Nicholson &lt;matt@matt-land.com&gt; | https://github.com/iamcodemaker/console_log | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0009</code> |
+| const-oid | 0.10.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0140</code> |
+| const-oid | 0.9.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/const-oid | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0239</code> |
+| const_format | 0.2.36 | registry+https://github.com/rust-lang/crates.io-index | Zlib | rodrimati1992 &lt;rodrimatt1985@gmail.com&gt; | https://github.com/rodrimati1992/const_format_crates/ | upstream-packaged legal file | <code>LICENSE-ZLIB.md</code> → <code>L0244</code> |
+| const_format_proc_macros | 0.2.34 | registry+https://github.com/rust-lang/crates.io-index | Zlib | rodrimati1992 &lt;rodrimatt1985@gmail.com&gt; | https://github.com/rodrimati1992/const_format_crates/ | upstream-packaged legal file | <code>LICENSE-ZLIB.md</code> → <code>L0244</code> |
+| constant_time_eq | 0.4.2 | registry+https://github.com/rust-lang/crates.io-index | CC0-1.0 OR MIT-0 OR Apache-2.0 | Cesar Eduardo Barros &lt;cesarb@cesarb.eti.br&gt; | https://github.com/cesarb/constant_time_eq | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-CC0</code> → <code>L0208</code><br><code>LICENSE-MIT0</code> → <code>L0200</code> |
+| core-foundation-sys | 0.8.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Servo Project Developers | https://github.com/servo/core-foundation-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0117</code> |
+| cpubits | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0003</code> |
+| cpufeatures | 0.2.17 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0221</code> |
+| cpufeatures | 0.3.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0140</code> |
+| crc32fast | 1.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Sam Rijs &lt;srijs@airpost.net&gt;; Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/srijs/rust-crc32fast | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0116</code> |
+| crossbeam-channel | 0.5.17 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/crossbeam-rs/crossbeam | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0107</code><br><code>LICENSE-THIRD-PARTY</code> → <code>L0224</code> |
+| crossbeam-deque | 0.8.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/crossbeam-rs/crossbeam | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0107</code> |
+| crossbeam-epoch | 0.9.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/crossbeam-rs/crossbeam | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0107</code> |
+| crossbeam-utils | 0.8.23 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/crossbeam-rs/crossbeam | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0107</code> |
+| crossterm | 0.28.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | T. Post | https://github.com/crossterm-rs/crossterm | upstream-packaged legal file | <code>LICENSE</code> → <code>L0077</code> |
+| crossterm_winapi | 0.9.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | T. Post | https://github.com/crossterm-rs/crossterm-winapi | upstream-packaged legal file | <code>LICENSE</code> → <code>L0077</code> |
+| crunchy | 0.2.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Eira Fransham &lt;jackefransham@gmail.com&gt; | https://github.com/eira-fransham/crunchy | upstream-packaged legal file | <code>LICENSE</code> → <code>L0075</code> |
+| crypto-bigint | 0.5.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/crypto-bigint | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0186</code> |
+| crypto-bigint | 0.7.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/crypto-bigint | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0109</code> |
+| crypto-common | 0.1.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0064</code> |
+| crypto-common | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0267</code> |
+| ctr | 0.10.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/block-modes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0121</code> |
+| ctr | 0.7.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/stream-ciphers | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0294</code> |
+| ctr | 0.9.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/block-modes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0121</code> |
+| ctutils | 0.4.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0190</code> |
+| curve25519-dalek | 4.1.3 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Isis Lovecruft &lt;isis@patternsinthevoid.net&gt;; Henry de Valence &lt;hdevalence@hdevalence.ca&gt; | https://github.com/dalek-cryptography/curve25519-dalek/tree/main/curve25519-dalek | upstream-packaged legal file | <code>LICENSE</code> → <code>L0259</code> |
+| curve25519-dalek | 5.0.0 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Isis Lovecruft &lt;isis@patternsinthevoid.net&gt;; Henry de Valence &lt;hdevalence@hdevalence.ca&gt; | https://github.com/dalek-cryptography/curve25519-dalek/tree/main/curve25519-dalek | upstream-packaged legal file | <code>LICENSE</code> → <code>L0078</code> |
+| curve25519-dalek-derive | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | — | https://github.com/dalek-cryptography/curve25519-dalek | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| darling | 0.14.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling | 0.20.11 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling | 0.23.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling_core | 0.14.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling_core | 0.20.11 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling_core | 0.23.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling_macro | 0.14.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling_macro | 0.20.11 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| darling_macro | 0.23.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/darling | upstream-packaged legal file | <code>LICENSE</code> → <code>L0183</code> |
+| data-encoding | 2.11.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/ia0/data-encoding | upstream-packaged legal file | <code>LICENSE</code> → <code>L0232</code> |
+| der | 0.7.10 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/der | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0220</code> |
+| der | 0.8.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0140</code> |
+| derivation-path | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Julian Popescu &lt;jpopesculian@gmail.com&gt; | https://github.com/jpopesculian/derivation-path | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| derive_builder | 0.12.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Colin Kiegel &lt;kiegel@gmx.de&gt;; Pascal Hertleif &lt;killercup@gmail.com&gt;; Jan-Erik Rediger &lt;janerik@fnordig.de&gt;; Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/colin-kiegel/rust-derive-builder | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0178</code> |
+| derive_builder | 0.20.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Colin Kiegel &lt;kiegel@gmx.de&gt;; Pascal Hertleif &lt;killercup@gmail.com&gt;; Jan-Erik Rediger &lt;janerik@fnordig.de&gt;; Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/colin-kiegel/rust-derive-builder | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0178</code> |
+| derive_builder_core | 0.12.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Colin Kiegel &lt;kiegel@gmx.de&gt;; Pascal Hertleif &lt;killercup@gmail.com&gt;; Jan-Erik Rediger &lt;janerik@fnordig.de&gt;; Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/colin-kiegel/rust-derive-builder | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0178</code> |
+| derive_builder_core | 0.20.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Colin Kiegel &lt;kiegel@gmx.de&gt;; Pascal Hertleif &lt;killercup@gmail.com&gt;; Jan-Erik Rediger &lt;janerik@fnordig.de&gt;; Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/colin-kiegel/rust-derive-builder | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0178</code> |
+| derive_builder_macro | 0.12.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Colin Kiegel &lt;kiegel@gmx.de&gt;; Pascal Hertleif &lt;killercup@gmail.com&gt;; Jan-Erik Rediger &lt;janerik@fnordig.de&gt;; Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/colin-kiegel/rust-derive-builder | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0178</code> |
+| derive_builder_macro | 0.20.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Colin Kiegel &lt;kiegel@gmx.de&gt;; Pascal Hertleif &lt;killercup@gmail.com&gt;; Jan-Erik Rediger &lt;janerik@fnordig.de&gt;; Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/colin-kiegel/rust-derive-builder | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0178</code> |
+| derive_more | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Jelte Fennema &lt;github-tech@jeltef.nl&gt; | https://github.com/JelteF/derive_more | upstream-packaged legal file | <code>LICENSE</code> → <code>L0170</code> |
+| derive_more-impl | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Jelte Fennema &lt;github-tech@jeltef.nl&gt; | https://github.com/JelteF/derive_more | upstream-packaged legal file | <code>LICENSE</code> → <code>L0170</code> |
+| dialoguer | 0.10.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Armin Ronacher &lt;armin.ronacher@active-4.com&gt;; Pavan Kumar Sunkara &lt;pavan.sss1991@gmail.com&gt; | https://github.com/mitsuhiko/dialoguer | upstream-packaged legal file | <code>LICENSE</code> → <code>L0040</code> |
+| digest | 0.10.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0205</code> |
+| digest | 0.11.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0222</code> |
+| digest | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0205</code> |
+| displaydoc | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Jane Lusby &lt;jlusby@yaah.dev&gt; | https://github.com/yaahc/displaydoc | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| ecdsa | 0.16.9 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/signatures/tree/master/ecdsa | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0149</code><br><code>LICENSE-MIT</code> → <code>L0240</code> |
+| ed25519 | 2.2.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/signatures/tree/master/ed25519 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0149</code><br><code>LICENSE-MIT</code> → <code>L0226</code> |
+| ed25519-dalek | 2.2.0 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | isis lovecruft &lt;isis@patternsinthevoid.net&gt;; Tony Arcieri &lt;bascule@gmail.com&gt;; Michael Rosenberg &lt;michael@mrosenberg.pub&gt; | https://github.com/dalek-cryptography/curve25519-dalek/tree/main/ed25519-dalek | upstream-packaged legal file | <code>LICENSE</code> → <code>L0151</code> |
+| educe | 0.6.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Magic Len &lt;len@magiclen.org&gt; | https://github.com/magiclen/educe | upstream-packaged legal file | <code>LICENSE</code> → <code>L0274</code> |
+| either | 1.15.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/rayon-rs/either | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0144</code> |
+| elliptic-curve | 0.13.8 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/traits/tree/master/elliptic-curve | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0265</code> |
+| encode_unicode | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Torbjørn Birch Moltu &lt;t.b.moltu@lyse.net&gt; | https://github.com/tormol/encode_unicode | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0270</code> |
+| encoding_rs | 0.8.35 | registry+https://github.com/rust-lang/crates.io-index | (Apache-2.0 OR MIT) AND BSD-3-Clause | Henri Sivonen &lt;hsivonen@hsivonen.fi&gt; | https://github.com/hsivonen/encoding_rs | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0030</code><br><code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0076</code><br><code>LICENSE-WHATWG</code> → <code>L0160</code> |
+| enum-ordinalize | 4.4.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/magiclen/enum-ordinalize | upstream-packaged legal file | <code>LICENSE</code> → <code>L0274</code> |
+| enum-ordinalize-derive | 4.4.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/magiclen/enum-ordinalize | upstream-packaged legal file | <code>LICENSE</code> → <code>L0274</code> |
+| enum-try-as-inner | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | sinu; Benjamin Fry &lt;benjaminfry@me.com&gt; | https://github.com/sinui0/enum-try-as-inner | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0029</code><br><code>copyright.txt</code> → <code>L0231</code> |
+| equivalent | 1.0.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/indexmap-rs/equivalent | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0139</code> |
+| errno | 0.3.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Chris Wong &lt;lambda.fairy@gmail.com&gt;; Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/lambda-fairy/rust-errno | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0166</code> |
+| fastrand | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Stjepan Glavina &lt;stjepang@gmail.com&gt; | https://github.com/smol-rs/fastrand | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| feature-probe | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Jesse A. Tov &lt;jesse.tov@gmail.com&gt; | https://github.com/tov/feature-probe-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0233</code> |
+| ff | 0.13.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Sean Bowe &lt;ewillbefull@gmail.com&gt;; Jack Grigg &lt;thestr4d@gmail.com&gt; | https://github.com/zkcrypto/ff | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0068</code><br><code>LICENSE-MIT</code> → <code>L0182</code> |
+| fiat-crypto | 0.2.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR BSD-1-Clause | Fiat Crypto library authors &lt;jgross@mit.edu&gt; | https://github.com/mit-plv/fiat-crypto | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0129</code><br><code>LICENSE-APACHE</code> → <code>L0206</code><br><code>LICENSE-BSD-1</code> → <code>L0024</code><br><code>LICENSE-MIT</code> → <code>L0002</code> |
+| fiat-crypto | 0.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR BSD-1-Clause | Fiat Crypto library authors &lt;jgross@mit.edu&gt; | https://github.com/mit-plv/fiat-crypto | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0129</code><br><code>LICENSE-APACHE</code> → <code>L0206</code><br><code>LICENSE-BSD-1</code> → <code>L0024</code><br><code>LICENSE-MIT</code> → <code>L0002</code> |
+| find-msvc-tools | 0.1.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/cc-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| five8 | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/kevinheavey/five8 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| five8_const | 0.1.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/kevinheavey/five8 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| five8_core | 0.1.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/kevinheavey/five8 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| flate2 | 1.1.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt;; Josh Triplett &lt;josh@joshtriplett.org&gt; | https://github.com/rust-lang/flate2-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0008</code> |
+| fnv | 1.0.7 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 / MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/servo/rust-fnv | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0124</code> |
+| foldhash | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | Zlib | Orson Peters &lt;orsonpeters@gmail.com&gt; | https://github.com/orlp/foldhash | upstream-packaged legal file | <code>LICENSE</code> → <code>L0223</code> |
+| foldhash | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | Zlib | Orson Peters &lt;orsonpeters@gmail.com&gt; | https://github.com/orlp/foldhash | upstream-packaged legal file | <code>LICENSE</code> → <code>L0223</code> |
+| form_urlencoded | 1.2.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0042</code> |
+| funty | 2.0.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | myrrlyn &lt;self@myrrlyn.dev&gt; | https://github.com/myrrlyn/funty | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0291</code> |
+| futures | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-channel | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-core | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-executor | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-io | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-macro | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-plex | 0.1.0 | git+https://github.com/tlsnotary/tlsn-utils?rev=e2f31e6a30bc5d1641ed6407fb1a38a595e523ce#e2f31e6a30bc5d1641ed6407fb1a38a595e523ce | — | — | — | upstream Git repository-root legal file (the crate has none of its own) | <code>repository root: LICENSE-APACHE</code> → <code>L0119</code><br><code>repository root: LICENSE-MIT</code> → <code>L0179</code> |
+| futures-sink | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-task | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| futures-util | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/futures-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0053</code><br><code>LICENSE-MIT</code> → <code>L0125</code> |
+| generic-array | 0.14.7 | registry+https://github.com/rust-lang/crates.io-index | MIT | Bartłomiej Kamiński &lt;fizyk20@gmail.com&gt;; Aaron Trent &lt;novacrazy@gmail.com&gt; | https://github.com/fizyk20/generic-array.git | upstream-packaged legal file | <code>LICENSE</code> → <code>L0219</code> |
+| getrandom | 0.1.16 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| getrandom | 0.2.17 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0086</code> |
+| getrandom | 0.3.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0056</code> |
+| getrandom | 0.4.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/getrandom | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0102</code> |
+| ghash | 0.4.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/universal-hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0241</code> |
+| ghash | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/universal-hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0241</code> |
+| group | 0.13.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Sean Bowe &lt;ewillbefull@gmail.com&gt;; Jack Grigg &lt;jack@z.cash&gt; | https://github.com/zkcrypto/group | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0141</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| hashbrown | 0.13.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/rust-lang/hashbrown | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0303</code> |
+| hashbrown | 0.15.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/rust-lang/hashbrown | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0303</code> |
+| hashbrown | 0.16.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/rust-lang/hashbrown | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0303</code> |
+| hashbrown | 0.17.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rust-lang/hashbrown | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0303</code> |
+| hashlink | 0.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/kyren/hashlink | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0242</code><br><code>LICENSE-MIT</code> → <code>L0280</code> |
+| heck | 0.4.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Without Boats &lt;woboats@gmail.com&gt; | https://github.com/withoutboats/heck | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0153</code> |
+| heck | 0.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/withoutboats/heck | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0153</code> |
+| hex | 0.4.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | KokaKiwi &lt;kokakiwi@kokakiwi.net&gt; | https://github.com/KokaKiwi/rust-hex | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0292</code> |
+| hex-literal | 0.4.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0299</code> |
+| hidapi | 2.6.6 | registry+https://github.com/rust-lang/crates.io-index | MIT | Roland Ruckerbauer &lt;mail@ruabmbua.dev&gt;; Osspial &lt;osspial@gmail.com&gt;; Artyom Pavlov &lt;newpavlov@gmail.com&gt;; mberndt123; niklasad1; Stefan Kerkmann | https://github.com/ruabmbua/hidapi-rs | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0148</code><br><code>etc/hidapi/LICENSE-bsd.txt</code> → <code>L0059</code><br><code>etc/hidapi/LICENSE-gpl3.txt</code> → <code>L0181</code><br><code>etc/hidapi/LICENSE-orig.txt</code> → <code>L0297</code><br><code>etc/hidapi/LICENSE.txt</code> → <code>L0156</code> |
+| hkdf | 0.12.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/KDFs/ | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0111</code><br><code>LICENSE-MIT</code> → <code>L0266</code> |
+| hmac | 0.12.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/MACs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0205</code> |
+| http | 1.4.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt;; Carl Lerche &lt;me@carllerche.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/http | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0176</code><br><code>LICENSE-MIT</code> → <code>L0273</code> |
+| http-body | 1.0.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Lucio Franco &lt;luciofranco14@gmail.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/http-body | upstream-packaged legal file | <code>LICENSE</code> → <code>L0260</code> |
+| http-body-util | 0.1.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Lucio Franco &lt;luciofranco14@gmail.com&gt;; Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/http-body | upstream-packaged legal file | <code>LICENSE</code> → <code>L0236</code> |
+| httparse | 1.10.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/httparse | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0071</code> |
+| httpdate | 1.0.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Pyfisch &lt;pyfisch@posteo.org&gt; | https://github.com/pyfisch/httpdate | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0095</code><br><code>LICENSE-MIT</code> → <code>L0192</code> |
+| hybrid-array | 0.4.15 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hybrid-array | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0137</code> |
+| hyper | 1.8.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/hyper | upstream-packaged legal file | <code>LICENSE</code> → <code>L0184</code> |
+| hyper-rustls | 0.27.7 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR ISC OR MIT | — | https://github.com/rustls/hyper-rustls | upstream-packaged legal file | <code>LICENSE</code> → <code>L0263</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-ISC</code> → <code>L0155</code><br><code>LICENSE-MIT</code> → <code>L0136</code> |
+| hyper-util | 0.1.20 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/hyperium/hyper-util | upstream-packaged legal file | <code>LICENSE</code> → <code>L0204</code> |
+| iana-time-zone | 0.1.65 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Andrew Straw &lt;strawman@astraw.com&gt;; René Kijewski &lt;rene.kijewski@fu-berlin.de&gt;; Ryan Lopopolo &lt;rjl@hyperbo.la&gt; | https://github.com/strawlab/iana-time-zone | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0126</code><br><code>LICENSE-MIT</code> → <code>L0271</code> |
+| iana-time-zone-haiku | 0.1.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | René Kijewski &lt;crates.io@k6i.de&gt; | https://github.com/strawlab/iana-time-zone | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0126</code><br><code>LICENSE-MIT</code> → <code>L0271</code> |
+| icu_collections | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| icu_locale_core | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| icu_normalizer | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| icu_normalizer_data | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| icu_properties | 2.1.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| icu_properties_data | 2.1.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| icu_provider | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| id-arena | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Nick Fitzgerald &lt;fitzgen@gmail.com&gt;; Aleksey Kladov &lt;aleksey.kladov@gmail.com&gt; | https://github.com/fitzgen/id-arena | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| ident_case | 1.0.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Ted Driggs &lt;ted.driggs@outlook.com&gt; | https://github.com/TedDriggs/ident_case | upstream-packaged legal file | <code>LICENSE</code> → <code>L0100</code> |
+| idna | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url/ | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0227</code> |
+| idna_adapter | 1.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | The rust-url developers | https://github.com/hsivonen/idna_adapter | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0173</code> |
+| impl-trait-for-tuples | 0.2.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Bastian Köcher &lt;git@kchr.de&gt; | https://github.com/bkchr/impl-trait-for-tuples | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| indexmap | 2.13.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/indexmap-rs/indexmap | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0283</code> |
+| indoc | 2.0.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/indoc | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| inout | 0.1.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0058</code> |
+| inout | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0207</code> |
+| instability | 0.3.12 | registry+https://github.com/rust-lang/crates.io-index | MIT | Stephen M. Coakley &lt;me@stephencoakley.com&gt;; The Ratatui Developers | https://github.com/ratatui/instability | upstream-packaged legal file | <code>LICENSE.md</code> → <code>L0010</code> |
+| ipnet | 2.12.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Kris Price &lt;kris@krisprice.nz&gt; | https://github.com/krisprice/ipnet | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0167</code><br><code>LICENSE-MIT</code> → <code>L0091</code> |
+| iri-string | 0.7.10 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | YOSHIOKA Takuma &lt;nop_thread@nops.red&gt; | https://github.com/lo48576/iri-string | upstream-packaged legal file | <code>LICENSE-APACHE.txt</code> → <code>L0262</code><br><code>LICENSE-MIT.txt</code> → <code>L0046</code> |
+| is_terminal_polyfill | 1.70.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/polyfill-rs/is_terminal_polyfill | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| itertools | 0.13.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/rust-itertools/itertools | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0144</code> |
+| itoa | 1.0.17 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/itoa | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| itybity | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | sinui0 | https://github.com/sinui0/itybity | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0179</code> |
+| itybity | 0.3.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | sinui0 | https://github.com/sinui0/itybity | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0179</code> |
+| js-sys | 0.3.91 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/js-sys | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| k256 | 0.13.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/elliptic-curves/tree/master/k256 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0072</code> |
+| keccak | 0.1.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/sponges/tree/master/keccak | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0240</code> |
+| konst | 0.2.20 | registry+https://github.com/rust-lang/crates.io-index | Zlib | rodrimati1992 &lt;rodrimatt1985@gmail.com&gt; | https://github.com/rodrimati1992/konst/ | upstream-packaged legal file | <code>LICENSE-ZLIB.md</code> → <code>L0108</code> |
+| konst_macro_rules | 0.2.19 | registry+https://github.com/rust-lang/crates.io-index | Zlib | rodrimati1992 &lt;rodrimatt1985@gmail.com&gt; | https://github.com/rodrimati1992/konst/ | upstream-packaged legal file | <code>LICENSE-ZLIB.md</code> → <code>L0108</code> |
+| lazy_static | 1.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Marvin Löbel &lt;loebel.marvin@gmail.com&gt; | https://github.com/rust-lang-nursery/lazy-static.rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0013</code> |
+| leb128fmt | 0.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Bryant Luk &lt;code@bryantluk.com&gt; | https://github.com/bluk/leb128fmt | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| libc | 0.2.183 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-lang/libc | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0031</code> |
+| libsecp256k1 | 0.6.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | upstream-packaged legal file | <code>LICENSE</code> → <code>L0229</code> |
+| libsecp256k1-core | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| libsecp256k1-gen-ecmult | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| libsecp256k1-gen-genmult | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Wei Tang &lt;hi@that.world&gt; | https://github.com/paritytech/libsecp256k1 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| linux-raw-sys | 0.12.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/sunfishcode/linux-raw-sys | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0063</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| linux-raw-sys | 0.4.15 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt; | https://github.com/sunfishcode/linux-raw-sys | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0063</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| litemap | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| lock_api | 0.4.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/Amanieu/parking_lot | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0254</code> |
+| log | 0.4.29 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-lang/log | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| lru | 0.12.5 | registry+https://github.com/rust-lang/crates.io-index | MIT | Jerome Froelich &lt;jeromefroelic@hotmail.com&gt; | https://github.com/jeromefroe/lru-rs.git | upstream-packaged legal file | <code>LICENSE</code> → <code>L0012</code> |
+| lru-slab | 0.1.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR Zlib | Benjamin Saunders &lt;ben.e.saunders@gmail.com&gt; | https://github.com/Ralith/lru-slab | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0033</code><br><code>LICENSE-ZLIB</code> → <code>L0016</code> |
+| matrix-transpose | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| memchr | 2.8.0 | registry+https://github.com/rust-lang/crates.io-index | Unlicense OR MIT | Andrew Gallant &lt;jamslam@gmail.com&gt;; bluss | https://github.com/BurntSushi/memchr | upstream-packaged legal file | <code>COPYING</code> → <code>L0006</code><br><code>LICENSE-MIT</code> → <code>L0028</code><br><code>UNLICENSE</code> → <code>L0157</code> |
+| memoffset | 0.9.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Gilad Naaman &lt;gilad.naaman@gmail.com&gt; | https://github.com/Gilnaa/memoffset | upstream-packaged legal file | <code>LICENSE</code> → <code>L0062</code> |
+| miniz_oxide | 0.8.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Zlib OR Apache-2.0 | Frommi &lt;daniil.liferenko@gmail.com&gt;; oyvindln &lt;oyvindln@users.noreply.github.com&gt;; Rich Geldreich richgel99@gmail.com | https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide | upstream-packaged legal file | <code>LICENSE</code> → <code>L0079</code><br><code>LICENSE-APACHE.md</code> → <code>L0026</code><br><code>LICENSE-MIT.md</code> → <code>L0150</code><br><code>LICENSE-ZLIB.md</code> → <code>L0017</code> |
+| mio | 1.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt;; Thomas de Zeeuw &lt;thomasdezeeuw@gmail.com&gt;; Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/mio | upstream-packaged legal file | <code>LICENSE</code> → <code>L0014</code> |
+| mpz-circuits | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-circuits-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-circuits-data | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-cointoss | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-cointoss-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-common | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-fields | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-garble | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-garble-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-hash | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-ideal-vm | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-memory-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-ole | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-ole-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-ot | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-ot-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-share-conversion | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-share-conversion-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-vm-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-zk | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| mpz-zk-core | 0.1.0-alpha.6 | git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| nohash-hasher | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Parity Technologies &lt;admin@parity.io&gt; | https://github.com/paritytech/nohash-hasher | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0282</code> |
+| num-bigint | 0.4.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-bigint | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| num-derive | 0.4.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-derive | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| num-integer | 0.1.46 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-integer | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| num-traits | 0.2.19 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers | https://github.com/rust-num/num-traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| num_enum | 0.7.5 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause OR MIT OR Apache-2.0 | Daniel Wagner-Hall &lt;dawagner@gmail.com&gt;; Daniel Henry-Mantilla &lt;daniel.henry.mantilla@gmail.com&gt;; Vincent Esche &lt;regexident@gmail.com&gt; | https://github.com/illicitonion/num_enum | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-BSD</code> → <code>L0023</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| num_enum_derive | 0.7.5 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause OR MIT OR Apache-2.0 | Daniel Wagner-Hall &lt;dawagner@gmail.com&gt;; Daniel Henry-Mantilla &lt;daniel.henry.mantilla@gmail.com&gt;; Vincent Esche &lt;regexident@gmail.com&gt; | https://github.com/illicitonion/num_enum | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-BSD</code> → <code>L0023</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| once_cell | 1.21.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Aleksey Kladov &lt;aleksey.kladov@gmail.com&gt; | https://github.com/matklad/once_cell | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| once_cell_polyfill | 1.70.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/polyfill-rs/once_cell_polyfill | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| opaque-debug | 0.3.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0289</code> |
+| p256 | 0.13.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/elliptic-curves/tree/master/p256 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0047</code> |
+| parity-scale-codec | 3.7.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Parity Technologies &lt;admin@parity.io&gt; | https://github.com/paritytech/parity-scale-codec | upstream-packaged legal file | <code>LICENSE</code> → <code>L0250</code> |
+| parity-scale-codec-derive | 3.7.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Parity Technologies &lt;admin@parity.io&gt; | https://github.com/paritytech/parity-scale-codec | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| parking_lot | 0.12.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/Amanieu/parking_lot | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0254</code> |
+| parking_lot_core | 0.9.12 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Amanieu d'Antras &lt;amanieu@gmail.com&gt; | https://github.com/Amanieu/parking_lot | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0254</code> |
+| paste | 1.0.15 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/paste | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pbkdf2 | 0.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/password-hashes/tree/master/pbkdf2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0015</code> |
+| pem-rfc7468 | 0.7.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/pem-rfc7468 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0186</code> |
+| percent-encoding | 2.3.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url/ | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0227</code> |
+| pest | 2.9.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Dragoș Tiselice &lt;dragostiselice@gmail.com&gt; | https://github.com/pest-parser/pest | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pest_derive | 2.9.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Dragoș Tiselice &lt;dragostiselice@gmail.com&gt; | https://github.com/pest-parser/pest | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pest_generator | 2.9.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Dragoș Tiselice &lt;dragostiselice@gmail.com&gt; | https://github.com/pest-parser/pest | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pest_meta | 2.9.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Dragoș Tiselice &lt;dragostiselice@gmail.com&gt; | https://github.com/pest-parser/pest | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pharos | 0.5.3 | registry+https://github.com/rust-lang/crates.io-index | Unlicense | Naja Melan &lt;najamelan@autistici.org&gt; | https://github.com/najamelan/pharos | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Unlicense</code> → <code>L0157</code> |
+| pin-project | 1.1.13 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/taiki-e/pin-project | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0026</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pin-project-internal | 1.1.13 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/taiki-e/pin-project | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0026</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pin-project-lite | 0.2.17 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | — | https://github.com/taiki-e/pin-project-lite | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0026</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| pin-utils | 0.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Josef Brandl &lt;mail@josefbrandl.de&gt; | https://github.com/rust-lang-nursery/pin-utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0211</code><br><code>LICENSE-MIT</code> → <code>L0055</code> |
+| pkcs8 | 0.10.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/pkcs8 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0220</code> |
+| pkg-config | 0.3.32 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/rust-lang/pkg-config-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| pollster | 0.4.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Joshua Barretto &lt;joshua.s.barretto@gmail.com&gt; | https://github.com/zesterer/pollster | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0257</code> |
+| polyval | 0.5.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/universal-hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0241</code> |
+| polyval | 0.6.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/universal-hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0210</code> |
+| potential_utf | 0.1.4 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| ppv-lite86 | 0.2.21 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The CryptoCorrosion Contributors | https://github.com/cryptocorrosion/cryptocorrosion | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0007</code><br><code>LICENSE-MIT</code> → <code>L0094</code> |
+| prettyplease | 0.2.37 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/prettyplease | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| primeorder | 0.13.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/elliptic-curves/tree/master/primeorder | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0047</code> |
+| proc-macro-crate | 0.1.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Bastian Köcher &lt;git@kchr.de&gt; | https://github.com/bkchr/proc-macro-crate | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0171</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| proc-macro-crate | 3.5.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Bastian Köcher &lt;git@kchr.de&gt; | https://github.com/bkchr/proc-macro-crate | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0171</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| proc-macro2 | 1.0.106 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt;; Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/dtolnay/proc-macro2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| psm | 0.1.24 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Simonas Kazlauskas &lt;psm@kazlauskas.me&gt; | https://github.com/rust-lang/stacker/ | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0198</code><br><code>LICENSE-MIT</code> → <code>L0074</code> |
+| qstring | 0.7.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | Martin Algesten &lt;martin@algesten.se&gt; | https://github.com/algesten/qstring | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| quinn | 0.11.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/quinn-rs/quinn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0250</code><br><code>LICENSE-MIT</code> → <code>L0093</code> |
+| quinn-proto | 0.11.15 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/quinn-rs/quinn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0250</code><br><code>LICENSE-MIT</code> → <code>L0093</code> |
+| quinn-udp | 0.5.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/quinn-rs/quinn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0250</code><br><code>LICENSE-MIT</code> → <code>L0093</code> |
+| quote | 1.0.45 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/quote | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| r-efi | 5.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR LGPL-2.1-or-later | — | https://github.com/r-efi/r-efi | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: LGPL-2.1-or-later</code> → <code>L0043</code> |
+| r-efi | 6.0.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR LGPL-2.1-or-later | — | https://github.com/r-efi/r-efi | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: LGPL-2.1-or-later</code> → <code>L0043</code> |
+| radium | 0.7.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Nika Layzell &lt;nika@thelayzells.com&gt;; myrrlyn &lt;self@myrrlyn.dev&gt; | https://github.com/bitvecto-rs/radium | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0032</code> |
+| rand | 0.10.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0065</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand | 0.7.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand | 0.8.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0065</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand | 0.9.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0065</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand06-compat | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | TLSNotary Contributors | https://github.com/tlsnotary/tlsn-utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0269</code><br><code>LICENSE-MIT</code> → <code>L0131</code> |
+| rand_chacha | 0.10.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers; The CryptoCorrosion Contributors | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0065</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand_chacha | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers; The CryptoCorrosion Contributors | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand_chacha | 0.3.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers; The CryptoCorrosion Contributors | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand_chacha | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers; The CryptoCorrosion Contributors | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0065</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand_core | 0.10.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/rand_core | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0191</code><br><code>LICENSE-APACHE</code> → <code>L0132</code><br><code>LICENSE-MIT</code> → <code>L0175</code> |
+| rand_core | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand_core | 0.6.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0132</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand_core | 0.9.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rand Project Developers; The Rust Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0132</code><br><code>LICENSE-MIT</code> → <code>L0041</code> |
+| rand_hc | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | The Rand Project Developers | https://github.com/rust-random/rand | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0188</code><br><code>LICENSE-APACHE</code> → <code>L0218</code><br><code>LICENSE-MIT</code> → <code>L0215</code> |
+| rangeset | 0.4.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | TLSNotary Contributors | https://github.com/tlsnotary/tlsn-utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0269</code><br><code>LICENSE-MIT</code> → <code>L0131</code> |
+| ratatui | 0.29.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Florian Dehau &lt;work@fdehau.com&gt;; The Ratatui Developers | https://github.com/ratatui/ratatui | upstream-packaged legal file | <code>LICENSE</code> → <code>L0130</code> |
+| rayon | 1.12.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rayon-rs/rayon | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0013</code> |
+| rayon-core | 1.13.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rayon-rs/rayon | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0013</code> |
+| redox_syscall | 0.5.18 | registry+https://github.com/rust-lang/crates.io-index | MIT | Jeremy Soller &lt;jackpot51@gmail.com&gt; | https://gitlab.redox-os.org/redox-os/syscall | upstream-packaged legal file | <code>LICENSE</code> → <code>L0284</code> |
+| regex | 1.13.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers; Andrew Gallant &lt;jamslam@gmail.com&gt; | https://github.com/rust-lang/regex | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| regex-automata | 0.4.18 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers; Andrew Gallant &lt;jamslam@gmail.com&gt; | https://github.com/rust-lang/regex | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code> |
+| regex-syntax | 0.8.11 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Rust Project Developers; Andrew Gallant &lt;jamslam@gmail.com&gt; | https://github.com/rust-lang/regex | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0122</code><br><code>src/unicode_tables/LICENSE-UNICODE</code> → <code>L0142</code> |
+| reqwest | 0.12.28 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/reqwest | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0143</code><br><code>LICENSE-MIT</code> → <code>L0090</code> |
+| rfc6979 | 0.4.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/signatures/tree/master/rfc6979 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0149</code><br><code>LICENSE-MIT</code> → <code>L0240</code> |
+| ring | 0.17.14 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 AND ISC | — | https://github.com/briansmith/ring | upstream-packaged legal file | <code>LICENSE</code> → <code>L0228</code><br><code>LICENSE-BoringSSL</code> → <code>L0004</code><br><code>LICENSE-other-bits</code> → <code>L0285</code><br><code>src/polyfill/once_cell/LICENSE-APACHE</code> → <code>L0213</code><br><code>src/polyfill/once_cell/LICENSE-MIT</code> → <code>L0133</code><br><code>third_party/fiat/LICENSE</code> → <code>L0206</code> |
+| rs_merkle | 1.4.2 | git+https://github.com/tlsnotary/rs-merkle.git?rev=85f3e82#85f3e827451e18c21f110068b4322fb99d2f0a8c | Apache-2.0/MIT | Anton Suprunchuk &lt;anton.suprunchuk@gmail.com&gt; | https://github.com/antouhou/rs-merkle | upstream Git legal file | <code>LICENSE.md</code> → <code>L0104</code> |
+| rustc-hash | 2.1.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | The Rust Project Developers | https://github.com/rust-lang/rustc-hash | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0197</code><br><code>LICENSE-MIT</code> → <code>L0060</code> |
+| rustc_version | 0.4.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/djc/rustc-version-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0254</code> |
+| rustix | 0.38.44 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt;; Jakub Konka &lt;kubkon@jakubkonka.com&gt; | https://github.com/bytecodealliance/rustix | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0069</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| rustix | 1.1.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Dan Gohman &lt;dev@sunfishcode.online&gt;; Jakub Konka &lt;kubkon@jakubkonka.com&gt; | https://github.com/bytecodealliance/rustix | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0069</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| rustls | 0.23.37 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR ISC OR MIT | — | https://github.com/rustls/rustls | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-ISC</code> → <code>L0155</code><br><code>LICENSE-MIT</code> → <code>L0136</code> |
+| rustls-pemfile | 1.0.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR ISC OR MIT | — | https://github.com/rustls/pemfile | upstream-packaged legal file | <code>LICENSE</code> → <code>L0248</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-ISC</code> → <code>L0155</code><br><code>LICENSE-MIT</code> → <code>L0136</code> |
+| rustls-pki-types | 1.14.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rustls/pki-types | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0089</code><br><code>LICENSE-MIT</code> → <code>L0189</code> |
+| rustls-webpki | 0.103.13 | registry+https://github.com/rust-lang/crates.io-index | ISC | — | https://github.com/rustls/webpki | upstream-packaged legal file | <code>LICENSE</code> → <code>L0112</code> |
+| rustversion | 1.0.22 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/rustversion | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| ryu | 1.0.23 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR BSL-1.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/ryu | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-BOOST</code> → <code>L0255</code> |
+| scale-info | 2.11.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Parity Technologies &lt;admin@parity.io&gt;; Centrality Developers &lt;support@centrality.ai&gt; | https://github.com/paritytech/scale-info | upstream-packaged legal file | <code>LICENSE</code> → <code>L0252</code> |
+| scopeguard | 1.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | bluss | https://github.com/bluss/scopeguard | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0298</code> |
+| sct | 0.7.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR ISC OR MIT | Joseph Birr-Pixton &lt;jpixton@gmail.com&gt; | https://github.com/rustls/sct.rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0146</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-ISC</code> → <code>L0155</code><br><code>LICENSE-MIT</code> → <code>L0136</code> |
+| sec1 | 0.7.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/sec1 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0092</code> |
+| semver | 1.0.27 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/semver | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| serde | 1.0.228 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/serde | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| serde-big-array | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | est31 &lt;MTest31@outlook.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/est31/serde-big-array | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0115</code><br><code>LICENSE-MIT</code> → <code>L0085</code> |
+| serde_arrays | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Travis Veazey &lt;travisvz@gmail.com&gt; | https://github.com/Kromey/serde_arrays | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0039</code><br><code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0120</code> |
+| serde_bytes | 0.11.19 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/bytes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| serde_core | 1.0.228 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/serde | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| serde_derive | 1.0.228 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/serde | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| serde_json | 1.0.149 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Erick Tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/serde-rs/json | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| serde_spanned | 1.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| serde_urlencoded | 0.7.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Anthony Ramine &lt;n.oxyde@gmail.com&gt; | https://github.com/nox/serde_urlencoded | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0238</code> |
+| serdect | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/serdect | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0164</code> |
+| serio | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | TLSNotary Contributors | https://github.com/tlsnotary/tlsn-utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0269</code><br><code>LICENSE-MIT</code> → <code>L0131</code> |
+| sha1 | 0.10.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0230</code> |
+| sha2 | 0.10.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0230</code> |
+| sha2 | 0.9.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0230</code> |
+| sha3 | 0.10.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/hashes | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0286</code> |
+| shell-words | 1.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Tomasz Miąsko &lt;tomasz.miasko@gmail.com&gt; | https://github.com/tmiasko/shell-words | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0162</code><br><code>LICENSE-MIT</code> → <code>L0290</code> |
+| shlex | 1.3.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | comex &lt;comexk@gmail.com&gt;; Fenhl &lt;fenhl@fenhl.net&gt;; Adrian Taylor &lt;adetaylor@chromium.org&gt;; Alex Touchet &lt;alextouchet@outlook.com&gt;; Daniel Parks &lt;dp+git@oxidized.org&gt;; Garrett Berg &lt;googberg@gmail.com&gt; | https://github.com/comex/rust-shlex | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0106</code><br><code>LICENSE-MIT</code> → <code>L0087</code> |
+| signal-hook | 0.3.18 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0/MIT | Michal 'vorner' Vaner &lt;vorner@vorner.cz&gt;; Thomas Himmelstoss &lt;thimm@posteo.de&gt; | https://github.com/vorner/signal-hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
+| signal-hook-mio | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Michal 'vorner' Vaner &lt;vorner@vorner.cz&gt;; Thomas Himmelstoss &lt;thimm@posteo.de&gt; | https://github.com/vorner/signal-hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
+| signal-hook-registry | 1.4.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Michal 'vorner' Vaner &lt;vorner@vorner.cz&gt;; Masaki Hara &lt;ackie.h.gmai@gmail.com&gt; | https://github.com/vorner/signal-hook | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0098</code> |
+| signature | 2.2.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/traits/tree/master/signature | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0226</code> |
+| simd-adler32 | 0.3.8 | registry+https://github.com/rust-lang/crates.io-index | MIT | Marvin Countryman &lt;me@maar.vin&gt; | https://github.com/mcountryman/simd-adler32 | upstream-packaged legal file | <code>LICENSE.md</code> → <code>L0083</code> |
+| slab | 0.4.12 | registry+https://github.com/rust-lang/crates.io-index | MIT | Carl Lerche &lt;me@carllerche.com&gt; | https://github.com/tokio-rs/slab | upstream-packaged legal file | <code>LICENSE</code> → <code>L0180</code> |
+| smallvec | 1.15.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The Servo Project Developers | https://github.com/servo/rust-smallvec | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0021</code> |
+| snafu | 0.8.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Jake Goulding &lt;jake.goulding@gmail.com&gt; | https://github.com/shepmaster/snafu | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0103</code><br><code>LICENSE-MIT</code> → <code>L0135</code> |
+| snafu-derive | 0.8.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Jake Goulding &lt;jake.goulding@gmail.com&gt; | https://github.com/shepmaster/snafu | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0103</code><br><code>LICENSE-MIT</code> → <code>L0135</code> |
+| socket2 | 0.6.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt;; Thomas de Zeeuw &lt;thomasdezeeuw@gmail.com&gt; | https://github.com/rust-lang/socket2 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| solana-account | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-account-info | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-address-lookup-table-interface | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-atomic-u64 | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-big-mod-exp | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-bincode | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-blake3-hasher | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-borsh | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-clock | 2.2.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-cpi | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-decode-error | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-define-syscall | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-derivation-path | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-ed25519-program | 2.2.3 | vendored crates.io patch: vendor/solana-ed25519-program-2.2.3/Cargo.toml | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | vendored patch legal file + SPDX-text fallback | <code>vendor/LICENSE-APACHE-2.0</code> → <code>L0171</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-epoch-rewards | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-epoch-schedule | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-example-mocks | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-feature-gate-interface | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-feature-set | 2.2.5 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-fee-calculator | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-hash | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-instruction | 2.3.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-instructions-sysvar | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-keccak-hasher | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-keypair | 2.2.3 | vendored crates.io patch: vendor/solana-keypair-2.2.3/Cargo.toml | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | vendored patch legal file + SPDX-text fallback | <code>vendor/LICENSE-APACHE-2.0</code> → <code>L0171</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-last-restart-slot | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-loader-v2-interface | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-loader-v3-interface | 5.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-loader-v4-interface | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-message | 2.4.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-msg | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-native-token | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-nonce | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-offchain-message | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-packet | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-precompile-error | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-program | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-program-entrypoint | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-program-error | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-program-memory | 2.3.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-program-option | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-program-pack | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-pubkey | 2.4.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-remote-wallet | 2.3.13 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-rent | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-sanitize | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-sdk-ids | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-sdk-macro | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-secp256k1-recover | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-seed-phrase | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-serde-varint | 2.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-serialize-utils | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-sha256-hasher | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-short-vec | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-signature | 2.3.0 | vendored crates.io patch: vendor/solana-signature-2.3.0/Cargo.toml | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | vendored patch legal file + SPDX-text fallback | <code>vendor/LICENSE-APACHE-2.0</code> → <code>L0171</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-signer | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-slot-hashes | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-slot-history | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-stable-layout | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-stake-interface | 1.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/solana-program/stake | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-system-interface | 1.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/solana-program/system | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-sysvar | 2.3.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-sysvar-id | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-transaction | 2.2.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-transaction-error | 2.2.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/agave | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| solana-vote-interface | 2.2.6 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Anza Maintainers &lt;maintainers@anza.xyz&gt; | https://github.com/anza-xyz/solana-sdk | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| spansy | 0.1.0 | git+https://github.com/tlsnotary/tlsn-utils?rev=e2f31e6a30bc5d1641ed6407fb1a38a595e523ce#e2f31e6a30bc5d1641ed6407fb1a38a595e523ce | MIT OR Apache-2.0 | — | https://github.com/tlsnotary/tlsn-utils | upstream Git repository-root legal file (the crate has none of its own) | <code>repository root: LICENSE-APACHE</code> → <code>L0119</code><br><code>repository root: LICENSE-MIT</code> → <code>L0179</code> |
+| spki | 0.7.3 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats/tree/master/spki | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0253</code> |
+| spki | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | RustCrypto Developers | https://github.com/RustCrypto/formats | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0109</code> |
+| spl-token | 7.0.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Solana Labs Maintainers &lt;maintainers@solanalabs.com&gt; | https://github.com/solana-labs/solana-program-library | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| stable_deref_trait | 1.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Robert Grosse &lt;n210241048576@gmail.com&gt; | https://github.com/storyyeller/stable_deref_trait | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0114</code> |
+| stacker | 0.1.25 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt;; Simonas Kazlauskas &lt;stacker@kazlauskas.me&gt; | https://github.com/rust-lang/stacker | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| static_assertions | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Nikolai Vazquez | https://github.com/nvzqz/static-assertions-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0281</code> |
+| strsim | 0.10.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Danny Guo &lt;danny@dannyguo.com&gt; | https://github.com/dguo/strsim-rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0038</code> |
+| strsim | 0.11.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Danny Guo &lt;danny@dannyguo.com&gt;; maxbachmann &lt;oss@maxbachmann.de&gt; | https://github.com/rapidfuzz/strsim-rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0038</code> |
+| strum | 0.26.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Peter Glotfelty &lt;peter.glotfelty@microsoft.com&gt; | https://github.com/Peternator7/strum | upstream-packaged legal file | <code>LICENSE</code> → <code>L0177</code> |
+| strum_macros | 0.26.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Peter Glotfelty &lt;peter.glotfelty@microsoft.com&gt; | https://github.com/Peternator7/strum | upstream-packaged legal file | <code>LICENSE</code> → <code>L0177</code> |
+| subtle | 2.6.1 | registry+https://github.com/rust-lang/crates.io-index | BSD-3-Clause | Isis Lovecruft &lt;isis@patternsinthevoid.net&gt;; Henry de Valence &lt;hdevalence@hdevalence.ca&gt; | https://github.com/dalek-cryptography/subtle | upstream-packaged legal file | <code>LICENSE</code> → <code>L0264</code> |
+| syn | 1.0.109 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/syn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| syn | 2.0.117 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/syn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| syn | 3.0.9 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/syn | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| sync_wrapper | 1.0.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 | Actyx AG &lt;developer@actyx.io&gt; | https://github.com/Actyx/sync_wrapper | upstream-packaged legal file | <code>LICENSE</code> → <code>L0026</code> |
+| synstructure | 0.13.2 | registry+https://github.com/rust-lang/crates.io-index | MIT | Nika Layzell &lt;nika@thelayzells.com&gt; | https://github.com/mystor/synstructure | upstream-packaged legal file | <code>LICENSE</code> → <code>L0045</code> |
+| tap | 1.0.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Elliott Linder &lt;elliott.darfink@gmail.com&gt;; myrrlyn &lt;self@myrrlyn.dev&gt; | https://github.com/myrrlyn/tap | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0174</code> |
+| tempfile | 3.27.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Steven Allen &lt;steven@stebalien.com&gt;; The Rust Project Developers; Ashley Mannix &lt;ashleymannix@live.com.au&gt;; Jason White &lt;me@jasonwhite.io&gt; | https://github.com/Stebalien/tempfile | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0172</code> |
+| thiserror | 1.0.69 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| thiserror | 2.0.18 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| thiserror-impl | 1.0.69 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| thiserror-impl | 2.0.18 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/thiserror | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| tiny-keccak | 2.0.2 | registry+https://github.com/rust-lang/crates.io-index | CC0-1.0 | debris &lt;marek.kotewicz@gmail.com&gt; | https://github.com/debris/tiny-keccak | upstream-packaged legal file | <code>LICENSE</code> → <code>L0208</code> |
+| tinystr | 0.8.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| tinyvec | 1.10.0 | registry+https://github.com/rust-lang/crates.io-index | Zlib OR Apache-2.0 OR MIT | Lokathor &lt;zefria@gmail.com&gt; | https://github.com/Lokathor/tinyvec | upstream-packaged legal file | <code>LICENSE-APACHE.md</code> → <code>L0262</code><br><code>LICENSE-MIT.md</code> → <code>L0302</code><br><code>LICENSE-ZLIB.md</code> → <code>L0163</code> |
+| tinyvec_macros | 0.1.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 OR Zlib | Soveu &lt;marx.tomasz@gmail.com&gt; | https://github.com/Soveu/tinyvec_macros | upstream-packaged legal file | <code>LICENSE-APACHE.md</code> → <code>L0097</code><br><code>LICENSE-MIT.md</code> → <code>L0037</code><br><code>LICENSE-ZLIB.md</code> → <code>L0081</code> |
+| tlsn | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | MIT OR Apache-2.0 | TLSNotary Team | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-attestation | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-cipher | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | MIT OR Apache-2.0 | TLSNotary Team | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-core | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | MIT OR Apache-2.0 | TLSNotary Team | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-deap | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-formats | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | — | — | — | SPDX-text fallback per the repository's license statement (README.md at the locked revision: "All crates in this repository are licensed under either of Apache License, Version 2.0 or MIT license") | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-hmac-sha256 | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | MIT OR Apache-2.0 | TLSNotary Team | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-key-exchange | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | MIT OR Apache-2.0 | TLSNotary Team | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-mpc-tls | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | MIT OR Apache-2.0 | TLSNotary Team | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| tlsn-mux | 0.1.0 | git+https://github.com/tlsnotary/tlsn-utils?rev=e2f31e6a30bc5d1641ed6407fb1a38a595e523ce#e2f31e6a30bc5d1641ed6407fb1a38a595e523ce | MIT OR Apache-2.0 | TLSNotary Contributors | https://github.com/tlsnotary/tlsn-utils | upstream Git repository-root legal file (the crate has none of its own) | <code>repository root: LICENSE-APACHE</code> → <code>L0119</code><br><code>repository root: LICENSE-MIT</code> → <code>L0179</code> |
+| tlsn-tls-core | 0.1.0-alpha.16-pre | git+https://github.com/tlsnotary/tlsn?rev=5f67389de3f8962227fddffd71d78a852acc9b01#5f67389de3f8962227fddffd71d78a852acc9b01 | Apache-2.0 OR ISC OR MIT | TLSNotary Team | — | SPDX-text fallback (upstream Git package contains no legal file) | <code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: ISC</code> → <code>L0152</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| tokio | 1.50.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tokio | upstream-packaged legal file | <code>LICENSE</code> → <code>L0050</code> |
+| tokio-macros | 2.6.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tokio | upstream-packaged legal file | <code>LICENSE</code> → <code>L0022</code> |
+| tokio-rustls | 0.26.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/rustls/tokio-rustls | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0258</code><br><code>LICENSE-MIT</code> → <code>L0275</code> |
+| tokio-util | 0.7.19 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tokio | upstream-packaged legal file | <code>LICENSE</code> → <code>L0050</code> |
+| toml | 0.5.11 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| toml | 1.0.6+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| toml_datetime | 1.0.0+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| toml_edit | 0.25.4+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| toml_parser | 1.0.9+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| toml_writer | 1.1.1+spec-1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/toml-rs/toml | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0249</code><br><code>LICENSE-MIT</code> → <code>L0134</code> |
+| tower | 0.5.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower | upstream-packaged legal file | <code>LICENSE</code> → <code>L0082</code> |
+| tower-http | 0.6.8 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower-http | upstream-packaged legal file | <code>LICENSE</code> → <code>L0099</code> |
+| tower-layer | 0.3.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower | upstream-packaged legal file | <code>LICENSE</code> → <code>L0082</code> |
+| tower-service | 0.3.3 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tower Maintainers &lt;team@tower-rs.com&gt; | https://github.com/tower-rs/tower | upstream-packaged legal file | <code>LICENSE</code> → <code>L0082</code> |
+| tracing | 0.1.44 | registry+https://github.com/rust-lang/crates.io-index | MIT | Eliza Weisman &lt;eliza@buoyant.io&gt;; Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tracing | upstream-packaged legal file | <code>LICENSE</code> → <code>L0169</code> |
+| tracing-attributes | 0.1.31 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt;; Eliza Weisman &lt;eliza@buoyant.io&gt;; David Barsky &lt;dbarsky@amazon.com&gt; | https://github.com/tokio-rs/tracing | upstream-packaged legal file | <code>LICENSE</code> → <code>L0169</code> |
+| tracing-core | 0.1.36 | registry+https://github.com/rust-lang/crates.io-index | MIT | Tokio Contributors &lt;team@tokio.rs&gt; | https://github.com/tokio-rs/tracing | upstream-packaged legal file | <code>LICENSE</code> → <code>L0169</code><br><code>src/spin/LICENSE</code> → <code>L0110</code> |
+| try-lock | 0.2.5 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/try-lock | upstream-packaged legal file | <code>LICENSE</code> → <code>L0251</code> |
+| tungstenite | 0.26.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Alexey Galakhov; Daniel Abramov | https://github.com/snapview/tungstenite-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0158</code> |
+| typed-path | 0.12.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Chip Senkbeil &lt;chip@senkbeil.org&gt; | https://github.com/chipsenkbeil/typed-path | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| typenum | 1.20.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/paholg/typenum | upstream-packaged legal file | <code>LICENSE</code> → <code>L0272</code><br><code>LICENSE-APACHE</code> → <code>L0101</code><br><code>LICENSE-MIT</code> → <code>L0216</code> |
+| ucd-trie | 0.1.7 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Andrew Gallant &lt;jamslam@gmail.com&gt; | https://github.com/BurntSushi/ucd-generate | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0028</code> |
+| ultrahonk-no-std | 0.1.0 | git+https://github.com/zkVerify/ultrahonk_verifier?tag=v0.3.2#986b79b232d0f44c52fe50cd85ba8c3f505fc3c8 | MIT/Apache-2.0 | Horizen Labs &lt;admin@horizenlabs.io&gt; | https://github.com/zkVerify/ultrahonk_verifier | upstream Git legal file | <code>LICENSE-APACHE</code> → <code>L0145</code><br><code>LICENSE-MIT</code> → <code>L0235</code> |
+| unicode-ident | 1.0.24 | registry+https://github.com/rust-lang/crates.io-index | (MIT OR Apache-2.0) AND Unicode-3.0 | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/unicode-ident | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code><br><code>LICENSE-UNICODE</code> → <code>L0293</code> |
+| unicode-segmentation | 1.13.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-segmentation | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0048</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0153</code> |
+| unicode-truncate | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Aetf &lt;aetf@unlimitedcodeworks.xyz&gt; | https://github.com/Aetf/unicode-truncate | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0048</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0296</code> |
+| unicode-width | 0.1.14 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-width | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0048</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0153</code> |
+| unicode-width | 0.2.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-width | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0048</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0153</code> |
+| unicode-xid | 0.2.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | erick.tryzelaar &lt;erick.tryzelaar@gmail.com&gt;; kwantam &lt;kwantam@gmail.com&gt;; Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-rs/unicode-xid | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0048</code><br><code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0153</code> |
+| universal-hash | 0.4.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0128</code> |
+| universal-hash | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | RustCrypto Developers | https://github.com/RustCrypto/traits | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0217</code><br><code>LICENSE-MIT</code> → <code>L0128</code> |
+| untrusted | 0.9.0 | registry+https://github.com/rust-lang/crates.io-index | ISC | Brian Smith &lt;brian@briansmith.org&gt; | https://github.com/briansmith/untrusted | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0152</code> |
+| uriparse | 0.6.4 | registry+https://github.com/rust-lang/crates.io-index | MIT | Scott Godwin &lt;sgodwincs@gmail.com&gt; | https://github.com/sgodwincs/uriparse-rs | upstream-packaged legal file | <code>LICENSE</code> → <code>L0127</code> |
+| url | 2.5.8 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The rust-url developers | https://github.com/servo/rust-url | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0227</code> |
+| utf-8 | 0.7.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Simon Sapin &lt;simon.sapin@exyr.org&gt; | https://github.com/SimonSapin/rust-utf8 | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| utf8_iter | 1.0.4 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Henri Sivonen &lt;hsivonen@hsivonen.fi&gt; | https://github.com/hsivonen/utf8_iter | upstream-packaged legal file | <code>COPYRIGHT</code> → <code>L0246</code><br><code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0076</code> |
+| utf8parse | 0.2.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | Joe Wilm &lt;joe@jwilm.com&gt;; Christian Duerr &lt;contact@christianduerr.com&gt; | https://github.com/alacritty/vte | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0119</code><br><code>LICENSE-MIT</code> → <code>L0278</code> |
+| version_check | 0.9.5 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Sergio Benitez &lt;sb@sergio.bz&gt; | https://github.com/SergioBenitez/version_check | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0234</code> |
+| want | 0.3.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | Sean McArthur &lt;sean@seanmonstar.com&gt; | https://github.com/seanmonstar/want | upstream-packaged legal file | <code>LICENSE</code> → <code>L0214</code> |
+| wasi | 0.11.1+wasi-snapshot-preview1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | The Cranelift Project Developers | https://github.com/bytecodealliance/wasi | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| wasi | 0.9.0+wasi-snapshot-preview1 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | The Cranelift Project Developers | https://github.com/bytecodealliance/wasi | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| wasip2 | 1.0.2+wasi-0.2.9 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | — | https://github.com/bytecodealliance/wasi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0052</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| wasip3 | 0.4.0+wasi-0.3.0-rc-2026-01-06 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | — | https://github.com/bytecodealliance/wasi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0052</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| wasm-bindgen | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| wasm-bindgen-futures | 0.4.64 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/futures | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| wasm-bindgen-macro | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/macro | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| wasm-bindgen-macro-support | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/macro-support | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| wasm-bindgen-shared | 0.2.114 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/shared | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| wasm-encoder | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Nick Fitzgerald &lt;fitzgen@gmail.com&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-encoder | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0052</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| wasm-metadata | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | — | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-metadata | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0052</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| wasmparser | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Yury Delendik &lt;ydelendik@mozilla.com&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmparser | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0052</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| web-sys | 0.3.91 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | The wasm-bindgen Developers | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/web-sys | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-MIT</code> → <code>L0070</code> |
+| web-time | 0.2.4 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/daxpedda/web-time | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0105</code><br><code>LICENSE-MIT</code> → <code>L0288</code> |
+| web-time | 1.1.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/daxpedda/web-time | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0105</code><br><code>LICENSE-MIT</code> → <code>L0288</code> |
+| webpki-root-certs | 1.0.10 | registry+https://github.com/rust-lang/crates.io-index | CDLA-Permissive-2.0 | — | https://github.com/rustls/webpki-roots | upstream-packaged legal file | <code>LICENSE</code> → <code>L0276</code> |
+| webpki-roots | 0.26.11 | registry+https://github.com/rust-lang/crates.io-index | CDLA-Permissive-2.0 | — | https://github.com/rustls/webpki-roots | upstream-packaged legal file | <code>LICENSE</code> → <code>L0276</code> |
+| webpki-roots | 1.0.6 | registry+https://github.com/rust-lang/crates.io-index | CDLA-Permissive-2.0 | — | https://github.com/rustls/webpki-roots | upstream-packaged legal file | <code>LICENSE</code> → <code>L0276</code> |
+| winapi | 0.3.9 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Peter Atashian &lt;retep998@gmail.com&gt; | https://github.com/retep998/winapi-rs | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0229</code><br><code>LICENSE-MIT</code> → <code>L0261</code> |
+| winapi-i686-pc-windows-gnu | 0.4.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Peter Atashian &lt;retep998@gmail.com&gt; | https://github.com/retep998/winapi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| winapi-x86_64-pc-windows-gnu | 0.4.0 | registry+https://github.com/rust-lang/crates.io-index | MIT/Apache-2.0 | Peter Atashian &lt;retep998@gmail.com&gt; | https://github.com/retep998/winapi-rs | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| windows-core | 0.62.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-implement | 0.60.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-interface | 0.59.3 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-link | 0.2.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-result | 0.4.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-strings | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-sys | 0.52.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-sys | 0.59.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-sys | 0.61.2 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | — | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows-targets | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_aarch64_gnullvm | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_aarch64_msvc | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_i686_gnu | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_i686_gnullvm | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_i686_msvc | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_x86_64_gnu | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_x86_64_gnullvm | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| windows_x86_64_msvc | 0.52.6 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Microsoft | https://github.com/microsoft/windows-rs | upstream-packaged legal file | <code>license-apache-2.0</code> → <code>L0243</code><br><code>license-mit</code> → <code>L0245</code> |
+| winnow | 0.7.15 | registry+https://github.com/rust-lang/crates.io-index | MIT | — | https://github.com/winnow-rs/winnow | upstream-packaged legal file | <code>LICENSE-MIT</code> → <code>L0256</code> |
+| winresource | 0.1.31 | registry+https://github.com/rust-lang/crates.io-index | MIT | Max Resch &lt;resch.max@gmail.com&gt; | https://github.com/BenjaminRi/winresource | upstream-packaged legal file | <code>LICENSE</code> → <code>L0067</code> |
+| wit-bindgen | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| wit-bindgen-core | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| wit-bindgen-rust | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| wit-bindgen-rust-macro | 0.51.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wit-bindgen | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0213</code><br><code>LICENSE-Apache-2.0_WITH_LLVM-exception</code> → <code>L0052</code><br><code>LICENSE-MIT</code> → <code>L0049</code> |
+| wit-component | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Peter Huene &lt;peter@huene.dev&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-component | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0052</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| wit-parser | 0.244.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | Alex Crichton &lt;alex@alexcrichton.com&gt; | https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-parser | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Apache-2.0 WITH LLVM-exception</code> → <code>L0052</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code><br><code>SPDX fallback: MIT</code> → <code>L0049</code> |
+| writeable | 0.6.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| ws_stream_tungstenite | 0.15.0 | registry+https://github.com/rust-lang/crates.io-index | Unlicense | Naja Melan &lt;najamelan@autistici.org&gt; | https://github.com/najamelan/ws_stream_tungstenite | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: Unlicense</code> → <code>L0157</code> |
+| wyz | 0.5.1 | registry+https://github.com/rust-lang/crates.io-index | MIT | myrrlyn &lt;self@myrrlyn.dev&gt; | https://github.com/myrrlyn/wyz | upstream-packaged legal file | <code>LICENSE.txt</code> → <code>L0080</code> |
+| yaml-rust2 | 0.11.0 | registry+https://github.com/rust-lang/crates.io-index | MIT OR Apache-2.0 | Yuheng Chen &lt;yuhengchen@sensetime.com&gt;; Ethiraric &lt;ethiraric@gmail.com&gt;; David Aguilar &lt;davvid@gmail.com&gt; | https://github.com/Ethiraric/yaml-rust2 | SPDX-text fallback (upstream package contains no legal file) | <code>SPDX fallback: MIT</code> → <code>L0049</code><br><code>SPDX fallback: Apache-2.0</code> → <code>L0218</code> |
+| yoke | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| yoke-derive | 0.8.1 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| zerocopy | 0.8.42 | registry+https://github.com/rust-lang/crates.io-index | BSD-2-Clause OR Apache-2.0 OR MIT | Joshua Liebow-Feeser &lt;joshlf@google.com&gt;; Jack Wrenn &lt;jswrenn@amazon.com&gt; | https://github.com/google/zerocopy | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0202</code><br><code>LICENSE-BSD</code> → <code>L0161</code><br><code>LICENSE-MIT</code> → <code>L0035</code> |
+| zerocopy-derive | 0.8.42 | registry+https://github.com/rust-lang/crates.io-index | BSD-2-Clause OR Apache-2.0 OR MIT | Joshua Liebow-Feeser &lt;joshlf@google.com&gt;; Jack Wrenn &lt;jswrenn@amazon.com&gt; | https://github.com/google/zerocopy | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0202</code><br><code>LICENSE-BSD</code> → <code>L0161</code><br><code>LICENSE-MIT</code> → <code>L0035</code> |
+| zerofrom | 0.1.6 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| zerofrom-derive | 0.1.6 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| zeroize | 1.8.2 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | The RustCrypto Project Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0020</code> |
+| zeroize_derive | 1.5.0 | registry+https://github.com/rust-lang/crates.io-index | Apache-2.0 OR MIT | The RustCrypto Project Developers | https://github.com/RustCrypto/utils | upstream-packaged legal file | <code>LICENSE-APACHE</code> → <code>L0262</code><br><code>LICENSE-MIT</code> → <code>L0237</code> |
+| zerotrie | 0.2.3 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| zerovec | 0.11.5 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | The ICU4X Project Developers | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| zerovec-derive | 0.11.2 | registry+https://github.com/rust-lang/crates.io-index | Unicode-3.0 | Manish Goregaokar &lt;manishsmail@gmail.com&gt; | https://github.com/unicode-org/icu4x | upstream-packaged legal file | <code>LICENSE</code> → <code>L0287</code> |
+| zip | 8.6.0 | registry+https://github.com/rust-lang/crates.io-index | MIT | Mathijs van de Nes &lt;git@mathijs.vd-nes.nl&gt;; Marli Frost &lt;marli@frost.red&gt;; Ryan Levick &lt;ryan.levick@gmail.com&gt;; Chris Hennick &lt;hennickc@amazon.com&gt; | https://github.com/zip-rs/zip2 | upstream-packaged legal file | <code>LICENSE</code> → <code>L0110</code> |
+| zmij | 1.0.21 | registry+https://github.com/rust-lang/crates.io-index | MIT | David Tolnay &lt;dtolnay@gmail.com&gt; | https://github.com/dtolnay/zmij | upstream-packaged legal file | <code>LICENSE-MIT</code> → <code>L0049</code> |
 
 ## Exact legal texts
 
@@ -651,7 +851,7 @@ An **SPDX-text fallback** is used only when an upstream `.crate` archive contain
 
 - SHA-256: `0034712d5e97a4f5b900a160a5c19d582b740d8e0638b4e44fd07e7b492dcd13`
 - Provenance class: upstream-package
-- Observed source: <code>fiat-crypto@0.2.9/LICENSE-MIT</code>
+- Observed sources: <code>fiat-crypto@0.2.9/LICENSE-MIT</code>, <code>fiat-crypto@0.3.0/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=0034712d5e97a4f5b900a160a5c19d582b740d8e0638b4e44fd07e7b492dcd13 -->
 ```text
@@ -681,6 +881,43 @@ SOFTWARE.
 <!-- legal-text-end sha256=0034712d5e97a4f5b900a160a5c19d582b740d8e0638b4e44fd07e7b492dcd13 -->
 
 ### L0003
+
+- SHA-256: `003736bc98408b53511b9cc8ff5d1af3bf0a8f17d53841cc39d8ab1b96a195b0`
+- Provenance class: upstream-package
+- Observed source: <code>cpubits@0.1.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=003736bc98408b53511b9cc8ff5d1af3bf0a8f17d53841cc39d8ab1b96a195b0 -->
+```text
+Copyright (c) 2023-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=003736bc98408b53511b9cc8ff5d1af3bf0a8f17d53841cc39d8ab1b96a195b0 -->
+
+### L0004
 
 - SHA-256: `005fc765ddc5115da796cca915baa9557abae13ff35e0a47c47affc56f6c414d`
 - Provenance class: upstream-package
@@ -964,7 +1201,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=005fc765ddc5115da796cca915baa9557abae13ff35e0a47c47affc56f6c414d -->
 
-### L0004
+### L0005
 
 - SHA-256: `00fcc7a934ddbc9ece2a7cc063ac788e284b703b1d705ccbba72d462aa97921e`
 - Provenance class: upstream-package
@@ -1178,11 +1415,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=00fcc7a934ddbc9ece2a7cc063ac788e284b703b1d705ccbba72d462aa97921e -->
 
-### L0005
+### L0006
 
 - SHA-256: `01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f`
 - Provenance class: upstream-package
-- Observed source: <code>memchr@2.8.0/COPYING</code>
+- Observed sources: <code>aho-corasick@1.1.5/COPYING</code>, <code>memchr@2.8.0/COPYING</code>
 
 <!-- legal-text-begin sha256=01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f -->
 ```text
@@ -1193,7 +1430,7 @@ You may use this code under the terms of either license.
 ```
 <!-- legal-text-end sha256=01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f -->
 
-### L0006
+### L0007
 
 - SHA-256: `0218327e7a480793ffdd4eb792379a9709e5c135c7ba267f709d6f6d4d70af0a`
 - Provenance class: upstream-package
@@ -1406,7 +1643,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=0218327e7a480793ffdd4eb792379a9709e5c135c7ba267f709d6f6d4d70af0a -->
 
-### L0007
+### L0008
 
 - SHA-256: `025436edff4cfcdde17a5811fdea78892d8482efd1abdec5a17872d07a4f2112`
 - Provenance class: upstream-package
@@ -1443,7 +1680,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=025436edff4cfcdde17a5811fdea78892d8482efd1abdec5a17872d07a4f2112 -->
 
-### L0008
+### L0009
 
 - SHA-256: `0315568149476c50fa16ce5f7f735267a24e10a582254a7656f6c3daacaa37b7`
 - Provenance class: upstream-package
@@ -1474,7 +1711,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=0315568149476c50fa16ce5f7f735267a24e10a582254a7656f6c3daacaa37b7 -->
 
-### L0009
+### L0010
 
 - SHA-256: `0352320d9929e862c1f07b59caacc3cd1bbacfec0ad4136bf4c89d4ca8939781`
 - Provenance class: upstream-package
@@ -1508,7 +1745,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=0352320d9929e862c1f07b59caacc3cd1bbacfec0ad4136bf4c89d4ca8939781 -->
 
-### L0010
+### L0011
 
 - SHA-256: `0444c6991eead6822f7b9102e654448d51624431119546492e8b231db42c48bb`
 - Provenance class: upstream-package
@@ -1545,7 +1782,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=0444c6991eead6822f7b9102e654448d51624431119546492e8b231db42c48bb -->
 
-### L0011
+### L0012
 
 - SHA-256: `061dc50af2cd9340703daf61978af3200cf681b12ea67a323c33ba109a23a45e`
 - Provenance class: upstream-package
@@ -1577,11 +1814,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=061dc50af2cd9340703daf61978af3200cf681b12ea67a323c33ba109a23a45e -->
 
-### L0012
+### L0013
 
 - SHA-256: `0621878e61f0d0fda054bcbe02df75192c28bde1ecc8289cbd86aeba2dd72720`
 - Provenance class: upstream-package
-- Observed source: <code>lazy_static@1.5.0/LICENSE-MIT</code>
+- Observed sources: <code>lazy_static@1.5.0/LICENSE-MIT</code>, <code>rayon-core@1.13.0/LICENSE-MIT</code>, <code>rayon@1.12.0/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=0621878e61f0d0fda054bcbe02df75192c28bde1ecc8289cbd86aeba2dd72720 -->
 ```text
@@ -1614,7 +1851,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=0621878e61f0d0fda054bcbe02df75192c28bde1ecc8289cbd86aeba2dd72720 -->
 
-### L0013
+### L0014
 
 - SHA-256: `07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b`
 - Provenance class: upstream-package
@@ -1645,7 +1882,7 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b -->
 
-### L0014
+### L0015
 
 - SHA-256: `0943fbdd0b6e8ec33e4dec45f163fb556de0ed6a6f80f1b196da2734380e106b`
 - Provenance class: upstream-package
@@ -1683,7 +1920,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=0943fbdd0b6e8ec33e4dec45f163fb556de0ed6a6f80f1b196da2734380e106b -->
 
-### L0015
+### L0016
 
 - SHA-256: `09785877275ffada6c371b652a30e95c26b435126fc0fc62f1bc2d72171f80a4`
 - Provenance class: upstream-package
@@ -1714,7 +1951,7 @@ the following restrictions:
 ```
 <!-- legal-text-end sha256=09785877275ffada6c371b652a30e95c26b435126fc0fc62f1bc2d72171f80a4 -->
 
-### L0016
+### L0017
 
 - SHA-256: `0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39`
 - Provenance class: upstream-package
@@ -1740,7 +1977,45 @@ Permission is granted to anyone to use this software for any purpose, including 
 ```
 <!-- legal-text-end sha256=0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39 -->
 
-### L0017
+### L0018
+
+- SHA-256: `0aa8963e105e8b6e02f634484145d4e5b0f42d0a6dd05c16f8148f033383adef`
+- Provenance class: upstream-package
+- Observed source: <code>base16ct@0.2.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=0aa8963e105e8b6e02f634484145d4e5b0f42d0a6dd05c16f8148f033383adef -->
+```text
+Copyright (c) 2014 Steve "Sc00bz" Thomas (steve at tobtu dot com)
+Copyright (c) 2022 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=0aa8963e105e8b6e02f634484145d4e5b0f42d0a6dd05c16f8148f033383adef -->
+
+### L0019
 
 - SHA-256: `0aab2eeeaa27c8e946c235e5e605c6d52cb0a56d254c660bdcf618d6f7faf4af`
 - Provenance class: upstream-package
@@ -1773,7 +2048,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=0aab2eeeaa27c8e946c235e5e605c6d52cb0a56d254c660bdcf618d6f7faf4af -->
 
-### L0018
+### L0020
 
 - SHA-256: `0b04ee3ce0021a922f43f37a17fee09a5a1ee6d1f4e149d5bf75b72395a49c72`
 - Provenance class: upstream-package
@@ -1806,7 +2081,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=0b04ee3ce0021a922f43f37a17fee09a5a1ee6d1f4e149d5bf75b72395a49c72 -->
 
-### L0019
+### L0021
 
 - SHA-256: `0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9`
 - Provenance class: upstream-package
@@ -1843,7 +2118,41 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9 -->
 
-### L0020
+### L0022
+
+- SHA-256: `0b83dc40cba89b9922bb84b0a9c7d2768ce37c1d7e138b7424fd4549915778c9`
+- Provenance class: upstream-package
+- Observed source: <code>tokio-macros@2.6.1/LICENSE</code>
+
+<!-- legal-text-begin sha256=0b83dc40cba89b9922bb84b0a9c7d2768ce37c1d7e138b7424fd4549915778c9 -->
+```text
+MIT License
+
+Copyright (c) 2019 Yoshua Wuyts
+Copyright (c) Tokio Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=0b83dc40cba89b9922bb84b0a9c7d2768ce37c1d7e138b7424fd4549915778c9 -->
+
+### L0023
 
 - SHA-256: `0be96d891d00e0ae0df75d7f3289b12871c000a1f5ac744f3b570768d4bb277c`
 - Provenance class: upstream-package
@@ -1882,11 +2191,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=0be96d891d00e0ae0df75d7f3289b12871c000a1f5ac744f3b570768d4bb277c -->
 
-### L0021
+### L0024
 
 - SHA-256: `0c1240e29b4a2c528bcc3ccc38a98b1dba5e3e6b465da910208935f082e2ced6`
 - Provenance class: upstream-package
-- Observed source: <code>fiat-crypto@0.2.9/LICENSE-BSD-1</code>
+- Observed sources: <code>fiat-crypto@0.2.9/LICENSE-BSD-1</code>, <code>fiat-crypto@0.3.0/LICENSE-BSD-1</code>
 
 <!-- legal-text-begin sha256=0c1240e29b4a2c528bcc3ccc38a98b1dba5e3e6b465da910208935f082e2ced6 -->
 ```text
@@ -1917,7 +2226,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=0c1240e29b4a2c528bcc3ccc38a98b1dba5e3e6b465da910208935f082e2ced6 -->
 
-### L0022
+### L0025
 
 - SHA-256: `0d52feec79589df30138dad3800323fe5686b764b73347330a2dfef8ac83efe8`
 - Provenance class: upstream-package
@@ -1950,11 +2259,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=0d52feec79589df30138dad3800323fe5686b764b73347330a2dfef8ac83efe8 -->
 
-### L0023
+### L0026
 
 - SHA-256: `0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594`
 - Provenance class: upstream-package
-- Observed sources: <code>miniz_oxide@0.8.9/LICENSE-APACHE.md</code>, <code>pin-project-lite@0.2.17/LICENSE-APACHE</code>, <code>sync_wrapper@1.0.2/LICENSE</code>
+- Observed sources: <code>miniz_oxide@0.8.9/LICENSE-APACHE.md</code>, <code>pin-project-internal@1.1.13/LICENSE-APACHE</code>, <code>pin-project-lite@0.2.17/LICENSE-APACHE</code>, <code>pin-project@1.1.13/LICENSE-APACHE</code>, <code>sync_wrapper@1.0.2/LICENSE</code>
 
 <!-- legal-text-begin sha256=0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594 -->
 ```text
@@ -2139,11 +2448,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594 -->
 
-### L0024
+### L0027
 
 - SHA-256: `0dd882e53de11566d50f8e8e2d5a651bcf3fabee4987d70f306233cf39094ba7`
 - Provenance class: upstream-package
-- Observed sources: <code>base64@0.12.3/LICENSE-MIT</code>, <code>base64@0.22.1/LICENSE-MIT</code>
+- Observed sources: <code>base64@0.12.3/LICENSE-MIT</code>, <code>base64@0.21.7/LICENSE-MIT</code>, <code>base64@0.22.1/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=0dd882e53de11566d50f8e8e2d5a651bcf3fabee4987d70f306233cf39094ba7 -->
 ```text
@@ -2172,11 +2481,11 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=0dd882e53de11566d50f8e8e2d5a651bcf3fabee4987d70f306233cf39094ba7 -->
 
-### L0025
+### L0028
 
 - SHA-256: `0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f`
 - Provenance class: upstream-package
-- Observed source: <code>memchr@2.8.0/LICENSE-MIT</code>
+- Observed sources: <code>aho-corasick@1.1.5/LICENSE-MIT</code>, <code>memchr@2.8.0/LICENSE-MIT</code>, <code>ucd-trie@0.1.7/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f -->
 ```text
@@ -2205,7 +2514,39 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f -->
 
-### L0026
+### L0029
+
+- SHA-256: `10d73bf26900fa6dd6f2613bb962b7bd8fa1e66618fcf0f9f899aa071a4ee200`
+- Provenance class: upstream-package
+- Observed source: <code>enum-try-as-inner@0.1.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=10d73bf26900fa6dd6f2613bb962b7bd8fa1e66618fcf0f9f899aa071a4ee200 -->
+```text
+Copyright (c) 2015 The trust-dns Developers
+Copyright (c) 2017 Google LLC.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=10d73bf26900fa6dd6f2613bb962b7bd8fa1e66618fcf0f9f899aa071a4ee200 -->
+
+### L0030
 
 - SHA-256: `11789f45bb180841cd362a5eee6789c68ddb573a11105e30768c308a6add0190`
 - Provenance class: upstream-package
@@ -2234,7 +2575,7 @@ designated (see the individual files for PD/CC0-dedicated sections).
 ```
 <!-- legal-text-end sha256=11789f45bb180841cd362a5eee6789c68ddb573a11105e30768c308a6add0190 -->
 
-### L0027
+### L0031
 
 - SHA-256: `123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e`
 - Provenance class: upstream-package
@@ -2271,7 +2612,40 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e -->
 
-### L0028
+### L0032
+
+- SHA-256: `13f4cc9fbc8d4a447b28aa84019c10ad4abf4b5f6919db061bf6690ccc23bc02`
+- Provenance class: upstream-package
+- Observed source: <code>radium@0.7.0/LICENSE.txt</code>
+
+<!-- legal-text-begin sha256=13f4cc9fbc8d4a447b28aa84019c10ad4abf4b5f6919db061bf6690ccc23bc02 -->
+```text
+MIT License
+
+Copyright (c) 2019 kneecaw (Nika Layzell)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=13f4cc9fbc8d4a447b28aa84019c10ad4abf4b5f6919db061bf6690ccc23bc02 -->
+
+### L0033
 
 - SHA-256: `1466d9b4f3a59bb8997fc8d5fa977ce3f6a24bb2358793c09bfdf007039f6486`
 - Provenance class: upstream-package
@@ -2290,7 +2664,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 <!-- legal-text-end sha256=1466d9b4f3a59bb8997fc8d5fa977ce3f6a24bb2358793c09bfdf007039f6486 -->
 
-### L0029
+### L0034
+
+- SHA-256: `154397a08d0cb342110281129971868cd562542d0780b0d10722788cd11a1399`
+- Provenance class: upstream-git-package
+- Observed source: <code>ark-models-ext@0.6.0 (git+https://github.com/zkVerify/accelerated-bn-cryptography.git?tag=v0.6.0#6249e3a8e5f7d679af483339dfbcb391ac78450a)/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=154397a08d0cb342110281129971868cd562542d0780b0d10722788cd11a1399 -->
+```text
+../LICENSE-APACHE
+```
+<!-- legal-text-end sha256=154397a08d0cb342110281129971868cd562542d0780b0d10722788cd11a1399 -->
+
+### L0035
 
 - SHA-256: `1a2f5c12ddc934d58956aa5dbdd3255fe55fd957633ab7d0d39e4f0daa73f7df`
 - Provenance class: upstream-package
@@ -2328,7 +2714,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=1a2f5c12ddc934d58956aa5dbdd3255fe55fd957633ab7d0d39e4f0daa73f7df -->
 
-### L0030
+### L0036
 
 - SHA-256: `1bc7e6f475b3ec99b7e2643411950ae2368c250dd4c5c325f80f9811362a94a1`
 - Provenance class: upstream-package
@@ -2366,7 +2752,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=1bc7e6f475b3ec99b7e2643411950ae2368c250dd4c5c325f80f9811362a94a1 -->
 
-### L0031
+### L0037
 
 - SHA-256: `1dd8eca0f83669e75fa119e34fb9e1be9d16e3e9b6368962b8019db6e8ae5f7b`
 - Provenance class: upstream-package
@@ -2399,11 +2785,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=1dd8eca0f83669e75fa119e34fb9e1be9d16e3e9b6368962b8019db6e8ae5f7b -->
 
-### L0032
+### L0038
 
 - SHA-256: `1e697ce8d21401fbf1bddd9b5c3fd4c4c79ae1e3bdf51f81761c85e11d5a89cd`
 - Provenance class: upstream-package
-- Observed source: <code>strsim@0.11.1/LICENSE</code>
+- Observed sources: <code>strsim@0.10.0/LICENSE</code>, <code>strsim@0.11.1/LICENSE</code>
 
 <!-- legal-text-begin sha256=1e697ce8d21401fbf1bddd9b5c3fd4c4c79ae1e3bdf51f81761c85e11d5a89cd -->
 ```text
@@ -2434,7 +2820,24 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=1e697ce8d21401fbf1bddd9b5c3fd4c4c79ae1e3bdf51f81761c85e11d5a89cd -->
 
-### L0033
+### L0039
+
+- SHA-256: `1fe2be9825c4477c6e246b0310543c0b98b497a4b53f58d15dd8367d88a69109`
+- Provenance class: upstream-package
+- Observed source: <code>serde_arrays@0.2.0/COPYRIGHT</code>
+
+<!-- legal-text-begin sha256=1fe2be9825c4477c6e246b0310543c0b98b497a4b53f58d15dd8367d88a69109 -->
+```text
+Copyright 2021 Travis Veazey
+
+Licensed under the Apache License, Version 2.0, <LICENSE-APACHE or
+http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
+http://opensource.org/licenses/MIT>, at your option. This file may not be
+copied, modified, or distributed except according to those terms.
+```
+<!-- legal-text-end sha256=1fe2be9825c4477c6e246b0310543c0b98b497a4b53f58d15dd8367d88a69109 -->
+
+### L0040
 
 - SHA-256: `2022c11b24fc1e50fa06a5959e40198a3464f560729ad3d00139abb8a328362d`
 - Provenance class: upstream-package
@@ -2468,11 +2871,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=2022c11b24fc1e50fa06a5959e40198a3464f560729ad3d00139abb8a328362d -->
 
-### L0034
+### L0041
 
 - SHA-256: `209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b`
 - Provenance class: upstream-package
-- Observed sources: <code>getrandom@0.1.16/LICENSE-MIT</code>, <code>rand@0.7.3/LICENSE-MIT</code>, <code>rand@0.8.5/LICENSE-MIT</code>, <code>rand@0.9.2/LICENSE-MIT</code>, <code>rand_chacha@0.2.2/LICENSE-MIT</code>, plus 5 more mapped package file(s)
+- Observed sources: <code>getrandom@0.1.16/LICENSE-MIT</code>, <code>rand@0.10.3/LICENSE-MIT</code>, <code>rand@0.7.3/LICENSE-MIT</code>, <code>rand@0.8.5/LICENSE-MIT</code>, <code>rand@0.9.2/LICENSE-MIT</code>, plus 7 more mapped package file(s)
 
 <!-- legal-text-begin sha256=209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b -->
 ```text
@@ -2506,7 +2909,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b -->
 
-### L0035
+### L0042
 
 - SHA-256: `20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e`
 - Provenance class: upstream-package
@@ -2543,7 +2946,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e -->
 
-### L0036
+### L0043
 
 - SHA-256: `20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95`
 - Provenance class: spdx-fallback
@@ -3056,7 +3459,7 @@ That's all there is to it!
 ```
 <!-- legal-text-end sha256=20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95 -->
 
-### L0037
+### L0044
 
 - SHA-256: `216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06`
 - Provenance class: upstream-package
@@ -3081,7 +3484,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06 -->
 
-### L0038
+### L0045
 
 - SHA-256: `219920e865eee70b7dcfc948a86b099e7f4fe2de01bcca2ca9a20c0a033f2b59`
 - Provenance class: upstream-package
@@ -3100,7 +3503,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 <!-- legal-text-end sha256=219920e865eee70b7dcfc948a86b099e7f4fe2de01bcca2ca9a20c0a033f2b59 -->
 
-### L0039
+### L0046
 
 - SHA-256: `21ab3c8e9af71d0212606c98a210f71d6a86234b179b3babff0ccc4798b90f33`
 - Provenance class: upstream-package
@@ -3137,7 +3540,44 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=21ab3c8e9af71d0212606c98a210f71d6a86234b179b3babff0ccc4798b90f33 -->
 
-### L0040
+### L0047
+
+- SHA-256: `233b95ccbf90dc67e32f3e8995c489f6312d9191ebd141a931c3b684f1e3be6d`
+- Provenance class: upstream-package
+- Observed sources: <code>p256@0.13.2/LICENSE-MIT</code>, <code>primeorder@0.13.6/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=233b95ccbf90dc67e32f3e8995c489f6312d9191ebd141a931c3b684f1e3be6d -->
+```text
+Copyright (c) 2020-2023 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=233b95ccbf90dc67e32f3e8995c489f6312d9191ebd141a931c3b684f1e3be6d -->
+
+### L0048
 
 - SHA-256: `23860c2a7b5d96b21569afedf033469bab9fe14a1b24a35068b8641c578ce24d`
 - Provenance class: upstream-package
@@ -3156,11 +3596,11 @@ according to those terms.
 ```
 <!-- legal-text-end sha256=23860c2a7b5d96b21569afedf033469bab9fe14a1b24a35068b8641c578ce24d -->
 
-### L0041
+### L0049
 
 - SHA-256: `23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3`
 - Provenance class: spdx-fallback, upstream-package
-- Observed sources: <code>MIT standard text from locked wasi@0.9.0+wasi-snapshot-preview1/LICENSE-MIT</code>, <code>adler2@2.0.1/LICENSE-MIT</code>, <code>allocator-api2@0.2.21/LICENSE-MIT</code>, <code>anyhow@1.0.102/LICENSE-MIT</code>, <code>atomic-waker@1.1.2/LICENSE-MIT</code>, plus 44 more mapped package file(s)
+- Observed sources: <code>MIT standard text from locked wasi@0.9.0+wasi-snapshot-preview1/LICENSE-MIT</code>, <code>adler2@2.0.1/LICENSE-MIT</code>, <code>allocator-api2@0.2.21/LICENSE-MIT</code>, <code>anyhow@1.0.102/LICENSE-MIT</code>, <code>async-task@4.7.1/LICENSE-MIT</code>, plus 56 more mapped package file(s)
 
 <!-- legal-text-begin sha256=23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3 -->
 ```text
@@ -3191,11 +3631,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3 -->
 
-### L0042
+### L0050
 
 - SHA-256: `253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552`
 - Provenance class: upstream-package
-- Observed source: <code>tokio@1.50.0/LICENSE</code>
+- Observed sources: <code>tokio-util@0.7.19/LICENSE</code>, <code>tokio@1.50.0/LICENSE</code>
 
 <!-- legal-text-begin sha256=253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552 -->
 ```text
@@ -3224,7 +3664,45 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552 -->
 
-### L0043
+### L0051
+
+- SHA-256: `25f77efa393854f7c15eaf6a2589a2071db2d7337642742763adb12bdecf0445`
+- Provenance class: upstream-package
+- Observed source: <code>aes@0.9.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=25f77efa393854f7c15eaf6a2589a2071db2d7337642742763adb12bdecf0445 -->
+```text
+Copyright (c) 2018-2024 The RustCrypto Project Developers
+Copyright (c) 2018 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=25f77efa393854f7c15eaf6a2589a2071db2d7337642742763adb12bdecf0445 -->
+
+### L0052
 
 - SHA-256: `268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5`
 - Provenance class: spdx-fallback, upstream-package
@@ -3456,11 +3934,11 @@ Software.
 ```
 <!-- legal-text-end sha256=268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5 -->
 
-### L0044
+### L0053
 
 - SHA-256: `275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427`
 - Provenance class: upstream-package
-- Observed sources: <code>futures-channel@0.3.32/LICENSE-APACHE</code>, <code>futures-core@0.3.32/LICENSE-APACHE</code>, <code>futures-io@0.3.32/LICENSE-APACHE</code>, <code>futures-sink@0.3.32/LICENSE-APACHE</code>, <code>futures-task@0.3.32/LICENSE-APACHE</code>, plus 1 more mapped package file(s)
+- Observed sources: <code>futures-channel@0.3.32/LICENSE-APACHE</code>, <code>futures-core@0.3.32/LICENSE-APACHE</code>, <code>futures-executor@0.3.32/LICENSE-APACHE</code>, <code>futures-io@0.3.32/LICENSE-APACHE</code>, <code>futures-macro@0.3.32/LICENSE-APACHE</code>, plus 4 more mapped package file(s)
 
 <!-- legal-text-begin sha256=275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427 -->
 ```text
@@ -3670,7 +4148,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427 -->
 
-### L0045
+### L0054
 
 - SHA-256: `27995d58ad5c1145c1a8cd86244ce844886958a35eb2b78c6b772748669999ac`
 - Provenance class: upstream-package
@@ -3707,7 +4185,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=27995d58ad5c1145c1a8cd86244ce844886958a35eb2b78c6b772748669999ac -->
 
-### L0046
+### L0055
 
 - SHA-256: `28802412d2bfbafe432b305634413b41a984d30fba0df41d30aa2c8a2077c5b1`
 - Provenance class: upstream-package
@@ -3744,7 +4222,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=28802412d2bfbafe432b305634413b41a984d30fba0df41d30aa2c8a2077c5b1 -->
 
-### L0047
+### L0056
 
 - SHA-256: `29e9fe5074bd27e0e5d5d110394fbbcd841baee2651a3c4b4560a632702cede4`
 - Provenance class: upstream-package
@@ -3782,7 +4260,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=29e9fe5074bd27e0e5d5d110394fbbcd841baee2651a3c4b4560a632702cede4 -->
 
-### L0048
+### L0057
 
 - SHA-256: `2d1c57bff28344b9e698f51063bc8509799cc4c99a4e0cf2aa3f7e7c3e1f9a9d`
 - Provenance class: upstream-package
@@ -3820,7 +4298,45 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=2d1c57bff28344b9e698f51063bc8509799cc4c99a4e0cf2aa3f7e7c3e1f9a9d -->
 
-### L0049
+### L0058
+
+- SHA-256: `304b898acad7f02e03d6d8832d682a3b43ee729ab5d3a069af5a36979083b6b4`
+- Provenance class: upstream-package
+- Observed source: <code>inout@0.1.4/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=304b898acad7f02e03d6d8832d682a3b43ee729ab5d3a069af5a36979083b6b4 -->
+```text
+Copyright (c) 2022 The RustCrypto Project Developers
+Copyright (c) 2022 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=304b898acad7f02e03d6d8832d682a3b43ee729ab5d3a069af5a36979083b6b4 -->
+
+### L0059
 
 - SHA-256: `30eb1bef29b46f8ba7ab8b416035dbd93cb034a45481dd97815b944284582cd2`
 - Provenance class: upstream-package
@@ -3858,7 +4374,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=30eb1bef29b46f8ba7ab8b416035dbd93cb034a45481dd97815b944284582cd2 -->
 
-### L0050
+### L0060
 
 - SHA-256: `30fefc3a7d6a0041541858293bcbea2dde4caa4c0a5802f996a7f7e8c0085652`
 - Provenance class: upstream-package
@@ -3892,7 +4408,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=30fefc3a7d6a0041541858293bcbea2dde4caa4c0a5802f996a7f7e8c0085652 -->
 
-### L0051
+### L0061
 
 - SHA-256: `31b94860253d8ec7b4529f51901044d3b459d6292d996504a36b1bae3a36a812`
 - Provenance class: upstream-package
@@ -3913,7 +4429,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 <!-- legal-text-end sha256=31b94860253d8ec7b4529f51901044d3b459d6292d996504a36b1bae3a36a812 -->
 
-### L0052
+### L0062
 
 - SHA-256: `3234ac55816264ee7b6c7ee27efd61cf0a1fe775806870e3d9b4c41ea73c5cb1`
 - Provenance class: upstream-package
@@ -3943,7 +4459,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=3234ac55816264ee7b6c7ee27efd61cf0a1fe775806870e3d9b4c41ea73c5cb1 -->
 
-### L0053
+### L0063
 
 - SHA-256: `3290ae0fbc9ddb77d2239121d710f0bb9d31b3b4744e6d97fe01e652b4c1870b`
 - Provenance class: upstream-package
@@ -3984,7 +4500,7 @@ at your option.
 ```
 <!-- legal-text-end sha256=3290ae0fbc9ddb77d2239121d710f0bb9d31b3b4744e6d97fe01e652b4c1870b -->
 
-### L0054
+### L0064
 
 - SHA-256: `3521672491a3479422d5fe1aca6645dd2984090f85da6e5205abfb18fb7a6897`
 - Provenance class: upstream-package
@@ -4021,11 +4537,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=3521672491a3479422d5fe1aca6645dd2984090f85da6e5205abfb18fb7a6897 -->
 
-### L0055
+### L0065
 
 - SHA-256: `35242e7a83f69875e6edeff02291e688c97caafe2f8902e4e19b49d3e78b4cab`
 - Provenance class: upstream-package
-- Observed sources: <code>rand@0.8.5/LICENSE-APACHE</code>, <code>rand@0.9.2/LICENSE-APACHE</code>, <code>rand_chacha@0.9.0/LICENSE-APACHE</code>
+- Observed sources: <code>rand@0.10.3/LICENSE-APACHE</code>, <code>rand@0.8.5/LICENSE-APACHE</code>, <code>rand@0.9.2/LICENSE-APACHE</code>, <code>rand_chacha@0.10.0/LICENSE-APACHE</code>, <code>rand_chacha@0.9.0/LICENSE-APACHE</code>
 
 <!-- legal-text-begin sha256=35242e7a83f69875e6edeff02291e688c97caafe2f8902e4e19b49d3e78b4cab -->
 ```text
@@ -4209,7 +4725,7 @@ END OF TERMS AND CONDITIONS
 ```
 <!-- legal-text-end sha256=35242e7a83f69875e6edeff02291e688c97caafe2f8902e4e19b49d3e78b4cab -->
 
-### L0056
+### L0066
 
 - SHA-256: `353b508bbc50274d47a23729f568bab2618e3d0eaa10208616f5fd475255b896`
 - Provenance class: upstream-package
@@ -4422,7 +4938,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=353b508bbc50274d47a23729f568bab2618e3d0eaa10208616f5fd475255b896 -->
 
-### L0057
+### L0067
 
 - SHA-256: `3564da09711c475669c15346bb25a1530a7de683c13f4a51489c15a6d74438fa`
 - Provenance class: upstream-package
@@ -4459,7 +4975,221 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=3564da09711c475669c15346bb25a1530a7de683c13f4a51489c15a6d74438fa -->
 
-### L0058
+### L0068
+
+- SHA-256: `3708458dee7f359ac6c9c5558023ed481be87e5372c43ebd7f2ca7ad23c12026`
+- Provenance class: upstream-package
+- Observed source: <code>ff@0.13.1/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=3708458dee7f359ac6c9c5558023ed481be87e5372c43ebd7f2ca7ad23c12026 -->
+```text
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+```
+<!-- legal-text-end sha256=3708458dee7f359ac6c9c5558023ed481be87e5372c43ebd7f2ca7ad23c12026 -->
+
+### L0069
 
 - SHA-256: `377c2e7c53250cc5905c0b0532d35973392af16ffb9596a41d99d202cf3617c9`
 - Provenance class: upstream-package
@@ -4500,11 +5230,11 @@ at your option.
 ```
 <!-- legal-text-end sha256=377c2e7c53250cc5905c0b0532d35973392af16ffb9596a41d99d202cf3617c9 -->
 
-### L0059
+### L0070
 
 - SHA-256: `378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397`
 - Provenance class: upstream-package
-- Observed sources: <code>cc@1.2.56/LICENSE-MIT</code>, <code>cfg-if@1.0.4/LICENSE-MIT</code>, <code>find-msvc-tools@0.1.9/LICENSE-MIT</code>, <code>id-arena@2.3.0/LICENSE-MIT</code>, <code>js-sys@0.3.91/LICENSE-MIT</code>, plus 9 more mapped package file(s)
+- Observed sources: <code>cc@1.2.56/LICENSE-MIT</code>, <code>cfg-if@1.0.4/LICENSE-MIT</code>, <code>find-msvc-tools@0.1.9/LICENSE-MIT</code>, <code>id-arena@2.3.0/LICENSE-MIT</code>, <code>js-sys@0.3.91/LICENSE-MIT</code>, plus 10 more mapped package file(s)
 
 <!-- legal-text-begin sha256=378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397 -->
 ```text
@@ -4537,7 +5267,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397 -->
 
-### L0060
+### L0071
 
 - SHA-256: `391a5396cec6230bfabd4ef4eb2350eb895bc5efce377a2218f5702ed020d3e3`
 - Provenance class: upstream-package
@@ -4569,7 +5299,109 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=391a5396cec6230bfabd4ef4eb2350eb895bc5efce377a2218f5702ed020d3e3 -->
 
-### L0061
+### L0072
+
+- SHA-256: `3b4f73047906835fba5005acdf68f25a460b9ee298dae710f22b435d335a6f7b`
+- Provenance class: upstream-package
+- Observed source: <code>k256@0.13.4/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=3b4f73047906835fba5005acdf68f25a460b9ee298dae710f22b435d335a6f7b -->
+```text
+Copyright (c) 2020-2024 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=3b4f73047906835fba5005acdf68f25a460b9ee298dae710f22b435d335a6f7b -->
+
+### L0073
+
+- SHA-256: `3c0dfa33fd2e6976038555b52095699452653b1fcabe113074f14e0848a6b11e`
+- Provenance class: upstream-package
+- Observed source: <code>aes-gcm@0.9.2/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=3c0dfa33fd2e6976038555b52095699452653b1fcabe113074f14e0848a6b11e -->
+```text
+Copyright (c) 2019 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=3c0dfa33fd2e6976038555b52095699452653b1fcabe113074f14e0848a6b11e -->
+
+### L0074
+
+- SHA-256: `3e3714aa69bd874601741fd7d7ad5298740cece37778e279fc1ab4451c5a11af`
+- Provenance class: upstream-package
+- Observed source: <code>psm@0.1.24/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=3e3714aa69bd874601741fd7d7ad5298740cece37778e279fc1ab4451c5a11af -->
+```text
+Copyright © 2018, Simonas Kazlauskas
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=3e3714aa69bd874601741fd7d7ad5298740cece37778e279fc1ab4451c5a11af -->
+
+### L0075
 
 - SHA-256: `3eab77734a181b2a2e8418af9004f960f715f04aac4d76a26cf774f63a7b13d1`
 - Provenance class: upstream-package
@@ -4602,7 +5434,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=3eab77734a181b2a2e8418af9004f960f715f04aac4d76a26cf774f63a7b13d1 -->
 
-### L0062
+### L0076
 
 - SHA-256: `3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c`
 - Provenance class: upstream-package
@@ -4639,7 +5471,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c -->
 
-### L0063
+### L0077
 
 - SHA-256: `3fea97e00df9a8e30027f4298d6941b6970c542ffd49de68b4a2bcafedcbfe02`
 - Provenance class: upstream-package
@@ -4672,7 +5504,48 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=3fea97e00df9a8e30027f4298d6941b6970c542ffd49de68b4a2bcafedcbfe02 -->
 
-### L0064
+### L0078
+
+- SHA-256: `403c53069750101aeb9df7e15f127056ceaf7e4e92d0b919a1f4c084afd5f1d4`
+- Provenance class: upstream-package
+- Observed source: <code>curve25519-dalek@5.0.0/LICENSE</code>
+
+<!-- legal-text-begin sha256=403c53069750101aeb9df7e15f127056ceaf7e4e92d0b919a1f4c084afd5f1d4 -->
+```text
+Copyright (c) 2016-2021 isis agora lovecruft. All rights reserved.
+Copyright (c) 2016-2021 Henry de Valence. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+```
+<!-- legal-text-end sha256=403c53069750101aeb9df7e15f127056ceaf7e4e92d0b919a1f4c084afd5f1d4 -->
+
+### L0079
 
 - SHA-256: `4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b`
 - Provenance class: upstream-package
@@ -4709,7 +5582,40 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b -->
 
-### L0065
+### L0080
+
+- SHA-256: `411781fd38700f2357a14126d0ab048164ab881f1dcb335c1bb932e232c9a2f5`
+- Provenance class: upstream-package
+- Observed sources: <code>bitvec@1.1.1/LICENSE.txt</code>, <code>wyz@0.5.1/LICENSE.txt</code>
+
+<!-- legal-text-begin sha256=411781fd38700f2357a14126d0ab048164ab881f1dcb335c1bb932e232c9a2f5 -->
+```text
+MIT License
+
+Copyright (c) 2018 myrrlyn (Alexander Payne)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=411781fd38700f2357a14126d0ab048164ab881f1dcb335c1bb932e232c9a2f5 -->
+
+### L0081
 
 - SHA-256: `41ace205715d9f19a3214218cc1c01d57c533e02cd0fef7c8e51a49a7fce5ac5`
 - Provenance class: upstream-package
@@ -4741,7 +5647,7 @@ freely, subject to the following restrictions:
 ```
 <!-- legal-text-end sha256=41ace205715d9f19a3214218cc1c01d57c533e02cd0fef7c8e51a49a7fce5ac5 -->
 
-### L0066
+### L0082
 
 - SHA-256: `4249c8e6c5ebb85f97c77e6457c6fafc1066406eb8f1ef61e796fbdc5ff18482`
 - Provenance class: upstream-package
@@ -4778,7 +5684,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=4249c8e6c5ebb85f97c77e6457c6fafc1066406eb8f1ef61e796fbdc5ff18482 -->
 
-### L0067
+### L0083
 
 - SHA-256: `42a35170233e83e18856792e748de4c1ce4a63b2afce9a370c89ef3fe23f9f2d`
 - Provenance class: upstream-package
@@ -4811,7 +5717,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=42a35170233e83e18856792e748de4c1ce4a63b2afce9a370c89ef3fe23f9f2d -->
 
-### L0068
+### L0084
 
 - SHA-256: `42d3bf7e7d4d49d72c0555d14ed99c3ee7ce9ce3cbffbc38bbafe8c103f50969`
 - Provenance class: upstream-package
@@ -4843,7 +5749,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=42d3bf7e7d4d49d72c0555d14ed99c3ee7ce9ce3cbffbc38bbafe8c103f50969 -->
 
-### L0069
+### L0085
 
 - SHA-256: `42f47aca13ea949271e5fc396966e95509a3380d51dcada709aa605b901f23d2`
 - Provenance class: upstream-package
@@ -4876,7 +5782,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=42f47aca13ea949271e5fc396966e95509a3380d51dcada709aa605b901f23d2 -->
 
-### L0070
+### L0086
 
 - SHA-256: `42fa16951ce7f24b5a467a40e5b449a1d41e662f97ca779864f053f39e097737`
 - Provenance class: upstream-package
@@ -4914,7 +5820,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=42fa16951ce7f24b5a467a40e5b449a1d41e662f97ca779864f053f39e097737 -->
 
-### L0071
+### L0087
 
 - SHA-256: `4455bf75a91154108304cb283e0fea9948c14f13e20d60887cf2552449dea3b1`
 - Provenance class: upstream-package
@@ -4947,7 +5853,7 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=4455bf75a91154108304cb283e0fea9948c14f13e20d60887cf2552449dea3b1 -->
 
-### L0072
+### L0088
 
 - SHA-256: `45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42`
 - Provenance class: upstream-package
@@ -4984,7 +5890,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42 -->
 
-### L0073
+### L0089
 
 - SHA-256: `45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742`
 - Provenance class: upstream-package
@@ -5197,7 +6103,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742 -->
 
-### L0074
+### L0090
 
 - SHA-256: `47d4e1803702728e03d30f8a848ae2249ba274bbd9f8443e803f7924d83cd371`
 - Provenance class: upstream-package
@@ -5229,7 +6135,7 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=47d4e1803702728e03d30f8a848ae2249ba274bbd9f8443e803f7924d83cd371 -->
 
-### L0075
+### L0091
 
 - SHA-256: `47dc9ff29128ddfb4d6a0435383c9f89120bc374dbcc1dd00b933a0b28aa7865`
 - Provenance class: upstream-package
@@ -5248,7 +6154,44 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 <!-- legal-text-end sha256=47dc9ff29128ddfb4d6a0435383c9f89120bc374dbcc1dd00b933a0b28aa7865 -->
 
-### L0076
+### L0092
+
+- SHA-256: `4a883ecc3bb1010faed542bf63d53e530fea5e5e12cf676aed588784298ba929`
+- Provenance class: upstream-package
+- Observed source: <code>sec1@0.7.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=4a883ecc3bb1010faed542bf63d53e530fea5e5e12cf676aed588784298ba929 -->
+```text
+Copyright (c) 2021-2022 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=4a883ecc3bb1010faed542bf63d53e530fea5e5e12cf676aed588784298ba929 -->
+
+### L0093
 
 - SHA-256: `4b2d0aca6789fa39e03d6738e869ea0988cceba210ca34ebb59c15c463e93a04`
 - Provenance class: upstream-package
@@ -5267,7 +6210,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 <!-- legal-text-end sha256=4b2d0aca6789fa39e03d6738e869ea0988cceba210ca34ebb59c15c463e93a04 -->
 
-### L0077
+### L0094
 
 - SHA-256: `4cada0bd02ea3692eee6f16400d86c6508bbd3bafb2b65fed0419f36d4f83e8f`
 - Provenance class: upstream-package
@@ -5304,7 +6247,220 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=4cada0bd02ea3692eee6f16400d86c6508bbd3bafb2b65fed0419f36d4f83e8f -->
 
-### L0078
+### L0095
+
+- SHA-256: `4d10fe5f3aa176b05b229a248866bad70b834c173f1252a814ff4748d8a13837`
+- Provenance class: upstream-package
+- Observed source: <code>httpdate@1.0.3/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=4d10fe5f3aa176b05b229a248866bad70b834c173f1252a814ff4748d8a13837 -->
+```text
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+"License" shall mean the terms and conditions for use, reproduction,
+and distribution as defined by Sections 1 through 9 of this document.
+
+"Licensor" shall mean the copyright owner or entity authorized by
+the copyright owner that is granting the License.
+
+"Legal Entity" shall mean the union of the acting entity and all
+other entities that control, are controlled by, or are under common
+control with that entity. For the purposes of this definition,
+"control" means (i) the power, direct or indirect, to cause the
+direction or management of such entity, whether by contract or
+otherwise, or (ii) ownership of fifty percent (50%) or more of the
+outstanding shares, or (iii) beneficial ownership of such entity.
+
+"You" (or "Your") shall mean an individual or Legal Entity
+exercising permissions granted by this License.
+
+"Source" form shall mean the preferred form for making modifications,
+including but not limited to software source code, documentation
+source, and configuration files.
+
+"Object" form shall mean any form resulting from mechanical
+transformation or translation of a Source form, including but
+not limited to compiled object code, generated documentation,
+and conversions to other media types.
+
+"Work" shall mean the work of authorship, whether in Source or
+Object form, made available under the License, as indicated by a
+copyright notice that is included in or attached to the work
+(an example is provided in the Appendix below).
+
+"Derivative Works" shall mean any work, whether in Source or Object
+form, that is based on (or derived from) the Work and for which the
+editorial revisions, annotations, elaborations, or other modifications
+represent, as a whole, an original work of authorship. For the purposes
+of this License, Derivative Works shall not include works that remain
+separable from, or merely link (or bind by name) to the interfaces of,
+the Work and Derivative Works thereof.
+
+"Contribution" shall mean any work of authorship, including
+the original version of the Work and any modifications or additions
+to that Work or Derivative Works thereof, that is intentionally
+submitted to Licensor for inclusion in the Work by the copyright owner
+or by an individual or Legal Entity authorized to submit on behalf of
+the copyright owner. For the purposes of this definition, "submitted"
+means any form of electronic, verbal, or written communication sent
+to the Licensor or its representatives, including but not limited to
+communication on electronic mailing lists, source code control systems,
+and issue tracking systems that are managed by, or on behalf of, the
+Licensor for the purpose of discussing and improving the Work, but
+excluding communication that is conspicuously marked or otherwise
+designated in writing by the copyright owner as "Not a Contribution."
+
+"Contributor" shall mean Licensor and any individual or Legal Entity
+on behalf of whom a Contribution has been received by Licensor and
+subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+copyright license to reproduce, prepare Derivative Works of,
+publicly display, publicly perform, sublicense, and distribute the
+Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+(except as stated in this section) patent license to make, have made,
+use, offer to sell, sell, import, and otherwise transfer the Work,
+where such license applies only to those patent claims licensable
+by such Contributor that are necessarily infringed by their
+Contribution(s) alone or by combination of their Contribution(s)
+with the Work to which such Contribution(s) was submitted. If You
+institute patent litigation against any entity (including a
+cross-claim or counterclaim in a lawsuit) alleging that the Work
+or a Contribution incorporated within the Work constitutes direct
+or contributory patent infringement, then any patent licenses
+granted to You under this License for that Work shall terminate
+as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+Work or Derivative Works thereof in any medium, with or without
+modifications, and in Source or Object form, provided that You
+meet the following conditions:
+
+(a) You must give any other recipients of the Work or
+Derivative Works a copy of this License; and
+
+(b) You must cause any modified files to carry prominent notices
+stating that You changed the files; and
+
+(c) You must retain, in the Source form of any Derivative Works
+that You distribute, all copyright, patent, trademark, and
+attribution notices from the Source form of the Work,
+excluding those notices that do not pertain to any part of
+the Derivative Works; and
+
+(d) If the Work includes a "NOTICE" text file as part of its
+distribution, then any Derivative Works that You distribute must
+include a readable copy of the attribution notices contained
+within such NOTICE file, excluding those notices that do not
+pertain to any part of the Derivative Works, in at least one
+of the following places: within a NOTICE text file distributed
+as part of the Derivative Works; within the Source form or
+documentation, if provided along with the Derivative Works; or,
+within a display generated by the Derivative Works, if and
+wherever such third-party notices normally appear. The contents
+of the NOTICE file are for informational purposes only and
+do not modify the License. You may add Your own attribution
+notices within Derivative Works that You distribute, alongside
+or as an addendum to the NOTICE text from the Work, provided
+that such additional attribution notices cannot be construed
+as modifying the License.
+
+You may add Your own copyright statement to Your modifications and
+may provide additional or different license terms and conditions
+for use, reproduction, or distribution of Your modifications, or
+for any such Derivative Works as a whole, provided Your use,
+reproduction, and distribution of the Work otherwise complies with
+the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+any Contribution intentionally submitted for inclusion in the Work
+by You to the Licensor shall be under the terms and conditions of
+this License, without any additional terms or conditions.
+Notwithstanding the above, nothing herein shall supersede or modify
+the terms of any separate license agreement you may have executed
+with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+names, trademarks, service marks, or product names of the Licensor,
+except as required for reasonable and customary use in describing the
+origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+agreed to in writing, Licensor provides the Work (and each
+Contributor provides its Contributions) on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied, including, without limitation, any warranties or conditions
+of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+PARTICULAR PURPOSE. You are solely responsible for determining the
+appropriateness of using or redistributing the Work and assume any
+risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+whether in tort (including negligence), contract, or otherwise,
+unless required by applicable law (such as deliberate and grossly
+negligent acts) or agreed to in writing, shall any Contributor be
+liable to You for damages, including any direct, indirect, special,
+incidental, or consequential damages of any character arising as a
+result of this License or out of the use or inability to use the
+Work (including but not limited to damages for loss of goodwill,
+work stoppage, computer failure or malfunction, or any and all
+other commercial damages or losses), even if such Contributor
+has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+the Work or Derivative Works thereof, You may choose to offer,
+and charge a fee for, acceptance of support, warranty, indemnity,
+or other liability obligations and/or rights consistent with this
+License. However, in accepting such obligations, You may act only
+on Your own behalf and on Your sole responsibility, not on behalf
+of any other Contributor, and only if You agree to indemnify,
+defend, and hold each Contributor harmless for any liability
+incurred by, or claims asserted against, such Contributor by reason
+of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+To apply the Apache License to your work, attach the following
+boilerplate notice, with the fields enclosed by brackets "[]"
+replaced with your own identifying information. (Don't include
+the brackets!)  The text should be enclosed in the appropriate
+comment syntax for the file format. We also recommend that a
+file or class name and description of purpose be included on the
+same "printed page" as the copyright notice for easier
+identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
+<!-- legal-text-end sha256=4d10fe5f3aa176b05b229a248866bad70b834c173f1252a814ff4748d8a13837 -->
+
+### L0096
 
 - SHA-256: `4da95ec4ecb65b738d470b7d762894ad9c97da93e6cbfb18b570fc2c96f4b871`
 - Provenance class: upstream-package
@@ -5341,7 +6497,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=4da95ec4ecb65b738d470b7d762894ad9c97da93e6cbfb18b570fc2c96f4b871 -->
 
-### L0079
+### L0097
 
 - SHA-256: `4f44572785f35152c1fd2eadf565b7e079c0f300b4324f0af653419f9d76b735`
 - Provenance class: upstream-package
@@ -5555,7 +6711,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=4f44572785f35152c1fd2eadf565b7e079c0f300b4324f0af653419f9d76b735 -->
 
-### L0080
+### L0098
 
 - SHA-256: `503558bfefe66ca15e4e3f7955b3cb0ec87fd52f29bf24b336af7bd00e946d5c`
 - Provenance class: upstream-package
@@ -5592,7 +6748,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=503558bfefe66ca15e4e3f7955b3cb0ec87fd52f29bf24b336af7bd00e946d5c -->
 
-### L0081
+### L0099
 
 - SHA-256: `5049cf464977eff4b4fcfa7988d84e74116956a3eb9d5f1d451b3f828f945233`
 - Provenance class: upstream-package
@@ -5629,7 +6785,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=5049cf464977eff4b4fcfa7988d84e74116956a3eb9d5f1d451b3f828f945233 -->
 
-### L0082
+### L0100
 
 - SHA-256: `508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1`
 - Provenance class: upstream-package
@@ -5660,11 +6816,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1 -->
 
-### L0083
+### L0101
 
 - SHA-256: `516b24e051bf5630880ebbd55c40a25ce9552ebaf8970a53e8976eb70e522406`
 - Provenance class: upstream-package
-- Observed source: <code>typenum@1.19.0/LICENSE-APACHE</code>
+- Observed source: <code>typenum@1.20.1/LICENSE-APACHE</code>
 
 <!-- legal-text-begin sha256=516b24e051bf5630880ebbd55c40a25ce9552ebaf8970a53e8976eb70e522406 -->
 ```text
@@ -5872,7 +7028,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=516b24e051bf5630880ebbd55c40a25ce9552ebaf8970a53e8976eb70e522406 -->
 
-### L0084
+### L0102
 
 - SHA-256: `523a42c25d245dde9c015f882cec7f4555aad883382a6cf19b4b7d9b2cd5419b`
 - Provenance class: upstream-package
@@ -5910,11 +7066,257 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=523a42c25d245dde9c015f882cec7f4555aad883382a6cf19b4b7d9b2cd5419b -->
 
-### L0085
+### L0103
+
+- SHA-256: `53231f493e357180e66a7f5c5c6e5027726976bc5dbb75abcff37b4710fe0133`
+- Provenance class: upstream-package
+- Observed sources: <code>snafu-derive@0.8.9/LICENSE-APACHE</code>, <code>snafu@0.8.9/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=53231f493e357180e66a7f5c5c6e5027726976bc5dbb75abcff37b4710fe0133 -->
+```text
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright 2019- Jake Goulding
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
+<!-- legal-text-end sha256=53231f493e357180e66a7f5c5c6e5027726976bc5dbb75abcff37b4710fe0133 -->
+
+### L0104
+
+- SHA-256: `533249742aa1330fb628d426cedb4abca2af35f0026e20f3d2b1d5019a748746`
+- Provenance class: upstream-git-package
+- Observed source: <code>rs_merkle@1.4.2 (git+https://github.com/tlsnotary/rs-merkle.git?rev=85f3e82#85f3e827451e18c21f110068b4322fb99d2f0a8c)/LICENSE.md</code>
+
+<!-- legal-text-begin sha256=533249742aa1330fb628d426cedb4abca2af35f0026e20f3d2b1d5019a748746 -->
+```text
+MIT License
+
+Copyright (c) 2021 Anton Suprunchuk
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=533249742aa1330fb628d426cedb4abca2af35f0026e20f3d2b1d5019a748746 -->
+
+### L0105
 
 - SHA-256: `54a744942eb3fa63a74d8d359989ed6962c04f3f10ff20cfa08ff8aa7efbe4e6`
 - Provenance class: upstream-package
-- Observed source: <code>web-time@1.1.0/LICENSE-APACHE</code>
+- Observed sources: <code>web-time@0.2.4/LICENSE-APACHE</code>, <code>web-time@1.1.0/LICENSE-APACHE</code>
 
 <!-- legal-text-begin sha256=54a744942eb3fa63a74d8d359989ed6962c04f3f10ff20cfa08ff8aa7efbe4e6 -->
 ```text
@@ -6123,7 +7525,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=54a744942eb3fa63a74d8d359989ed6962c04f3f10ff20cfa08ff8aa7efbe4e6 -->
 
-### L0086
+### L0106
 
 - SHA-256: `553fffcd9b1cb158bc3e9edc35da85ca5c3b3d7d2e61c883ebcfa8a65814b583`
 - Provenance class: upstream-package
@@ -6148,7 +7550,111 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=553fffcd9b1cb158bc3e9edc35da85ca5c3b3d7d2e61c883ebcfa8a65814b583 -->
 
-### L0087
+### L0107
+
+- SHA-256: `5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab`
+- Provenance class: upstream-package
+- Observed sources: <code>crossbeam-channel@0.5.17/LICENSE-MIT</code>, <code>crossbeam-deque@0.8.8/LICENSE-MIT</code>, <code>crossbeam-epoch@0.9.21/LICENSE-MIT</code>, <code>crossbeam-utils@0.8.23/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab -->
+```text
+The MIT License (MIT)
+
+Copyright (c) 2019 The Crossbeam Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab -->
+
+### L0108
+
+- SHA-256: `573e362dc50a6d9eb444cea38ef61587e16a0645cb8098ba13a2c42fdde72acd`
+- Provenance class: upstream-package
+- Observed sources: <code>konst@0.2.20/LICENSE-ZLIB.md</code>, <code>konst_macro_rules@0.2.19/LICENSE-ZLIB.md</code>
+
+<!-- legal-text-begin sha256=573e362dc50a6d9eb444cea38ef61587e16a0645cb8098ba13a2c42fdde72acd -->
+```text
+Copyright (c) 2021 Matias Rodriguez.
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+```
+<!-- legal-text-end sha256=573e362dc50a6d9eb444cea38ef61587e16a0645cb8098ba13a2c42fdde72acd -->
+
+### L0109
+
+- SHA-256: `57a4d75c1d095bb94754a478f3cd15e60ac66a5c5627d844be01a918eea5fe88`
+- Provenance class: upstream-package
+- Observed sources: <code>crypto-bigint@0.7.5/LICENSE-MIT</code>, <code>spki@0.8.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=57a4d75c1d095bb94754a478f3cd15e60ac66a5c5627d844be01a918eea5fe88 -->
+```text
+Copyright (c) 2021-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=57a4d75c1d095bb94754a478f3cd15e60ac66a5c5627d844be01a918eea5fe88 -->
+
+### L0110
 
 - SHA-256: `58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79`
 - Provenance class: upstream-package
@@ -6181,7 +7687,219 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79 -->
 
-### L0088
+### L0111
+
+- SHA-256: `59013a5c8d3a19c26a457579105915a5d51bb0c09d579f8cdedf12e4203c3018`
+- Provenance class: upstream-package
+- Observed source: <code>hkdf@0.12.4/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=59013a5c8d3a19c26a457579105915a5d51bb0c09d579f8cdedf12e4203c3018 -->
+```text
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+<!-- legal-text-end sha256=59013a5c8d3a19c26a457579105915a5d51bb0c09d579f8cdedf12e4203c3018 -->
+
+### L0112
 
 - SHA-256: `5b698ca13897be3afdb7174256fa1574f8c6892b8bea1a66dd6469d3fe27885a`
 - Provenance class: upstream-package
@@ -6212,7 +7930,44 @@ third-party/chromium/LICENSE.
 ```
 <!-- legal-text-end sha256=5b698ca13897be3afdb7174256fa1574f8c6892b8bea1a66dd6469d3fe27885a -->
 
-### L0089
+### L0113
+
+- SHA-256: `5c7bd92d1f096f12203dc1b601e3cb17484fa1b023e30b6b8edcc80e416237ec`
+- Provenance class: upstream-package
+- Observed sources: <code>cipher@0.3.0/LICENSE-MIT</code>, <code>cipher@0.4.4/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=5c7bd92d1f096f12203dc1b601e3cb17484fa1b023e30b6b8edcc80e416237ec -->
+```text
+Copyright (c) 2016-2020 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=5c7bd92d1f096f12203dc1b601e3cb17484fa1b023e30b6b8edcc80e416237ec -->
+
+### L0114
 
 - SHA-256: `5e05b024f653a5ce199e77cbbbd42fb5553562ec714b819421ed0c3e552a75d7`
 - Provenance class: upstream-package
@@ -6248,7 +8003,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=5e05b024f653a5ce199e77cbbbd42fb5553562ec714b819421ed0c3e552a75d7 -->
 
-### L0090
+### L0115
 
 - SHA-256: `5e8bb0726d139ddfaa7dec0b9c65183825ba02b77b1a2016af9ce9839db8511d`
 - Provenance class: upstream-package
@@ -6273,7 +8028,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=5e8bb0726d139ddfaa7dec0b9c65183825ba02b77b1a2016af9ce9839db8511d -->
 
-### L0091
+### L0116
 
 - SHA-256: `61d383b05b87d78f94d2937e2580cce47226d17823c0430fbcad09596537efcf`
 - Provenance class: upstream-package
@@ -6306,7 +8061,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=61d383b05b87d78f94d2937e2580cce47226d17823c0430fbcad09596537efcf -->
 
-### L0092
+### L0117
 
 - SHA-256: `62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3`
 - Provenance class: upstream-package
@@ -6343,7 +8098,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3 -->
 
-### L0093
+### L0118
 
 - SHA-256: `6226d0632e2e1a80c23597e964da9812ae193c535fe058154afb034e94167aa5`
 - Provenance class: upstream-package
@@ -6400,11 +8155,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=6226d0632e2e1a80c23597e964da9812ae193c535fe058154afb034e94167aa5 -->
 
-### L0094
+### L0119
 
 - SHA-256: `62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a`
-- Provenance class: upstream-package
-- Observed sources: <code>allocator-api2@0.2.21/LICENSE-APACHE</code>, <code>anyhow@1.0.102/LICENSE-APACHE</code>, <code>constant_time_eq@0.4.2/LICENSE-APACHE</code>, <code>indoc@2.0.7/LICENSE-APACHE</code>, <code>itoa@1.0.17/LICENSE-APACHE</code>, plus 24 more mapped package file(s)
+- Provenance class: upstream-git-repository, upstream-package
+- Observed sources: <code>allocator-api2@0.2.21/LICENSE-APACHE</code>, <code>anyhow@1.0.102/LICENSE-APACHE</code>, <code>async-trait@0.1.92/LICENSE-APACHE</code>, <code>constant_time_eq@0.4.2/LICENSE-APACHE</code>, <code>futures-plex@0.1.0 (git+https://github.com/tlsnotary/tlsn-utils?rev=e2f31e6a30bc5d1641ed6407fb1a38a595e523ce#e2f31e6a30bc5d1641ed6407fb1a38a595e523ce) repository root/LICENSE-APACHE</code>, plus 32 more mapped package file(s)
 
 <!-- legal-text-begin sha256=62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a -->
 ```text
@@ -6588,11 +8343,86 @@ END OF TERMS AND CONDITIONS
 ```
 <!-- legal-text-end sha256=62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a -->
 
-### L0095
+### L0120
+
+- SHA-256: `62e090ea82fd7f7fecce434b6ae2eb51680cc6288fb0f2620d0fab4b13cea236`
+- Provenance class: upstream-package
+- Observed source: <code>serde_arrays@0.2.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=62e090ea82fd7f7fecce434b6ae2eb51680cc6288fb0f2620d0fab4b13cea236 -->
+```text
+Copyright (c) 2016 The Amethyst Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=62e090ea82fd7f7fecce434b6ae2eb51680cc6288fb0f2620d0fab4b13cea236 -->
+
+### L0121
+
+- SHA-256: `63af4bea227c94d021e99427f6ca3a4b8efddadcca93ab6130f708cf6138cf68`
+- Provenance class: upstream-package
+- Observed sources: <code>ctr@0.10.1/LICENSE-MIT</code>, <code>ctr@0.9.2/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=63af4bea227c94d021e99427f6ca3a4b8efddadcca93ab6130f708cf6138cf68 -->
+```text
+Copyright (c) 2018-2022 RustCrypto Developers
+Copyright (c) 2018 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=63af4bea227c94d021e99427f6ca3a4b8efddadcca93ab6130f708cf6138cf68 -->
+
+### L0122
 
 - SHA-256: `6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb`
 - Provenance class: upstream-package
-- Observed sources: <code>bitflags@2.11.0/LICENSE-MIT</code>, <code>log@0.4.29/LICENSE-MIT</code>, <code>num-bigint@0.4.8/LICENSE-MIT</code>, <code>num-derive@0.4.2/LICENSE-MIT</code>, <code>num-integer@0.1.46/LICENSE-MIT</code>, plus 1 more mapped package file(s)
+- Observed sources: <code>bitflags@2.11.0/LICENSE-MIT</code>, <code>log@0.4.29/LICENSE-MIT</code>, <code>num-bigint@0.4.8/LICENSE-MIT</code>, <code>num-derive@0.4.2/LICENSE-MIT</code>, <code>num-integer@0.1.46/LICENSE-MIT</code>, plus 4 more mapped package file(s)
 
 <!-- legal-text-begin sha256=6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb -->
 ```text
@@ -6625,7 +8455,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb -->
 
-### L0096
+### L0123
 
 - SHA-256: `65f94e99ddaf4f5d1782a6dae23f35d4293a9a01444a13135a6887017d353cee`
 - Provenance class: upstream-package
@@ -6662,7 +8492,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=65f94e99ddaf4f5d1782a6dae23f35d4293a9a01444a13135a6887017d353cee -->
 
-### L0097
+### L0124
 
 - SHA-256: `65fdb6c76cd61612070c066eec9ecdb30ee74fb27859d0d9af58b9f499fd0c3e`
 - Provenance class: upstream-package
@@ -6699,11 +8529,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=65fdb6c76cd61612070c066eec9ecdb30ee74fb27859d0d9af58b9f499fd0c3e -->
 
-### L0098
+### L0125
 
 - SHA-256: `6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd`
 - Provenance class: upstream-package
-- Observed sources: <code>futures-channel@0.3.32/LICENSE-MIT</code>, <code>futures-core@0.3.32/LICENSE-MIT</code>, <code>futures-io@0.3.32/LICENSE-MIT</code>, <code>futures-sink@0.3.32/LICENSE-MIT</code>, <code>futures-task@0.3.32/LICENSE-MIT</code>, plus 1 more mapped package file(s)
+- Observed sources: <code>futures-channel@0.3.32/LICENSE-MIT</code>, <code>futures-core@0.3.32/LICENSE-MIT</code>, <code>futures-executor@0.3.32/LICENSE-MIT</code>, <code>futures-io@0.3.32/LICENSE-MIT</code>, <code>futures-macro@0.3.32/LICENSE-MIT</code>, plus 4 more mapped package file(s)
 
 <!-- legal-text-begin sha256=6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd -->
 ```text
@@ -6737,7 +8567,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd -->
 
-### L0099
+### L0126
 
 - SHA-256: `696759d65dfe558ff7d9f031c76db19ec5c0767470fb67c4e8d990820d1e99c9`
 - Provenance class: upstream-package
@@ -6950,7 +8780,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=696759d65dfe558ff7d9f031c76db19ec5c0767470fb67c4e8d990820d1e99c9 -->
 
-### L0100
+### L0127
 
 - SHA-256: `6b151ad42eec6e544d863c9e7631b1449e8c62c1a2045d0333d932e1940ef7dc`
 - Provenance class: upstream-package
@@ -6983,11 +8813,48 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=6b151ad42eec6e544d863c9e7631b1449e8c62c1a2045d0333d932e1940ef7dc -->
 
-### L0101
+### L0128
+
+- SHA-256: `6b50510a0400c72172355cc5d2ba0f2c5c2eb33149b8f96539dc345fdc484920`
+- Provenance class: upstream-package
+- Observed sources: <code>universal-hash@0.4.0/LICENSE-MIT</code>, <code>universal-hash@0.5.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=6b50510a0400c72172355cc5d2ba0f2c5c2eb33149b8f96539dc345fdc484920 -->
+```text
+Copyright (c) 2019-2020 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=6b50510a0400c72172355cc5d2ba0f2c5c2eb33149b8f96539dc345fdc484920 -->
+
+### L0129
 
 - SHA-256: `6c935d087a2992d0f092665400a2fa99c98db58d96fbe29368f8f48182bed9aa`
 - Provenance class: upstream-package
-- Observed source: <code>fiat-crypto@0.2.9/COPYRIGHT</code>
+- Observed sources: <code>fiat-crypto@0.2.9/COPYRIGHT</code>, <code>fiat-crypto@0.3.0/COPYRIGHT</code>
 
 <!-- legal-text-begin sha256=6c935d087a2992d0f092665400a2fa99c98db58d96fbe29368f8f48182bed9aa -->
 ```text
@@ -7002,7 +8869,7 @@ the BSD 1-Clause License <LICENSE-BSD-1> or
 ```
 <!-- legal-text-end sha256=6c935d087a2992d0f092665400a2fa99c98db58d96fbe29368f8f48182bed9aa -->
 
-### L0102
+### L0130
 
 - SHA-256: `6cfda12c40ae6c1175a0d1798c56e4d7089d9c781a2dbe29a53076defde829d0`
 - Provenance class: upstream-package
@@ -7036,11 +8903,49 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=6cfda12c40ae6c1175a0d1798c56e4d7089d9c781a2dbe29a53076defde829d0 -->
 
-### L0103
+### L0131
+
+- SHA-256: `6da8d67e2ff438db4f09aa1fa945efd0348b81403e8ce93121e2d55b23c12b52`
+- Provenance class: upstream-package
+- Observed sources: <code>rand06-compat@0.2.0/LICENSE-MIT</code>, <code>rangeset@0.4.1/LICENSE-MIT</code>, <code>serio@0.2.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=6da8d67e2ff438db4f09aa1fa945efd0348b81403e8ce93121e2d55b23c12b52 -->
+```text
+Copyright (c) 2016 Alex Crichton
+Copyright (c) 2017 The Tokio Authors
+Copyright (c) 2024 The TLSNotary authors
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+<!-- legal-text-end sha256=6da8d67e2ff438db4f09aa1fa945efd0348b81403e8ce93121e2d55b23c12b52 -->
+
+### L0132
 
 - SHA-256: `6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51`
 - Provenance class: upstream-package
-- Observed sources: <code>rand_core@0.6.4/LICENSE-APACHE</code>, <code>rand_core@0.9.5/LICENSE-APACHE</code>
+- Observed sources: <code>rand_core@0.10.1/LICENSE-APACHE</code>, <code>rand_core@0.6.4/LICENSE-APACHE</code>, <code>rand_core@0.9.5/LICENSE-APACHE</code>
 
 <!-- legal-text-begin sha256=6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51 -->
 ```text
@@ -7235,7 +9140,7 @@ APPENDIX: How to apply the Apache License to your work.
 ```
 <!-- legal-text-end sha256=6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51 -->
 
-### L0104
+### L0133
 
 - SHA-256: `6ee2ed6c77710de911761acd5fc1ad1da00f476beb1a7ef27e78c2d1858deafc`
 - Provenance class: upstream-package
@@ -7270,7 +9175,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=6ee2ed6c77710de911761acd5fc1ad1da00f476beb1a7ef27e78c2d1858deafc -->
 
-### L0105
+### L0134
 
 - SHA-256: `6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6`
 - Provenance class: upstream-package
@@ -7301,11 +9206,48 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6 -->
 
-### L0106
+### L0135
+
+- SHA-256: `7003375a1162b7510d6f053c4a505a0771bbc38d674c4d0687ff6063c000b175`
+- Provenance class: upstream-package
+- Observed sources: <code>snafu-derive@0.8.9/LICENSE-MIT</code>, <code>snafu@0.8.9/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=7003375a1162b7510d6f053c4a505a0771bbc38d674c4d0687ff6063c000b175 -->
+```text
+Copyright (c) 2019- Jake Goulding
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=7003375a1162b7510d6f053c4a505a0771bbc38d674c4d0687ff6063c000b175 -->
+
+### L0136
 
 - SHA-256: `709e3175b4212f7b13aa93971c9f62ff8c69ec45ad8c6532a7e0c41d7a7d6f8c`
 - Provenance class: upstream-package
-- Observed sources: <code>hyper-rustls@0.27.7/LICENSE-MIT</code>, <code>rustls@0.23.37/LICENSE-MIT</code>
+- Observed sources: <code>hyper-rustls@0.27.7/LICENSE-MIT</code>, <code>rustls-pemfile@1.0.4/LICENSE-MIT</code>, <code>rustls@0.23.37/LICENSE-MIT</code>, <code>sct@0.7.1/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=709e3175b4212f7b13aa93971c9f62ff8c69ec45ad8c6532a7e0c41d7a7d6f8c -->
 ```text
@@ -7338,7 +9280,56 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=709e3175b4212f7b13aa93971c9f62ff8c69ec45ad8c6532a7e0c41d7a7d6f8c -->
 
-### L0107
+### L0137
+
+- SHA-256: `70c9d40f1f9545c3f133b8a67206e89da850f6468eed072281bb3701514114a9`
+- Provenance class: upstream-package
+- Observed sources: <code>cmov@0.5.4/LICENSE-MIT</code>, <code>hybrid-array@0.4.15/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=70c9d40f1f9545c3f133b8a67206e89da850f6468eed072281bb3701514114a9 -->
+```text
+Copyright (c) 2022-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=70c9d40f1f9545c3f133b8a67206e89da850f6468eed072281bb3701514114a9 -->
+
+### L0138
+
+- SHA-256: `72af89a828df52a9dcc42512ed64663b3b8d7961dd7a5586d44478eede82bc7a`
+- Provenance class: upstream-git-package
+- Observed source: <code>ark-models-ext@0.6.0 (git+https://github.com/zkVerify/accelerated-bn-cryptography.git?tag=v0.6.0#6249e3a8e5f7d679af483339dfbcb391ac78450a)/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=72af89a828df52a9dcc42512ed64663b3b8d7961dd7a5586d44478eede82bc7a -->
+```text
+../LICENSE-MIT
+```
+<!-- legal-text-end sha256=72af89a828df52a9dcc42512ed64663b3b8d7961dd7a5586d44478eede82bc7a -->
+
+### L0139
 
 - SHA-256: `7365cc8878a1d7ce155a58c4ca09c3d7a6be413efa5334a80ea842912b669349`
 - Provenance class: upstream-package
@@ -7375,7 +9366,139 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=7365cc8878a1d7ce155a58c4ca09c3d7a6be413efa5334a80ea842912b669349 -->
 
-### L0108
+### L0140
+
+- SHA-256: `73b9dc2e79c7308998dd30296e073aefaefb944a68fb89aa412c23c0edcabcaa`
+- Provenance class: upstream-package
+- Observed sources: <code>const-oid@0.10.2/LICENSE-MIT</code>, <code>cpufeatures@0.3.1/LICENSE-MIT</code>, <code>der@0.8.2/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=73b9dc2e79c7308998dd30296e073aefaefb944a68fb89aa412c23c0edcabcaa -->
+```text
+Copyright (c) 2020-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=73b9dc2e79c7308998dd30296e073aefaefb944a68fb89aa412c23c0edcabcaa -->
+
+### L0141
+
+- SHA-256: `7429802d3e67e3308471b91fbea341e484c4e0a23d0fb230a8636c38184cec79`
+- Provenance class: upstream-package
+- Observed source: <code>group@0.13.0/COPYRIGHT</code>
+
+<!-- legal-text-begin sha256=7429802d3e67e3308471b91fbea341e484c4e0a23d0fb230a8636c38184cec79 -->
+```text
+Copyrights in the "group" library are retained by their contributors. No
+copyright assignment is required to contribute to the "group" library.
+
+The "group" library is licensed under either of
+
+ * Apache License, Version 2.0, (see ./LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license (see ./LICENSE-MIT or http://opensource.org/licenses/MIT)
+
+at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally
+submitted for inclusion in the work by you, as defined in the Apache-2.0
+license, shall be dual licensed as above, without any additional terms or
+conditions.
+
+```
+<!-- legal-text-end sha256=7429802d3e67e3308471b91fbea341e484c4e0a23d0fb230a8636c38184cec79 -->
+
+### L0142
+
+- SHA-256: `74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3`
+- Provenance class: upstream-package
+- Observed source: <code>regex-syntax@0.8.11/src/unicode_tables/LICENSE-UNICODE</code>
+
+<!-- legal-text-begin sha256=74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3 -->
+```text
+UNICODE, INC. LICENSE AGREEMENT - DATA FILES AND SOFTWARE
+
+Unicode Data Files include all data files under the directories
+http://www.unicode.org/Public/, http://www.unicode.org/reports/,
+http://www.unicode.org/cldr/data/, http://source.icu-project.org/repos/icu/, and
+http://www.unicode.org/utility/trac/browser/.
+
+Unicode Data Files do not include PDF online code charts under the
+directory http://www.unicode.org/Public/.
+
+Software includes any source code published in the Unicode Standard
+or under the directories
+http://www.unicode.org/Public/, http://www.unicode.org/reports/,
+http://www.unicode.org/cldr/data/, http://source.icu-project.org/repos/icu/, and
+http://www.unicode.org/utility/trac/browser/.
+
+NOTICE TO USER: Carefully read the following legal agreement.
+BY DOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING UNICODE INC.'S
+DATA FILES ("DATA FILES"), AND/OR SOFTWARE ("SOFTWARE"),
+YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, ALL OF THE
+TERMS AND CONDITIONS OF THIS AGREEMENT.
+IF YOU DO NOT AGREE, DO NOT DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE
+THE DATA FILES OR SOFTWARE.
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright © 1991-2018 Unicode, Inc. All rights reserved.
+Distributed under the Terms of Use in http://www.unicode.org/copyright.html.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Unicode data files and any associated documentation
+(the "Data Files") or Unicode software and any associated documentation
+(the "Software") to deal in the Data Files or Software
+without restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, and/or sell copies of
+the Data Files or Software, and to permit persons to whom the Data Files
+or Software are furnished to do so, provided that either
+(a) this copyright and permission notice appear with all copies
+of the Data Files or Software, or
+(b) this copyright and permission notice appear in associated
+Documentation.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT OF THIRD PARTY RIGHTS.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS
+NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL
+DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THE DATA FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder
+shall not be used in advertising or otherwise to promote the sale,
+use or other dealings in these Data Files or Software without prior
+written authorization of the copyright holder.
+
+```
+<!-- legal-text-end sha256=74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3 -->
+
+### L0143
 
 - SHA-256: `751963a8b88c0e3a9f27e98933079fbcf09b9998b2c13ac49c2e4d58444520d6`
 - Provenance class: upstream-package
@@ -7588,7 +9711,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=751963a8b88c0e3a9f27e98933079fbcf09b9998b2c13ac49c2e4d58444520d6 -->
 
-### L0109
+### L0144
 
 - SHA-256: `7576269ea71f767b99297934c0b2367532690f8c4badc695edf8e04ab6a1e545`
 - Provenance class: upstream-package
@@ -7625,7 +9748,241 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=7576269ea71f767b99297934c0b2367532690f8c4badc695edf8e04ab6a1e545 -->
 
-### L0110
+### L0145
+
+- SHA-256: `769f80b5bcb42ed0af4e4d2fd74e1ac9bf843cb80c5a29219d1ef3544428a6bb`
+- Provenance class: upstream-git-package
+- Observed source: <code>ultrahonk-no-std@0.1.0 (git+https://github.com/zkVerify/ultrahonk_verifier?tag=v0.3.2#986b79b232d0f44c52fe50cd85ba8c3f505fc3c8)/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=769f80b5bcb42ed0af4e4d2fd74e1ac9bf843cb80c5a29219d1ef3544428a6bb -->
+```text
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+<!-- legal-text-end sha256=769f80b5bcb42ed0af4e4d2fd74e1ac9bf843cb80c5a29219d1ef3544428a6bb -->
+
+### L0146
+
+- SHA-256: `772e36c6caff6d6027363b043cd3e8fdcba69301b65291301e7d9f0cbff0d5fe`
+- Provenance class: upstream-package
+- Observed source: <code>sct@0.7.1/LICENSE</code>
+
+<!-- legal-text-begin sha256=772e36c6caff6d6027363b043cd3e8fdcba69301b65291301e7d9f0cbff0d5fe -->
+```text
+sct.rs is distributed under the following three licenses:
+
+- Apache License version 2.0.
+- MIT license.
+- ISC license.
+
+These are included as LICENSE-APACHE, LICENSE-MIT and LICENSE-ISC
+respectively.  You may use this software under the terms of any
+of these licenses, at your option.
+
+
+```
+<!-- legal-text-end sha256=772e36c6caff6d6027363b043cd3e8fdcba69301b65291301e7d9f0cbff0d5fe -->
+
+### L0147
 
 - SHA-256: `77674336af8ded214dc3ae07da631c7dd35cc8205f39298474ba98a889e57272`
 - Provenance class: upstream-package
@@ -7662,7 +10019,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=77674336af8ded214dc3ae07da631c7dd35cc8205f39298474ba98a889e57272 -->
 
-### L0111
+### L0148
 
 - SHA-256: `778d971f6152990cee1644e7aadcd51a68050dd73f76463c5a9c1863ca495d73`
 - Provenance class: upstream-package
@@ -7690,11 +10047,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=778d971f6152990cee1644e7aadcd51a68050dd73f76463c5a9c1863ca495d73 -->
 
-### L0112
+### L0149
 
 - SHA-256: `78779d420019e6b4630376af8e86b6b335ee8a2f89ede6e0411e0469a326aaa4`
 - Provenance class: upstream-package
-- Observed source: <code>ed25519@2.2.3/LICENSE-APACHE</code>
+- Observed sources: <code>ecdsa@0.16.9/LICENSE-APACHE</code>, <code>ed25519@2.2.3/LICENSE-APACHE</code>, <code>rfc6979@0.4.0/LICENSE-APACHE</code>
 
 <!-- legal-text-begin sha256=78779d420019e6b4630376af8e86b6b335ee8a2f89ede6e0411e0469a326aaa4 -->
 ```text
@@ -7903,7 +10260,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=78779d420019e6b4630376af8e86b6b335ee8a2f89ede6e0411e0469a326aaa4 -->
 
-### L0113
+### L0150
 
 - SHA-256: `799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d`
 - Provenance class: upstream-package
@@ -7939,7 +10296,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d -->
 
-### L0114
+### L0151
 
 - SHA-256: `7a313964a6e050794d2ad57f4863c11f6bbe055c0ae6ce2cf3b9fc45150bada3`
 - Provenance class: upstream-package
@@ -7979,11 +10336,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=7a313964a6e050794d2ad57f4863c11f6bbe055c0ae6ce2cf3b9fc45150bada3 -->
 
-### L0115
+### L0152
 
 - SHA-256: `7abd9b6960dcf7d4d0a48606a5b71bfe37d472db68d70637f3a58a56785f1621`
-- Provenance class: upstream-package
-- Observed source: <code>untrusted@0.9.0/LICENSE.txt</code>
+- Provenance class: spdx-fallback, upstream-package
+- Observed sources: <code>ISC standard text from locked untrusted@0.9.0/LICENSE.txt</code>, <code>untrusted@0.9.0/LICENSE.txt</code>
 
 <!-- legal-text-begin sha256=7abd9b6960dcf7d4d0a48606a5b71bfe37d472db68d70637f3a58a56785f1621 -->
 ```text
@@ -8004,11 +10361,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=7abd9b6960dcf7d4d0a48606a5b71bfe37d472db68d70637f3a58a56785f1621 -->
 
-### L0116
+### L0153
 
 - SHA-256: `7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0`
 - Provenance class: upstream-package
-- Observed sources: <code>heck@0.5.0/LICENSE-MIT</code>, <code>unicode-segmentation@1.13.3/LICENSE-MIT</code>, <code>unicode-width@0.1.14/LICENSE-MIT</code>, <code>unicode-width@0.2.0/LICENSE-MIT</code>, <code>unicode-xid@0.2.6/LICENSE-MIT</code>
+- Observed sources: <code>heck@0.4.1/LICENSE-MIT</code>, <code>heck@0.5.0/LICENSE-MIT</code>, <code>unicode-segmentation@1.13.3/LICENSE-MIT</code>, <code>unicode-width@0.1.14/LICENSE-MIT</code>, <code>unicode-width@0.2.0/LICENSE-MIT</code>, plus 1 more mapped package file(s)
 
 <!-- legal-text-begin sha256=7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0 -->
 ```text
@@ -8041,7 +10398,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0 -->
 
-### L0117
+### L0154
 
 - SHA-256: `7b724c8fa4a82af733caccabdaa21e2bf8bcb0822fe62d5cf03f99d458438705`
 - Provenance class: upstream-package
@@ -8254,11 +10611,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=7b724c8fa4a82af733caccabdaa21e2bf8bcb0822fe62d5cf03f99d458438705 -->
 
-### L0118
+### L0155
 
 - SHA-256: `7cfafc877eccc46c0e346ccbaa5c51bb6b894d2b818e617d970211e232785ad4`
 - Provenance class: upstream-package
-- Observed sources: <code>hyper-rustls@0.27.7/LICENSE-ISC</code>, <code>rustls@0.23.37/LICENSE-ISC</code>
+- Observed sources: <code>hyper-rustls@0.27.7/LICENSE-ISC</code>, <code>rustls-pemfile@1.0.4/LICENSE-ISC</code>, <code>rustls@0.23.37/LICENSE-ISC</code>, <code>sct@0.7.1/LICENSE-ISC</code>
 
 <!-- legal-text-begin sha256=7cfafc877eccc46c0e346ccbaa5c51bb6b894d2b818e617d970211e232785ad4 -->
 ```text
@@ -8281,7 +10638,7 @@ THIS SOFTWARE.
 ```
 <!-- legal-text-end sha256=7cfafc877eccc46c0e346ccbaa5c51bb6b894d2b818e617d970211e232785ad4 -->
 
-### L0119
+### L0156
 
 - SHA-256: `7d3b087c34f35d4d538e3bcddd1ff8f66e92f9ef336881999482800ddf840913`
 - Provenance class: upstream-package
@@ -8306,11 +10663,11 @@ under the terms of the BSD-style license or the original HIDAPI license.
 ```
 <!-- legal-text-end sha256=7d3b087c34f35d4d538e3bcddd1ff8f66e92f9ef336881999482800ddf840913 -->
 
-### L0120
+### L0157
 
 - SHA-256: `7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c`
-- Provenance class: upstream-package
-- Observed source: <code>memchr@2.8.0/UNLICENSE</code>
+- Provenance class: spdx-fallback, upstream-package
+- Observed sources: <code>Unlicense standard text from locked memchr@2.8.0/UNLICENSE</code>, <code>aho-corasick@1.1.5/UNLICENSE</code>, <code>memchr@2.8.0/UNLICENSE</code>
 
 <!-- legal-text-begin sha256=7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c -->
 ```text
@@ -8342,7 +10699,39 @@ For more information, please refer to <http://unlicense.org/>
 ```
 <!-- legal-text-end sha256=7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c -->
 
-### L0121
+### L0158
+
+- SHA-256: `7fea0ee51a4ca5d5cea7464135fd55e8b09caf3a61da3d451ac8a22af95c033f`
+- Provenance class: upstream-package
+- Observed source: <code>tungstenite@0.26.2/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=7fea0ee51a4ca5d5cea7464135fd55e8b09caf3a61da3d451ac8a22af95c033f -->
+```text
+Copyright (c) 2017 Alexey Galakhov
+Copyright (c) 2016 Jason Housley
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=7fea0ee51a4ca5d5cea7464135fd55e8b09caf3a61da3d451ac8a22af95c033f -->
+
+### L0159
 
 - SHA-256: `80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e`
 - Provenance class: upstream-package
@@ -8374,7 +10763,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e -->
 
-### L0122
+### L0160
 
 - SHA-256: `838118388fe5c2e7f1dbbaeed13e1c7f3ebf88be91319c7c1d77c18e987d1a50`
 - Provenance class: upstream-package
@@ -8412,7 +10801,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=838118388fe5c2e7f1dbbaeed13e1c7f3ebf88be91319c7c1d77c18e987d1a50 -->
 
-### L0123
+### L0161
 
 - SHA-256: `83c1763356e822adde0a2cae748d938a73fdc263849ccff6b27776dff213bd32`
 - Provenance class: upstream-package
@@ -8448,7 +10837,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=83c1763356e822adde0a2cae748d938a73fdc263849ccff6b27776dff213bd32 -->
 
-### L0124
+### L0162
 
 - SHA-256: `848d7bf14c618c39f1e29fcac2318a2fcc4254045ba7e2f6f5fa799e057225cb`
 - Provenance class: upstream-package
@@ -8661,7 +11050,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=848d7bf14c618c39f1e29fcac2318a2fcc4254045ba7e2f6f5fa799e057225cb -->
 
-### L0125
+### L0163
 
 - SHA-256: `84b34dd7608f7fb9b17bd588a6bf392bf7de504e2716f024a77d89f1b145a151`
 - Provenance class: upstream-package
@@ -8684,7 +11073,40 @@ Permission is granted to anyone to use this software for any purpose, including 
 ```
 <!-- legal-text-end sha256=84b34dd7608f7fb9b17bd588a6bf392bf7de504e2716f024a77d89f1b145a151 -->
 
-### L0126
+### L0164
+
+- SHA-256: `8510ba89044a4985037330b8a1a4a2fe291b2cb781e6b9f7fd391399e88be09b`
+- Provenance class: upstream-package
+- Observed source: <code>serdect@0.2.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=8510ba89044a4985037330b8a1a4a2fe291b2cb781e6b9f7fd391399e88be09b -->
+```text
+MIT License
+
+Copyright (c) 2022 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8510ba89044a4985037330b8a1a4a2fe291b2cb781e6b9f7fd391399e88be09b -->
+
+### L0165
 
 - SHA-256: `861399f8c21c042b110517e76dc6b63a2b334276c8cf17412fc3c8908ca8dc17`
 - Provenance class: upstream-package
@@ -8708,7 +11130,7 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 <!-- legal-text-end sha256=861399f8c21c042b110517e76dc6b63a2b334276c8cf17412fc3c8908ca8dc17 -->
 
-### L0127
+### L0166
 
 - SHA-256: `8764a597675778ddfd4e25f81b08a05dbcf089ac05662df7613fe67f150e3aa2`
 - Provenance class: upstream-package
@@ -8745,7 +11167,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=8764a597675778ddfd4e25f81b08a05dbcf089ac05662df7613fe67f150e3aa2 -->
 
-### L0128
+### L0167
 
 - SHA-256: `87d9feb9238c6bd8e0024fc4733b06cff036f89f36d93b7df1c8a0549bbb7a5b`
 - Provenance class: upstream-package
@@ -8958,11 +11380,47 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=87d9feb9238c6bd8e0024fc4733b06cff036f89f36d93b7df1c8a0549bbb7a5b -->
 
-### L0129
+### L0168
+
+- SHA-256: `88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd`
+- Provenance class: upstream-package
+- Observed source: <code>async_io_stream@0.3.3/LICENSE</code>
+
+<!-- legal-text-begin sha256=88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd -->
+```text
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <http://unlicense.org>
+
+```
+<!-- legal-text-end sha256=88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd -->
+
+### L0169
 
 - SHA-256: `898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1`
 - Provenance class: upstream-package
-- Observed sources: <code>tracing-core@0.1.36/LICENSE</code>, <code>tracing@0.1.44/LICENSE</code>
+- Observed sources: <code>tracing-attributes@0.1.31/LICENSE</code>, <code>tracing-core@0.1.36/LICENSE</code>, <code>tracing@0.1.44/LICENSE</code>
 
 <!-- legal-text-begin sha256=898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1 -->
 ```text
@@ -8995,11 +11453,44 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1 -->
 
-### L0130
+### L0170
+
+- SHA-256: `8a35369f3ca263b3c62fbb5032947e53b6bfebc6c8a4d1bb982de1c069f6fba5`
+- Provenance class: upstream-package
+- Observed sources: <code>derive_more-impl@1.0.0/LICENSE</code>, <code>derive_more@1.0.0/LICENSE</code>
+
+<!-- legal-text-begin sha256=8a35369f3ca263b3c62fbb5032947e53b6bfebc6c8a4d1bb982de1c069f6fba5 -->
+```text
+The MIT License (MIT)
+
+Copyright (c) 2016 Jelte Fennema
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8a35369f3ca263b3c62fbb5032947e53b6bfebc6c8a4d1bb982de1c069f6fba5 -->
+
+### L0171
 
 - SHA-256: `8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb`
 - Provenance class: local-package, upstream-package
-- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>amoeba@0.1.14/LICENSE</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, <code>proc-macro-crate@3.5.0/LICENSE-APACHE</code>, <code>solana-ed25519-program@2.2.3/vendor/LICENSE-APACHE-2.0</code>, plus 2 more mapped package file(s)
+- Observed sources: <code>adler2@2.0.1/LICENSE-APACHE</code>, <code>amoeba@0.1.15/LICENSE</code>, <code>proc-macro-crate@0.1.5/LICENSE-APACHE</code>, <code>proc-macro-crate@3.5.0/LICENSE-APACHE</code>, <code>solana-ed25519-program@2.2.3/vendor/LICENSE-APACHE-2.0</code>, plus 2 more mapped package file(s)
 
 <!-- legal-text-begin sha256=8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb -->
 ```text
@@ -9208,7 +11699,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb -->
 
-### L0131
+### L0172
 
 - SHA-256: `8b427f5bc501764575e52ba4f9d95673cf8f6d80a86d0d06599852e1a9a20a36`
 - Provenance class: upstream-package
@@ -9245,7 +11736,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=8b427f5bc501764575e52ba4f9d95673cf8f6d80a86d0d06599852e1a9a20a36 -->
 
-### L0132
+### L0173
 
 - SHA-256: `8b43ce8accd61e9d370b5ca9e9c4f953279b5c239926c62315b40e24df51b726`
 - Provenance class: upstream-package
@@ -9282,7 +11773,77 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=8b43ce8accd61e9d370b5ca9e9c4f953279b5c239926c62315b40e24df51b726 -->
 
-### L0133
+### L0174
+
+- SHA-256: `8b4e95f5cf0dc40269c99f7b787203ffe04ded245ca2427422c196efa2b2f42a`
+- Provenance class: upstream-package
+- Observed source: <code>tap@1.0.1/LICENSE.txt</code>
+
+<!-- legal-text-begin sha256=8b4e95f5cf0dc40269c99f7b787203ffe04ded245ca2427422c196efa2b2f42a -->
+```text
+MIT License
+
+Copyright (c) 2017 Elliot Linder <darfink@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8b4e95f5cf0dc40269c99f7b787203ffe04ded245ca2427422c196efa2b2f42a -->
+
+### L0175
+
+- SHA-256: `8b6e9feec03e7c9a5facb26855cecd31662bf989b636bcfe79521bdf8ac863f0`
+- Provenance class: upstream-package
+- Observed source: <code>rand_core@0.10.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=8b6e9feec03e7c9a5facb26855cecd31662bf989b636bcfe79521bdf8ac863f0 -->
+```text
+Copyright (c) 2018-2026 The Rand Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8b6e9feec03e7c9a5facb26855cecd31662bf989b636bcfe79521bdf8ac863f0 -->
+
+### L0176
 
 - SHA-256: `8bb1b50b0e5c9399ae33bd35fab2769010fa6c14e8860c729a52295d84896b7a`
 - Provenance class: upstream-package
@@ -9495,7 +12056,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=8bb1b50b0e5c9399ae33bd35fab2769010fa6c14e8860c729a52295d84896b7a -->
 
-### L0134
+### L0177
 
 - SHA-256: `8bce3b45e49ecd1461f223b46de133d8f62cd39f745cfdaf81bee554b908bd42`
 - Provenance class: upstream-package
@@ -9528,7 +12089,73 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=8bce3b45e49ecd1461f223b46de133d8f62cd39f745cfdaf81bee554b908bd42 -->
 
-### L0135
+### L0178
+
+- SHA-256: `8c9612877aacfa1b42f5e80b679e6c3c93a7ba2bb99dfaf6e87e200dca4b4e6c`
+- Provenance class: upstream-package
+- Observed sources: <code>derive_builder@0.12.0/LICENSE-MIT</code>, <code>derive_builder@0.20.2/LICENSE-MIT</code>, <code>derive_builder_core@0.12.0/LICENSE-MIT</code>, <code>derive_builder_core@0.20.2/LICENSE-MIT</code>, <code>derive_builder_macro@0.12.0/LICENSE-MIT</code>, plus 1 more mapped package file(s)
+
+<!-- legal-text-begin sha256=8c9612877aacfa1b42f5e80b679e6c3c93a7ba2bb99dfaf6e87e200dca4b4e6c -->
+```text
+The MIT License (MIT)
+
+Copyright (c) 2016 rust-derive-builder contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8c9612877aacfa1b42f5e80b679e6c3c93a7ba2bb99dfaf6e87e200dca4b4e6c -->
+
+### L0179
+
+- SHA-256: `8cbe1e7c6d38a54048bde0f0aa24660eab973f001031df3fdb612223719489f9`
+- Provenance class: upstream-git-repository, upstream-package
+- Observed sources: <code>futures-plex@0.1.0 (git+https://github.com/tlsnotary/tlsn-utils?rev=e2f31e6a30bc5d1641ed6407fb1a38a595e523ce#e2f31e6a30bc5d1641ed6407fb1a38a595e523ce) repository root/LICENSE-MIT</code>, <code>itybity@0.2.1/LICENSE-MIT</code>, <code>itybity@0.3.3/LICENSE-MIT</code>, <code>spansy@0.1.0 (git+https://github.com/tlsnotary/tlsn-utils?rev=e2f31e6a30bc5d1641ed6407fb1a38a595e523ce#e2f31e6a30bc5d1641ed6407fb1a38a595e523ce) repository root/LICENSE-MIT</code>, <code>tlsn-mux@0.1.0 (git+https://github.com/tlsnotary/tlsn-utils?rev=e2f31e6a30bc5d1641ed6407fb1a38a595e523ce#e2f31e6a30bc5d1641ed6407fb1a38a595e523ce) repository root/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=8cbe1e7c6d38a54048bde0f0aa24660eab973f001031df3fdb612223719489f9 -->
+```text
+MIT License
+
+Copyright (c) 2023 sinu <65924192+sinui0@users.noreply.github.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8cbe1e7c6d38a54048bde0f0aa24660eab973f001031df3fdb612223719489f9 -->
+
+### L0180
 
 - SHA-256: `8ce0830173fdac609dfb4ea603fdc002c2f4af0dc9b1a005653f5da9cf534b18`
 - Provenance class: upstream-package
@@ -9565,7 +12192,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=8ce0830173fdac609dfb4ea603fdc002c2f4af0dc9b1a005653f5da9cf534b18 -->
 
-### L0136
+### L0181
 
 - SHA-256: `8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903`
 - Provenance class: upstream-package
@@ -10251,11 +12878,44 @@ Public License instead of this License.  But first, please read
 ```
 <!-- legal-text-end sha256=8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903 -->
 
-### L0137
+### L0182
+
+- SHA-256: `8d0c1d1d4b2bebf5b9211f0e883d5a482b7808f3ed31320da14ddee95811f4ef`
+- Provenance class: upstream-package
+- Observed source: <code>ff@0.13.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=8d0c1d1d4b2bebf5b9211f0e883d5a482b7808f3ed31320da14ddee95811f4ef -->
+```text
+The MIT License (MIT)
+
+Copyright (c) 2017 Sean Bowe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8d0c1d1d4b2bebf5b9211f0e883d5a482b7808f3ed31320da14ddee95811f4ef -->
+
+### L0183
 
 - SHA-256: `8ea93490d74a5a1b1af3ff71d786271b3f1e5f0bea79ac16e02ec533cef040d6`
 - Provenance class: upstream-package
-- Observed sources: <code>darling@0.23.0/LICENSE</code>, <code>darling_core@0.23.0/LICENSE</code>, <code>darling_macro@0.23.0/LICENSE</code>
+- Observed sources: <code>darling@0.14.4/LICENSE</code>, <code>darling@0.20.11/LICENSE</code>, <code>darling@0.23.0/LICENSE</code>, <code>darling_core@0.14.4/LICENSE</code>, <code>darling_core@0.20.11/LICENSE</code>, plus 4 more mapped package file(s)
 
 <!-- legal-text-begin sha256=8ea93490d74a5a1b1af3ff71d786271b3f1e5f0bea79ac16e02ec533cef040d6 -->
 ```text
@@ -10284,7 +12944,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=8ea93490d74a5a1b1af3ff71d786271b3f1e5f0bea79ac16e02ec533cef040d6 -->
 
-### L0138
+### L0184
 
 - SHA-256: `8f2eee700f56dd8b381d92dc5b136befe09f90e186f2c1c8414a70c4c7534550`
 - Provenance class: upstream-package
@@ -10315,7 +12975,75 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=8f2eee700f56dd8b381d92dc5b136befe09f90e186f2c1c8414a70c4c7534550 -->
 
-### L0139
+### L0185
+
+- SHA-256: `8f71659370c5268d9a1dc962a46232540e8fca63462586d8efaa95aab492a208`
+- Provenance class: upstream-package
+- Observed sources: <code>ark-bn254@0.5.0/LICENSE-MIT</code>, <code>ark-ec@0.5.0/LICENSE-MIT</code>, <code>ark-ff-asm@0.5.0/LICENSE-MIT</code>, <code>ark-ff-macros@0.5.0/LICENSE-MIT</code>, <code>ark-ff@0.5.0/LICENSE-MIT</code>, plus 4 more mapped package file(s)
+
+<!-- legal-text-begin sha256=8f71659370c5268d9a1dc962a46232540e8fca63462586d8efaa95aab492a208 -->
+```text
+The MIT License (MIT)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=8f71659370c5268d9a1dc962a46232540e8fca63462586d8efaa95aab492a208 -->
+
+### L0186
+
+- SHA-256: `90c503b61dee04e1449c323ec34c229dfb68d7adcb96c7e140ee55f70fce2d8e`
+- Provenance class: upstream-package
+- Observed sources: <code>crypto-bigint@0.5.5/LICENSE-MIT</code>, <code>pem-rfc7468@0.7.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=90c503b61dee04e1449c323ec34c229dfb68d7adcb96c7e140ee55f70fce2d8e -->
+```text
+Copyright (c) 2021 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=90c503b61dee04e1449c323ec34c229dfb68d7adcb96c7e140ee55f70fce2d8e -->
+
+### L0187
 
 - SHA-256: `90d7e062634054e6866d3c81e6a2b3058a840e6af733e98e80bdfe1a7dec6912`
 - Provenance class: upstream-package
@@ -10348,11 +13076,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=90d7e062634054e6866d3c81e6a2b3058a840e6af733e98e80bdfe1a7dec6912 -->
 
-### L0140
+### L0188
 
 - SHA-256: `90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5`
 - Provenance class: upstream-package
-- Observed sources: <code>rand@0.7.3/COPYRIGHT</code>, <code>rand@0.8.5/COPYRIGHT</code>, <code>rand@0.9.2/COPYRIGHT</code>, <code>rand_chacha@0.2.2/COPYRIGHT</code>, <code>rand_chacha@0.3.1/COPYRIGHT</code>, plus 5 more mapped package file(s)
+- Observed sources: <code>rand@0.10.3/COPYRIGHT</code>, <code>rand@0.7.3/COPYRIGHT</code>, <code>rand@0.8.5/COPYRIGHT</code>, <code>rand@0.9.2/COPYRIGHT</code>, <code>rand_chacha@0.10.0/COPYRIGHT</code>, plus 7 more mapped package file(s)
 
 <!-- legal-text-begin sha256=90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5 -->
 ```text
@@ -10372,7 +13100,7 @@ published under these same licenses.
 ```
 <!-- legal-text-end sha256=90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5 -->
 
-### L0141
+### L0189
 
 - SHA-256: `9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639`
 - Provenance class: upstream-package
@@ -10409,7 +13137,96 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639 -->
 
-### L0142
+### L0190
+
+- SHA-256: `91585c36e4fb9ab4ca0d3dfac5d66d3c0c62cc51f640a0e1196542daf2267eae`
+- Provenance class: upstream-package
+- Observed source: <code>ctutils@0.4.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=91585c36e4fb9ab4ca0d3dfac5d66d3c0c62cc51f640a0e1196542daf2267eae -->
+```text
+Copyright (c) 2025-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=91585c36e4fb9ab4ca0d3dfac5d66d3c0c62cc51f640a0e1196542daf2267eae -->
+
+### L0191
+
+- SHA-256: `92b81db30f7ab6d693e0af5661a40d273ca1947e891123ed823924192c10cbc7`
+- Provenance class: upstream-package
+- Observed source: <code>rand_core@0.10.1/COPYRIGHT</code>
+
+<!-- legal-text-begin sha256=92b81db30f7ab6d693e0af5661a40d273ca1947e891123ed823924192c10cbc7 -->
+```text
+Copyrights in the Rand project are retained by their contributors. No
+copyright assignment is required to contribute to the Rand project.
+
+For full authorship information, see the version control history.
+
+Except as otherwise noted (below and/or in individual files), Rand is
+licensed under the Apache License, Version 2.0 <LICENSE-APACHE> or
+<http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+<LICENSE-MIT> or <http://opensource.org/licenses/MIT>, at your option.
+
+```
+<!-- legal-text-end sha256=92b81db30f7ab6d693e0af5661a40d273ca1947e891123ed823924192c10cbc7 -->
+
+### L0192
+
+- SHA-256: `934887691e05d69d7c86ad3f2c360980fa30c15b035e351f3c9865e99da4debc`
+- Provenance class: upstream-package
+- Observed source: <code>httpdate@1.0.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=934887691e05d69d7c86ad3f2c360980fa30c15b035e351f3c9865e99da4debc -->
+```text
+Copyright (c) 2016 Pyfisch
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=934887691e05d69d7c86ad3f2c360980fa30c15b035e351f3c9865e99da4debc -->
+
+### L0193
 
 - SHA-256: `946c9835d8034d24404f8cfec5f4654cee5dad17e944afc3d06d742cf2882831`
 - Provenance class: upstream-package
@@ -10661,7 +13478,94 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=946c9835d8034d24404f8cfec5f4654cee5dad17e944afc3d06d742cf2882831 -->
 
-### L0143
+### L0194
+
+- SHA-256: `94949dd83279f3ca3d0ce42ce0fc154d0ed817444454ee2925e903eec93949b6`
+- Provenance class: upstream-git-package
+- Observed source: <code>ark-bn254-ext@0.6.0 (git+https://github.com/zkVerify/accelerated-bn-cryptography.git?tag=v0.6.0#6249e3a8e5f7d679af483339dfbcb391ac78450a)/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=94949dd83279f3ca3d0ce42ce0fc154d0ed817444454ee2925e903eec93949b6 -->
+```text
+../../LICENSE-MIT
+```
+<!-- legal-text-end sha256=94949dd83279f3ca3d0ce42ce0fc154d0ed817444454ee2925e903eec93949b6 -->
+
+### L0195
+
+- SHA-256: `949ab7b3e7140fee216f06fe3a2bd67d68dd511f8ea73c1e01c98cb348e9c8ae`
+- Provenance class: upstream-package
+- Observed source: <code>aead@0.4.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=949ab7b3e7140fee216f06fe3a2bd67d68dd511f8ea73c1e01c98cb348e9c8ae -->
+```text
+Copyright (c) 2019 The RustCrypto Project Developers
+Copyright (c) 2019 MobileCoin, LLC
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=949ab7b3e7140fee216f06fe3a2bd67d68dd511f8ea73c1e01c98cb348e9c8ae -->
+
+### L0196
+
+- SHA-256: `950d712c518a02fcb7cff96950aee304a1cc5283361712c980ea21e8d6d669a5`
+- Provenance class: upstream-package
+- Observed source: <code>cipher@0.5.2/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=950d712c518a02fcb7cff96950aee304a1cc5283361712c980ea21e8d6d669a5 -->
+```text
+Copyright (c) 2016-2025 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=950d712c518a02fcb7cff96950aee304a1cc5283361712c980ea21e8d6d669a5 -->
+
+### L0197
 
 - SHA-256: `95bd3988beee069fa2848f648dab43cc6e0b2add2ad6bcb17360caf749802bcc`
 - Provenance class: upstream-package
@@ -10848,7 +13752,257 @@ END OF TERMS AND CONDITIONS
 ```
 <!-- legal-text-end sha256=95bd3988beee069fa2848f648dab43cc6e0b2add2ad6bcb17360caf749802bcc -->
 
-### L0144
+### L0198
+
+- SHA-256: `965a63a81d9a2fbeb5f9096954dabb49690f9dffcdac9825f675b25c807252a2`
+- Provenance class: upstream-package
+- Observed source: <code>psm@0.1.24/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=965a63a81d9a2fbeb5f9096954dabb49690f9dffcdac9825f675b25c807252a2 -->
+```text
+                             Apache License
+                       Version 2.0, January 2004
+                    http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+  "License" shall mean the terms and conditions for use, reproduction,
+  and distribution as defined by Sections 1 through 9 of this document.
+
+  "Licensor" shall mean the copyright owner or entity authorized by
+  the copyright owner that is granting the License.
+
+  "Legal Entity" shall mean the union of the acting entity and all
+  other entities that control, are controlled by, or are under common
+  control with that entity. For the purposes of this definition,
+  "control" means (i) the power, direct or indirect, to cause the
+  direction or management of such entity, whether by contract or
+  otherwise, or (ii) ownership of fifty percent (50%) or more of the
+  outstanding shares, or (iii) beneficial ownership of such entity.
+
+  "You" (or "Your") shall mean an individual or Legal Entity
+  exercising permissions granted by this License.
+
+  "Source" form shall mean the preferred form for making modifications,
+  including but not limited to software source code, documentation
+  source, and configuration files.
+
+  "Object" form shall mean any form resulting from mechanical
+  transformation or translation of a Source form, including but
+  not limited to compiled object code, generated documentation,
+  and conversions to other media types.
+
+  "Work" shall mean the work of authorship, whether in Source or
+  Object form, made available under the License, as indicated by a
+  copyright notice that is included in or attached to the work
+  (an example is provided in the Appendix below).
+
+  "Derivative Works" shall mean any work, whether in Source or Object
+  form, that is based on (or derived from) the Work and for which the
+  editorial revisions, annotations, elaborations, or other modifications
+  represent, as a whole, an original work of authorship. For the purposes
+  of this License, Derivative Works shall not include works that remain
+  separable from, or merely link (or bind by name) to the interfaces of,
+  the Work and Derivative Works thereof.
+
+  "Contribution" shall mean any work of authorship, including
+  the original version of the Work and any modifications or additions
+  to that Work or Derivative Works thereof, that is intentionally
+  submitted to Licensor for inclusion in the Work by the copyright owner
+  or by an individual or Legal Entity authorized to submit on behalf of
+  the copyright owner. For the purposes of this definition, "submitted"
+  means any form of electronic, verbal, or written communication sent
+  to the Licensor or its representatives, including but not limited to
+  communication on electronic mailing lists, source code control systems,
+  and issue tracking systems that are managed by, or on behalf of, the
+  Licensor for the purpose of discussing and improving the Work, but
+  excluding communication that is conspicuously marked or otherwise
+  designated in writing by the copyright owner as "Not a Contribution."
+
+  "Contributor" shall mean Licensor and any individual or Legal Entity
+  on behalf of whom a Contribution has been received by Licensor and
+  subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+  this License, each Contributor hereby grants to You a perpetual,
+  worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+  copyright license to reproduce, prepare Derivative Works of,
+  publicly display, publicly perform, sublicense, and distribute the
+  Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+  this License, each Contributor hereby grants to You a perpetual,
+  worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+  (except as stated in this section) patent license to make, have made,
+  use, offer to sell, sell, import, and otherwise transfer the Work,
+  where such license applies only to those patent claims licensable
+  by such Contributor that are necessarily infringed by their
+  Contribution(s) alone or by combination of their Contribution(s)
+  with the Work to which such Contribution(s) was submitted. If You
+  institute patent litigation against any entity (including a
+  cross-claim or counterclaim in a lawsuit) alleging that the Work
+  or a Contribution incorporated within the Work constitutes direct
+  or contributory patent infringement, then any patent licenses
+  granted to You under this License for that Work shall terminate
+  as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+  Work or Derivative Works thereof in any medium, with or without
+  modifications, and in Source or Object form, provided that You
+  meet the following conditions:
+
+  (a) You must give any other recipients of the Work or
+      Derivative Works a copy of this License; and
+
+  (b) You must cause any modified files to carry prominent notices
+      stating that You changed the files; and
+
+  (c) You must retain, in the Source form of any Derivative Works
+      that You distribute, all copyright, patent, trademark, and
+      attribution notices from the Source form of the Work,
+      excluding those notices that do not pertain to any part of
+      the Derivative Works; and
+
+  (d) If the Work includes a "NOTICE" text file as part of its
+      distribution, then any Derivative Works that You distribute must
+      include a readable copy of the attribution notices contained
+      within such NOTICE file, excluding those notices that do not
+      pertain to any part of the Derivative Works, in at least one
+      of the following places: within a NOTICE text file distributed
+      as part of the Derivative Works; within the Source form or
+      documentation, if provided along with the Derivative Works; or,
+      within a display generated by the Derivative Works, if and
+      wherever such third-party notices normally appear. The contents
+      of the NOTICE file are for informational purposes only and
+      do not modify the License. You may add Your own attribution
+      notices within Derivative Works that You distribute, alongside
+      or as an addendum to the NOTICE text from the Work, provided
+      that such additional attribution notices cannot be construed
+      as modifying the License.
+
+  You may add Your own copyright statement to Your modifications and
+  may provide additional or different license terms and conditions
+  for use, reproduction, or distribution of Your modifications, or
+  for any such Derivative Works as a whole, provided Your use,
+  reproduction, and distribution of the Work otherwise complies with
+  the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+  any Contribution intentionally submitted for inclusion in the Work
+  by You to the Licensor shall be under the terms and conditions of
+  this License, without any additional terms or conditions.
+  Notwithstanding the above, nothing herein shall supersede or modify
+  the terms of any separate license agreement you may have executed
+  with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+  names, trademarks, service marks, or product names of the Licensor,
+  except as required for reasonable and customary use in describing the
+  origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+  agreed to in writing, Licensor provides the Work (and each
+  Contributor provides its Contributions) on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+  implied, including, without limitation, any warranties or conditions
+  of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+  PARTICULAR PURPOSE. You are solely responsible for determining the
+  appropriateness of using or redistributing the Work and assume any
+  risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+  whether in tort (including negligence), contract, or otherwise,
+  unless required by applicable law (such as deliberate and grossly
+  negligent acts) or agreed to in writing, shall any Contributor be
+  liable to You for damages, including any direct, indirect, special,
+  incidental, or consequential damages of any character arising as a
+  result of this License or out of the use or inability to use the
+  Work (including but not limited to damages for loss of goodwill,
+  work stoppage, computer failure or malfunction, or any and all
+  other commercial damages or losses), even if such Contributor
+  has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+  the Work or Derivative Works thereof, You may choose to offer,
+  and charge a fee for, acceptance of support, warranty, indemnity,
+  or other liability obligations and/or rights consistent with this
+  License. However, in accepting such obligations, You may act only
+  on Your own behalf and on Your sole responsibility, not on behalf
+  of any other Contributor, and only if You agree to indemnify,
+  defend, and hold each Contributor harmless for any liability
+  incurred by, or claims asserted against, such Contributor by reason
+  of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+  To apply the Apache License to your work, attach the following
+  boilerplate notice, with the fields enclosed by brackets "[]"
+  replaced with your own identifying information. (Don't include
+  the brackets!)  The text should be enclosed in the appropriate
+  comment syntax for the file format. We also recommend that a
+  file or class name and description of purpose be included on the
+  same "printed page" as the copyright notice for easier
+  identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
+<!-- legal-text-end sha256=965a63a81d9a2fbeb5f9096954dabb49690f9dffcdac9825f675b25c807252a2 -->
+
+### L0199
+
+- SHA-256: `98181e7249d0c01737645ec982499ce99a0f07eb8f7d625b8840d799d10dbc01`
+- Provenance class: upstream-package
+- Observed source: <code>block-buffer@0.12.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=98181e7249d0c01737645ec982499ce99a0f07eb8f7d625b8840d799d10dbc01 -->
+```text
+Copyright (c) 2018-2025 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=98181e7249d0c01737645ec982499ce99a0f07eb8f7d625b8840d799d10dbc01 -->
+
+### L0200
 
 - SHA-256: `9a3aeb3f63659c4c6302d315e1d98784d1e8559858a47ff9562e091bb922d28d`
 - Provenance class: upstream-package
@@ -10874,7 +14028,19 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=9a3aeb3f63659c4c6302d315e1d98784d1e8559858a47ff9562e091bb922d28d -->
 
-### L0145
+### L0201
+
+- SHA-256: `9cff568488e9d56aae60f162404acdb15d8533a0202cf01f6eb0843b264f20ff`
+- Provenance class: upstream-git-package
+- Observed source: <code>ark-bn254-ext@0.6.0 (git+https://github.com/zkVerify/accelerated-bn-cryptography.git?tag=v0.6.0#6249e3a8e5f7d679af483339dfbcb391ac78450a)/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=9cff568488e9d56aae60f162404acdb15d8533a0202cf01f6eb0843b264f20ff -->
+```text
+../../LICENSE-APACHE
+```
+<!-- legal-text-end sha256=9cff568488e9d56aae60f162404acdb15d8533a0202cf01f6eb0843b264f20ff -->
+
+### L0202
 
 - SHA-256: `9d185ac6703c4b0453974c0d85e9eee43e6941009296bb1f5eb0b54e2329e9f3`
 - Provenance class: upstream-package
@@ -11088,7 +14254,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=9d185ac6703c4b0453974c0d85e9eee43e6941009296bb1f5eb0b54e2329e9f3 -->
 
-### L0146
+### L0203
 
 - SHA-256: `9df9ba60a11af705f2e451b53762686e615d86f76b169cf075c3237730dbd7e2`
 - Provenance class: upstream-package
@@ -11109,7 +14275,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 <!-- legal-text-end sha256=9df9ba60a11af705f2e451b53762686e615d86f76b169cf075c3237730dbd7e2 -->
 
-### L0147
+### L0204
 
 - SHA-256: `9e0a97848ea543aef745c98e84fde696a9a3e0735538f6daefdd3cb1942effc1`
 - Provenance class: upstream-package
@@ -11140,7 +14306,7 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=9e0a97848ea543aef745c98e84fde696a9a3e0735538f6daefdd3cb1942effc1 -->
 
-### L0148
+### L0205
 
 - SHA-256: `9e0dfd2dd4173a530e238cb6adb37aa78c34c6bc7444e0e10c1ab5d8881f63ba`
 - Provenance class: upstream-package
@@ -11177,11 +14343,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=9e0dfd2dd4173a530e238cb6adb37aa78c34c6bc7444e0e10c1ab5d8881f63ba -->
 
-### L0149
+### L0206
 
 - SHA-256: `9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f`
 - Provenance class: upstream-package
-- Observed sources: <code>fiat-crypto@0.2.9/LICENSE-APACHE</code>, <code>ring@0.17.14/third_party/fiat/LICENSE</code>
+- Observed sources: <code>fiat-crypto@0.2.9/LICENSE-APACHE</code>, <code>fiat-crypto@0.3.0/LICENSE-APACHE</code>, <code>ring@0.17.14/third_party/fiat/LICENSE</code>
 
 <!-- legal-text-begin sha256=9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f -->
 ```text
@@ -11204,11 +14370,49 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f -->
 
-### L0150
+### L0207
+
+- SHA-256: `a07fcacc3c60de4dc0fab10ac9d6aaba7379974e28451c99da7f7df09c25b28c`
+- Provenance class: upstream-package
+- Observed source: <code>inout@0.2.5/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=a07fcacc3c60de4dc0fab10ac9d6aaba7379974e28451c99da7f7df09c25b28c -->
+```text
+Copyright (c) 2022-2025 The RustCrypto Project Developers
+Copyright (c) 2022 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=a07fcacc3c60de4dc0fab10ac9d6aaba7379974e28451c99da7f7df09c25b28c -->
+
+### L0208
 
 - SHA-256: `a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499`
 - Provenance class: upstream-package
-- Observed sources: <code>blake3@1.8.3/LICENSE_CC0</code>, <code>constant_time_eq@0.4.2/LICENSE-CC0</code>
+- Observed sources: <code>blake3@1.8.3/LICENSE_CC0</code>, <code>constant_time_eq@0.4.2/LICENSE-CC0</code>, <code>tiny-keccak@2.0.2/LICENSE</code>
 
 <!-- legal-text-begin sha256=a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499 -->
 ```text
@@ -11337,7 +14541,77 @@ express Statement of Purpose.
 ```
 <!-- legal-text-end sha256=a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499 -->
 
-### L0151
+### L0209
+
+- SHA-256: `a281dd237dee566748976ae1b31e3a1b2a95b28ce66a823dc92e0c7e6110e9ae`
+- Provenance class: upstream-package
+- Observed source: <code>async-tungstenite@0.29.1/LICENSE</code>
+
+<!-- legal-text-begin sha256=a281dd237dee566748976ae1b31e3a1b2a95b28ce66a823dc92e0c7e6110e9ae -->
+```text
+Copyright (c) 2017 Daniel Abramov
+Copyright (c) 2017 Alexey Galakhov
+Copyright (c) 2019 Sebastian Dröge
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=a281dd237dee566748976ae1b31e3a1b2a95b28ce66a823dc92e0c7e6110e9ae -->
+
+### L0210
+
+- SHA-256: `a291b6910744d262a9e953c3b5868d74510e20161359f649a11e1791fde84fcd`
+- Provenance class: upstream-package
+- Observed source: <code>polyval@0.6.2/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=a291b6910744d262a9e953c3b5868d74510e20161359f649a11e1791fde84fcd -->
+```text
+Copyright (c) 2019-2023 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=a291b6910744d262a9e953c3b5868d74510e20161359f649a11e1791fde84fcd -->
+
+### L0211
 
 - SHA-256: `a4db788775cb25f2da419a7ccd3f1f89c3d2cfa8748fb25257596b88183b4c77`
 - Provenance class: upstream-package
@@ -11550,7 +14824,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=a4db788775cb25f2da419a7ccd3f1f89c3d2cfa8748fb25257596b88183b4c77 -->
 
-### L0152
+### L0212
 
 - SHA-256: `a5695f57ea0c221e0e8b7d784ff774c35e88c3d3270353646a925880bb3492cc`
 - Provenance class: upstream-package
@@ -11781,11 +15055,11 @@ Software.
 ```
 <!-- legal-text-end sha256=a5695f57ea0c221e0e8b7d784ff774c35e88c3d3270353646a925880bb3492cc -->
 
-### L0153
+### L0213
 
 - SHA-256: `a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2`
 - Provenance class: upstream-package
-- Observed sources: <code>ahash@0.8.12/LICENSE-APACHE</code>, <code>arrayvec@0.7.6/LICENSE-APACHE</code>, <code>atomic-waker@1.1.2/LICENSE-APACHE</code>, <code>autocfg@1.5.0/LICENSE-APACHE</code>, <code>base64@0.12.3/LICENSE-APACHE</code>, plus 81 more mapped package file(s)
+- Observed sources: <code>ahash@0.8.12/LICENSE-APACHE</code>, <code>ark-std@0.5.0/LICENSE-APACHE</code>, <code>arrayvec@0.7.6/LICENSE-APACHE</code>, <code>async-task@4.7.1/LICENSE-APACHE</code>, <code>atomic-waker@1.1.2/LICENSE-APACHE</code>, plus 107 more mapped package file(s)
 
 <!-- legal-text-begin sha256=a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2 -->
 ```text
@@ -11994,7 +15268,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2 -->
 
-### L0154
+### L0214
 
 - SHA-256: `a65f5d0a945d267751344c95665945b90c030ea107faf5c85d518929886187da`
 - Provenance class: upstream-package
@@ -12026,7 +15300,7 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=a65f5d0a945d267751344c95665945b90c030ea107faf5c85d518929886187da -->
 
-### L0155
+### L0215
 
 - SHA-256: `a771e4354f6b3ad4c92da1a5c9a239b6c291527db869632ecea4f20e24ca1135`
 - Provenance class: upstream-package
@@ -12063,11 +15337,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=a771e4354f6b3ad4c92da1a5c9a239b6c291527db869632ecea4f20e24ca1135 -->
 
-### L0156
+### L0216
 
 - SHA-256: `a825bd853ab71619a4923d7b4311221427848070ff44d990da39b0b274c1683f`
 - Provenance class: upstream-package
-- Observed source: <code>typenum@1.19.0/LICENSE-MIT</code>
+- Observed source: <code>typenum@1.20.1/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=a825bd853ab71619a4923d7b4311221427848070ff44d990da39b0b274c1683f -->
 ```text
@@ -12096,11 +15370,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=a825bd853ab71619a4923d7b4311221427848070ff44d990da39b0b274c1683f -->
 
-### L0157
+### L0217
 
 - SHA-256: `a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5`
-- Provenance class: upstream-package
-- Observed sources: <code>base64ct@1.8.3/LICENSE-APACHE</code>, <code>block-buffer@0.10.4/LICENSE-APACHE</code>, <code>block-buffer@0.9.0/LICENSE-APACHE</code>, <code>const-oid@0.9.6/LICENSE-APACHE</code>, <code>cpufeatures@0.2.17/LICENSE-APACHE</code>, plus 14 more mapped package file(s)
+- Provenance class: upstream-git-package, upstream-package
+- Observed sources: <code>aes-gcm@0.9.2/LICENSE-APACHE</code>, <code>aes@0.7.5/LICENSE-APACHE</code>, <code>aes@0.8.4/LICENSE-APACHE</code>, <code>aes@0.9.3/LICENSE-APACHE</code>, <code>base16ct@0.2.0/LICENSE-APACHE</code>, plus 54 more mapped package file(s)
 
 <!-- legal-text-begin sha256=a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5 -->
 ```text
@@ -12309,7 +15583,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5 -->
 
-### L0158
+### L0218
 
 - SHA-256: `aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf`
 - Provenance class: spdx-fallback, upstream-package
@@ -12522,7 +15796,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf -->
 
-### L0159
+### L0219
 
 - SHA-256: `ad4fcfaf8d5b12b97409c137a03d4a4e4b21024c65c54f976cc3b609c1bd5b0f`
 - Provenance class: upstream-package
@@ -12554,7 +15828,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=ad4fcfaf8d5b12b97409c137a03d4a4e4b21024c65c54f976cc3b609c1bd5b0f -->
 
-### L0160
+### L0220
 
 - SHA-256: `ad64fcb9589f162720f3cc5010ad76ca6ad3764e11861f9192c489df176bb71d`
 - Provenance class: upstream-package
@@ -12591,7 +15865,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=ad64fcb9589f162720f3cc5010ad76ca6ad3764e11861f9192c489df176bb71d -->
 
-### L0161
+### L0221
 
 - SHA-256: `ae9baa7beea910273c2f384c2a6b721fb7bd02bda3436074a1072e4ee689f985`
 - Provenance class: upstream-package
@@ -12628,7 +15902,45 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=ae9baa7beea910273c2f384c2a6b721fb7bd02bda3436074a1072e4ee689f985 -->
 
-### L0162
+### L0222
+
+- SHA-256: `af59cea35d7f5e2777a713b8d155d65efa2c339eb43f3c14e868c6ac8506edad`
+- Provenance class: upstream-package
+- Observed source: <code>digest@0.11.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=af59cea35d7f5e2777a713b8d155d65efa2c339eb43f3c14e868c6ac8506edad -->
+```text
+Copyright (c) 2017-2025 RustCrypto Developers
+Copyright (c) 2017 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=af59cea35d7f5e2777a713b8d155d65efa2c339eb43f3c14e868c6ac8506edad -->
+
+### L0223
 
 - SHA-256: `b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744`
 - Provenance class: upstream-package
@@ -12658,7 +15970,826 @@ the following restrictions:
 ```
 <!-- legal-text-end sha256=b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744 -->
 
-### L0163
+### L0224
+
+- SHA-256: `b16db96b93b1d7cf7bea533f572091ec6bca3234fbe0a83038be772ff391a44c`
+- Provenance class: upstream-package
+- Observed source: <code>crossbeam-channel@0.5.17/LICENSE-THIRD-PARTY</code>
+
+<!-- legal-text-begin sha256=b16db96b93b1d7cf7bea533f572091ec6bca3234fbe0a83038be772ff391a44c -->
+```text
+===============================================================================
+
+matching.go
+https://creativecommons.org/licenses/by/3.0/legalcode
+
+Creative Commons Legal Code
+
+Attribution 3.0 Unported
+
+    CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE
+    LEGAL SERVICES. DISTRIBUTION OF THIS LICENSE DOES NOT CREATE AN
+    ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS
+    INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES
+    REGARDING THE INFORMATION PROVIDED, AND DISCLAIMS LIABILITY FOR
+    DAMAGES RESULTING FROM ITS USE.
+
+License
+
+THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE
+COMMONS PUBLIC LICENSE ("CCPL" OR "LICENSE"). THE WORK IS PROTECTED BY
+COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS
+AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+
+BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE
+TO BE BOUND BY THE TERMS OF THIS LICENSE. TO THE EXTENT THIS LICENSE MAY
+BE CONSIDERED TO BE A CONTRACT, THE LICENSOR GRANTS YOU THE RIGHTS
+CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND
+CONDITIONS.
+
+1. Definitions
+
+ a. "Adaptation" means a work based upon the Work, or upon the Work and
+    other pre-existing works, such as a translation, adaptation,
+    derivative work, arrangement of music or other alterations of a
+    literary or artistic work, or phonogram or performance and includes
+    cinematographic adaptations or any other form in which the Work may be
+    recast, transformed, or adapted including in any form recognizably
+    derived from the original, except that a work that constitutes a
+    Collection will not be considered an Adaptation for the purpose of
+    this License. For the avoidance of doubt, where the Work is a musical
+    work, performance or phonogram, the synchronization of the Work in
+    timed-relation with a moving image ("synching") will be considered an
+    Adaptation for the purpose of this License.
+ b. "Collection" means a collection of literary or artistic works, such as
+    encyclopedias and anthologies, or performances, phonograms or
+    broadcasts, or other works or subject matter other than works listed
+    in Section 1(f) below, which, by reason of the selection and
+    arrangement of their contents, constitute intellectual creations, in
+    which the Work is included in its entirety in unmodified form along
+    with one or more other contributions, each constituting separate and
+    independent works in themselves, which together are assembled into a
+    collective whole. A work that constitutes a Collection will not be
+    considered an Adaptation (as defined above) for the purposes of this
+    License.
+ c. "Distribute" means to make available to the public the original and
+    copies of the Work or Adaptation, as appropriate, through sale or
+    other transfer of ownership.
+ d. "Licensor" means the individual, individuals, entity or entities that
+    offer(s) the Work under the terms of this License.
+ e. "Original Author" means, in the case of a literary or artistic work,
+    the individual, individuals, entity or entities who created the Work
+    or if no individual or entity can be identified, the publisher; and in
+    addition (i) in the case of a performance the actors, singers,
+    musicians, dancers, and other persons who act, sing, deliver, declaim,
+    play in, interpret or otherwise perform literary or artistic works or
+    expressions of folklore; (ii) in the case of a phonogram the producer
+    being the person or legal entity who first fixes the sounds of a
+    performance or other sounds; and, (iii) in the case of broadcasts, the
+    organization that transmits the broadcast.
+ f. "Work" means the literary and/or artistic work offered under the terms
+    of this License including without limitation any production in the
+    literary, scientific and artistic domain, whatever may be the mode or
+    form of its expression including digital form, such as a book,
+    pamphlet and other writing; a lecture, address, sermon or other work
+    of the same nature; a dramatic or dramatico-musical work; a
+    choreographic work or entertainment in dumb show; a musical
+    composition with or without words; a cinematographic work to which are
+    assimilated works expressed by a process analogous to cinematography;
+    a work of drawing, painting, architecture, sculpture, engraving or
+    lithography; a photographic work to which are assimilated works
+    expressed by a process analogous to photography; a work of applied
+    art; an illustration, map, plan, sketch or three-dimensional work
+    relative to geography, topography, architecture or science; a
+    performance; a broadcast; a phonogram; a compilation of data to the
+    extent it is protected as a copyrightable work; or a work performed by
+    a variety or circus performer to the extent it is not otherwise
+    considered a literary or artistic work.
+ g. "You" means an individual or entity exercising rights under this
+    License who has not previously violated the terms of this License with
+    respect to the Work, or who has received express permission from the
+    Licensor to exercise rights under this License despite a previous
+    violation.
+ h. "Publicly Perform" means to perform public recitations of the Work and
+    to communicate to the public those public recitations, by any means or
+    process, including by wire or wireless means or public digital
+    performances; to make available to the public Works in such a way that
+    members of the public may access these Works from a place and at a
+    place individually chosen by them; to perform the Work to the public
+    by any means or process and the communication to the public of the
+    performances of the Work, including by public digital performance; to
+    broadcast and rebroadcast the Work by any means including signs,
+    sounds or images.
+ i. "Reproduce" means to make copies of the Work by any means including
+    without limitation by sound or visual recordings and the right of
+    fixation and reproducing fixations of the Work, including storage of a
+    protected performance or phonogram in digital form or other electronic
+    medium.
+
+2. Fair Dealing Rights. Nothing in this License is intended to reduce,
+limit, or restrict any uses free from copyright or rights arising from
+limitations or exceptions that are provided for in connection with the
+copyright protection under copyright law or other applicable laws.
+
+3. License Grant. Subject to the terms and conditions of this License,
+Licensor hereby grants You a worldwide, royalty-free, non-exclusive,
+perpetual (for the duration of the applicable copyright) license to
+exercise the rights in the Work as stated below:
+
+ a. to Reproduce the Work, to incorporate the Work into one or more
+    Collections, and to Reproduce the Work as incorporated in the
+    Collections;
+ b. to create and Reproduce Adaptations provided that any such Adaptation,
+    including any translation in any medium, takes reasonable steps to
+    clearly label, demarcate or otherwise identify that changes were made
+    to the original Work. For example, a translation could be marked "The
+    original work was translated from English to Spanish," or a
+    modification could indicate "The original work has been modified.";
+ c. to Distribute and Publicly Perform the Work including as incorporated
+    in Collections; and,
+ d. to Distribute and Publicly Perform Adaptations.
+ e. For the avoidance of doubt:
+
+     i. Non-waivable Compulsory License Schemes. In those jurisdictions in
+        which the right to collect royalties through any statutory or
+        compulsory licensing scheme cannot be waived, the Licensor
+        reserves the exclusive right to collect such royalties for any
+        exercise by You of the rights granted under this License;
+    ii. Waivable Compulsory License Schemes. In those jurisdictions in
+        which the right to collect royalties through any statutory or
+        compulsory licensing scheme can be waived, the Licensor waives the
+        exclusive right to collect such royalties for any exercise by You
+        of the rights granted under this License; and,
+   iii. Voluntary License Schemes. The Licensor waives the right to
+        collect royalties, whether individually or, in the event that the
+        Licensor is a member of a collecting society that administers
+        voluntary licensing schemes, via that society, from any exercise
+        by You of the rights granted under this License.
+
+The above rights may be exercised in all media and formats whether now
+known or hereafter devised. The above rights include the right to make
+such modifications as are technically necessary to exercise the rights in
+other media and formats. Subject to Section 8(f), all rights not expressly
+granted by Licensor are hereby reserved.
+
+4. Restrictions. The license granted in Section 3 above is expressly made
+subject to and limited by the following restrictions:
+
+ a. You may Distribute or Publicly Perform the Work only under the terms
+    of this License. You must include a copy of, or the Uniform Resource
+    Identifier (URI) for, this License with every copy of the Work You
+    Distribute or Publicly Perform. You may not offer or impose any terms
+    on the Work that restrict the terms of this License or the ability of
+    the recipient of the Work to exercise the rights granted to that
+    recipient under the terms of the License. You may not sublicense the
+    Work. You must keep intact all notices that refer to this License and
+    to the disclaimer of warranties with every copy of the Work You
+    Distribute or Publicly Perform. When You Distribute or Publicly
+    Perform the Work, You may not impose any effective technological
+    measures on the Work that restrict the ability of a recipient of the
+    Work from You to exercise the rights granted to that recipient under
+    the terms of the License. This Section 4(a) applies to the Work as
+    incorporated in a Collection, but this does not require the Collection
+    apart from the Work itself to be made subject to the terms of this
+    License. If You create a Collection, upon notice from any Licensor You
+    must, to the extent practicable, remove from the Collection any credit
+    as required by Section 4(b), as requested. If You create an
+    Adaptation, upon notice from any Licensor You must, to the extent
+    practicable, remove from the Adaptation any credit as required by
+    Section 4(b), as requested.
+ b. If You Distribute, or Publicly Perform the Work or any Adaptations or
+    Collections, You must, unless a request has been made pursuant to
+    Section 4(a), keep intact all copyright notices for the Work and
+    provide, reasonable to the medium or means You are utilizing: (i) the
+    name of the Original Author (or pseudonym, if applicable) if supplied,
+    and/or if the Original Author and/or Licensor designate another party
+    or parties (e.g., a sponsor institute, publishing entity, journal) for
+    attribution ("Attribution Parties") in Licensor's copyright notice,
+    terms of service or by other reasonable means, the name of such party
+    or parties; (ii) the title of the Work if supplied; (iii) to the
+    extent reasonably practicable, the URI, if any, that Licensor
+    specifies to be associated with the Work, unless such URI does not
+    refer to the copyright notice or licensing information for the Work;
+    and (iv) , consistent with Section 3(b), in the case of an Adaptation,
+    a credit identifying the use of the Work in the Adaptation (e.g.,
+    "French translation of the Work by Original Author," or "Screenplay
+    based on original Work by Original Author"). The credit required by
+    this Section 4 (b) may be implemented in any reasonable manner;
+    provided, however, that in the case of a Adaptation or Collection, at
+    a minimum such credit will appear, if a credit for all contributing
+    authors of the Adaptation or Collection appears, then as part of these
+    credits and in a manner at least as prominent as the credits for the
+    other contributing authors. For the avoidance of doubt, You may only
+    use the credit required by this Section for the purpose of attribution
+    in the manner set out above and, by exercising Your rights under this
+    License, You may not implicitly or explicitly assert or imply any
+    connection with, sponsorship or endorsement by the Original Author,
+    Licensor and/or Attribution Parties, as appropriate, of You or Your
+    use of the Work, without the separate, express prior written
+    permission of the Original Author, Licensor and/or Attribution
+    Parties.
+ c. Except as otherwise agreed in writing by the Licensor or as may be
+    otherwise permitted by applicable law, if You Reproduce, Distribute or
+    Publicly Perform the Work either by itself or as part of any
+    Adaptations or Collections, You must not distort, mutilate, modify or
+    take other derogatory action in relation to the Work which would be
+    prejudicial to the Original Author's honor or reputation. Licensor
+    agrees that in those jurisdictions (e.g. Japan), in which any exercise
+    of the right granted in Section 3(b) of this License (the right to
+    make Adaptations) would be deemed to be a distortion, mutilation,
+    modification or other derogatory action prejudicial to the Original
+    Author's honor and reputation, the Licensor will waive or not assert,
+    as appropriate, this Section, to the fullest extent permitted by the
+    applicable national law, to enable You to reasonably exercise Your
+    right under Section 3(b) of this License (right to make Adaptations)
+    but not otherwise.
+
+5. Representations, Warranties and Disclaimer
+
+UNLESS OTHERWISE MUTUALLY AGREED TO BY THE PARTIES IN WRITING, LICENSOR
+OFFERS THE WORK AS-IS AND MAKES NO REPRESENTATIONS OR WARRANTIES OF ANY
+KIND CONCERNING THE WORK, EXPRESS, IMPLIED, STATUTORY OR OTHERWISE,
+INCLUDING, WITHOUT LIMITATION, WARRANTIES OF TITLE, MERCHANTIBILITY,
+FITNESS FOR A PARTICULAR PURPOSE, NONINFRINGEMENT, OR THE ABSENCE OF
+LATENT OR OTHER DEFECTS, ACCURACY, OR THE PRESENCE OF ABSENCE OF ERRORS,
+WHETHER OR NOT DISCOVERABLE. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION
+OF IMPLIED WARRANTIES, SO SUCH EXCLUSION MAY NOT APPLY TO YOU.
+
+6. Limitation on Liability. EXCEPT TO THE EXTENT REQUIRED BY APPLICABLE
+LAW, IN NO EVENT WILL LICENSOR BE LIABLE TO YOU ON ANY LEGAL THEORY FOR
+ANY SPECIAL, INCIDENTAL, CONSEQUENTIAL, PUNITIVE OR EXEMPLARY DAMAGES
+ARISING OUT OF THIS LICENSE OR THE USE OF THE WORK, EVEN IF LICENSOR HAS
+BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+7. Termination
+
+ a. This License and the rights granted hereunder will terminate
+    automatically upon any breach by You of the terms of this License.
+    Individuals or entities who have received Adaptations or Collections
+    from You under this License, however, will not have their licenses
+    terminated provided such individuals or entities remain in full
+    compliance with those licenses. Sections 1, 2, 5, 6, 7, and 8 will
+    survive any termination of this License.
+ b. Subject to the above terms and conditions, the license granted here is
+    perpetual (for the duration of the applicable copyright in the Work).
+    Notwithstanding the above, Licensor reserves the right to release the
+    Work under different license terms or to stop distributing the Work at
+    any time; provided, however that any such election will not serve to
+    withdraw this License (or any other license that has been, or is
+    required to be, granted under the terms of this License), and this
+    License will continue in full force and effect unless terminated as
+    stated above.
+
+8. Miscellaneous
+
+ a. Each time You Distribute or Publicly Perform the Work or a Collection,
+    the Licensor offers to the recipient a license to the Work on the same
+    terms and conditions as the license granted to You under this License.
+ b. Each time You Distribute or Publicly Perform an Adaptation, Licensor
+    offers to the recipient a license to the original Work on the same
+    terms and conditions as the license granted to You under this License.
+ c. If any provision of this License is invalid or unenforceable under
+    applicable law, it shall not affect the validity or enforceability of
+    the remainder of the terms of this License, and without further action
+    by the parties to this agreement, such provision shall be reformed to
+    the minimum extent necessary to make such provision valid and
+    enforceable.
+ d. No term or provision of this License shall be deemed waived and no
+    breach consented to unless such waiver or consent shall be in writing
+    and signed by the party to be charged with such waiver or consent.
+ e. This License constitutes the entire agreement between the parties with
+    respect to the Work licensed here. There are no understandings,
+    agreements or representations with respect to the Work not specified
+    here. Licensor shall not be bound by any additional provisions that
+    may appear in any communication from You. This License may not be
+    modified without the mutual written agreement of the Licensor and You.
+ f. The rights granted under, and the subject matter referenced, in this
+    License were drafted utilizing the terminology of the Berne Convention
+    for the Protection of Literary and Artistic Works (as amended on
+    September 28, 1979), the Rome Convention of 1961, the WIPO Copyright
+    Treaty of 1996, the WIPO Performances and Phonograms Treaty of 1996
+    and the Universal Copyright Convention (as revised on July 24, 1971).
+    These rights and subject matter take effect in the relevant
+    jurisdiction in which the License terms are sought to be enforced
+    according to the corresponding provisions of the implementation of
+    those treaty provisions in the applicable national law. If the
+    standard suite of rights granted under applicable copyright law
+    includes additional rights not granted under this License, such
+    additional rights are deemed to be included in the License; this
+    License is not intended to restrict the license of any rights under
+    applicable law.
+
+
+Creative Commons Notice
+
+    Creative Commons is not a party to this License, and makes no warranty
+    whatsoever in connection with the Work. Creative Commons will not be
+    liable to You or any party on any legal theory for any damages
+    whatsoever, including without limitation any general, special,
+    incidental or consequential damages arising in connection to this
+    license. Notwithstanding the foregoing two (2) sentences, if Creative
+    Commons has expressly identified itself as the Licensor hereunder, it
+    shall have all rights and obligations of Licensor.
+
+    Except for the limited purpose of indicating to the public that the
+    Work is licensed under the CCPL, Creative Commons does not authorize
+    the use by either party of the trademark "Creative Commons" or any
+    related trademark or logo of Creative Commons without the prior
+    written consent of Creative Commons. Any permitted use will be in
+    compliance with Creative Commons' then-current trademark usage
+    guidelines, as may be published on its website or otherwise made
+    available upon request from time to time. For the avoidance of doubt,
+    this trademark restriction does not form part of this License.
+
+    Creative Commons may be contacted at https://creativecommons.org/.
+
+===============================================================================
+
+The Go Programming Language
+https://golang.org/LICENSE
+
+Copyright (c) 2009 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+===============================================================================
+
+The Rust Programming Language
+https://github.com/rust-lang/rust/blob/master/LICENSE-MIT
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+===============================================================================
+
+The Rust Programming Language
+https://github.com/rust-lang/rust/blob/master/LICENSE-APACHE
+
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
+<!-- legal-text-end sha256=b16db96b93b1d7cf7bea533f572091ec6bca3234fbe0a83038be772ff391a44c -->
+
+### L0225
+
+- SHA-256: `b1cf9a3333ca78152b859012cd4a804156e5243e9ca20ad1df7327ba5ea7405c`
+- Provenance class: upstream-package
+- Observed source: <code>aead@0.4.3/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=b1cf9a3333ca78152b859012cd4a804156e5243e9ca20ad1df7327ba5ea7405c -->
+```text
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+```
+<!-- legal-text-end sha256=b1cf9a3333ca78152b859012cd4a804156e5243e9ca20ad1df7327ba5ea7405c -->
+
+### L0226
 
 - SHA-256: `b3470648aff02beb36d7a53240fc9260ed80ed93bd43bace6b67d7ef7336ee33`
 - Provenance class: upstream-package
@@ -12695,7 +16826,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=b3470648aff02beb36d7a53240fc9260ed80ed93bd43bace6b67d7ef7336ee33 -->
 
-### L0164
+### L0227
 
 - SHA-256: `b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5`
 - Provenance class: upstream-package
@@ -12732,7 +16863,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5 -->
 
-### L0165
+### L0228
 
 - SHA-256: `b3d734001a94efff3579978d953391aa7115f877657d25eb54037a43875d078a`
 - Provenance class: upstream-package
@@ -12753,7 +16884,7 @@ for the license to code that was sourced from the once_cell project.
 ```
 <!-- legal-text-end sha256=b3d734001a94efff3579978d953391aa7115f877657d25eb54037a43875d078a -->
 
-### L0166
+### L0229
 
 - SHA-256: `b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1`
 - Provenance class: upstream-package
@@ -12966,11 +17097,11 @@ for the license to code that was sourced from the once_cell project.
 ```
 <!-- legal-text-end sha256=b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1 -->
 
-### L0167
+### L0230
 
 - SHA-256: `b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1`
 - Provenance class: upstream-package
-- Observed sources: <code>sha2@0.10.9/LICENSE-MIT</code>, <code>sha2@0.9.9/LICENSE-MIT</code>
+- Observed sources: <code>sha1@0.10.7/LICENSE-MIT</code>, <code>sha2@0.10.9/LICENSE-MIT</code>, <code>sha2@0.9.9/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1 -->
 ```text
@@ -13005,7 +17136,59 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1 -->
 
-### L0168
+### L0231
+
+- SHA-256: `b54db71f7d0b1f62c8c1b6b297347b81f7c217b4ce7e58223a20d2275535cd17`
+- Provenance class: upstream-package
+- Observed source: <code>enum-try-as-inner@0.1.1/copyright.txt</code>
+
+<!-- legal-text-begin sha256=b54db71f7d0b1f62c8c1b6b297347b81f7c217b4ce7e58223a20d2275535cd17 -->
+```text
+// Copyright 2015-2018 Benjamin Fry <benjaminfry@me.com>
+//
+// Licensed under the Apache License, Version 2.0, <LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
+// http://opensource.org/licenses/MIT>, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
+
+```
+<!-- legal-text-end sha256=b54db71f7d0b1f62c8c1b6b297347b81f7c217b4ce7e58223a20d2275535cd17 -->
+
+### L0232
+
+- SHA-256: `b68ad1a3367b825447089e1f8d6829b97f47a89eb78d2f4ebaef4672f5606186`
+- Provenance class: upstream-package
+- Observed source: <code>data-encoding@2.11.1/LICENSE</code>
+
+<!-- legal-text-begin sha256=b68ad1a3367b825447089e1f8d6829b97f47a89eb78d2f4ebaef4672f5606186 -->
+```text
+The MIT License (MIT)
+
+Copyright (c) 2015-2020 Julien Cretin
+Copyright (c) 2017-2020 Google Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=b68ad1a3367b825447089e1f8d6829b97f47a89eb78d2f4ebaef4672f5606186 -->
+
+### L0233
 
 - SHA-256: `b766d21b534e9303428c16644ef624e264668525fdcd4c2490865ed023dba842`
 - Provenance class: upstream-package
@@ -13042,7 +17225,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=b766d21b534e9303428c16644ef624e264668525fdcd4c2490865ed023dba842 -->
 
-### L0169
+### L0234
 
 - SHA-256: `b7e650f3fce5c53249d1cdc608b54df156a97edd636cf9d23498d0cfe7aec63e`
 - Provenance class: upstream-package
@@ -13073,7 +17256,37 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=b7e650f3fce5c53249d1cdc608b54df156a97edd636cf9d23498d0cfe7aec63e -->
 
-### L0170
+### L0235
+
+- SHA-256: `b801c8d677ef9701149e05cf98f28b82a56832dd67c94d96d36d25d063b1b353`
+- Provenance class: upstream-git-package
+- Observed source: <code>ultrahonk-no-std@0.1.0 (git+https://github.com/zkVerify/ultrahonk_verifier?tag=v0.3.2#986b79b232d0f44c52fe50cd85ba8c3f505fc3c8)/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=b801c8d677ef9701149e05cf98f28b82a56832dd67c94d96d36d25d063b1b353 -->
+```text
+The MIT License (MIT)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+<!-- legal-text-end sha256=b801c8d677ef9701149e05cf98f28b82a56832dd67c94d96d36d25d063b1b353 -->
+
+### L0236
 
 - SHA-256: `b843fb7430efdf9732c834b6814beda44fccf3f0ddf7c9e030b39da17f6b159c`
 - Provenance class: upstream-package
@@ -13110,7 +17323,44 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=b843fb7430efdf9732c834b6814beda44fccf3f0ddf7c9e030b39da17f6b159c -->
 
-### L0171
+### L0237
+
+- SHA-256: `b8c6939380a400f53e11923d50fcc4dd2fa1ba8339fd9d04cda38a0251b6c9b0`
+- Provenance class: upstream-package
+- Observed sources: <code>chacha20@0.10.2/LICENSE-MIT</code>, <code>zeroize_derive@1.5.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=b8c6939380a400f53e11923d50fcc4dd2fa1ba8339fd9d04cda38a0251b6c9b0 -->
+```text
+Copyright (c) 2019-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=b8c6939380a400f53e11923d50fcc4dd2fa1ba8339fd9d04cda38a0251b6c9b0 -->
+
+### L0238
 
 - SHA-256: `b9eb266294324f672cbe945fe8f2e32f85024f0d61a1a7d14382cdde0ac44769`
 - Provenance class: upstream-package
@@ -13147,7 +17397,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=b9eb266294324f672cbe945fe8f2e32f85024f0d61a1a7d14382cdde0ac44769 -->
 
-### L0172
+### L0239
 
 - SHA-256: `bada9e7ed8dc00d63502053c455d7c8d7575dfb7e8277a2a832531844d900682`
 - Provenance class: upstream-package
@@ -13184,11 +17434,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=bada9e7ed8dc00d63502053c455d7c8d7575dfb7e8277a2a832531844d900682 -->
 
-### L0173
+### L0240
 
 - SHA-256: `bdebaf9156a298f8fdab56dd26cb5144673de522d80f4c0d88e0039145f147f9`
 - Provenance class: upstream-package
-- Observed source: <code>keccak@0.1.6/LICENSE-MIT</code>
+- Observed sources: <code>ecdsa@0.16.9/LICENSE-MIT</code>, <code>keccak@0.1.6/LICENSE-MIT</code>, <code>rfc6979@0.4.0/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=bdebaf9156a298f8fdab56dd26cb5144673de522d80f4c0d88e0039145f147f9 -->
 ```text
@@ -13221,7 +17471,44 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=bdebaf9156a298f8fdab56dd26cb5144673de522d80f4c0d88e0039145f147f9 -->
 
-### L0174
+### L0241
+
+- SHA-256: `c0fabcc308b450cb6fe62c9f56fae6abbeb9768eb80d992484c857d744846c2e`
+- Provenance class: upstream-package
+- Observed sources: <code>ghash@0.4.4/LICENSE-MIT</code>, <code>ghash@0.5.1/LICENSE-MIT</code>, <code>polyval@0.5.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=c0fabcc308b450cb6fe62c9f56fae6abbeb9768eb80d992484c857d744846c2e -->
+```text
+Copyright (c) 2019 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=c0fabcc308b450cb6fe62c9f56fae6abbeb9768eb80d992484c857d744846c2e -->
+
+### L0242
 
 - SHA-256: `c144680885b29e4719e2a51f0aab5439a1e02d980692b5aaf086cae12727f28b`
 - Provenance class: upstream-package
@@ -13433,7 +17720,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=c144680885b29e4719e2a51f0aab5439a1e02d980692b5aaf086cae12727f28b -->
 
-### L0175
+### L0243
 
 - SHA-256: `c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b`
 - Provenance class: upstream-package
@@ -13646,7 +17933,35 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b -->
 
-### L0176
+### L0244
+
+- SHA-256: `c1e018d60dd011b335b5280b919bd3a75dbba81c6fbe24e2fc90cb235bdb6883`
+- Provenance class: upstream-package
+- Observed sources: <code>const_format@0.2.36/LICENSE-ZLIB.md</code>, <code>const_format_proc_macros@0.2.34/LICENSE-ZLIB.md</code>
+
+<!-- legal-text-begin sha256=c1e018d60dd011b335b5280b919bd3a75dbba81c6fbe24e2fc90cb235bdb6883 -->
+```text
+Copyright (c) 2020 Matias Rodriguez.
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+```
+<!-- legal-text-end sha256=c1e018d60dd011b335b5280b919bd3a75dbba81c6fbe24e2fc90cb235bdb6883 -->
+
+### L0245
 
 - SHA-256: `c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383`
 - Provenance class: upstream-package
@@ -13679,7 +17994,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383 -->
 
-### L0177
+### L0246
 
 - SHA-256: `c30152c94a6d75e021adbc52b3a52470366a46edb917e17deae3259251af244c`
 - Provenance class: upstream-package
@@ -13733,11 +18048,68 @@ licensed under the Apache License, Version 2.0 <LICENSE-APACHE> or
 ```
 <!-- legal-text-end sha256=c30152c94a6d75e021adbc52b3a52470366a46edb917e17deae3259251af244c -->
 
-### L0178
+### L0247
+
+- SHA-256: `c524732311819f888ce57b1b56148feaa6e9b1705fcb158e7e5d71554ccf39ed`
+- Provenance class: upstream-package
+- Observed source: <code>byte-slice-cast@1.2.3/LICENSE</code>
+
+<!-- legal-text-begin sha256=c524732311819f888ce57b1b56148feaa6e9b1705fcb158e7e5d71554ccf39ed -->
+```text
+The MIT License (MIT)
+
+Copyright (c) 2017 Sebastian Dröge <sebastian@centricular.com>.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+
+```
+<!-- legal-text-end sha256=c524732311819f888ce57b1b56148feaa6e9b1705fcb158e7e5d71554ccf39ed -->
+
+### L0248
+
+- SHA-256: `c5dae4585d8520d1bc3d435dc5dd813be63046ebccc3c4eb866044eff304f0f0`
+- Provenance class: upstream-package
+- Observed source: <code>rustls-pemfile@1.0.4/LICENSE</code>
+
+<!-- legal-text-begin sha256=c5dae4585d8520d1bc3d435dc5dd813be63046ebccc3c4eb866044eff304f0f0 -->
+```text
+rustls-pemfile is distributed under the following three licenses:
+
+- Apache License version 2.0.
+- MIT license.
+- ISC license.
+
+These are included as LICENSE-APACHE, LICENSE-MIT and LICENSE-ISC
+respectively.  You may use this software under the terms of any
+of these licenses, at your option.
+
+
+```
+<!-- legal-text-end sha256=c5dae4585d8520d1bc3d435dc5dd813be63046ebccc3c4eb866044eff304f0f0 -->
+
+### L0249
 
 - SHA-256: `c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08`
 - Provenance class: upstream-package
-- Observed sources: <code>anstream@0.6.21/LICENSE-APACHE</code>, <code>anstyle-parse@0.2.7/LICENSE-APACHE</code>, <code>anstyle-query@1.1.5/LICENSE-APACHE</code>, <code>anstyle-wincon@3.0.11/LICENSE-APACHE</code>, <code>anstyle@1.0.13/LICENSE-APACHE</code>, plus 14 more mapped package file(s)
+- Observed sources: <code>anstream@0.6.21/LICENSE-APACHE</code>, <code>anstyle-parse@0.2.7/LICENSE-APACHE</code>, <code>anstyle-query@1.1.5/LICENSE-APACHE</code>, <code>anstyle-wincon@3.0.11/LICENSE-APACHE</code>, <code>anstyle@1.0.13/LICENSE-APACHE</code>, plus 22 more mapped package file(s)
 
 <!-- legal-text-begin sha256=c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08 -->
 ```text
@@ -13947,11 +18319,11 @@ licensed under the Apache License, Version 2.0 <LICENSE-APACHE> or
 ```
 <!-- legal-text-end sha256=c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08 -->
 
-### L0179
+### L0250
 
 - SHA-256: `c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4`
 - Provenance class: upstream-package
-- Observed sources: <code>quinn-proto@0.11.15/LICENSE-APACHE</code>, <code>quinn-udp@0.5.14/LICENSE-APACHE</code>, <code>quinn@0.11.9/LICENSE-APACHE</code>
+- Observed sources: <code>bcs@0.1.6/LICENSE</code>, <code>bcs@0.2.1/LICENSE</code>, <code>parity-scale-codec@3.7.5/LICENSE</code>, <code>quinn-proto@0.11.15/LICENSE-APACHE</code>, <code>quinn-udp@0.5.14/LICENSE-APACHE</code>, plus 1 more mapped package file(s)
 
 <!-- legal-text-begin sha256=c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4 -->
 ```text
@@ -14160,7 +18532,7 @@ licensed under the Apache License, Version 2.0 <LICENSE-APACHE> or
 ```
 <!-- legal-text-end sha256=c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4 -->
 
-### L0180
+### L0251
 
 - SHA-256: `c816a0749cdc6bf062a5111c159723de51b2bfac66a1dac2655abd9e6b1583eb`
 - Provenance class: upstream-package
@@ -14193,7 +18565,221 @@ THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=c816a0749cdc6bf062a5111c159723de51b2bfac66a1dac2655abd9e6b1583eb -->
 
-### L0181
+### L0252
+
+- SHA-256: `c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c`
+- Provenance class: upstream-package
+- Observed source: <code>scale-info@2.11.6/LICENSE</code>
+
+<!-- legal-text-begin sha256=c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c -->
+```text
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+```
+<!-- legal-text-end sha256=c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c -->
+
+### L0253
 
 - SHA-256: `c995204cc6bad2ed67dd41f7d89bb9f1a9d48e0edd745732b30640d7912089a4`
 - Provenance class: upstream-package
@@ -14230,7 +18816,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=c995204cc6bad2ed67dd41f7d89bb9f1a9d48e0edd745732b30640d7912089a4 -->
 
-### L0182
+### L0254
 
 - SHA-256: `c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5`
 - Provenance class: upstream-package
@@ -14267,7 +18853,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5 -->
 
-### L0183
+### L0255
 
 - SHA-256: `c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566`
 - Provenance class: upstream-package
@@ -14302,7 +18888,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566 -->
 
-### L0184
+### L0256
 
 - SHA-256: `cb5aedb296c5246d1f22e9099f925a65146f9f0d6b4eebba97fd27a6cdbbab2d`
 - Provenance class: upstream-package
@@ -14332,7 +18918,44 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=cb5aedb296c5246d1f22e9099f925a65146f9f0d6b4eebba97fd27a6cdbbab2d -->
 
-### L0185
+### L0257
+
+- SHA-256: `cc02a53316678ca2575cc69d12daa7b1833935d4b7742c31fbab7bd74a481077`
+- Provenance class: upstream-package
+- Observed source: <code>pollster@0.4.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=cc02a53316678ca2575cc69d12daa7b1833935d4b7742c31fbab7bd74a481077 -->
+```text
+Copyright (c) 2020-2021 Joshua Barretto
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=cc02a53316678ca2575cc69d12daa7b1833935d4b7742c31fbab7bd74a481077 -->
+
+### L0258
 
 - SHA-256: `cc117d90b498b32b11a886f279b359da16a73c3b01efbb2f5cc004b20262334e`
 - Provenance class: upstream-package
@@ -14545,7 +19168,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=cc117d90b498b32b11a886f279b359da16a73c3b01efbb2f5cc004b20262334e -->
 
-### L0186
+### L0259
 
 - SHA-256: `cca0bd3c4fcdba74145ef9d49c62337e2c9fbf9368288f11d0547f1b0273219f`
 - Provenance class: upstream-package
@@ -14622,7 +19245,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=cca0bd3c4fcdba74145ef9d49c62337e2c9fbf9368288f11d0547f1b0273219f -->
 
-### L0187
+### L0260
 
 - SHA-256: `cddabf8adc6ccd6c3e68f5d71eac9fae3094116623cf23a46af0a5fd6b8ee813`
 - Provenance class: upstream-package
@@ -14659,7 +19282,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=cddabf8adc6ccd6c3e68f5d71eac9fae3094116623cf23a46af0a5fd6b8ee813 -->
 
-### L0188
+### L0261
 
 - SHA-256: `ce7bc3499fee93d5022ef430d5e4201e79a6d9154f3974e42f41349f0569e09b`
 - Provenance class: upstream-package
@@ -14690,11 +19313,11 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=ce7bc3499fee93d5022ef430d5e4201e79a6d9154f3974e42f41349f0569e09b -->
 
-### L0189
+### L0262
 
 - SHA-256: `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`
 - Provenance class: upstream-package
-- Observed sources: <code>encode_unicode@1.0.0/LICENSE-APACHE</code>, <code>encoding_rs@0.8.35/LICENSE-APACHE</code>, <code>iri-string@0.7.10/LICENSE-APACHE.txt</code>, <code>lru-slab@0.1.2/LICENSE-APACHE</code>, <code>static_assertions@1.1.0/LICENSE-APACHE</code>, plus 3 more mapped package file(s)
+- Observed sources: <code>cmov@0.5.4/LICENSE-APACHE</code>, <code>ctutils@0.4.3/LICENSE-APACHE</code>, <code>encode_unicode@1.0.0/LICENSE-APACHE</code>, <code>encoding_rs@0.8.35/LICENSE-APACHE</code>, <code>iri-string@0.7.10/LICENSE-APACHE.txt</code>, plus 9 more mapped package file(s)
 
 <!-- legal-text-begin sha256=cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 -->
 ```text
@@ -14904,7 +19527,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 -->
 
-### L0190
+### L0263
 
 - SHA-256: `d1ef92123fc699442e1e8d971fe84921947efc8d9a1249ab037f1e661a972a6d`
 - Provenance class: upstream-package
@@ -14926,7 +19549,7 @@ of these licenses, at your option.
 ```
 <!-- legal-text-end sha256=d1ef92123fc699442e1e8d971fe84921947efc8d9a1249ab037f1e661a972a6d -->
 
-### L0191
+### L0264
 
 - SHA-256: `d1fc1bc0d155df60b2e7705b6b2ae02a05c96f948e1cec6e2fb86360b09f346b`
 - Provenance class: upstream-package
@@ -14967,7 +19590,119 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 <!-- legal-text-end sha256=d1fc1bc0d155df60b2e7705b6b2ae02a05c96f948e1cec6e2fb86360b09f346b -->
 
-### L0192
+### L0265
+
+- SHA-256: `d27687b51f2874822c1530976b7e837eac4f308d94bf3dd42047011b7d437b47`
+- Provenance class: upstream-package
+- Observed source: <code>elliptic-curve@0.13.8/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=d27687b51f2874822c1530976b7e837eac4f308d94bf3dd42047011b7d437b47 -->
+```text
+Copyright (c) 2020-2022 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=d27687b51f2874822c1530976b7e837eac4f308d94bf3dd42047011b7d437b47 -->
+
+### L0266
+
+- SHA-256: `d288f9c9b4590446ec18c22ead8f8b5a12a3d4025b68f62dc9015063eb9cca69`
+- Provenance class: upstream-package
+- Observed source: <code>hkdf@0.12.4/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=d288f9c9b4590446ec18c22ead8f8b5a12a3d4025b68f62dc9015063eb9cca69 -->
+```text
+Copyright (c) 2015-2018 Vlad Filippov
+Copyright (c) 2018-2021 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=d288f9c9b4590446ec18c22ead8f8b5a12a3d4025b68f62dc9015063eb9cca69 -->
+
+### L0267
+
+- SHA-256: `d2e7ec5355c96eeade56b09187ceb48a6a30299da3ce7531a66d3d11405ab963`
+- Provenance class: upstream-package
+- Observed source: <code>crypto-common@0.2.2/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=d2e7ec5355c96eeade56b09187ceb48a6a30299da3ce7531a66d3d11405ab963 -->
+```text
+Copyright (c) 2021-2026 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=d2e7ec5355c96eeade56b09187ceb48a6a30299da3ce7531a66d3d11405ab963 -->
+
+### L0268
 
 - SHA-256: `d5c22aa3118d240e877ad41c5d9fa232f9c77d757d4aac0c2f943afc0a95e0ef`
 - Provenance class: upstream-package
@@ -15004,7 +19739,221 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=d5c22aa3118d240e877ad41c5d9fa232f9c77d757d4aac0c2f943afc0a95e0ef -->
 
-### L0193
+### L0269
+
+- SHA-256: `d652d3bfbb0a01444c7fd5178269101a13a1212b4e2e1177ec1790f071778ce8`
+- Provenance class: upstream-package
+- Observed sources: <code>rand06-compat@0.2.0/LICENSE-APACHE</code>, <code>rangeset@0.4.1/LICENSE-APACHE</code>, <code>serio@0.2.1/LICENSE-APACHE</code>
+
+<!-- legal-text-begin sha256=d652d3bfbb0a01444c7fd5178269101a13a1212b4e2e1177ec1790f071778ce8 -->
+```text
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright (c) 2016 Alex Crichton
+Copyright (c) 2017 The Tokio Authors
+Copyright (c) 2024 The TLSNotary authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+<!-- legal-text-end sha256=d652d3bfbb0a01444c7fd5178269101a13a1212b4e2e1177ec1790f071778ce8 -->
+
+### L0270
 
 - SHA-256: `da23be69ad3ccf7a5823d62152efcd2b15de9482a5014fcb1b02844662d86abd`
 - Provenance class: upstream-package
@@ -15033,7 +19982,7 @@ SOFTWARE
 ```
 <!-- legal-text-end sha256=da23be69ad3ccf7a5823d62152efcd2b15de9482a5014fcb1b02844662d86abd -->
 
-### L0194
+### L0271
 
 - SHA-256: `da28ccc6b158fc2d8cccc74e99794b1cff1d29bd7bbeb019442fcf0c04c6cad9`
 - Provenance class: upstream-package
@@ -15070,11 +20019,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=da28ccc6b158fc2d8cccc74e99794b1cff1d29bd7bbeb019442fcf0c04c6cad9 -->
 
-### L0195
+### L0272
 
 - SHA-256: `db11fec9946737df39ca3898d9cd8c10ec6f6c3a884a6802b0ad0b81b4e8f23a`
 - Provenance class: upstream-package
-- Observed source: <code>typenum@1.19.0/LICENSE</code>
+- Observed source: <code>typenum@1.20.1/LICENSE</code>
 
 <!-- legal-text-begin sha256=db11fec9946737df39ca3898d9cd8c10ec6f6c3a884a6802b0ad0b81b4e8f23a -->
 ```text
@@ -15082,7 +20031,7 @@ MIT OR Apache-2.0
 ```
 <!-- legal-text-end sha256=db11fec9946737df39ca3898d9cd8c10ec6f6c3a884a6802b0ad0b81b4e8f23a -->
 
-### L0196
+### L0273
 
 - SHA-256: `dc91f8200e4b2a1f9261035d4c18c33c246911a6c0f7b543d75347e61b249cff`
 - Provenance class: upstream-package
@@ -15119,7 +20068,40 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=dc91f8200e4b2a1f9261035d4c18c33c246911a6c0f7b543d75347e61b249cff -->
 
-### L0197
+### L0274
+
+- SHA-256: `dd0741aba702705d02da3e18fca5d3a27538fe6c983e9f09946e82ecfc59acab`
+- Provenance class: upstream-package
+- Observed sources: <code>educe@0.6.0/LICENSE</code>, <code>enum-ordinalize-derive@4.4.2/LICENSE</code>, <code>enum-ordinalize@4.4.2/LICENSE</code>
+
+<!-- legal-text-begin sha256=dd0741aba702705d02da3e18fca5d3a27538fe6c983e9f09946e82ecfc59acab -->
+```text
+MIT License
+
+Copyright (c) 2023 magiclen.org (Ron Li)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=dd0741aba702705d02da3e18fca5d3a27538fe6c983e9f09946e82ecfc59acab -->
+
+### L0275
 
 - SHA-256: `e20fa2b8e0a2565f24a792b94b4bf4b6c2b9d36f781d8a9516e218a036e6677a`
 - Provenance class: upstream-package
@@ -15156,11 +20138,11 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=e20fa2b8e0a2565f24a792b94b4bf4b6c2b9d36f781d8a9516e218a036e6677a -->
 
-### L0198
+### L0276
 
 - SHA-256: `e271993808fec50ab29350b39539cdec611a9103f827e0aa26d61da70e2d33f8`
 - Provenance class: upstream-package
-- Observed source: <code>webpki-roots@1.0.6/LICENSE</code>
+- Observed sources: <code>webpki-root-certs@1.0.10/LICENSE</code>, <code>webpki-roots@0.26.11/LICENSE</code>, <code>webpki-roots@1.0.6/LICENSE</code>
 
 <!-- legal-text-begin sha256=e271993808fec50ab29350b39539cdec611a9103f827e0aa26d61da70e2d33f8 -->
 ```text
@@ -15229,7 +20211,7 @@ insights.
 ```
 <!-- legal-text-end sha256=e271993808fec50ab29350b39539cdec611a9103f827e0aa26d61da70e2d33f8 -->
 
-### L0199
+### L0277
 
 - SHA-256: `e3ba223bb1423f0aad8c3dfce0fe3148db48926d41e6fbc3afbbf5ff9e1c89cb`
 - Provenance class: upstream-package
@@ -15302,7 +20284,7 @@ limitations under the License.
 ```
 <!-- legal-text-end sha256=e3ba223bb1423f0aad8c3dfce0fe3148db48926d41e6fbc3afbbf5ff9e1c89cb -->
 
-### L0200
+### L0278
 
 - SHA-256: `e4c9b06fa850cb9b540a5e400e9f6394cf15efcf4098144de477d1d3dae10150`
 - Provenance class: upstream-package
@@ -15339,7 +20321,220 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=e4c9b06fa850cb9b540a5e400e9f6394cf15efcf4098144de477d1d3dae10150 -->
 
-### L0201
+### L0279
+
+- SHA-256: `e8d77d4bbe96e1b46ec0f40d1f12e19825e718c764bb3e9a695633ade9289f9e`
+- Provenance class: upstream-package
+- Observed sources: <code>ark-bn254@0.5.0/LICENSE-APACHE</code>, <code>ark-ec@0.5.0/LICENSE-APACHE</code>, <code>ark-ff-asm@0.5.0/LICENSE-APACHE</code>, <code>ark-ff-macros@0.5.0/LICENSE-APACHE</code>, <code>ark-ff@0.5.0/LICENSE-APACHE</code>, plus 3 more mapped package file(s)
+
+<!-- legal-text-begin sha256=e8d77d4bbe96e1b46ec0f40d1f12e19825e718c764bb3e9a695633ade9289f9e -->
+```text
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright 2022 arkworks contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
+<!-- legal-text-end sha256=e8d77d4bbe96e1b46ec0f40d1f12e19825e718c764bb3e9a695633ade9289f9e -->
+
+### L0280
 
 - SHA-256: `e915669a595b11a200873df8286561881b0e04932f6412a585db6297ba0bc97c`
 - Provenance class: upstream-package
@@ -15376,7 +20571,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=e915669a595b11a200873df8286561881b0e04932f6412a585db6297ba0bc97c -->
 
-### L0202
+### L0281
 
 - SHA-256: `ea084a2373ebc1f0902c09266e7bf25a05ab3814c1805bb017ffa7308f90c061`
 - Provenance class: upstream-package
@@ -15409,7 +20604,37 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=ea084a2373ebc1f0902c09266e7bf25a05ab3814c1805bb017ffa7308f90c061 -->
 
-### L0203
+### L0282
+
+- SHA-256: `ec353d4fecf7963b4c054384557e5dbc3c7a717997eb4a3815b315721a6aa75a`
+- Provenance class: upstream-package
+- Observed source: <code>nohash-hasher@0.2.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=ec353d4fecf7963b4c054384557e5dbc3c7a717997eb4a3815b315721a6aa75a -->
+```text
+Copyright 2018 Parity Technologies (UK) Ltd.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=ec353d4fecf7963b4c054384557e5dbc3c7a717997eb4a3815b315721a6aa75a -->
+
+### L0283
 
 - SHA-256: `ecc269ef87fd38a1d98e30bfac9ba964a9dbd9315c3770fed98d4d7cb5882055`
 - Provenance class: upstream-package
@@ -15446,7 +20671,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=ecc269ef87fd38a1d98e30bfac9ba964a9dbd9315c3770fed98d4d7cb5882055 -->
 
-### L0204
+### L0284
 
 - SHA-256: `efcfee7981ff72431fffb06925cad00a23dce079ed4354f61030ad5abdb78829`
 - Provenance class: upstream-package
@@ -15480,7 +20705,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=efcfee7981ff72431fffb06925cad00a23dce079ed4354f61030ad5abdb78829 -->
 
-### L0205
+### L0285
 
 - SHA-256: `f025ccfb7dfb6bdfedc75ca0f67acc69e6fb4998143d834f7c2f38a29989680f`
 - Provenance class: upstream-package
@@ -15505,7 +20730,7 @@ CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 <!-- legal-text-end sha256=f025ccfb7dfb6bdfedc75ca0f67acc69e6fb4998143d834f7c2f38a29989680f -->
 
-### L0206
+### L0286
 
 - SHA-256: `f18f6229547ab07f0b7b3e1f83acad8bb436f5f4c95a8a98b44f876caa00f04e`
 - Provenance class: upstream-package
@@ -15545,7 +20770,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=f18f6229547ab07f0b7b3e1f83acad8bb436f5f4c95a8a98b44f876caa00f04e -->
 
-### L0207
+### L0287
 
 - SHA-256: `f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2`
 - Provenance class: upstream-package
@@ -15603,11 +20828,11 @@ ICU 1.8.1 to ICU 57.1 © 1995-2016 International Business Machines Corporation a
 ```
 <!-- legal-text-end sha256=f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2 -->
 
-### L0208
+### L0288
 
 - SHA-256: `f428305bbf2e70fbd807af0f3c7ac1b7acfb95311640f451e9d2e48db6d7e96b`
 - Provenance class: upstream-package
-- Observed source: <code>web-time@1.1.0/LICENSE-MIT</code>
+- Observed sources: <code>web-time@0.2.4/LICENSE-MIT</code>, <code>web-time@1.1.0/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=f428305bbf2e70fbd807af0f3c7ac1b7acfb95311640f451e9d2e48db6d7e96b -->
 ```text
@@ -15636,7 +20861,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=f428305bbf2e70fbd807af0f3c7ac1b7acfb95311640f451e9d2e48db6d7e96b -->
 
-### L0209
+### L0289
 
 - SHA-256: `f59f5a78193597e04fd932ee9af86254d14d08be5c9d0e003ab888feccce2161`
 - Provenance class: upstream-package
@@ -15673,7 +20898,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=f59f5a78193597e04fd932ee9af86254d14d08be5c9d0e003ab888feccce2161 -->
 
-### L0210
+### L0290
 
 - SHA-256: `f76b7831ee8f42d3ac38919101e4ceb9f56aeb7796cdfe8a5ef52e26acedcbbf`
 - Provenance class: upstream-package
@@ -15710,7 +20935,72 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=f76b7831ee8f42d3ac38919101e4ceb9f56aeb7796cdfe8a5ef52e26acedcbbf -->
 
-### L0211
+### L0291
+
+- SHA-256: `f790cc576999f5998c766d3d26d7d64dc368e805a98461484f65e8d961ec6d9f`
+- Provenance class: upstream-package
+- Observed source: <code>funty@2.0.0/LICENSE.txt</code>
+
+<!-- legal-text-begin sha256=f790cc576999f5998c766d3d26d7d64dc368e805a98461484f65e8d961ec6d9f -->
+```text
+MIT License
+
+Copyright (c) 2020 myrrlyn (Alexander Payne)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=f790cc576999f5998c766d3d26d7d64dc368e805a98461484f65e8d961ec6d9f -->
+
+### L0292
+
+- SHA-256: `f7bdb3426d045cd50efd4953026e3eb5a83d0199f458a075602611b9344da5b9`
+- Provenance class: upstream-package
+- Observed source: <code>hex@0.4.3/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=f7bdb3426d045cd50efd4953026e3eb5a83d0199f458a075602611b9344da5b9 -->
+```text
+Copyright (c) 2013-2014 The Rust Project Developers.
+Copyright (c) 2015-2020 The rust-hex Developers
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+<!-- legal-text-end sha256=f7bdb3426d045cd50efd4953026e3eb5a83d0199f458a075602611b9344da5b9 -->
+
+### L0293
 
 - SHA-256: `f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1`
 - Provenance class: upstream-package
@@ -15761,7 +21051,44 @@ authorization of the copyright holder.
 ```
 <!-- legal-text-end sha256=f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1 -->
 
-### L0212
+### L0294
+
+- SHA-256: `f7e8ab639afef15573680c97f796166835cbeb3865175882fea41c60d106b733`
+- Provenance class: upstream-package
+- Observed sources: <code>aes@0.7.5/LICENSE-MIT</code>, <code>aes@0.8.4/LICENSE-MIT</code>, <code>ctr@0.7.0/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=f7e8ab639afef15573680c97f796166835cbeb3865175882fea41c60d106b733 -->
+```text
+Copyright (c) 2018 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=f7e8ab639afef15573680c97f796166835cbeb3865175882fea41c60d106b733 -->
+
+### L0295
 
 - SHA-256: `f98e09091d5ae02b2f2ec1ead4f7f28c4c44d1cb98b078739ba67091637e170c`
 - Provenance class: upstream-package
@@ -15794,7 +21121,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=f98e09091d5ae02b2f2ec1ead4f7f28c4c44d1cb98b078739ba67091637e170c -->
 
-### L0213
+### L0296
 
 - SHA-256: `fa226a5c235dafc28fc9303b03f6bf5f7483c31d8355a031ebd6963ffeb65b95`
 - Provenance class: upstream-package
@@ -15831,7 +21158,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=fa226a5c235dafc28fc9303b03f6bf5f7483c31d8355a031ebd6963ffeb65b95 -->
 
-### L0214
+### L0297
 
 - SHA-256: `fb5436aa63d1b71a8dfbf74ecaf1a5b4e1ec4df7f80074d11fec99284f69ca5f`
 - Provenance class: upstream-package
@@ -15852,7 +21179,7 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=fb5436aa63d1b71a8dfbf74ecaf1a5b4e1ec4df7f80074d11fec99284f69ca5f -->
 
-### L0215
+### L0298
 
 - SHA-256: `fb77f0a9c53e473abe5103c8632ef9f0f2874d4fb3f17cb2d8c661aab9cee9d7`
 - Provenance class: upstream-package
@@ -15889,7 +21216,81 @@ DEALINGS IN THE SOFTWARE.
 ```
 <!-- legal-text-end sha256=fb77f0a9c53e473abe5103c8632ef9f0f2874d4fb3f17cb2d8c661aab9cee9d7 -->
 
-### L0216
+### L0299
+
+- SHA-256: `fbe7b9b51878efdfa613d4ec42ebfc9c7fb0c29806249ef9a3cd8f31ca5ef855`
+- Provenance class: upstream-package
+- Observed source: <code>hex-literal@0.4.1/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=fbe7b9b51878efdfa613d4ec42ebfc9c7fb0c29806249ef9a3cd8f31ca5ef855 -->
+```text
+Copyright (c) 2018 Artyom Pavlov
+Copyright (c) 2018 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+```
+<!-- legal-text-end sha256=fbe7b9b51878efdfa613d4ec42ebfc9c7fb0c29806249ef9a3cd8f31ca5ef855 -->
+
+### L0300
+
+- SHA-256: `fc15b628f1c4fccfd3c3028d99453826b49b1e3711e8c4af843223a78e5e3847`
+- Provenance class: upstream-git-package
+- Observed source: <code>clmul@0.1.0-alpha.6 (git+https://github.com/tlsnotary/mpz2?rev=8f897838f4e24aff9da8e8b012e8ba35ae770141#8f897838f4e24aff9da8e8b012e8ba35ae770141)/LICENSE-MIT</code>
+
+<!-- legal-text-begin sha256=fc15b628f1c4fccfd3c3028d99453826b49b1e3711e8c4af843223a78e5e3847 -->
+```text
+Copyright (c) 2019 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+<!-- legal-text-end sha256=fc15b628f1c4fccfd3c3028d99453826b49b1e3711e8c4af843223a78e5e3847 -->
+
+### L0301
 
 - SHA-256: `fd198949ebcc78b2d12fc57ebfb2da4ae8f781b7c3b7047aaccc2f804b6f12ef`
 - Provenance class: upstream-package
@@ -15922,7 +21323,7 @@ SOFTWARE.
 ```
 <!-- legal-text-end sha256=fd198949ebcc78b2d12fc57ebfb2da4ae8f781b7c3b7047aaccc2f804b6f12ef -->
 
-### L0217
+### L0302
 
 - SHA-256: `fd80a26fbb3f644af1fa994134446702932968519797227e07a1368dea80f0bc`
 - Provenance class: upstream-package
@@ -15939,11 +21340,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 <!-- legal-text-end sha256=fd80a26fbb3f644af1fa994134446702932968519797227e07a1368dea80f0bc -->
 
-### L0218
+### L0303
 
 - SHA-256: `ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2`
 - Provenance class: upstream-package
-- Observed sources: <code>hashbrown@0.13.2/LICENSE-MIT</code>, <code>hashbrown@0.15.2/LICENSE-MIT</code>, <code>hashbrown@0.16.1/LICENSE-MIT</code>
+- Observed sources: <code>hashbrown@0.13.2/LICENSE-MIT</code>, <code>hashbrown@0.15.2/LICENSE-MIT</code>, <code>hashbrown@0.16.1/LICENSE-MIT</code>, <code>hashbrown@0.17.1/LICENSE-MIT</code>
 
 <!-- legal-text-begin sha256=ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2 -->
 ```text

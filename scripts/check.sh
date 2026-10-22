@@ -5,7 +5,7 @@
 #   scripts/check.sh futures api        just those components
 #   scripts/check.sh --list             the component names
 #
-# Components: governance oracle futures api sdk cli web research docs.
+# Components: governance oracle evidence futures api sdk cli web research docs.
 # Each runs from its own folder, so its rust-toolchain.toml applies.
 #
 # Environment:
@@ -27,11 +27,14 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 # Rust cache, no incremental data or debug info, its ports.
 # shellcheck disable=SC1091
 [ -f "$root/.agent.env" ] && . "$root/.agent.env"
+# How builds share that cache (cache_of, shared_cargo_env, shared_clippy, sbf_claim).
+# shellcheck source=shared-cargo.sh
+. "$root/scripts/shared-cargo.sh"
 JOBS="${JOBS:-$(( ($(nproc) + 1) / 2 ))}"
 AGAVE_BIN="${AGAVE_BIN:-$HOME/.local/share/solana/install/releases/4.0.0/solana-release/bin}"
 export PATH="$AGAVE_BIN:$PATH"
 export CARGO_BUILD_JOBS="$JOBS"
-ALL=(governance oracle futures api sdk cli web research docs ops-dashboard)
+ALL=(governance oracle evidence futures api sdk cli web research docs ops-dashboard)
 # Node tests in research/ that fail on main today (pre-existing; the research
 # oracle reader test expects a catalog shape the API no longer serves).
 # Skipped in the gating run, then run and reported; fix and remove.
@@ -97,6 +100,19 @@ FAUCET_MARKERS=(/v1/faucet)
 step() { printf '\n==> %s: %s\n' "$component" "$*"; }
 run() { step "$*"; "$@"; }
 sbf() { [ "${SKIP_SBF:-}" != 1 ]; }
+# clippy <cargo args...> -- <lints...>: `cargo clippy`; on the shared cache,
+# shared_clippy (scripts/shared-cargo.sh).
+clippy() {
+  if [ "${RUSTC_WORKSPACE_WRAPPER:-}" = "$shared_cargo_root/scripts/shared-cargo/rustc" ]; then shared_clippy "$@"
+  else cargo clippy "$@"; fi
+}
+# subtarget <name>: the rest of this (sub)shell builds in Cargo directories of
+# its own, <name> below the component's (another workspace, or another feature
+# graph of the same crates).
+subtarget() {
+  export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$root/$component/target}/$1"
+  [ -z "${CARGO_BUILD_BUILD_DIR:-}" ] || export CARGO_BUILD_BUILD_DIR="$CARGO_BUILD_BUILD_DIR/$1"
+}
 # node_known <pattern> <files...>: the gating run skips the tests whose names
 # match <pattern>; they then run on their own and are only reported.
 node_known() {
@@ -126,14 +142,18 @@ npm_install() {
 # sbf_build <target-dir>:<program>... -- <command...>: run an SBF build and
 # fail on its stack errors (SBF_STACK_ERRORS). Each <program> is one the build
 # links, in cargo's <target-dir>; an SBF_DEAD_CODE error is allowed only while
-# its function is in none of them.
-sbf_build() {
+# its function is in none of them. In a worktree the target directories are
+# shared: it holds the SBF lock from the build through these checks, and
+# makes them this worktree's first (sbf_claim, scripts/sbf-cache.sh). A
+# subshell, so the lock ends with it.
+sbf_build() (
   local specs=() spec so found log line sym errors=0 dead=() linked=()
   while [ "$1" != -- ]; do specs+=("$1"); shift; done
   shift
+  sbf_claim "${specs[@]%:*}"
   log="$(mktemp)"
   step "$*"
-  if ! "$@" 2>&1 | tee "$log"; then rm -f "$log"; return 1; fi
+  if ! sbf_env "$@" 2>&1 | tee "$log"; then rm -f "$log"; return 1; fi
   step "SBF stack errors"
   while IFS= read -r line; do
     sym="$(sed -nE 's/^Error: (Function|A function call in method) ([^ ]+) .*/\2/p' <<<"$line")"
@@ -166,7 +186,7 @@ sbf_build() {
   fi
   echo "  none in ${#linked[@]} linked program(s)$([ ${#dead[@]} -eq 0 ] \
     || echo "; ${#dead[@]} function(s) of SBF_DEAD_CODE reported, linked into none")"
-}
+)
 in_list() { local x="$1" y; shift; for y in "$@"; do [ "$x" = "$y" ] && return 0; done; return 1; }
 # release_markers <artifact>...: production artifacts carry no DEV_MARKERS.
 release_markers() {
@@ -234,33 +254,45 @@ check_oracle() {
   AMEBA_ORACLE_PROGRAM_ID=9MBnqUCLEgkCxZHDPPrJGdwEJAiGU8K5tD3R5SD5MUkm \
     run cargo test -p ameba_oracle --locked -j "$JOBS" --features localnet-dev-authority
   sbf || return 0
-  local sbf_target="${CARGO_TARGET_DIR:-$PWD/target}"
+  # The intermediates' directory: the shared cache in a worktree.
+  local sbf_target="${CARGO_BUILD_BUILD_DIR:-${CARGO_TARGET_DIR:-$PWD/target}}"
   # Production artifact (no features, SBPF v1): target/deploy.
-  sbf_build "$sbf_target:ameba_oracle" -- cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
+  sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
     "${SBPF_ARCH[@]}" --sbf-out-dir target/deploy -- --locked -j "$JOBS"
   release_markers target/deploy/ameba_oracle.so
   sbpf_v1 target/deploy/ameba_oracle.so
   ls -l target/deploy/ameba_oracle.so
   # Test-only artifact on the shortened test calendar, on the production arch
   # so the SBF tests run what ships; never deployed.
-  sbf_build "$sbf_target:ameba_oracle" -- cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
+  sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
     "${SBPF_ARCH[@]}" --features test-sbf --sbf-out-dir target/deploy-test -- --locked -j "$JOBS"
   SBF_OUT_DIR="$PWD/target/deploy-test" run cargo test -p ameba_oracle --locked -j "$JOBS" --features test-sbf
+}
+
+check_evidence() {
+  cd "$root/evidence"
+  run cargo fmt --all -- --check
+  run clippy --workspace --all-targets --locked -j "$JOBS" -- -D warnings
+  # The end-to-end tests run real MPC-TLS sessions (a few seconds each).
+  run cargo test --workspace --locked -j "$JOBS"
+  # The verify-side crate also builds on the API's toolchain (1.93.1), which
+  # compiles it through its path dependency.
+  (subtarget msrv-1.93 && run cargo +1.93.1 check --locked -j "$JOBS" -p amoeba-evidence)
 }
 
 check_futures() {
   cd "$root/futures"
   run cargo fmt --all -- --check
-  run cargo clippy --workspace --all-targets --locked -j "$JOBS" -- -D warnings
+  run clippy --workspace --all-targets --locked -j "$JOBS" -- -D warnings
   run cargo test --workspace --locked -j "$JOBS"
   # The ops binaries and unit tests, built for the tests' oracle id (the dev
   # chain's build is scripts/build-ops.sh, for the .localnet key).
-  (cd ops && AMEBA_ORACLE_PROGRAM_ID="$TEST_ORACLE_ID" \
-    run cargo test --locked -j "$JOBS" --target-dir "${CARGO_TARGET_DIR:-$root/futures/target}/ops-check")
+  (cd ops && subtarget ops-check && AMEBA_ORACLE_PROGRAM_ID="$TEST_ORACLE_ID" \
+    run cargo test --locked -j "$JOBS")
   # The mainnet build (scripts/build-ops.sh --mainnet): the production oracle
   # profile, no dev tools. Its own target: the oracle crate's features differ.
-  (cd ops && unset AMEBA_ORACLE_PROGRAM_ID && \
-    run cargo test --locked -j "$JOBS" --no-default-features --target-dir "${CARGO_TARGET_DIR:-$root/futures/target}/ops-mainnet-check")
+  (cd ops && subtarget ops-mainnet-check && unset AMEBA_ORACLE_PROGRAM_ID && \
+    run cargo test --locked -j "$JOBS" --no-default-features)
   sbf || return 0
   # build-sbf.sh's cargo target directories (its intermediates, and those of
   # build-oracle.sh --test).
@@ -272,10 +304,10 @@ check_futures() {
   release_markers target/deploy/{ameba_futures,governance_controller_v3}.so
   sbpf_v1 target/deploy/ameba_futures.so
   # This is a separate Cargo workspace with a different feature graph. Program
-  # crates emit un-hashed .rlib files (cdylib + lib), so sharing its target with
-  # the main workspace can replace artifacts that Cargo still considers fresh.
-  (cd integration && run cargo test --locked -j "$JOBS" \
-    --target-dir "${CARGO_TARGET_DIR:-$root/futures/target}/integration-check")
+  # crates emit un-hashed .rlib files (cdylib + lib), so outside an agent
+  # worktree (no shared_cargo_env) sharing its target with the main workspace
+  # can replace artifacts that Cargo still considers fresh.
+  (cd integration && subtarget integration-check && run cargo test --locked -j "$JOBS")
 }
 
 check_api() {
@@ -303,8 +335,9 @@ check_sdk() {
 
 check_cli() {
   cd "$root/cli"
-  # The MCP server check runs target/debug/petri unless told otherwise; with a
-  # shared CARGO_TARGET_DIR (agent worktrees) the fresh build is there.
+  # The MCP server check runs target/debug/petri unless told otherwise. In an
+  # agent worktree CARGO_TARGET_DIR is cli/target too, the worktree's own
+  # (shared_cargo_env: only intermediates go to the shared cache).
   run env CARGO_BUILD_JOBS="$JOBS" ${CARGO_TARGET_DIR:+PETRI_MCP_PETRI_BIN="$CARGO_TARGET_DIR/debug/petri"} scripts/devloop.sh
   # devloop's petri has a release build's features: no dev faucet.
   no_faucet "${CARGO_TARGET_DIR:-$PWD/target}/debug/petri"
@@ -381,8 +414,12 @@ done
 failed=()
 for component in "${selected[@]}"; do
   set +e
-  # In an agent worktree, Rust builds use the component's shared cache.
-  ( set -e; [ -z "${AMEBA_CARGO_CACHE:-}" ] || export CARGO_TARGET_DIR="$AMEBA_CARGO_CACHE/$component"
+  # In an agent worktree, Rust builds use the component's shared cache, with
+  # this worktree's own crates kept apart (scripts/shared-cargo.sh).
+  ( set -e
+    if [ -n "${AMEBA_CARGO_CACHE:-}" ] && [ -f "$root/$component/Cargo.toml" ]; then
+      shared_cargo_env "$(cache_of "$component")" "$root/$component"
+    fi
     "check_$component" )
   rc=$?
   set -e

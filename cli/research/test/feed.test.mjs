@@ -4,10 +4,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
+import { createInterface } from 'node:readline';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { createApplication } from '../service/application.mjs';
@@ -56,10 +57,20 @@ test('an agent reports its searches, pages, values and petri writes; malformed r
       const { event } = await report(kind, message, reference);
       assert.deepEqual([event.actor, event.kind, event.message, event.referenceUrl], ['agent', kind, message, reference ?? null]);
     }
-    // A read names its page; references stay public HTTPS without credentials.
+    // A read names its page; references stay HTTPS without credentials.
     await assert.rejects(report('read', 'No page given'), { code: 'INVALID_REFERENCE' });
     await assert.rejects(report('read', 'Plain HTTP', 'http://example.com/ram'), { code: 'INVALID_REFERENCE' });
     await assert.rejects(report('value', 'With a password', 'https://user:pw@example.com/ram'), { code: 'INVALID_REFERENCE' });
+    // A page read in the owner's signed-in browser is a reference like any
+    // other, as long as its URL carries no token, key or session id.
+    const portal = 'https://portal.distributor.example/account/prices?region=us';
+    assert.equal((await report('read', 'Distributor X price list (signed in)', portal)).event.referenceUrl, portal);
+    for (const leak of ['https://portal.distributor.example/prices?token=abc', 'https://portal.distributor.example/prices?access_token=abc',
+      'https://portal.distributor.example/prices;jsessionid=ABC123', 'https://portal.distributor.example/prices#id_token=abc',
+      'https://files.example.com/prices.json?X-Amz-Signature=abc', 'https://portal.distributor.example/prices?API_KEY=abc',
+      'https://portal.distributor.example/prices?p=%74oken%3Dabc']) {
+      await assert.rejects(report('read', 'Leaky link', leak), { code: 'INVALID_REFERENCE' }, leak);
+    }
     // Only the owner, petri and the backend write their own kinds.
     for (const kind of ['directive', 'run_started', 'run_finished', 'candidate_received', 'Search', 'page']) await assert.rejects(report(kind, 'Forged'), { code: 'INVALID_EVENT' });
     // The 4,000-character limit stays as it was.
@@ -68,7 +79,7 @@ test('an agent reports its searches, pages, values and petri writes; malformed r
 
     // The snapshot: the agent's events oldest first, with its runs and who is on what.
     const snapshot = await f.snapshot(a.agent.id), { events, runs } = snapshot.selected;
-    assert.deepEqual(events.map(e => [e.actor, e.kind]), [['petri', 'run_started'], ...steps.map(([kind]) => ['agent', kind]), ['agent', 'search']]);
+    assert.deepEqual(events.map(e => [e.actor, e.kind]), [['petri', 'run_started'], ...steps.map(([kind]) => ['agent', kind]), ['agent', 'read'], ['agent', 'search']]);
     assert.deepEqual(events.map(e => e.sequence), events.map(e => e.sequence).sort((x, y) => x - y));
     for (const event of events) {
       assert.deepEqual(Object.keys(event).sort(), ['actor', 'createdAt', 'kind', 'message', 'referenceUrl', 'runId', 'sequence']);
@@ -134,7 +145,7 @@ test('the MCP report tool offers every report kind and refuses others', async ()
   assert.equal((await send(4, 'tools/call', { name: 'petri_report_progress', arguments: args('directive') })).error.code, -32602);
 });
 
-test('work next tells the agent to report each search, page, value and petri write, for every kind of work', { timeout: 30000 }, async () => {
+test('work next tells the agent to report each step and how to prove a signed-in page, the same over the CLI and MCP', { timeout: 30000 }, async () => {
   const root = mkdtempSync(join(tmpdir(), 'petri-research-test-')), run = '0f1e2d3c-4b5a-4968-8776-655443322110';
   let assignment;
   // A workspace that hands out one assignment: work next prints its steps.
@@ -145,22 +156,109 @@ test('work next tells the agent to report each search, page, value and petri wri
     response.end(JSON.stringify({ ok: true, data }));
   });
   await new Promise(done => server.listen(0, '127.0.0.1', done));
+  const bin = fileURLToPath(new URL('../bin/petri.mjs', import.meta.url));
+  let mcp;
   try {
     const baseUrl = `http://127.0.0.1:${server.address().port}`, profiles = privateDirectory(join(root, 'profiles'));
     privateWrite(join(profiles, 'cedar.json'), { version: 1, name: 'cedar', baseUrl, credential: token(), sessionId: 'session-1' });
-    for (const kind of ['source', 'update', 'opening']) {
+    // The MCP server of the same agent: petri_work_next returns the same steps.
+    mcp = spawn(process.execPath, [bin, 'mcp', '--agent', 'cedar', '--url', baseUrl, '--profile-dir', profiles], { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    const replies = createInterface({ input: mcp.stdout })[Symbol.asyncIterator]();
+    let id = 0;
+    const send = async (method, params) => { mcp.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: ++id, method, params })}\n`); return JSON.parse((await replies.next()).value).result; };
+    await send('initialize', { protocolVersion: '2025-06-18' });
+    for (const [kind, chip] of ['source', 'update', 'opening'].flatMap(kind => [[kind, false], [kind, true]])) {
       assignment = { id: 'work-1', title: 'RAMX · DDR5 RDIMM 64GB', candidateScope: { marketId: 'ramx', expiryId: 'RAMX-202612' },
-        objective: { kind, expiryId: 'RAMX-202612', url: page, sourceAddress: 'source-address', bucketLabel: 'DDR5 RDIMM 64GB', openingBondAtomic: '1000000' } };
-      const { stdout } = await promisify(execFile)(process.execPath, [fileURLToPath(new URL('../bin/petri.mjs', import.meta.url)),
+        objective: { kind, expiryId: 'RAMX-202612', url: page, sourceAddress: 'source-address', bucketLabel: chip ? 'DDR5_16GBIT' : 'DDR5 RDIMM 64GB',
+          ...(chip ? { chip, bucketName: 'DDR5 16Gb', seriesId: 'example-ddr5-16gb' } : {}), openingBondAtomic: '1000000' } };
+      const { stdout } = await promisify(execFile)(process.execPath, [bin,
         'work', 'next', '--agent', 'cedar', '--url', baseUrl, '--profile-dir', profiles], { windowsHide: true, timeout: 20000 });
-      const lines = JSON.parse(stdout).data.nextStep.split('\n');
+      const nextStep = JSON.parse(stdout).data.nextStep, lines = nextStep.split('\n');
       const say = report => lines.find(line => line.includes(`work report ${run} `) && line.includes(` --kind ${report} `));
       for (const report of ['search', 'read', 'value', 'submit']) assert(say(report), `${kind}: ${report}`);
       assert.match(say('search'), /--message "<query>"$/u);
       assert.match(say('read'), /--source <page URL> --message/u);
       assert.match(say('submit'), /--message "<what it did, e\.g\. [^>]+>"$/u);
       if (kind === 'source') assert(say('source_found'));
+      // A page behind a sign-in: browser use, the owner signs in, a web proof.
+      const line = text => lines.find(item => item.includes(text));
+      const target = kind === 'source' ? '<page URL>' : page;
+      assert(line(`- Open it with browser use: petri evidence browser ${target}. It prints a DevTools address`), kind);
+      assert(line('chrome-devtools-mcp --browserUrl, Playwright connectOverCDP'), kind);
+      assert(line('- Ask the owner to sign in there themselves. Never ask for, type or store their password.'), kind);
+      assert(line('"format":"amoeba-extraction-manifest-v1"'), kind);
+      assert(line('petri evidence check-manifest <manifest file> --body <saved response>'), kind);
+      assert(line(`petri evidence prove ${kind === 'source' ? '<JSON URL>' : page} --manifest <manifest file> --browser --out <bundle file> --json`), kind);
+      assert(line('- Show the owner the preview it prints (what is disclosed)'), kind);
+      if (kind === 'source' && !chip) {
+        assert(line(`work submit ${run} `).includes('--file <file>'));
+        assert.match(line('--evidence-bundle'), /work submit 0f1e2d3c-[^ ]+ --agent 'cedar' --profile-dir '[^']+' --file <file> --evidence-bundle <bundle file>, with the JSON URL as canonicalUrl\./u);
+        assert(line('Only a catalog_price or published_benchmark can be a source'));
+      } else if (kind === 'source') {
+        // A series' page is its origin.locator: the proven JSON URL goes there.
+        assert.match(line('--evidence-bundle'), /Put the JSON URL in the series' origin\.locator, check it again, and submit it with the bundle: .*work submit 0f1e2d3c-[^ ]+ --agent 'cedar' --profile-dir '[^']+' --file <file> --evidence-bundle <bundle file>\./u);
+      } else if (!chip) {
+        assert(line('--evidence <bundle file> in place of --archive-url'), kind);
+        assert(lines.indexOf(line('instead of step 2')) > lines.indexOf(line('2. Archive the page')), kind);
+        assert(lines.indexOf(line('--evidence <bundle file> in place of')) < lines.indexOf(lines.find(item => item.startsWith('3. '))), kind);
+      } else {
+        // An observation cites the proof in its evidenceReference instead of the archive.
+        assert(line('Put the bundle file in evidenceReference in place of the archive URL'), kind);
+        assert(lines.indexOf(line('instead of step 3')) > lines.indexOf(line('3. Archive the page')), kind);
+        assert(lines.indexOf(line('Put the bundle file in evidenceReference')) < lines.indexOf(lines.find(item => item.startsWith('4. '))), kind);
+      }
+      // Plain words for the agent: "sign in", never "login".
+      assert.doesNotMatch(nextStep, /login/iu);
+      const result = await send('tools/call', { name: 'petri_work_next', arguments: {} });
+      assert.equal(result.isError, false); assert.equal(result.structuredContent.nextStep, nextStep, kind);
+      // A chip month's sources are series, its prints observations, through petri's own checks.
+      const has = text => lines.some(item => item.includes(text));
+      if (chip && kind === 'source') {
+        assert(has('petri oracle series template --bucket DDR5_16GBIT --out series.json'), nextStep);
+        assert(has('petri oracle series check series.json RAMX-202612') && has('series: the checked series object') && has('origin.row'));
+      } else if (chip) {
+        assert(has('petri oracle observe template RAMX-202612 --source source-address --out obs.json'), nextStep);
+        assert(has('petri oracle observe RAMX-202612 --source source-address --file obs.json --yes') && has('evidenceReference'));
+        assert(has(kind === 'update' ? 'petri oracle updates reveal <CLAIM> --yes' : 'petri oracle prints finalize RAMX-202612'));
+        assert(!has('petri oracle prints opening') && !has('petri oracle updates commit'));
+      } else assert(!has('oracle series') && !has('oracle observe'));
     }
+  } finally {
+    if (mcp) { mcp.stdin.end(); if (mcp.exitCode === null) await new Promise(done => { mcp.once('exit', done); setTimeout(() => mcp.kill(), 2000).unref(); }); }
+    await new Promise(done => server.close(done));
+    const exact = resolve(root); assert.equal(dirname(exact), resolve(tmpdir())); rmSync(exact, { recursive: true, force: true });
+  }
+});
+
+test('work submit --evidence-bundle sends the bundle file\u2019s bytes with the candidate, and refuses one over 2 MiB', { timeout: 30000 }, async () => {
+  const root = mkdtempSync(join(tmpdir(), 'petri-research-test-')), run = '0f1e2d3c-4b5a-4968-8776-655443322110';
+  const bodies = [];
+  const server = http.createServer(async (request, response) => {
+    const chunks = []; for await (const chunk of request) chunks.push(chunk);
+    if (request.url.endsWith('/candidates')) bodies.push(JSON.parse(Buffer.concat(chunks)));
+    response.setHeader('content-type', 'application/json');
+    response.end(JSON.stringify({ ok: true, data: request.url.endsWith('/candidates') ? { duplicate: false, evidence: { bundleDigest: 'ab'.repeat(32) } } : { session: { id: 'session-1' } } }));
+  });
+  await new Promise(done => server.listen(0, '127.0.0.1', done));
+  try {
+    const baseUrl = `http://127.0.0.1:${server.address().port}`, profiles = privateDirectory(join(root, 'profiles'));
+    privateWrite(join(profiles, 'cedar.json'), { version: 1, name: 'cedar', baseUrl, credential: token(), sessionId: 'session-1' });
+    const candidate = join(root, 'candidate.json'), bundle = join(root, 'bundle.json'), large = join(root, 'large.json');
+    writeFileSync(candidate, JSON.stringify({ marketId: 'ramx', canonicalUrl: 'https://portal.distributor.example/api/prices' }));
+    const bytes = Buffer.from('{\n  "format": "amoeba-evidence-bundle-v1",\n  "presentation": "AAAA"\n}\n');
+    writeFileSync(bundle, bytes);
+    writeFileSync(large, Buffer.concat([Buffer.from('{"format":"amoeba-evidence-bundle-v1","presentation":"'), Buffer.alloc(2 * 1024 * 1024, 'A'), Buffer.from('"}')]));
+    const submit = file => promisify(execFile)(process.execPath, [fileURLToPath(new URL('../bin/petri.mjs', import.meta.url)), 'work', 'submit', run,
+      '--agent', 'cedar', '--url', baseUrl, '--profile-dir', profiles, '--key', 'proven', '--file', candidate, '--evidence-bundle', file], { windowsHide: true, timeout: 20000 });
+    const { stdout } = await submit(bundle);
+    assert.equal(JSON.parse(stdout).data.evidence.bundleDigest, 'ab'.repeat(32));
+    assert.deepEqual(Object.keys(bodies[0]).sort(), ['candidate', 'clientKey', 'evidenceBundle', 'sessionId']);
+    assert(Buffer.from(bodies[0].evidenceBundle, 'base64').equals(bytes));
+    for (const [file, code] of [[large, 'BUNDLE_TOO_LARGE'], [candidate, 'INVALID_BUNDLE'], [join(root, 'missing.json'), 'BUNDLE_NOT_FOUND']]) {
+      const failure = await submit(file).then(() => null, error => error);
+      assert(failure, file); assert.equal(JSON.parse(failure.stderr).error.code, code);
+    }
+    assert.equal(bodies.length, 1);
   } finally {
     await new Promise(done => server.close(done));
     const exact = resolve(root); assert.equal(dirname(exact), resolve(tmpdir())); rmSync(exact, { recursive: true, force: true });

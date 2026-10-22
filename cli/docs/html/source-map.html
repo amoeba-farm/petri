@@ -148,12 +148,12 @@
           </tr>
           <tr>
             <td><a href="../../src/oracle/mod.rs">src/oracle/mod.rs</a></td>
-            <td>The index oracle: <code>args</code> grammar, <code>reads</code> (futures API oracle documents and candidates), <code>chain</code> (periods, months, sources, ledgers read and checked from chain), <code>skus</code> (governed SKU sets and Merkle proofs), <code>send</code> (identity, the oracle's own governance gate, review, simulate, sign, send), <code>writes</code> (one handler per instruction), <code>sponsor</code> (sponsorships), <code>rewards</code> (a wallet's rewards read from chain and their tag 174 claims), <code>council</code> (emergency council cases), <code>claims</code> (private update-claim reveal material), <code>errors</code> (oracle error names).</td>
+            <td>The index oracle: <code>args</code> grammar, <code>reads</code> (futures API oracle documents and candidates), <code>chain</code> (periods, months, sources, ledgers read and checked from chain), <code>skus</code> (governed SKU sets, part numbers and chip buckets, and Merkle proofs), <code>series</code> (comparison series of the chip months: template, check, propose, show; the commodity spec's routing of a month's sources, shared with the TUI), <code>observe</code> (observations of a series: its opening print or Game update, and its record with the API), <code>send</code> (identity, the oracle's own governance gate, review, simulate, sign, send), <code>writes</code> (one handler per instruction), <code>sponsor</code> (sponsorships), <code>rewards</code> (a wallet's rewards read from chain and their tag 174 claims), <code>council</code> (emergency council cases), <code>claims</code> (private update-claim reveal material), <code>errors</code> (oracle error names).</td>
             <td>Build instructions only with <code>ameba_oracle::instruction</code> builders against the deployment's oracle id. Decode every account through <code>chain::decode</code> and check its canonical address and parent. <code>council</code> reads current council rosters, case commitments and round ballots before building a council decision.</td>
           </tr>
           <tr>
             <td><a href="../../../oracle/governance/">../oracle/governance/</a></td>
-            <td>The governed RAMX and NANDX product SKU manifests, compiled in from the monorepo's oracle.</td>
+            <td>The governed RAMX and NANDX product SKU manifests (v1 part numbers, v2 chip buckets) and the commodity submission spec, compiled in from the monorepo's oracle (v2 and the spec through <code>../oracle/crates/commodity-spec</code>).</td>
             <td>Tests pin their roots to the oracle program's; they change only with the oracle.</td>
           </tr>
           <tr>
@@ -268,7 +268,7 @@
 
       <h2>External Contracts</h2>
       <ul>
-        <li>The futures API (<code>--api</code>, contract in <code>../api/API.md</code>) serves the market views under <code>/v1/markets</code>, <code>/v1/quote</code> and <code>/v1/accounts</code> (markets, depth, trades, candles, quotes, accounts and history), sponsored preparation and submission, the dev faucet, the oracle documents <code>/v1/oracle/public-snapshot</code> and <code>/v1/oracle/catalog</code>, and the candidate store at <code>/oracle/agents</code> and <code>/oracle/source-candidates</code>.</li>
+        <li>The futures API (<code>--api</code>, contract in <code>../api/API.md</code>) serves the market views under <code>/v1/markets</code>, <code>/v1/quote</code> and <code>/v1/accounts</code> (markets, depth, trades, candles, quotes, accounts and history), sponsored preparation and submission, the dev faucet, the oracle documents <code>/v1/oracle/public-snapshot</code> and <code>/v1/oracle/catalog</code>, the candidate store at <code>/oracle/agents</code> and <code>/oracle/source-candidates</code>, and the observation records at <code>/oracle/observations</code> (<code>petri oracle observe</code>).</li>
         <li>The Solana RPC (<code>--rpc</code>) serves account reads, simulation and sending.</li>
         <li>Program ids come from the trusted deployment (<code>--deployment</code> manifest, else the API's <code>/v1/config</code>).</li>
         <li>Futures instructions come from the futures client crate (<code>ameba_sdk_futures::futures</code>); oracle instructions, PDAs and layouts from the <code>ameba_oracle</code> crate of the monorepo (<code>../oracle</code>, a path dependency in <code>Cargo.toml</code>).</li>

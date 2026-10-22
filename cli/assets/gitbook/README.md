@@ -1,6 +1,6 @@
 # Welcome to Amoeba Farm
 
-Amoeba Farm is a futures market on hardware component prices. Two indexes trade: **RAMX** tracks memory module (DRAM) prices, and **NANDX** tracks NAND flash and storage prices. You trade **capped futures**: a long or a short on a range of one index, paid for up front and settled in USDC at the market's expiry. Nothing physical is delivered.
+Amoeba Farm is a futures market on hardware component prices. Two indexes trade: **RAMX** tracks DRAM memory chip prices, and **NANDX** tracks NAND flash wafer prices. A third index, **BATX**, tracks lithium-ion battery cell prices in China. BATX is a prototype, and its first month is BATX Nov 26. You trade **capped futures**: a long or a short on a range of one index, paid for up front and settled in USDC at the market's expiry. Nothing physical is delivered.
 
 > **Caution:**
 > Capped futures run on Solana mainnet and settle in real USDC. You trade them in the web app at [amoeba.farm](https://amoeba.farm); Petri's mainnet release is coming. The programs have not been audited.
@@ -17,7 +17,7 @@ Amoeba Farm is a futures market on hardware component prices. Two indexes trade:
 
 ## How it works
 
-1. **The index.** Each month, RAMX and NANDX start at 100 and move with a fixed, weighted basket of product categories, such as DDR5 server modules or 1TB SSDs.
+1. **The index.** Each month, every index starts at 100 and moves with a fixed, weighted basket of buckets, such as DDR5 16Gb memory chips, 1Tb TLC NAND wafers or LFP battery cells for energy storage. RAMX's and NANDX's launch month, Oct 26, uses memory modules and storage products instead.
 2. **The market.** Each index and expiry is one market with one price line. Every position is a claim on a range of that line. Longs and shorts on different ranges and at different leverages trade against each other in the same book.
 3. **The other side.** Other traders' orders, and a treasury market maker that quotes both sides of every one-point step of the market, so any range can be bought or sold. Depositors in **Earn** fund that maker and share its result.
 4. **Fully funded.** A long and a short on the same range together pay exactly the width of the range. The market holds that cash behind every position until settlement.
@@ -27,7 +27,7 @@ Amoeba Farm is a futures market on hardware component prices. Two indexes trade:
 
 | You want to | Start here |
 |---|---|
-| Understand what you are trading | [Synthetic exposure](https://docs.amoeba.farm/about-synthetics/01-about-synthetics/), [RAMX and NANDX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/) |
+| Understand what you are trading | [Synthetic exposure](https://docs.amoeba.farm/about-synthetics/01-about-synthetics/), [RAMX, NANDX, and BATX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/) |
 | Make a first trade | [Getting started](https://docs.amoeba.farm/getting-started/01-where-to-begin/), [Web app](https://docs.amoeba.farm/getting-started/03-web-client/) |
 | Understand a position's payoff | [Capped futures](https://docs.amoeba.farm/trading/03-capped-futures/) |
 | Provide liquidity or deposit into Earn | [Earn](https://docs.amoeba.farm/earn/02-earn/), [Providing liquidity](https://docs.amoeba.farm/earn/01-providing-liquidity/) |

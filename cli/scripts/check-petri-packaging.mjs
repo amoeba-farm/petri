@@ -77,6 +77,9 @@ if (process.platform === "win32") {
 for (const governed of ["ramx", "nandx"]) {
   readFileSync(new URL(`../../oracle/governance/${governed}_product_sku_manifest.v1.json`, import.meta.url));
 }
+// The commodity buckets of the chip months come from ameba-commodity-spec,
+// which compiles in its own governed documents.
+readFileSync(new URL("../../oracle/crates/commodity-spec/Cargo.toml", import.meta.url));
 
 const lockedPackages = new Set(
   cargoLockSource
@@ -118,6 +121,7 @@ if (/path\s*=\s*"\.\.\//.test(launcherSource) || launcherSource.includes('"../or
 for (const requiredDependencyContract of [
   'package = "ameba-sdk", path = "../sdk"',
   'ameba_oracle = { path = "../oracle/programs/ameba_oracle", features = ["no-entrypoint"] }',
+  'ameba-commodity-spec = { path = "../oracle/crates/commodity-spec" }',
   'exclude = ["tools/petri-conpty-harness"]',
 ]) {
   if (!cargoSource.includes(requiredDependencyContract)) {

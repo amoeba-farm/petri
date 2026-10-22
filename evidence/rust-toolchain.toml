@@ -1,0 +1,6 @@
+[toolchain]
+# TLSNotary's protocol crate (`tlsn`) needs Rust 1.95 (`cfg_select!`). The
+# verify-only crate `amoeba-evidence` also builds on the API's 1.93.1.
+channel = "1.95.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

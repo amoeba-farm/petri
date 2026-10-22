@@ -19,10 +19,18 @@ use ratatui::{
 };
 use serde_json::Value;
 
-use super::render::{ACCENT, ALERT, BORDER, DIM, MUTED, PANEL, TEXT, month_name, scrim};
+use super::{
+    phase::{Checked, Month},
+    render::{ACCENT, ALERT, BORDER, DIM, MUTED, PANEL, TEXT, month_name, scrim},
+};
 use crate::{
     futures::{ctx::Ctx, settings::Settings, view::Paint},
-    oracle::{chain::Oracle, reads, send, skus, sponsor, writes},
+    oracle::{
+        chain::Oracle,
+        reads, send,
+        series::{self, Entry, Parsed},
+        skus, sponsor, writes,
+    },
 };
 
 /// The Markets view's green: on the oracle, done.
@@ -43,6 +51,8 @@ pub struct Find {
     pub created_ms: u64,
     /// Its status on the oracle, once a source there has the same page.
     pub on_oracle: Option<String>,
+    /// Whether it would count, on a chip month (its series' routing).
+    pub checked: Option<Checked>,
 }
 
 /// A source on the oracle that this wallet listed.
@@ -51,6 +61,10 @@ pub struct Mine {
     pub title: String,
     pub url: String,
     pub status: String,
+    /// Its 64-hex id.
+    pub id: String,
+    /// Whether it counts, on a chip month.
+    pub checked: Option<Checked>,
 }
 
 /// A sponsorship this wallet paid for.
@@ -130,23 +144,105 @@ pub struct Fund {
     replies: Option<Receiver<Reply>>,
 }
 
-/// "RAMX · Nov 2026 · DDR5 16Gb": the market, month and product of a bucket.
+/// "RAMX · Nov 2026 · DDR5 16Gb": the market, month and product of a bucket
+/// (a chip bucket by its name).
 fn title(market: &str, expiry: &str, bucket: &str, label: Option<&str>) -> String {
-    let product = label
-        .filter(|l| !l.is_empty())
-        .map(str::to_string)
-        .or_else(|| {
-            skus::parse_hex32(bucket, "bucket")
-                .ok()
-                .and_then(|b| skus::decode_label(&b))
-        })
-        .unwrap_or_else(|| format!("Unnamed product {}", &bucket[..bucket.len().min(6)]));
+    let product = super::nav::bucket_label(bucket, label);
     let month = month_name(expiry).unwrap_or_else(|| expiry.to_string());
     format!("{} · {month} · {product}", market.to_uppercase())
 }
 
 fn text(v: &Value, key: &str) -> String {
     v[key].as_str().unwrap_or_default().to_string()
+}
+
+/// A find's routing: the API's, else its series' own (a candidate is not on
+/// chain, so no month decides it yet).
+fn find_checked(c: &Value) -> Option<Checked> {
+    Checked::from_api(c).or_else(|| {
+        let series =
+            ameba_commodity_spec::SeriesDefinition::parse(&c["series"].to_string()).ok()?;
+        let product =
+            ameba_commodity_spec::Product::from_symbol(c["details"]["marketId"].as_str()?)?;
+        Some(Checked::of(&ameba_commodity_spec::route_series(
+            &series, product,
+        )))
+    })
+}
+
+/// Sources' definitions read from chain, by source address. A source's
+/// definition never changes, so each is read once.
+pub(crate) type Definitions = std::collections::HashMap<String, Option<String>>;
+
+/// Routes the sources of each chip month the API did not route, from their
+/// definitions on chain: one batched read of the sources not read yet, then
+/// none.
+pub(crate) fn check_locally(ctx: &Ctx, months: &mut [Month], known: &mut Definitions) {
+    let unchecked =
+        |m: &Month| m.chip_product().is_some() && m.sources.iter().any(|s| s.checked.is_none());
+    let wanted: Vec<solana_program::pubkey::Pubkey> = months
+        .iter()
+        .filter(|m| unchecked(m))
+        .flat_map(|m| m.sources.iter())
+        .filter_map(|s| s.address.as_deref())
+        .filter(|a| !known.contains_key(*a))
+        .filter_map(|a| a.parse().ok())
+        .collect();
+    if !wanted.is_empty()
+        && let Ok(oracle) = Oracle::new(ctx)
+        && let Ok(read) = oracle.definitions_at(&wanted)
+    {
+        for (address, text) in wanted.iter().zip(read) {
+            known.insert(address.to_string(), text);
+        }
+    }
+    route_months(months, known);
+}
+
+/// Routes the unrouted sources of each chip month whose definitions are all in `known`.
+pub(crate) fn route_months(months: &mut [Month], known: &Definitions) {
+    let unchecked =
+        |m: &Month| m.chip_product().is_some() && m.sources.iter().any(|s| s.checked.is_none());
+    for month in months.iter_mut().filter(|m| unchecked(m)) {
+        let Some(product) = month.chip_product() else {
+            continue;
+        };
+        // A repeat is judged against the month's other sources: route only
+        // once every one is read.
+        let Some(entries) = month
+            .sources
+            .iter()
+            .map(|s| {
+                let text = known.get(s.address.as_deref()?)?;
+                Some(Entry {
+                    source_id: s.id.clone(),
+                    parsed: Parsed::of(text.as_deref()),
+                    committed: series::in_recipe_named(&s.status),
+                })
+            })
+            .collect::<Option<Vec<_>>>()
+        else {
+            continue;
+        };
+        let routings = series::route_entries(product, series::stage_named(&month.phase), &entries);
+        // A source whose definition is not on chain stays without a routing.
+        for (source, routing) in month.sources.iter_mut().zip(&routings) {
+            if source.checked.is_none() {
+                source.checked = routing.as_ref().map(Checked::of);
+            }
+        }
+    }
+}
+
+/// Your sources' routing, from their months'.
+pub(crate) fn check_mine(mine: &mut [Mine], months: &[Month]) {
+    for m in mine.iter_mut().filter(|m| m.checked.is_none()) {
+        m.checked = months
+            .iter()
+            .flat_map(|month| &month.sources)
+            .find(|s| !s.id.is_empty() && s.id == m.id)
+            .and_then(|s| s.checked.clone());
+    }
 }
 
 /// Finds this wallet sponsored are on the oracle, whether or not the API's
@@ -182,6 +278,8 @@ pub(crate) fn snapshot_from(candidates: &Value, oracle: &Value, owner: Option<&s
                         .unwrap_or_default()
                         .to_string(),
                     status,
+                    id: text(source, "sourceId"),
+                    checked: Checked::from_api(source),
                 });
             }
         }
@@ -217,6 +315,7 @@ pub(crate) fn snapshot_from(candidates: &Value, oracle: &Value, owner: Option<&s
                 on_oracle: on_oracle
                     .get(&text(c, "canonicalLocatorHash").to_lowercase())
                     .cloned(),
+                checked: find_checked(c),
             }
         })
         .collect();
@@ -238,13 +337,14 @@ pub(crate) type Months = std::collections::HashMap<String, (String, String)>;
 
 /// Reads the finds, the oracle's sources and the wallet's oracle balance.
 pub fn fetch(ctx: &Ctx) -> Snapshot {
-    fetch_with(ctx, &mut Months::new())
+    fetch_with(ctx, &mut Months::new(), &mut Definitions::new())
 }
 
-/// `fetch`, naming months from `known` (and adding to it). The API's two
-/// documents and the wallet's chain reads go out at once: each is a round
-/// trip, and over a slow link one after another adds up.
-pub(crate) fn fetch_with(ctx: &Ctx, known: &mut Months) -> Snapshot {
+/// `fetch`, naming months from `known` (and adding to it) and routing chip
+/// months' sources the API did not route from `definitions` (adding to it).
+/// The API's two documents and the wallet's chain reads go out at once: each
+/// is a round trip, and over a slow link one after another adds up.
+pub(crate) fn fetch_with(ctx: &Ctx, known: &mut Months, definitions: &mut Definitions) -> Snapshot {
     let owner = ctx.wallet_pubkey().ok();
     let api = &ctx.api;
     let (read, chain, clock) = thread::scope(|s| {
@@ -287,6 +387,8 @@ pub(crate) fn fetch_with(ctx: &Ctx, known: &mut Months) -> Snapshot {
     let owner_text = owner.map(|o| o.to_string());
     let mut snap = snapshot_from(&candidates, &oracle, owner_text.as_deref());
     snap.chain_now = clock;
+    check_locally(ctx, &mut snap.months, definitions);
+    check_mine(&mut snap.mine, &snap.months);
     if let Some((balance, list)) = chain {
         snap.balance = balance;
         // The months' names, by address, from the oracle's own inventory.
@@ -360,9 +462,12 @@ fn worker(settings: Settings) -> (Sender<Command>, Receiver<Reply>) {
         quiet.json = true;
         let mut pending: Option<(Ctx, send::Write)> = None;
         let mut months = Months::new();
+        let mut definitions = Definitions::new();
         while let Ok(command) = command_rx.recv() {
             let reply = match command {
-                Command::Refresh => Reply::Snapshot(Box::new(fetch_with(&ctx, &mut months))),
+                Command::Refresh => {
+                    Reply::Snapshot(Box::new(fetch_with(&ctx, &mut months, &mut definitions)))
+                }
                 Command::Prepare(kind, amount) => {
                     let write_ctx = Ctx::new(quiet.clone());
                     let write = match kind {
@@ -608,7 +713,8 @@ pub fn content(frame: &mut Frame, f: &Fund, area: Rect) -> Drawn {
             Span::styled(if f.offline { "  offline" } else { "" }, muted()),
         ]),
     );
-    let side: u16 = 30;
+    // "found" and "on the oracle", or, off it, what the spec makes of it.
+    let side: u16 = 34;
     let column = area.right().saturating_sub(side);
     if !f.snap.finds.is_empty() {
         put(
@@ -634,12 +740,13 @@ pub fn content(frame: &mut Frame, f: &Fund, area: Rect) -> Drawn {
         drawn
             .finds
             .push((row, format!("{} · {}", find.title, host(&find.url)), index));
-        let oracle = match &find.on_oracle {
-            Some(status) => Span::styled(
+        let oracle = match (&find.on_oracle, &find.checked) {
+            (Some(status), _) => Span::styled(
                 format!("● {}", status.to_lowercase()),
                 Style::default().fg(GREEN),
             ),
-            None => Span::styled("–", muted()),
+            (None, Some(checked)) => Span::styled(format!("– {}", checked.words()), muted()),
+            (None, None) => Span::styled("–", muted()),
         };
         put(
             frame,
@@ -680,7 +787,15 @@ pub fn content(frame: &mut Frame, f: &Fund, area: Rect) -> Drawn {
                     format!("{} · {}", mine.title, host(&mine.url)),
                     Style::default().fg(TEXT),
                 ),
-                Span::styled(format!("  {}", mine.status.to_lowercase()), muted()),
+                Span::styled(
+                    match &mine.checked {
+                        Some(checked) => {
+                            format!("  {} · {}", mine.status.to_lowercase(), checked.words())
+                        }
+                        None => format!("  {}", mine.status.to_lowercase()),
+                    },
+                    muted(),
+                ),
             ]),
         );
         y += 1;

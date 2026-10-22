@@ -25,7 +25,7 @@ The [Web app](https://docs.amoeba.farm/getting-started/03-web-client/) page desc
 
 ## Choose your path
 
-**Traders.** Start with [Capped futures](https://docs.amoeba.farm/trading/03-capped-futures/) for payoffs, [RAMX and NANDX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/) for what you are trading, and [Fees and transaction costs](https://docs.amoeba.farm/trading/02-fees/). Then read [Trading and liquidity](https://docs.amoeba.farm/markets/02-liquidity-and-trading/) and [Market lifecycle](https://docs.amoeba.farm/reference/01-market-lifecycle/).
+**Traders.** Start with [Capped futures](https://docs.amoeba.farm/trading/03-capped-futures/) for payoffs, [RAMX, NANDX, and BATX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/) for what you are trading, and [Fees and transaction costs](https://docs.amoeba.farm/trading/02-fees/). Then read [Trading and liquidity](https://docs.amoeba.farm/markets/02-liquidity-and-trading/) and [Market lifecycle](https://docs.amoeba.farm/reference/01-market-lifecycle/).
 
 **Liquidity providers.** You can deposit USDC into the Earn vault on **Earn**, which funds the treasury maker in every market and shares its result, or place your own limit orders. Earn withdrawals pay your shares at the vault's lowest value, at once. Read [Providing liquidity](https://docs.amoeba.farm/earn/01-providing-liquidity/), [Earn](https://docs.amoeba.farm/earn/02-earn/), and [Earn settlement](https://docs.amoeba.farm/earn/03-earn-settlement/).
 

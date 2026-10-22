@@ -249,17 +249,27 @@ fn source_matches(source: &Value, query: Option<&str>) -> bool {
     })
 }
 
-fn bucket_name(source: &Value) -> String {
-    source["bucketLabel"]
+/// What people read for a bucket of an API document: its `bucketName`
+/// ("DDR5 16Gb" for a chip bucket), else the name its label or id gives.
+pub(crate) fn bucket_name(v: &Value) -> String {
+    v["bucketName"]
         .as_str()
+        .filter(|n| !n.is_empty())
         .map(str::to_string)
+        .or_else(|| v["bucketLabel"].as_str().and_then(skus::name_of))
+        .or_else(|| skus::id_name(text(v, "bucketId")))
         .unwrap_or_else(|| {
-            let id = text(source, "bucketId");
-            skus::parse_hex32(id, "bucket")
-                .ok()
-                .and_then(|b| skus::decode_label(&b))
-                .unwrap_or_else(|| format!("{}…", &id[..id.len().min(12)]))
+            let id = text(v, "bucketId");
+            format!("{}…", &id[..id.len().min(12)])
         })
+}
+
+/// A document's routing (the API's, of a source or candidate) in plain words.
+pub(crate) fn routing_summary(v: &Value) -> Option<&'static str> {
+    v["routing"]["status"]
+        .as_str()
+        .and_then(ameba_commodity_spec::Status::parse)
+        .map(|status| status.summary())
 }
 
 /// `petri oracle sources [MARKET] [--expiry] [--query] [--limit]`.
@@ -287,7 +297,9 @@ pub fn sources(
             sources.len(),
             number(inventory, "sourceCount")
         )));
-        let mut table = Table::new(&[
+        // Chip months' sources carry the spec's routing: whether each counts.
+        let checked = sources.iter().any(|s| routing_summary(s).is_some());
+        let mut headers = vec![
             "Source id",
             "Bucket",
             "Status",
@@ -295,10 +307,13 @@ pub fn sources(
             "Current",
             "Baseline",
             "URL",
-        ])
-        .right(&[3, 4, 5]);
+        ];
+        if checked {
+            headers.insert(3, "Checked");
+        }
+        let mut table = Table::new(&headers).right(if checked { &[4, 5, 6] } else { &[3, 4, 5] });
         for source in sources.iter().take(limit) {
-            table.row(vec![
+            let mut row = vec![
                 format!(
                     "{}…",
                     &text(source, "sourceId")[..16.min(text(source, "sourceId").len())]
@@ -312,7 +327,11 @@ pub fn sources(
                     .as_str()
                     .unwrap_or("(locator not published)")
                     .to_string(),
-            ]);
+            ];
+            if checked {
+                row.insert(3, routing_summary(source).unwrap_or("-").to_string());
+            }
+            table.row(row);
         }
         if table.is_empty() {
             lines.push("  no matching sources".to_string());
@@ -450,12 +469,9 @@ pub fn candidates(
                 &text(c, "contentHash")[..16.min(text(c, "contentHash").len())]
             ),
             text(details, "expiryId").to_string(),
-            {
-                let id = text(details, "bucketId");
-                skus::parse_hex32(id, "bucket")
-                    .ok()
-                    .and_then(|b| skus::decode_label(&b))
-                    .unwrap_or_else(|| format!("{}…", &id[..id.len().min(12)]))
+            match routing_summary(c) {
+                Some(summary) => format!("{} · {summary}", bucket_name(details)),
+                None => bucket_name(details),
             },
             format!(
                 "{}…",
@@ -484,9 +500,29 @@ pub fn candidate(ctx: &Ctx, p: Paint, hash: &str) -> Result<Report> {
     let c = &data["candidate"];
     let d = &c["details"];
     let mut lines = vec![p.bold(&format!("Candidate {hash}"))];
+    let bucket = bucket_name(d);
+    let series = &c["series"];
+    let row = [&series["origin"]["publisher"], &series["origin"]["row"]]
+        .iter()
+        .filter_map(|v| v.as_str())
+        .collect::<Vec<_>>()
+        .join(" · ");
     for (label, value) in [
         ("Month", text(d, "expiryId")),
-        ("Bucket", text(d, "bucketId")),
+        ("Bucket", bucket.as_str()),
+        (
+            "Series",
+            if series.is_object() {
+                text(series, "seriesId")
+            } else {
+                "-"
+            },
+        ),
+        (
+            "Reported as",
+            if row.is_empty() { "-" } else { row.as_str() },
+        ),
+        ("Checked", routing_summary(c).unwrap_or("-")),
         ("URL", text(d, "canonicalUrl")),
         ("Source type", text(d, "sourceType")),
         ("Price field", text(d, "priceField")),

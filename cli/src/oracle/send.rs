@@ -5,9 +5,13 @@
 //! that uses what an earlier one writes (its evidence) is left to the send's
 //! preflight, since the earlier one is not on chain yet.
 
+use std::collections::HashMap;
+
 use serde_json::{Value, json};
-use solana_program::{instruction::Instruction, pubkey::Pubkey};
-use solana_transaction::Transaction;
+use solana_message::{AddressLookupTableAccount, VersionedMessage, v0};
+use solana_program::{hash::Hash, instruction::Instruction, pubkey::Pubkey};
+use solana_signature::Signature;
+use solana_transaction::{Transaction, versioned::VersionedTransaction};
 
 use ameba_sdk_futures::futures::governance::GateBinding;
 
@@ -25,10 +29,13 @@ use crate::{
     },
 };
 
-/// One transaction: named instructions, sent atomically.
+/// One transaction: named instructions, sent atomically, as a legacy
+/// transaction or (with `lookup_table`) a v0 one whose accounts resolve
+/// through that address lookup table.
 #[derive(Clone, Debug, Default)]
 pub struct Tx {
     pub steps: Vec<(String, Instruction)>,
+    pub lookup_table: Option<Pubkey>,
 }
 
 impl Tx {
@@ -44,6 +51,12 @@ impl Tx {
 
     pub fn push(&mut self, name: &str, ix: Instruction) -> &mut Self {
         self.steps.push((name.to_string(), ix));
+        self
+    }
+
+    /// The same transaction, sent as v0 through the lookup table `table`.
+    pub fn through(mut self, table: Pubkey) -> Self {
+        self.lookup_table = Some(table);
         self
     }
 
@@ -184,11 +197,154 @@ fn wire_size(tx: &Transaction) -> usize {
     bincode::serialized_size(tx).unwrap_or(u64::MAX) as usize
 }
 
-fn build(ctx: &Ctx, tx: &Tx, payer: &Pubkey) -> Result<Transaction> {
-    Ok(Transaction::new_with_payer(
+/// The address lookup table program.
+pub const LOOKUP_TABLE_PROGRAM: Pubkey =
+    Pubkey::from_str_const("AddressLookupTab1e1111111111111111111111111");
+/// A lookup table's header (`LookupTableMeta`) before its addresses.
+const LOOKUP_TABLE_META: usize = 56;
+
+/// An address lookup table's addresses, from its account: owned by the
+/// lookup table program, a table (state 1), not deactivated, then whole
+/// 32-byte addresses. Entries are append-only, so the indexes a message
+/// uses keep naming the accounts it was compiled with.
+pub fn decode_table(
+    key: &Pubkey,
+    account: Option<&crate::futures::rpc::Account>,
+) -> Result<AddressLookupTableAccount> {
+    let account =
+        account.ok_or_else(|| Error::msg(format!("lookup table {key} does not exist")))?;
+    let d = &account.data;
+    let deactivation = d
+        .get(4..12)
+        .map(|b| u64::from_le_bytes(b.try_into().unwrap()));
+    if account.owner != LOOKUP_TABLE_PROGRAM
+        || d.len() < LOOKUP_TABLE_META
+        || d[..4] != [1, 0, 0, 0]
+        || !(d.len() - LOOKUP_TABLE_META).is_multiple_of(32)
+    {
+        bail(format!("{key} is not an address lookup table"))?;
+    }
+    if deactivation != Some(u64::MAX) {
+        bail(format!("lookup table {key} is deactivated"))?;
+    }
+    Ok(AddressLookupTableAccount {
+        key: *key,
+        addresses: d[LOOKUP_TABLE_META..]
+            .chunks_exact(32)
+            .map(|a| Pubkey::new_from_array(a.try_into().unwrap()))
+            .collect(),
+    })
+}
+
+/// The lookup tables a write's transactions go through, read once.
+fn tables(ctx: &Ctx, write: &Write) -> Result<HashMap<Pubkey, AddressLookupTableAccount>> {
+    let mut out = HashMap::new();
+    for key in write.txs.iter().filter_map(|tx| tx.lookup_table) {
+        if let std::collections::hash_map::Entry::Vacant(entry) = out.entry(key) {
+            entry.insert(decode_table(&key, ctx.rpc.account(&key)?.as_ref())?);
+        }
+    }
+    Ok(out)
+}
+
+/// One transaction as it goes on the wire.
+#[derive(Debug)]
+enum Wire {
+    Legacy(Transaction),
+    V0(VersionedTransaction),
+}
+
+impl Wire {
+    fn size(&self) -> usize {
+        match self {
+            Wire::Legacy(tx) => wire_size(tx),
+            Wire::V0(tx) => bincode::serialized_size(tx).unwrap_or(u64::MAX) as usize,
+        }
+    }
+
+    fn simulate(&self, ctx: &Ctx) -> Result<crate::futures::rpc::Simulation> {
+        match self {
+            Wire::Legacy(tx) => ctx.rpc.simulate(tx),
+            Wire::V0(tx) => ctx.rpc.simulate(tx),
+        }
+    }
+
+    fn send(
+        &self,
+        ctx: &Ctx,
+    ) -> Result<std::result::Result<Signature, crate::futures::rpc::RpcFailure>> {
+        match self {
+            Wire::Legacy(tx) => ctx.rpc.send(tx),
+            Wire::V0(tx) => ctx.rpc.send(tx),
+        }
+    }
+}
+
+/// `ixs` as a v0 message resolving its other accounts through `table`.
+fn v0_message(
+    ixs: &[Instruction],
+    payer: &Pubkey,
+    table: &AddressLookupTableAccount,
+    blockhash: Hash,
+) -> Result<VersionedMessage> {
+    v0::Message::try_compile(payer, ixs, std::slice::from_ref(table), blockhash)
+        .map(VersionedMessage::V0)
+        .map_err(|e| {
+            Error::msg(format!(
+                "cannot compile a v0 message through {}: {e}",
+                table.key
+            ))
+        })
+}
+
+/// The unsigned transaction (each signature a zeroed slot).
+fn compose(
+    ixs: &[Instruction],
+    payer: &Pubkey,
+    table: Option<&AddressLookupTableAccount>,
+) -> Result<Wire> {
+    Ok(match table {
+        None => Wire::Legacy(Transaction::new_with_payer(ixs, Some(payer))),
+        Some(table) => {
+            let message = v0_message(ixs, payer, table, Hash::default())?;
+            let signers = usize::from(message.header().num_required_signatures);
+            Wire::V0(VersionedTransaction {
+                signatures: vec![Signature::default(); signers],
+                message,
+            })
+        }
+    })
+}
+
+fn table_of<'a>(
+    tx: &Tx,
+    tables: &'a HashMap<Pubkey, AddressLookupTableAccount>,
+) -> Result<Option<&'a AddressLookupTableAccount>> {
+    tx.lookup_table
+        .map(|key| {
+            tables
+                .get(&key)
+                .ok_or_else(|| Error::msg(format!("lookup table {key} was not read")))
+        })
+        .transpose()
+}
+
+fn build(
+    ctx: &Ctx,
+    tx: &Tx,
+    payer: &Pubkey,
+    tables: &HashMap<Pubkey, AddressLookupTableAccount>,
+) -> Result<Wire> {
+    compose(&instructions(ctx, tx)?, payer, table_of(tx, tables)?)
+}
+
+/// The wire size of `tx` as a legacy transaction (what goes out without a
+/// lookup table).
+pub fn legacy_size(ctx: &Ctx, tx: &Tx, payer: &Pubkey) -> Result<usize> {
+    Ok(wire_size(&Transaction::new_with_payer(
         &instructions(ctx, tx)?,
         Some(payer),
-    ))
+    )))
 }
 
 /// `steps` in order, in as few transactions as fit a packet once each
@@ -273,7 +429,13 @@ fn waiting_note(txs: &[Tx], waits: &[usize]) -> String {
 /// Simulates every transaction in order without signing; stops at the first
 /// failure. A transaction that uses what an earlier one writes is not
 /// simulated, since the earlier one is not on chain yet.
-fn simulate(ctx: &Ctx, write: &Write, payer: &Pubkey, oracle: &Pubkey) -> Result<Value> {
+fn simulate(
+    ctx: &Ctx,
+    write: &Write,
+    payer: &Pubkey,
+    oracle: &Pubkey,
+    tables: &HashMap<Pubkey, AddressLookupTableAccount>,
+) -> Result<Value> {
     let waits = waits_for(&write.txs);
     let mut results = Vec::new();
     for (i, tx) in write.txs.iter().enumerate() {
@@ -289,7 +451,7 @@ fn simulate(ctx: &Ctx, write: &Write, payer: &Pubkey, oracle: &Pubkey) -> Result
             }));
             continue;
         }
-        let sim = ctx.rpc.simulate(&build(ctx, tx, payer)?)?;
+        let sim = build(ctx, tx, payer, tables)?.simulate(ctx)?;
         let ok = sim.err.is_none();
         let error = sim
             .err
@@ -324,8 +486,9 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
     let (identity, _config) = chain_identity::verify_oracle(ctx)?;
     let oracle = identity.oracle;
     let payer = ctx.wallet_pubkey()?;
+    let tables = tables(ctx, &write)?;
     for tx in &write.txs {
-        let size = wire_size(&build(ctx, tx, &payer)?);
+        let size = build(ctx, tx, &payer, &tables)?.size();
         if size > PACKET_SIZE {
             bail(format!(
                 "{} would be {size} bytes, over the {PACKET_SIZE}-byte packet limit",
@@ -336,7 +499,13 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
     let plan: Vec<Value> = write
         .txs
         .iter()
-        .map(|tx| json!({"steps": tx.names()}))
+        .map(|tx| {
+            json!({
+                "steps": tx.names(),
+                "version": if tx.lookup_table.is_some() { "v0" } else { "legacy" },
+                "lookupTable": tx.lookup_table.map(|t| t.to_string()),
+            })
+        })
         .collect();
     let mut lines = vec![p.bold(&write.title)];
     lines.extend(write.review.iter().map(|l| format!("  {l}")));
@@ -345,7 +514,7 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
         write.txs.len()
     ));
     if simulate_only {
-        let results = simulate(ctx, &write, &payer, &oracle)?;
+        let results = simulate(ctx, &write, &payer, &oracle, &tables)?;
         let all_ok = results
             .as_array()
             .is_some_and(|r| simulated_ok(r, write.txs.len()));
@@ -405,12 +574,22 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
     let mut sent = Vec::new();
     for (i, tx) in write.txs.iter().enumerate() {
         let (blockhash, last_valid) = ctx.rpc.latest_blockhash()?;
-        let signed = Transaction::new_signed_with_payer(
-            &instructions(ctx, tx)?,
-            Some(&payer),
-            &[signer.as_ref()],
-            blockhash,
-        );
+        let ixs = instructions(ctx, tx)?;
+        let signed = match table_of(tx, &tables)? {
+            None => Wire::Legacy(Transaction::new_signed_with_payer(
+                &ixs,
+                Some(&payer),
+                &[signer.as_ref()],
+                blockhash,
+            )),
+            Some(table) => Wire::V0(
+                VersionedTransaction::try_new(
+                    v0_message(&ixs, &payer, table, blockhash)?,
+                    &[signer.as_ref()],
+                )
+                .map_err(|e| Error::msg(format!("cannot sign the v0 transaction: {e}")))?,
+            ),
+        };
         let names = tx.names();
         let fail = |e: Error| {
             let mut e = e;
@@ -426,7 +605,7 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
             }
             e
         };
-        let signature = match ctx.rpc.send(&signed)? {
+        let signature = match signed.send(ctx)? {
             Err(failure) => {
                 let err = failure
                     .err
@@ -472,6 +651,128 @@ use solana_signer::Signer as _;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The lookup table ops creates for a month (contract of 2026-10-21):
+    /// period, month, coverage manifest, reward schedule, carry period, the
+    /// system program, the oracle's gate, then every SKU pool by bucket id.
+    fn month_table(
+        program: &Pubkey,
+        period: &Pubkey,
+        month: &Pubkey,
+        gate: &Pubkey,
+        buckets: &[[u8; 32]],
+    ) -> AddressLookupTableAccount {
+        use ameba_oracle::{instruction as ix, state};
+        let schedule = state::derive_oracle_usdc_reward_schedule_pda(program, month).0;
+        let mut addresses = vec![
+            *period,
+            *month,
+            state::derive_oracle_sku_coverage_manifest_pda(program, month).0,
+            schedule,
+            ix::find_carry_period_address(program, month),
+            solana_program::system_program::ID,
+            *gate,
+        ];
+        addresses.extend(
+            buckets
+                .iter()
+                .map(|b| state::derive_oracle_usdc_sku_pool_pda(program, &schedule, b).0),
+        );
+        AddressLookupTableAccount {
+            key: Pubkey::new_unique(),
+            addresses,
+        }
+    }
+
+    #[test]
+    fn a_chip_months_sponsorship_fits_a_packet_as_v0_through_its_table() {
+        use ameba_oracle::{
+            instruction::{self as ix, ProposeOracleSourceV3Params},
+            sponsorship::{DEFAULT_RETENTION_BPS, SponsorTerms},
+        };
+        let (program, sponsor) = (Pubkey::new_unique(), Pubkey::new_unique());
+        let (period, month) = (Pubkey::new_unique(), Pubkey::new_unique());
+        // RAMX's four chip buckets: a two-level SKU proof.
+        let chips = super::super::skus::chips(ameba_commodity_spec::Product::Ramx).unwrap();
+        let bucket = chips.ids[2];
+        let (sku_index, sku_proof) = chips.proof(&bucket).unwrap();
+        assert_eq!(sku_proof.len(), 2);
+        let activation = Tx::one(
+            "sponsorSource",
+            ix::sponsored_activate(
+                &program,
+                &sponsor,
+                &sponsor,
+                &sponsor,
+                &period,
+                &month,
+                SponsorTerms {
+                    agent_id: [1; 32],
+                    researcher: Pubkey::new_unique(),
+                    candidate_hash: [2; 32],
+                    funding: 0,
+                    researcher_bps: 2_000,
+                    retention_bps: DEFAULT_RETENTION_BPS,
+                    maximum_bond: 1_000_000,
+                    maximum_outstanding: 5_000_000,
+                },
+                ProposeOracleSourceV3Params {
+                    source_id: [2; 32],
+                    bucket_id: bucket,
+                    source_type_hash: [3; 32],
+                    canonical_locator_hash: [4; 32],
+                    source_definition_hash: [5; 32],
+                    listing_bond: 1_000_000,
+                    sku_index,
+                    sku_proof,
+                },
+            ),
+        );
+        // A governed oracle: the gate account and tail on the instruction.
+        let gate = GateBinding {
+            controller: Pubkey::new_unique(),
+            target: program,
+            address: Pubkey::new_unique(),
+            epoch: 7,
+        };
+        let ixs = bind_oracle(Some(&gate), activation.instructions()).unwrap();
+        let table = month_table(&program, &period, &month, &gate.address, &chips.ids);
+        let legacy = compose(&ixs, &sponsor, None).unwrap().size();
+        let v0 = compose(&ixs, &sponsor, Some(&table)).unwrap().size();
+        // Over the packet as legacy; as v0 through the table it fits.
+        assert!(legacy > PACKET_SIZE && v0 <= PACKET_SIZE, "{legacy} {v0}");
+        // With the compute-unit limit and the gate: 1283 bytes legacy, 1071 as v0.
+        assert_eq!((legacy, v0), (1_283, 1_071));
+    }
+
+    #[test]
+    fn a_lookup_table_reads_from_its_account() {
+        let key = Pubkey::new_unique();
+        let addresses = [Pubkey::new_unique(), Pubkey::new_unique()];
+        let mut data = vec![1, 0, 0, 0];
+        data.extend(u64::MAX.to_le_bytes());
+        data.resize(LOOKUP_TABLE_META, 0);
+        for a in &addresses {
+            data.extend(a.to_bytes());
+        }
+        let account = |data: Vec<u8>, owner| crate::futures::rpc::Account {
+            lamports: 1,
+            owner,
+            data,
+            executable: false,
+        };
+        let table = decode_table(&key, Some(&account(data.clone(), LOOKUP_TABLE_PROGRAM))).unwrap();
+        assert_eq!((table.key, table.addresses), (key, addresses.to_vec()));
+        assert!(decode_table(&key, None).is_err());
+        assert!(decode_table(&key, Some(&account(data.clone(), Pubkey::new_unique()))).is_err());
+        let mut closing = data.clone();
+        closing[4..12].copy_from_slice(&100u64.to_le_bytes());
+        let error = decode_table(&key, Some(&account(closing, LOOKUP_TABLE_PROGRAM))).unwrap_err();
+        assert!(error.message.contains("deactivated"), "{}", error.message);
+        let mut torn = data;
+        torn.pop();
+        assert!(decode_table(&key, Some(&account(torn, LOOKUP_TABLE_PROGRAM))).is_err());
+    }
 
     #[test]
     fn the_size_check_measures_the_signed_transaction() {

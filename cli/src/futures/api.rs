@@ -51,6 +51,17 @@ pub struct ApiConfig {
     pub usdc_mint: String,
     pub usdc_decimals: u8,
     pub sponsor: String,
+    /// The sponsorship terms and the months' lookup tables.
+    pub sponsorship: Option<SponsorshipConfig>,
+}
+
+/// `/v1/config`'s `sponsorship`.
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(default, rename_all = "camelCase")]
+pub struct SponsorshipConfig {
+    /// Each month's sponsorship lookup table (base58), by its series key
+    /// (`RAMX-1798761600`, as the deployment manifest's `oracle.periods`).
+    pub lookup_tables: std::collections::BTreeMap<String, String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
@@ -144,6 +155,33 @@ impl Api {
     pub fn post(&self, path: &str, body: &Value) -> Result<Value> {
         let url = format!("{}{path}", self.base);
         self.finish(path, self.http.post(url).json(body).send())
+    }
+
+    /// POSTs `bytes` as they are (`application/json`): evidence bundles,
+    /// whose digest a re-serialisation could change.
+    pub fn post_bytes(&self, path: &str, bytes: &[u8]) -> Result<Value> {
+        let url = format!("{}{path}", self.base);
+        self.finish(
+            path,
+            self.http
+                .post(url)
+                .header("content-type", "application/json")
+                .body(bytes.to_vec())
+                .send(),
+        )
+    }
+
+    /// POSTs with an `Authorization: Bearer` credential (the candidate store).
+    pub fn post_bearer(&self, path: &str, body: &Value, credential: &str) -> Result<Value> {
+        let url = format!("{}{path}", self.base);
+        self.finish(
+            path,
+            self.http
+                .post(url)
+                .bearer_auth(credential)
+                .json(body)
+                .send(),
+        )
     }
 
     pub fn config(&self) -> Result<ApiConfig> {

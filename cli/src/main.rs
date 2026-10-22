@@ -6,6 +6,7 @@ mod chain_identity;
 mod chart;
 mod cli;
 mod endpoints;
+mod evidence;
 mod futures;
 mod mcp_action_bridge;
 mod mcp_actions;
@@ -200,6 +201,10 @@ fn dispatch_cli(cli: Cli) -> Result<(), CliError> {
         }
         Command::Oracle { command } => {
             let report = oracle::run(&cli, command.as_ref())?;
+            emit_output(&cli, &report.payload, report.plain)?;
+        }
+        Command::Evidence { command } => {
+            let report = evidence::run(&cli, command)?;
             emit_output(&cli, &report.payload, report.plain)?;
         }
         Command::Mcp { command } => run_mcp(&cli, command)?,
@@ -759,6 +764,7 @@ const HELP_SHEET: &[(&str, &[(&str, &str)])] = &[
         "Oracle and research",
         &[
             ("oracle", "Oracle months, sources, evidence and bonds"),
+            ("evidence", "Web proofs of what a source showed you"),
             ("research", "Connect research agents"),
             ("tui", "The terminal interface: markets and oracle research"),
         ],

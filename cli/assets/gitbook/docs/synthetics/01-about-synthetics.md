@@ -1,14 +1,16 @@
 # Synthetic exposure
 
-Amoeba futures are synthetic. They pay USDC based on a hardware price index. You never receive memory modules, SSDs, warehouse receipts, or any claim on physical stock.
+Amoeba futures are synthetic. They pay USDC based on a hardware price index. You never receive memory chips, wafers, modules, SSDs, battery cells, warehouse receipts, or any claim on physical stock.
 
 ## What the exposure is
 
-Each market references the RAMX or NANDX index for one month. RAMX follows memory module prices; NANDX follows NAND flash and storage prices. Each index starts the month at 100 and moves with a fixed, weighted basket of product categories. See [RAMX and NANDX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/).
+Each market references the RAMX, NANDX, or BATX index for one month. RAMX follows DRAM memory chip contract prices; NANDX follows NAND flash wafer contract prices. BATX, a prototype, follows China domestic industrial prices of new lithium-ion battery cells, in yuan. Each index starts the month at 100 and moves with a fixed, weighted basket of buckets. See [RAMX, NANDX, and BATX markets](https://docs.amoeba.farm/overview/02-markets-ramx-nandx-future/).
 
 This is a view on component prices, not on companies. A memory maker's shares also depend on its costs, debt, product mix, and other business results. The index does not.
 
-The index is built from published category prices. It can differ from what a buyer pays under a supply contract, and it is not a universal transaction price. Read what each market's rows cover rather than relying on the ticker. The full list is in [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/).
+BATX measures price changes in Chinese yuan. Settling it in USDC adds no currency return.
+
+The index is built from published price assessments and recurring quotes. For RAMX and NANDX, these are contract prices only. It can differ from what a buyer pays under their own supply contract, and it is not a universal transaction price. Read what each market's buckets cover rather than relying on the ticker. The full list is in [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/).
 
 ## Why ranges
 

@@ -3,6 +3,7 @@
 //! Periods are discovered from the oracle program itself, so writes do not
 //! depend on the futures API.
 
+use ameba_commodity_spec::Product;
 use ameba_oracle::{
     instruction as ix,
     interface::{Period, PeriodStatus, find_period_address},
@@ -16,9 +17,12 @@ use ameba_oracle::{
 };
 use borsh::BorshDeserialize;
 use chrono::{DateTime, Datelike, Utc};
-use solana_program::pubkey::Pubkey;
+use solana_program::{hash::hashv, pubkey::Pubkey};
 
-use super::skus::{self, hex};
+use super::{
+    skus::{self, SetKind, hex},
+    writes::{OBJECT_HEADER, definition_text},
+};
 use crate::futures::{
     ctx::Ctx,
     error::{Error, Result, bail},
@@ -133,9 +137,86 @@ pub struct SourceRef {
 }
 
 impl SourceRef {
+    /// Its SKU label (`DDR5_16GBIT`, `KSM64R52BD8-32HA`), else its hex id.
     pub fn bucket_label(&self) -> String {
         skus::decode_label(&self.state.bucket_id).unwrap_or_else(|| hex(&self.state.bucket_id))
     }
+
+    /// What people read for its bucket: "DDR5 16Gb" for a chip bucket, else its label.
+    pub fn bucket_name(&self) -> String {
+        skus::bucket_name(&self.state.bucket_id)
+    }
+}
+
+/// The role of a source's definition link (0 is its locator's).
+const DEFINITION_ROLE: u8 = 1;
+/// Evidence object kind 2: a source definition.
+const DEFINITION_KIND: u8 = 2;
+/// An evidence link's exact length.
+const LINK_LEN: usize = 251;
+
+/// The evidence object a source's definition link points to, when the link is
+/// the canonical role-1 link of exactly this source and definition commitment.
+fn definition_object(
+    program: &Pubkey,
+    source: &SourceRef,
+    link: &Pubkey,
+    account: Option<&Account>,
+) -> Option<Pubkey> {
+    let account = account?;
+    let d = &account.data;
+    let s = &source.state;
+    let ok = account.owner == *program
+        && !account.executable
+        && d.len() == LINK_LEN
+        && d[..5] == *b"OEL\x01\x01"
+        && *link
+            == ix::find_evidence_link_address(
+                program,
+                &source.address,
+                DEFINITION_ROLE,
+                &s.source_definition_hash,
+            )
+        && d[6..38] == s.month.to_bytes()
+        && d[38..70] == source.address.to_bytes()
+        && d[70..102] == source.address.to_bytes()
+        && d[166] == DEFINITION_ROLE
+        && d[187..219] == s.source_definition_hash
+        && d[219..251] == s.source_id;
+    ok.then(|| Pubkey::new_from_array(d[102..134].try_into().unwrap()))
+}
+
+/// The definition text of a sealed definition object committed to `hash`.
+fn definition_in(
+    program: &Pubkey,
+    key: &Pubkey,
+    account: &Account,
+    hash: &[u8; 32],
+) -> Option<String> {
+    let d = &account.data;
+    if account.owner != *program
+        || account.executable
+        || d.len() < OBJECT_HEADER
+        || d[..5] != *b"OEB\x01\x01"
+    {
+        return None;
+    }
+    let payer = Pubkey::new_from_array(d[6..38].try_into().unwrap());
+    let total = usize::from(u16::from_le_bytes([d[71], d[72]]));
+    let written = usize::from(u16::from_le_bytes([d[73], d[74]]));
+    let body = &d[OBJECT_HEADER..];
+    let ok = *key == ix::find_evidence_object_address(program, &payer, DEFINITION_KIND, hash)
+        && d[38] == DEFINITION_KIND
+        && d[39..71] == *hash
+        && d[75] == 1
+        && total > 0
+        && written == total
+        && body.len() == total
+        && hashv(&[body]).to_bytes() == *hash;
+    if !ok {
+        return None;
+    }
+    definition_text(body)
 }
 
 fn squash(text: &str) -> String {
@@ -426,16 +507,17 @@ impl<'a> Oracle<'a> {
 
     /// The SKU index and proof for `bucket` in `month`. The month's coverage
     /// manifest commits to its required SKU root; Petri proves membership
-    /// against the governed SKU set of the product, or (for a month formed
-    /// outside the governed set, such as a dev bootstrap month) against the set
-    /// of bucket ids its sources carry, whichever reproduces that root.
+    /// against the governed set of the product with that root (its
+    /// part-number list for older months, its chip buckets for months expiring
+    /// after 2026-11-01), or (for a month formed outside the governed sets,
+    /// such as a dev bootstrap month) against the set of bucket ids its sources
+    /// carry, whichever reproduces that root.
     pub fn sku_proof(&self, month: &MonthRef, bucket: &[u8; 32]) -> Result<(u16, Vec<[u8; 32]>)> {
         let coverage = self.coverage(month)?;
         let symbol = &month.period.symbol;
-        let governed = skus::for_symbol(symbol).ok();
-        let set = match governed {
-            Some(governed) if coverage.required_sku_root == governed.root => governed,
-            _ => {
+        let set = match skus::for_root(symbol, &coverage.required_sku_root) {
+            Some(governed) => governed,
+            None => {
                 // The month's source buckets, with or without this one (a
                 // product's first source, or a one-SKU month).
                 let ids: Vec<[u8; 32]> = self
@@ -464,6 +546,117 @@ impl<'a> Oracle<'a> {
             bail("the SKU coverage manifest's count does not match its SKU set")?;
         }
         set.proof(bucket)
+    }
+
+    /// The commodity product of a chip month: its coverage commits to the
+    /// product's chip buckets, or (a month formed from its own source
+    /// buckets, such as a dev bootstrap month) every source it has is in one
+    /// of them. None for a month on part numbers or other categories, or a
+    /// product without chip buckets.
+    pub fn chip_product(&self, month: &MonthRef) -> Result<Option<Product>> {
+        let Some(product) = Product::from_symbol(&month.period.symbol) else {
+            return Ok(None);
+        };
+        let root = self.coverage(month)?.required_sku_root;
+        Ok(
+            match skus::for_root(&month.period.symbol, &root).and_then(|set| set.kind) {
+                Some(SetKind::Chips) => Some(product),
+                Some(SetKind::PartNumbers) => None,
+                None => {
+                    let sources = self.sources(month)?;
+                    (!sources.is_empty()
+                        && sources.iter().all(|s| {
+                            skus::chip_bucket(&s.state.bucket_id)
+                                .is_some_and(|b| b.product == product)
+                        }))
+                    .then_some(product)
+                }
+            },
+        )
+    }
+
+    /// The definition text of the sources at `addresses`, in order (three
+    /// batched reads): None for an address that is not a canonical source or
+    /// whose definition is not readable.
+    pub fn definitions_at(&self, addresses: &[Pubkey]) -> Result<Vec<Option<String>>> {
+        let accounts = self.ctx.rpc.accounts(addresses)?;
+        let sources: Vec<Option<SourceRef>> = addresses
+            .iter()
+            .zip(&accounts)
+            .map(|(address, account)| {
+                let state: OracleSourceState = decode(
+                    &self.program,
+                    address,
+                    account.as_ref(),
+                    OracleSourceState::LEN,
+                    "oracle source",
+                )
+                .ok()?;
+                (state.is_initialized
+                    && ix::find_oracle_source_address(
+                        &self.program,
+                        &state.month,
+                        &state.source_id,
+                    ) == *address)
+                    .then_some(SourceRef {
+                        address: *address,
+                        state,
+                    })
+            })
+            .collect();
+        let known: Vec<SourceRef> = sources.iter().flatten().cloned().collect();
+        let mut texts = self.definitions(&known)?.into_iter();
+        Ok(sources
+            .iter()
+            .map(|source| source.as_ref().and_then(|_| texts.next().flatten()))
+            .collect())
+    }
+
+    /// Each source's definition text, in order: read from its definition link
+    /// and the sealed evidence object the link points to (two batched reads
+    /// for any number of sources), and held to the source's definition
+    /// commitment. None where either is missing or does not match.
+    pub fn definitions(&self, sources: &[SourceRef]) -> Result<Vec<Option<String>>> {
+        let links: Vec<Pubkey> = sources
+            .iter()
+            .map(|s| {
+                ix::find_evidence_link_address(
+                    &self.program,
+                    &s.address,
+                    DEFINITION_ROLE,
+                    &s.state.source_definition_hash,
+                )
+            })
+            .collect();
+        let link_accounts = self.ctx.rpc.accounts(&links)?;
+        let objects: Vec<Option<Pubkey>> = sources
+            .iter()
+            .zip(&links)
+            .zip(&link_accounts)
+            .map(|((source, link), account)| {
+                definition_object(&self.program, source, link, account.as_ref())
+            })
+            .collect();
+        let keys: Vec<Pubkey> = objects.iter().flatten().copied().collect();
+        let accounts = self.ctx.rpc.accounts(&keys)?;
+        let found: std::collections::HashMap<Pubkey, Account> = keys
+            .into_iter()
+            .zip(accounts)
+            .filter_map(|(key, account)| Some((key, account?)))
+            .collect();
+        Ok(sources
+            .iter()
+            .zip(objects)
+            .map(|(source, object)| {
+                let key = object?;
+                definition_in(
+                    &self.program,
+                    &key,
+                    found.get(&key)?,
+                    &source.state.source_definition_hash,
+                )
+            })
+            .collect())
     }
 
     /// A month by its address (a sponsorship records only that).
@@ -693,6 +886,107 @@ mod tests {
         assert_eq!(names(Some("ramx"), Some("jan27")), ["RAMX-202701"]);
         assert_eq!(names(Some("nandx"), None), ["NANDX-202612"]);
         assert!(select(all, Some("nandx"), Some("jan27")).is_err());
+    }
+
+    /// A source, its definition link and its sealed definition object, as
+    /// the program writes them.
+    fn published(program: &Pubkey, text: &str) -> (SourceRef, Pubkey, Account, Pubkey, Account) {
+        let month = Pubkey::new_unique();
+        let payer = Pubkey::new_unique();
+        let mut body = b"ameba-oracle-source-definition-v1".to_vec();
+        body.push(0);
+        body.extend_from_slice(&(text.len() as u32).to_le_bytes());
+        body.extend_from_slice(text.as_bytes());
+        let hash = hashv(&[&body]).to_bytes();
+        let state = OracleSourceState {
+            is_initialized: true,
+            month,
+            source_id: [9; 32],
+            source_definition_hash: hash,
+            ..Default::default()
+        };
+        let source = SourceRef {
+            address: ix::find_oracle_source_address(program, &month, &[9; 32]),
+            state,
+        };
+        let object = ix::find_evidence_object_address(program, &payer, 2, &hash);
+        let mut data = b"OEB\x01\x01".to_vec();
+        data.push(0);
+        data.extend_from_slice(payer.as_ref());
+        data.push(2);
+        data.extend_from_slice(&hash);
+        data.extend_from_slice(&(body.len() as u16).to_le_bytes());
+        data.extend_from_slice(&(body.len() as u16).to_le_bytes());
+        data.push(1);
+        data.extend_from_slice(&body);
+        let object_account = Account {
+            lamports: 1,
+            owner: *program,
+            data,
+            executable: false,
+        };
+        let link = ix::find_evidence_link_address(program, &source.address, 1, &hash);
+        let mut data = b"OEL\x01\x01".to_vec();
+        data.push(0);
+        for key in [
+            month,
+            source.address,
+            source.address,
+            object,
+            source.address,
+        ] {
+            data.extend_from_slice(key.as_ref());
+        }
+        data.push(1);
+        data.extend_from_slice(&[0; 20]);
+        data.extend_from_slice(&hash);
+        data.extend_from_slice(&[9; 32]);
+        let link_account = Account {
+            lamports: 1,
+            owner: *program,
+            data,
+            executable: false,
+        };
+        (source, link, link_account, object, object_account)
+    }
+
+    #[test]
+    fn a_sources_definition_reads_from_its_link_and_sealed_object() {
+        let program = Pubkey::new_unique();
+        let text = r#"{"schema":"amoeba.comparison-series.v1","bucket":"DDR5_16GBIT"}"#;
+        let (source, link, link_account, object, object_account) = published(&program, text);
+        assert_eq!(
+            definition_object(&program, &source, &link, Some(&link_account)),
+            Some(object)
+        );
+        let hash = source.state.source_definition_hash;
+        assert_eq!(
+            definition_in(&program, &object, &object_account, &hash).as_deref(),
+            Some(text)
+        );
+        // Another source's link, another program's object, a draft, another
+        // commitment: nothing.
+        let mut other = source.clone();
+        other.state.source_id = [8; 32];
+        assert_eq!(
+            definition_object(&program, &other, &link, Some(&link_account)),
+            None
+        );
+        assert_eq!(definition_object(&program, &source, &link, None), None);
+        let mut foreign = object_account.clone();
+        foreign.owner = Pubkey::new_unique();
+        assert_eq!(definition_in(&program, &object, &foreign, &hash), None);
+        let mut draft = object_account.clone();
+        draft.data[75] = 0;
+        assert_eq!(definition_in(&program, &object, &draft, &hash), None);
+        assert_eq!(
+            definition_in(&program, &object, &object_account, &[1; 32]),
+            None
+        );
+        let mut tampered = object_account;
+        let last = tampered.data.len() - 2;
+        tampered.data[last] ^= 1;
+        assert_eq!(definition_in(&program, &object, &tampered, &hash), None);
     }
 
     #[test]

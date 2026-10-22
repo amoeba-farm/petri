@@ -175,6 +175,31 @@ test('each phase takes its own work: sources while a month forms, openings in Op
     [['update', 'source-address-0', 'gap', '15000000'], ['update', 'source-address-1', 'gap', '15000000']]);
   assert.equal(all[0].url, 'https://source-0.example/product');
 });
+test('a chip month names its buckets and marks its work as series and observations', () => {
+  const chip = '44'.repeat(32);
+  // Taking sources: the API lists its commodity buckets and names them.
+  const forming = observations(1), month = forming.snapshot.state.months[0];
+  month.buckets = [{ bucketId: chip, bucketLabel: 'DDR5_16GBIT', bucketName: 'DDR5 16Gb', weightBps: 3500 }];
+  month.skus = [{ bucketId: chip, bucketLabel: 'DDR5_16GBIT', bucketName: 'DDR5 16Gb' }];
+  forming.snapshot.sourceLinks[0].sources = [];
+  forming.snapshot.sourceLinks[0].sourceCount = 0; month.sourceCount = 0;
+  const [gap] = assessCoverage(forming, [directive], now).assessments;
+  assert.deepEqual([gap.kind, gap.chip, gap.bucketLabel, gap.bucketName], ['source', true, 'DDR5_16GBIT', 'DDR5 16Gb']);
+  const brief = describeGap(gap);
+  assert.equal(brief.title, 'RAMX · DDR5 16Gb');
+  assert.match(brief.brief, /comparison series of DDR5 16Gb/u);
+  // Game: an update is an observation of its source's series.
+  const game = observations(1);
+  for (const fact of [game.snapshot.state.months[0], game.snapshot.sourceLinks[0]]) fact.phase = 'Game';
+  game.snapshot.state.months[0].buckets = month.buckets;
+  Object.assign(game.snapshot.sourceLinks[0].sources[0], { bucketId: chip, bucketLabel: 'DDR5_16GBIT', bucketName: 'DDR5 16Gb',
+    sourceAddress: 'live-source', series: { seriesId: 'example-ddr5-16gb' } });
+  const [update] = assessCoverage(game, [directive], now).assessments;
+  assert.deepEqual([update.kind, update.chip, update.bucketName, update.seriesId], ['update', true, 'DDR5 16Gb', 'example-ddr5-16gb']);
+  assert.match(describeGap(update).brief, /comparison series example-ddr5-16gb: each update is one observation of it, sent with petri oracle observe/u);
+  // A part-number month is not one.
+  assert.equal(assessCoverage(observations(1), [directive], now).assessments[0].chip, false);
+});
 test('work next hands out openings before updates, and an unpaid one only when the owner picks it', async () => {
   const day = 86400000, ownerToken = token(), agentId = token();
   // RAMX-202611 is in Opening with one frozen source; RAMX-202610 in Game with rewards.

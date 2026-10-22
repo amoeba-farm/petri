@@ -6,6 +6,7 @@ pub mod markets;
 mod model;
 mod nav;
 pub mod phase;
+mod proofs;
 mod render;
 mod research_page;
 pub mod rewards;
@@ -189,6 +190,9 @@ pub fn run(
     }
     if let Some(size) = render_size {
         let (width, height) = render_dimensions(size)?;
+        if app.view == View::Evidence {
+            app.proofs.list = proofs::read_list();
+        }
         if app.view == View::Markets {
             let ctx = crate::futures::ctx::Ctx::new(futures);
             app.markets.snap = markets::fetch(&ctx, None);
@@ -218,6 +222,7 @@ pub fn run(
         let _ = session_tx.send(research_session(&api_url));
     });
     app.fund.start(futures.clone());
+    app.proofs.start(futures.clone());
     app.rewards.start(futures.clone());
     app.markets.start(futures);
     let (mut commands, mut replies) = (None, None);
@@ -263,6 +268,7 @@ pub fn run(
         }
         app.markets.tick(app.view == View::Markets);
         app.fund.tick(app.view == View::Fund);
+        app.proofs.tick(app.view == View::Evidence);
         app.rewards
             .tick(app.view == View::Rewards, &app.snapshot.agents);
         while let Some(Ok(reply)) = replies.as_ref().map(|r| r.try_recv()) {

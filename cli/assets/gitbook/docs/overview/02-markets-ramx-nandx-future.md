@@ -1,19 +1,32 @@
-# RAMX and NANDX markets
+# RAMX, NANDX, and BATX markets
 
-Amoeba Farm has two indexes. **RAMX** tracks memory module (DRAM) prices. **NANDX** tracks NAND flash and storage prices. Each index has one capped futures market per monthly expiry, paid in USDC on Solana mainnet.
+Amoeba Farm has three indexes. **RAMX** tracks DRAM memory chip prices. **NANDX** tracks NAND flash wafer prices. **BATX** tracks lithium-ion battery cell prices in China. Each index has one capped futures market per monthly expiry, paid in USDC on Solana mainnet. BATX is a prototype, and its first month is BATX Nov 26.
 
 ## What each index tracks
 
-Each index measures how a fixed basket of product categories moves during the month. It starts the month at **100**. A 3% weighted rise in the basket puts the index at 103.
+Each index measures how a fixed basket of buckets moves during the month. It starts the month at **100**. A 3% weighted rise in the basket puts the index at 103.
 
-| Market | Product categories | Weights in the launch month |
+From the months expiring after 2026-11-01:
+
+| Market | What it prices | Buckets and weights |
 |---|---|---|
-| RAMX | DDR5 and DDR4 server modules (RDIMM), DDR5 and DDR4 unbuffered modules (UDIMM), and DDR4 laptop modules (SODIMM) | RDIMM 68%, UDIMM 23%, SODIMM 9% |
-| NANDX | Channel SSDs, OEM SSDs, eMMC, UFS, and raw NAND flash wafers | Channel SSD 30%, OEM SSD 25%, eMMC 10%, UFS 10%, flash wafer 25% |
+| RAMX | Contract prices of new, standard-production DDR5 and DDR4 memory chips, one die per package | DDR5 16Gb 40%, DDR5 24Gb 20%, DDR4 16Gb 25%, DDR4 8Gb 15% |
+| NANDX | Published contract-price assessments of 3D NAND flash wafers | 1Tb TLC 40%, 1Tb QLC 30%, 512Gb TLC 20%, 256Gb TLC 10% |
+| BATX | China domestic industrial prices of new lithium-ion battery cells, in Chinese yuan | LFP storage 40%, LFP EV 30%, Ternary prismatic EV 20%, Ternary pouch EV 10% |
 
-Each category is split into rows by generation and capacity, for example "DDR5 RDIMM 64GB" or "Channel SSD 1TB PCIe 4.0". RAMX has 13 rows and NANDX has 22. Each row's weight is fixed for the whole oracle month and shown on the **Oracle** page. [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/) lists every row.
+Each bucket's weight is fixed for the whole oracle month and shown on the **Oracle** page. The launch month, RAMX Oct 26 and NANDX Oct 26, uses the first definitions: 13 rows of memory modules (RDIMM 68%, UDIMM 23%, SODIMM 9%) and 22 rows of storage (channel SSD 30%, OEM SSD 25%, flash wafer 25%, eMMC 10%, UFS 10%). [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/) lists every bucket and row.
 
-The index follows the published prices of these categories. It is not the price of a single part, a contract price you would negotiate with a supplier, or a semiconductor company's share price.
+The index follows the published prices of these buckets. It is not the price of a single part, the contract price you would negotiate with your own supplier, or a chip or battery maker's share price.
+
+## BATX
+
+BATX measures China domestic industrial prices of new manufactured lithium-ion battery cells. It is priced in Chinese yuan (CNY), per Wh where possible. Like RAMX and NANDX, it starts each month at 100 and settles in USDC. Settling in USDC adds no currency return: BATX measures price changes in yuan.
+
+Its buckets are LFP cells for energy storage, LFP cells for electric vehicles, and nickel-based ternary prismatic and pouch cells for electric vehicles. Their weights are design allocations, not market shares. Raw materials, assembled packs, complete storage systems, used cells and retail prices are outside BATX. [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/) has the full definition.
+
+BATX's first month is BATX Nov 26, expiring 2026-12-01 00:00 UTC. It has no launch month: its sources form through the [ordinary monthly process](https://docs.amoeba.farm/oracle/01-how-it-is-structured/#the-ordinary-monthly-process) from its first month.
+
+BATX is a prototype. No publisher's prices are licensed for its settlement yet.
 
 ## What you can trade
 

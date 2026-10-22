@@ -1,0 +1,13 @@
+{
+  "format": "amoeba-webproof-verifier-policy-v1",
+  "profile": "dev",
+  "backend": { "name": "tlsnotary", "revision": "5f67389de3f8962227fddffd71d78a852acc9b01" },
+  "notaries": [
+    {
+      "name": "amoeba-dev-notary-1 (dev VM, ameba-evidence-notary.service)",
+      "alg": "secp256k1",
+      "key": "03b8be18a2606f33c96fc5e9c38546438068709e613ec11debbd2023d326a58dd0",
+      "trust": "development"
+    }
+  ]
+}

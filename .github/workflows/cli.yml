@@ -16,7 +16,9 @@ on:
       - 'oracle/programs/ameba_oracle/Cargo.toml'
       - 'oracle/governance/**'
       - 'oracle/Cargo.toml'
+      - 'evidence/**'
       - 'scripts/check.sh'
+      - 'scripts/shared-cargo.sh'
       - '.github/workflows/cli.yml'
   pull_request:
     paths:
@@ -32,7 +34,9 @@ on:
       - 'oracle/programs/ameba_oracle/Cargo.toml'
       - 'oracle/governance/**'
       - 'oracle/Cargo.toml'
+      - 'evidence/**'
       - 'scripts/check.sh'
+      - 'scripts/shared-cargo.sh'
       - '.github/workflows/cli.yml'
   workflow_dispatch:
 
@@ -60,6 +64,7 @@ jobs:
             sdk
             futures
             oracle
+            evidence
             scripts
       - name: Rust 1.93.1 (the default toolchain; folders with rust-toolchain.toml use theirs)
         run: |

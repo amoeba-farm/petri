@@ -388,6 +388,14 @@ pub enum Command {
         command: Option<crate::oracle::args::OracleCommand>,
     },
     #[command(
+        about = "Web proofs of what a source showed you, signed-in pages too",
+        long_about = "Prove what an HTTPS source shows you, including a page behind your own sign-in, and submit the proof with a source candidate or an update. Petri connects from this computer with your session through a notary (TLSNotary): the page can't be forged, your cookies stay hidden, and anyone can re-check the proof later without signing in. You see exactly what a proof discloses before anything is sent."
+    )]
+    Evidence {
+        #[command(subcommand)]
+        command: crate::evidence::args::EvidenceCommand,
+    },
+    #[command(
         about = "Connect research agents and submit oracle evidence",
         disable_help_flag = true
     )]

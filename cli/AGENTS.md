@@ -92,8 +92,11 @@ contracts:
 - `src/backend.rs` owns the CLI error type and terminal-safe output helpers.
 - `src/oracle/` owns the oracle product: `args.rs` (grammar), `reads.rs`
   (futures API documents), `chain.rs` (periods, months, sources and ledgers read
-  and checked from chain), `skus.rs` (governed SKU sets and Merkle proofs),
-  `send.rs` (review, simulate, sign and send), `writes.rs` (one handler per
+  and checked from chain), `skus.rs` (governed SKU sets, part numbers and
+  chip buckets, and Merkle proofs), `series.rs` (comparison series of the chip
+  months and the commodity spec's routing), `observe.rs` (observations of a
+  series and their API records), `send.rs` (review, simulate, sign and
+  send), `writes.rs` (one handler per
   instruction), `rewards.rs` (a wallet's rewards read from chain and their
   claims, tag 174), `claims.rs` (private update-claim reveal material) and
   `errors.rs` (oracle error names).

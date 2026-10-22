@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { createApplication } from './application.mjs';
 import { fail } from './security.mjs';
+import { MAX_SUBMISSION_BODY } from './evidence.mjs';
 
 export async function startServer(config, options = {}) {
   let application, closing;
@@ -24,10 +25,12 @@ export async function startServer(config, options = {}) {
       let body = {};
       if (request.method === 'POST') {
         if (!/^application\/json(?:\s*;|$)/iu.test(request.headers['content-type'] || '')) throw fail('INVALID_CONTENT_TYPE', 'Use application/json.', 415);
+        // A candidate may bring a web proof bundle (service/evidence.mjs).
+        const limit = /^\/v1\/runs\/[0-9a-f-]{36}\/candidates$/u.test(url.pathname) ? MAX_SUBMISSION_BODY : 32768;
         const chunks = []; let size = 0;
         for await (const chunk of request) {
           size += chunk.length;
-          if (size > 32768) throw fail('BODY_TOO_LARGE', 'The request is too large.', 413);
+          if (size > limit) throw fail('BODY_TOO_LARGE', 'The request is too large.', 413);
           chunks.push(chunk);
         }
         try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw fail('INVALID_JSON', 'Invalid JSON request.'); }

@@ -1,4 +1,41 @@
-# Petri v0.1.14 — preview
+# Petri v0.1.15 — preview
+
+## New in v0.1.15
+
+- **Web proofs.** `petri evidence` proves what an HTTPS page showed you,
+  including a page behind your own sign-in. `petri evidence browser <url>`
+  opens your own Chrome, Edge, Brave or Chromium with Petri's own profile,
+  and you sign in there yourself: Petri never asks for a password. Then
+  `petri evidence prove <url> --manifest <file> --browser` makes the proof
+  through Amoeba's notary (TLSNotary, MPC mode), and `show`, `verify`,
+  `import`, `list` and `submit` follow. A proof discloses the request line,
+  the host and the whole response; your cookies stay hidden. Anyone can
+  check it later, trusting the notary's key, the web's root certificates and
+  the notary's clock.
+- **Proofs with your finds.** `petri evidence submit <proof> --candidate
+  <find>` attaches a proof to a source find. The futures API checks it
+  itself and keeps it for anyone to re-check. The TUI's Evidence view does
+  the same by hand, and the messages you paste into your agent tell it to
+  use browser use and let you sign in.
+- **Email quotes, privately.** `petri evidence email --zk` proves the
+  labelled lines of a DKIM-signed email with a zero-knowledge proof made on
+  your computer: it discloses those lines, the signing domain and the
+  signature time, nothing else (about half a minute, after a first run that
+  also compiles the circuit for several minutes; needs `nargo`
+  1.0.0-beta.18 and `bb` 3.0.3). A quote stays a quotation, not a source.
+- **Not on Mainnet yet:** citing a proof in an on-chain opening, update,
+  challenge or observation (`--evidence`) needs an oracle update Mainnet
+  hasn't had. Until then the oracle refuses those transactions; Wayback
+  archives work as before.
+- **Chip buckets.** Oracle months after November 1, 2026 price RAMX on four
+  DRAM chip buckets (DDR5 16Gb, DDR5 24Gb, DDR4 16Gb, DDR4 8Gb) and NANDX on
+  four NAND wafer buckets. `petri oracle series template|check|propose|show`
+  writes and checks a comparison series' definition, and `petri oracle
+  observe` records an observation (with an archive or a web proof), signed
+  by your wallet.
+- **Sponsoring** a find in a month with several products sends its
+  activation through the month's lookup table, so it fits Solana's
+  transaction size.
 
 ## New in v0.1.14
 

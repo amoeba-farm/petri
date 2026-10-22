@@ -1,0 +1,32 @@
+[package]
+name = "amoeba-evidence"
+version = "0.1.0"
+description = "Authenticated oracle evidence: the bundle and envelope formats, extraction manifests and their verification"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+# Builds on the API's and the CLI's toolchains (1.93.1 and up): it needs
+# only TLSNotary's verify-side crates, not the protocol crate.
+rust-version = "1.93"
+
+[dependencies]
+tlsn-core = { workspace = true }
+tlsn-attestation = { workspace = true }
+base64 = { workspace = true }
+bincode = { workspace = true }
+hex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+# DKIM signature checks (RSA-SHA256, Ed25519) for email evidence.
+ring = "0.17"
+# email_dkim_zk: the RSA key as circuit limbs, and the proof check. zkVerify's
+# no_std UltraHonk verifier (ZK and plain, Keccak transcript), pure Rust on
+# arkworks, for proofs from Barretenberg 3.0.x (`bb prove -t evm`).
+num-bigint = "0.4"
+ultrahonk-no-std = { git = "https://github.com/zkVerify/ultrahonk_verifier", tag = "v0.3.2" }
+
+[dev-dependencies]
+# Test-only RSA-2048 DKIM signers, keys generated at run time.
+rsa = { version = "0.9", features = ["sha2"] }

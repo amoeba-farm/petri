@@ -39,6 +39,23 @@ pub enum OracleCommand {
     #[command(about = "Buckets of a month with their weights and sources")]
     Recipe(ListArgs),
     #[command(
+        about = "Comparison series of the chip months: a template, check one, propose one, a month's series"
+    )]
+    Series {
+        #[command(subcommand)]
+        command: SeriesCommand,
+    },
+    #[command(
+        about = "Observe a chip month's series: its opening print in Opening, an update in Game, with the observation's details",
+        args_conflicts_with_subcommands = true
+    )]
+    Observe {
+        #[command(subcommand)]
+        command: Option<ObserveCommand>,
+        #[command(flatten)]
+        send: ObserveArgs,
+    },
+    #[command(
         about = "Source candidates submitted by research agents (no oracle weight)",
         args_conflicts_with_subcommands = true
     )]
@@ -147,6 +164,139 @@ pub struct ListArgs {
     pub limit: usize,
 }
 
+#[derive(Debug, Subcommand)]
+pub enum SeriesCommand {
+    #[command(about = "A blank comparison series of a bucket, every field of the spec present")]
+    Template {
+        #[arg(
+            long,
+            value_name = "BUCKET",
+            help = "Commodity bucket: DDR5_16GBIT, tlc_1tb, or its name (\"DDR5 16Gb\")"
+        )]
+        bucket: String,
+        #[arg(long, help = "A direct component price, not a published assessment")]
+        direct: bool,
+        #[arg(
+            long,
+            value_name = "PATH",
+            help = "Write it to a file instead of stdout"
+        )]
+        out: Option<std::path::PathBuf>,
+    },
+    #[command(
+        about = "Check a series against the spec: on its own, or against a month's sources on chain"
+    )]
+    Check {
+        #[arg(value_name = "FILE", help = "The series JSON")]
+        file: std::path::PathBuf,
+        #[arg(
+            value_name = "MONTH",
+            help = "A month such as RAMX-202612 (or ramx with --expiry)"
+        )]
+        market: Option<String>,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+    },
+    #[command(
+        about = "Propose a series as a source of a chip month, with its listing bond (only one the spec admits)"
+    )]
+    Propose {
+        #[command(flatten)]
+        target: Target,
+        #[arg(long, value_name = "PATH", help = "The series JSON")]
+        file: std::path::PathBuf,
+        #[arg(
+            long,
+            value_name = "USDC",
+            help = "Listing bond; the product's exact bond when omitted"
+        )]
+        bond: Option<String>,
+        #[arg(
+            long,
+            value_name = "HEX",
+            help = "Source id; derived from the month, bucket and page when omitted"
+        )]
+        source_id: Option<String>,
+    },
+    #[command(about = "A chip month's sources: bucket, series and whether each counts")]
+    Show {
+        #[arg(value_name = "MONTH")]
+        market: String,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+    },
+}
+
+/// `petri oracle observe MONTH --source ID --file OBS.json [--stake USDC]`.
+#[derive(Debug, Args, Clone)]
+pub struct ObserveArgs {
+    #[arg(
+        value_name = "MONTH",
+        help = "A month such as RAMX-202612 (or ramx with --expiry)"
+    )]
+    pub market: Option<String>,
+    #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+    pub expiry: Option<String>,
+    #[arg(
+        long,
+        value_name = "SOURCE",
+        help = "64-hex source id or source address"
+    )]
+    pub source: Option<String>,
+    #[arg(long, value_name = "PATH", help = "The observation JSON")]
+    pub file: Option<std::path::PathBuf>,
+    #[arg(
+        long,
+        value_name = "USDC",
+        help = "Stake; the product's exact opening bond or update stake when omitted"
+    )]
+    pub stake: Option<String>,
+    #[command(flatten)]
+    pub send: SendArgs,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ObserveCommand {
+    #[command(about = "A blank observation of a source's series")]
+    Template {
+        #[arg(value_name = "MONTH")]
+        market: String,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+        #[arg(long, value_name = "SOURCE")]
+        source: String,
+        #[arg(
+            long,
+            value_name = "PATH",
+            help = "Write it to a file instead of stdout"
+        )]
+        out: Option<std::path::PathBuf>,
+    },
+    #[command(
+        about = "Store the observation record of a print already on chain with the API (a retry)"
+    )]
+    Record {
+        #[arg(value_name = "MONTH")]
+        market: String,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+        #[arg(long, value_name = "SOURCE")]
+        source: String,
+        #[arg(
+            long,
+            value_name = "CLAIM",
+            help = "The opening claim, or the revealed update claim"
+        )]
+        claim: String,
+        #[arg(
+            long,
+            value_name = "PATH",
+            help = "The observation JSON; an update `observe` committed keeps its own"
+        )]
+        file: Option<std::path::PathBuf>,
+    },
+}
+
 #[derive(Debug, Args, Clone)]
 pub struct CandidateFilter {
     #[arg(long, value_name = "MARKET")]
@@ -219,6 +369,9 @@ pub enum EvidenceKind {
     Definition,
     /// A Wayback archive URL (kind 3).
     Archive,
+    /// An authenticated evidence record (kind 4): a web proof's
+    /// `amoeba-evidence-v1;…` text (`petri evidence`).
+    Record,
 }
 
 #[derive(Debug, Args, Clone)]
@@ -377,15 +530,24 @@ pub enum PrintCommand {
         #[arg(
             long,
             value_name = "VALUE",
-            help = "Opening value of the source, in its own units"
+            required_unless_present = "evidence",
+            help = "Opening value of the source, in its own units [default with --evidence: the proven price]"
         )]
-        value: String,
+        value: Option<String>,
         #[arg(
             long,
             value_name = "URL",
+            required_unless_present = "evidence",
+            conflicts_with = "evidence",
             help = "https://web.archive.org/web/<14-digit UTC time>/<source URL>"
         )]
-        archive_url: String,
+        archive_url: Option<String>,
+        #[arg(
+            long,
+            value_name = "BUNDLE",
+            help = "A web proof of the source's page instead of an archive (petri evidence prove)"
+        )]
+        evidence: Option<String>,
         #[arg(long, value_name = "USDC")]
         stake: String,
     },
@@ -395,10 +557,21 @@ pub enum PrintCommand {
         target: Target,
         #[arg(long, value_name = "SOURCE")]
         source: String,
-        #[arg(long, value_name = "VALUE")]
-        value: String,
-        #[arg(long, value_name = "URL")]
-        archive_url: String,
+        #[arg(long, value_name = "VALUE", required_unless_present = "evidence")]
+        value: Option<String>,
+        #[arg(
+            long,
+            value_name = "URL",
+            required_unless_present = "evidence",
+            conflicts_with = "evidence"
+        )]
+        archive_url: Option<String>,
+        #[arg(
+            long,
+            value_name = "BUNDLE",
+            help = "A web proof of the source's page instead of an archive (petri evidence prove)"
+        )]
+        evidence: Option<String>,
         #[arg(long, value_name = "USDC")]
         bond: String,
         #[arg(long, value_name = "HEX")]
@@ -439,15 +612,24 @@ pub enum UpdateCommand {
         #[arg(
             long,
             value_name = "VALUE",
-            help = "New value of the source, in its own units"
+            required_unless_present = "evidence",
+            help = "New value of the source, in its own units [default with --evidence: the proven price]"
         )]
-        value: String,
+        value: Option<String>,
         #[arg(
             long,
             value_name = "URL",
+            required_unless_present = "evidence",
+            conflicts_with = "evidence",
             help = "https://web.archive.org/web/<14-digit UTC time>/<source URL>"
         )]
-        archive_url: String,
+        archive_url: Option<String>,
+        #[arg(
+            long,
+            value_name = "BUNDLE",
+            help = "A web proof of the source's page instead of an archive (petri evidence prove); uploaded when you reveal"
+        )]
+        evidence: Option<String>,
         #[arg(long, value_name = "USDC")]
         stake: String,
     },
@@ -467,10 +649,21 @@ pub enum UpdateCommand {
         target: Target,
         #[arg(long, value_name = "CLAIM", help = "Update claim address")]
         claim: String,
-        #[arg(long, value_name = "VALUE")]
-        value: String,
-        #[arg(long, value_name = "URL")]
-        archive_url: String,
+        #[arg(long, value_name = "VALUE", required_unless_present = "evidence")]
+        value: Option<String>,
+        #[arg(
+            long,
+            value_name = "URL",
+            required_unless_present = "evidence",
+            conflicts_with = "evidence"
+        )]
+        archive_url: Option<String>,
+        #[arg(
+            long,
+            value_name = "BUNDLE",
+            help = "A web proof of the source's page instead of an archive (petri evidence prove)"
+        )]
+        evidence: Option<String>,
         #[arg(long, value_name = "USDC")]
         bond: String,
         #[arg(long, value_name = "HEX")]

@@ -1,10 +1,10 @@
 # How the oracle works
 
-The oracle produces one number per monthly cohort: the settlement index that decides what every position in that month's RAMX or NANDX market pays. This page explains where that number comes from, who can influence it, and how you can check it.
+The oracle produces one number per monthly cohort: the settlement index that decides what every position in that month's RAMX, NANDX, or BATX market pays. This page explains where that number comes from, who can influence it, and how you can check it.
 
 ## The short version
 
-- Each cohort tracks a fixed list of public price sources for memory (RAMX) or storage (NANDX) products.
+- Each cohort tracks a fixed list of public price sources for memory (RAMX), storage (NANDX) or battery-cell (BATX) products.
 - Every source's movement is measured against its own opening value. The index starts at **100**.
 - Sources are grouped into buckets with fixed weights that add up to 100%. The index move is the weighted sum of the bucket moves.
 - At expiry, each bucket settles on a median of its sources' prices over the last five weekdays.
@@ -12,7 +12,9 @@ The oracle produces one number per monthly cohort: the settlement index that dec
 
 ## What the index measures
 
-Each source is one public price for one defined product, for example a module price on a price-tracking page. The source definition fixes the product, variant, price field, region, and currency. See [Evidence rules](https://docs.amoeba.farm/reference/02-evidence-rules/).
+Each source is one repeatable public price for one defined product. From the months expiring after 2026-11-01, a source is a **comparison series**: one defined price-assessment row, for example a DDR5 16Gb chip contract-price row on a price-tracking page, or one recurring direct quote. Its definition fixes the bucket, the statistic, the unit, the currency, the period and the terms before it reports, and each price it publishes for a period is an **observation**. In the launch month a source is a category price on memorymarket.com, and its definition fixes the product, variant, price field, region, and currency. See [Evidence rules](https://docs.amoeba.farm/reference/02-evidence-rules/).
+
+A prospective extension, [rules v2](https://docs.amoeba.farm/reference/02-evidence-rules/#authenticated-evidence-rules-v2), would also admit a price behind a contributor's own sign-in when every observation of it is a web proof that anyone can re-verify without signing in. It gives such a source no extra weight, and it is not yet on production. See [Authenticated evidence (web proofs)](https://docs.amoeba.farm/contributors/05-authenticated-evidence/).
 
 For an accepted opening value `P_open` and a later accepted value `P_t`, the source's movement is:
 
@@ -20,9 +22,9 @@ For an accepted opening value `P_open` and a later accepted value `P_t`, the sou
 delta = P_t / P_open - 1
 ```
 
-Measuring each source against its own opening lets a retailer and a distributor quote different prices and still be compared fairly. The oracle never averages raw prices from different channels.
+Measuring each source against its own opening lets two sources that quote different price levels, such as two publishers' assessments of the same chip, still be compared fairly. The oracle never averages raw prices from different sources.
 
-Sources are grouped into buckets. Within a bucket every source counts equally, and the bucket moves by the median of its sources' movements. Support capital behind a source does not give it more weight. Each bucket has a fixed weight from the product's manifest, and the weights add up to 100%:
+Sources are grouped into buckets. Within a bucket every source counts equally, and the bucket moves by the median of its sources' movements. Support capital behind a source does not give it more weight. Each bucket has a fixed weight from the product's definition, and the weights add up to 100%. From the months expiring after 2026-11-01 the buckets are commodity chips, wafers and battery cells, listed in [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/):
 
 ```text
 index move = sum over buckets of (bucket weight × bucket move)
@@ -33,7 +35,7 @@ The program works in basis points and rounds the final value half up. A 3% weigh
 
 ## Who set the launch month's sources
 
-The first RAMX and NANDX months on Solana mainnet, the launch month, did not use open, bonded source formation. The governance council approved a launch document instead: a fixed registry of public price pages with each one's bucket, weight and printed opening value, recorded on chain in one launch per index. Each index launches this way once; every later month forms through the ordinary process below.
+The first RAMX and NANDX months on Solana mainnet, the launch month, did not use open, bonded source formation. The governance council approved a launch document instead: a fixed registry of public price pages with each one's bucket, weight and printed opening value, recorded on chain in one launch per index. RAMX and NANDX each launched this way once; every later month forms through the ordinary process below. BATX has no launch month: its first month, BATX Nov 26, forms through the ordinary process too.
 
 | Market | Sources | Buckets | Source pages |
 |---|---|---|---|
@@ -57,6 +59,8 @@ The program also supports open, bonded source formation. An oracle month then mo
 | Game Mode | Until expiry | Contributors report changed values with evidence and a bond. Sources and weights stay fixed. |
 
 All bonds are in USDC, and every product bucket must end Freeze with at least one surviving source. Bond sizes and reward budgets are set separately for each month and bucket. See [Bounties and rewards](https://docs.amoeba.farm/oracle/03-bounty-collection/).
+
+From the months expiring after 2026-11-01, every proposed series and every observation also gets one **routing status**, which says whether and why it counts. Only **Counts this month** counts toward settlement: it marks a source in the month's committed series, which are the month's sources from Freeze on. A relevant source that arrives later reads **Not in this month** and can be proposed for a later month. The statuses are listed in [Evidence rules](https://docs.amoeba.farm/reference/02-evidence-rules/#routing-statuses).
 
 ### Game Mode updates
 
@@ -91,7 +95,8 @@ After expiry there is a 24-hour grace period. New update challenges can still be
 Open **Oracle** in the web app and choose a **Market** and **Month**.
 
 - The summary shows **Current Stage**, **Source Records**, **Source Links**, and when the data was **Updated**. "Last known" in front of a stage means the latest refresh could not confirm it.
-- The **Sources** tab lists one row per website with its **Link**, number of **Records**, and combined **Weight**. Select **View** to see each record's **Status**, **Weight**, and **Source ID**.
+- The **Sources** tab lists one row per website with its **Link**, number of **Records**, and combined **Weight**. Select **View** to see each record's bucket, **Status**, **Weight**, and **Source ID**. For a month on chip or wafer buckets, the tab first shows each bucket's weight, and each record shows the row its series reads and its routing status. Hover a routing status to see what it means; when reasons decided it, select it to see them.
+- The **Submissions** tab lists the sources research agents and wallets have sent in, newest first, with each one's bucket, status and routing status.
 - The **Contribute** tab lists the Petri commands for the current stage's contributions. Contributions are signed with your own wallet in Petri; the web app does not submit them.
 
 Each on-chain source record holds its locator, opening value, current value, and observation count. Opening and update evidence is stored on chain permanently.

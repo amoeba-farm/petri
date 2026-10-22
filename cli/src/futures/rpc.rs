@@ -11,7 +11,6 @@ use base64::{Engine, engine::general_purpose::STANDARD as B64};
 use serde_json::{Value, json};
 use solana_program::{hash::Hash, pubkey::Pubkey, sysvar};
 use solana_signature::Signature;
-use solana_transaction::Transaction;
 
 use super::error::{Error, Result};
 
@@ -433,7 +432,8 @@ impl Rpc {
     }
 
     /// Simulates without signature checks and with a fresh blockhash.
-    pub fn simulate(&self, tx: &Transaction) -> Result<Simulation> {
+    /// Simulates a legacy or versioned (v0) transaction.
+    pub fn simulate<T: serde::Serialize>(&self, tx: &T) -> Result<Simulation> {
         let wire = B64.encode(bincode::serialize(tx).expect("transaction serializes"));
         let v = self.call(
             "simulateTransaction",
@@ -454,7 +454,11 @@ impl Rpc {
 
     /// Sends with preflight. A preflight failure comes back as `Err` with the
     /// simulation's `err` and logs.
-    pub fn send(&self, tx: &Transaction) -> Result<std::result::Result<Signature, RpcFailure>> {
+    /// Sends a signed legacy or versioned (v0) transaction.
+    pub fn send<T: serde::Serialize>(
+        &self,
+        tx: &T,
+    ) -> Result<std::result::Result<Signature, RpcFailure>> {
         let wire = B64.encode(bincode::serialize(tx).expect("transaction serializes"));
         let r = self.call_raw(
             "sendTransaction",

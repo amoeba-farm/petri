@@ -10,7 +10,7 @@
 ## Overview
 
 * [Why Amoeba Farm](docs/overview/01-why-amoeba-farm.md)
-* [RAMX and NANDX markets](docs/overview/02-markets-ramx-nandx-future.md)
+* [RAMX, NANDX, and BATX markets](docs/overview/02-markets-ramx-nandx-future.md)
 
 ## Getting Started
 

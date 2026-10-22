@@ -33,6 +33,28 @@ pub struct Claim {
     pub secret_salt: String,
     #[serde(default)]
     pub revealed: bool,
+    /// The web proof the claim cites (its bundle digest in Petri's
+    /// evidence folder), published to the API when it is revealed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_bundle: Option<String>,
+    /// The observation record `petri oracle observe` stores once the claim is
+    /// revealed (no secret: the record is public once sent).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub observation: Option<PendingObservation>,
+}
+
+/// An observation record waiting for its update claim's reveal.
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct PendingObservation {
+    /// `ramx`.
+    pub market_id: String,
+    /// `RAMX-202612`.
+    pub expiry_id: String,
+    /// The source's 64-hex id.
+    pub source_id: String,
+    /// The observation, as its file gave it.
+    pub observation: serde_json::Value,
 }
 
 fn path() -> Result<PathBuf> {
@@ -107,11 +129,17 @@ mod tests {
             archive_url: "https://web.archive.org/web/20261013000000/https://example.com".into(),
             secret_salt: "22".repeat(32),
             revealed: false,
+            evidence_bundle: None,
+            observation: None,
         };
         let mut all = BTreeMap::new();
         all.insert("claim".to_string(), claim.clone());
         save_to(&path, &all).unwrap();
         assert_eq!(load_from(&path).unwrap()["claim"], claim);
+        // A claim saved before observations reads as one without.
+        let old = r#"{"c":{"oracle":"o","month":"m","source":"s","claimant":"c","claimId":"00","priorState":1,"newState":2,"sourceTime":3,"evidenceHash":"11","archiveUrl":"a","secretSalt":"22"}}"#;
+        let read: BTreeMap<String, Claim> = serde_json::from_str(old).unwrap();
+        assert_eq!(read["c"].observation, None);
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;

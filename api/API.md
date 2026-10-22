@@ -99,7 +99,14 @@ error codes (base `0x46520000`).
   "faucet": { "enabled": true, "amount": "10000000000", "perHour": 3 },
   "computeUnitLimit": 1400000,
   "preparedTtlSecs": 90,
-  "sponsorship": { "researcherBps": 2000, "retentionBps": 2000 }
+  "sponsorship": { "researcherBps": 2000, "retentionBps": 2000,
+                   "lookupTables": { "RAMX-1796083200": "<address lookup table>" } },
+  "evidence": { "webProof": {
+    "notary": "/oracle/notary",
+    "policy": "amoeba-webproof-verifier-policy-v1/dev",
+    "policyDigest": "…64 hex…",
+    "notaryKeys": [{ "name": "…", "alg": "secp256k1", "key": "…66 hex…", "trust": "development" }],
+    "backendRevision": "5f67389de3f8962227fddffd71d78a852acc9b01" } }
 }
 ```
 
@@ -136,6 +143,21 @@ researcher (`researcherBps`) and how much of that their reserve holds
 80%, the researcher 16% and their reserve 4%) on every cluster but
 `mainnet-beta`, whose deployed oracle predates that split and still takes
 the researcher's half (5,000 and 2,000) until it is upgraded.
+**[added 2026-10-21]** `sponsorship.lookupTables`: each month's sponsorship
+address lookup table, by series key (`<SYMBOL>-<expiry>`), as the manifest's
+`oracle.sponsorLookupTables` names it (`{}` without any). A prepared
+sponsorship's activation resolves through it (v0); petri sends the same.
+
+**[added 2026-10-20]** `evidence.webProof`: how to make web proofs this
+service accepts ("Oracle evidence"). `notary` is the WebSocket path to the
+API host's notary; `policy` and `policyDigest` name the verifier policy the
+service checks bundles under (`amoeba-webproof-verifier-policy-v1/dev` when
+the deployment is the dev chain, genesis
+`A5ZLaudxEFvFScV6RzNtNN7fzshRxQgXhC6JB6dishHX` in the manifest and at the
+RPC, else `…/production`); `notaryKeys` are the notaries it lists, each
+`trust` `production` or `development` (compressed secp256k1 keys, hex; an
+empty list means no proof verifies yet); `backendRevision` is the TLSNotary
+commit prover and notary must run.
 
 **[added]** `programs.futures` (the futures program) and `treasury` (its
 dev maker's trader key) are `null` until the deployment manifest has a
@@ -1680,9 +1702,13 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
               schedule: { scrambleStartUtc, listingUtc, expiryUtc, finalizedUtc } | null,
               coverage: { requiredSkus, coveredSkus, finalized, plannedScrambleStartUtc, plannedListingUtc } | null,
               rewards: { phase ("Building"|"Funded"|"EntitlementsFinalized"|…), totalAtomic, remainingAtomic } | null,
-              skus: [{ bucketId (hex), bucketLabel (string|null), sourceBudgetAtomic, openingBudgetAtomic,
-                       updateBudgetAtomic, listingBondAtomic, supportBondAtomic, openingBondAtomic,
-                       updateBondAtomic (strings) }] }
+              skus: [{ bucketId (hex), bucketLabel (string|null), bucketName (string|null), sourceBudgetAtomic,
+                       openingBudgetAtomic, updateBudgetAtomic, listingBondAtomic, supportBondAtomic,
+                       openingBondAtomic, updateBondAtomic (strings) }],
+              buckets: [Bucket] | null }                  // [added] a commodity-bucket month's; "Commodity buckets"
+Bucket    = { bucketId (hex), bucketLabel ("DDR5_16GBIT"), bucketName ("DDR5 16Gb"), group ("DDR5"),
+              weightBps (number), weightSource ("recipe"|"spec") }
+Routing   = { status (a spec status: "ELIGIBLE_FOR_CONTRACT", …), reasons: [{ status, field, message }] }
 ```
 
 * One fact per oracle `Period` (product, expiry): the manifest's
@@ -1705,7 +1731,16 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
   at its PDA under the schedule), by `bucketId`, with each product's reward
   budgets and bonds; `[]` otherwise. Their `bucketLabel`, like a source's, is
   the governed label, or for a product with no governed label set the
-  bucket id's own padded ASCII.
+  bucket id's own padded ASCII; `bucketName` is the commodity bucket's name
+  on a commodity-bucket month, else `null`.
+* **[added]** `buckets` is a commodity-bucket month's buckets
+  ("Commodity buckets"), in the spec's order, each with its manifest group
+  and weight: the weight its recipe sources carry once the month froze
+  (`weightSource: "recipe"`, the largest `bucketWeightBps` among its
+  Frozen, OpeningPending, Active or Inactive sources), else the spec's
+  (`"spec"`: before the freeze, or for a bucket the recipe has no source
+  in). `null` for a month on part numbers (and for a product without
+  commodity buckets).
 * `oracleMonthAddress` is the period's canonical month PDA
   (`[ameba-oracle-v1, g3-oracle_month, period, expiry_le]`), also when the
   month does not exist yet (`oracleMonthAvailable: false`, the month fields
@@ -1725,6 +1760,7 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
   sourceLinks: [{ marketId, expiryId, oracleMonthAddress, phase, sourceCount, observedAt,
                   usage: "source-display-only",
                   sources: [{ sourceAddress, sourceId (hex), bucketId (hex), bucketLabel (string|null),
+                              bucketName (string|null), series (SeriesDefinition|null), routing (Routing|null),
                               canonicalLocator: { url, hash, verified: true } | null, proposer, status,
                               baselineStateAtomic, currentStateAtomic, supportStakeAtomic (strings),
                               bucketWeightBps, openingSubmitted, lastFinalizedStep, observationCount (strings) }] }] } }
@@ -1754,15 +1790,71 @@ Fact      = { marketId ("ramx"), expiryId ("RAMX-202610"), onChainAvailable: tru
   evidence link points to, when its bytes hash to the source's
   `canonical_locator_hash` (`SHA-256("locator" || url)`) and the URL is
   public HTTPS; else `null`.
-* `bucketLabel` is the governed SKU label (`governance/*_product_sku_manifest.v1.json`
-  of the oracle program) whose zero-padded ASCII bytes equal `bucketId`,
-  provided the product's on-chain SKU manifest is absent or commits to the
-  same root; for a product with no governed label set, `bucketId`'s own
-  zero-padded printable ASCII; else `null`. `status` is the source status name (`Active`, …).
+* `bucketLabel` is the governed SKU label whose zero-padded ASCII bytes
+  equal `bucketId`, from the label set the month uses ("Commodity buckets":
+  its part numbers, `governance/*_product_sku_manifest.v1.json`, or its
+  commodity buckets); for a product with no governed label set,
+  `bucketId`'s own zero-padded printable ASCII; else `null`. `status` is the
+  source status name (`Active`, …).
+* **[added]** On a commodity-bucket month, `bucketName` is the bucket's
+  name, `series` the source's comparison series (its definition object
+  parsed, `null` when it is not one or not on chain) and `routing` its
+  routing (`null` when its definition is not on chain); all three are
+  `null` on other months ("Commodity buckets").
 * A source has no proposal time: the oracle program stores no creation
   slot or timestamp in a source, its evidence links (a proposal's link time
   is 0) or a sponsorship agreement. Off-chain candidates have `createdAt`
   (`GET /oracle/source-candidates/recent`).
+
+### Commodity buckets [added]
+
+On 2026-10-20 the user moved RAMX and NANDX from module and SSD part
+numbers to commodity chip and wafer buckets for every month expiring after
+2026-11-01 (`oracle/governance/commodity_submission_spec.v1.json`; the crate
+`oracle/crates/commodity-spec` is its code, compiled in). A bucket is an
+on-chain SKU (id: its label, zero-padded to 32 bytes) of the product's
+bucket manifest (`governance/*_product_sku_manifest.v2.json`); a
+comparison series is one source, whose definition object holds the series'
+definition text; an observation is one opening or update print of that
+source ("Oracle observations"). Months formed on part numbers keep them
+(the v1 manifests stay compiled in). Every product the crate names is
+served the same way.
+
+* **Which labels a month uses.** The governed set (part numbers or
+  buckets) its SKU coverage manifest commits to (`required_sku_root`).
+  Without one that matches, and while the product's on-chain SKU manifest is
+  absent or registers one of the product's governed roots: the set of the
+  month's era (buckets for a month expiring after 2026-11-01, part numbers
+  before), unless every SKU the month holds (its SKU pools' and sources'
+  bucket ids) is in the other set and not all in that one. Else no labels.
+  A month whose set is a bucket set is a **commodity-bucket month**.
+* **Definitions.** On a commodity-bucket month each source's definition
+  object is read from chain: its role-1 evidence link
+  (`[ns, "g3-evidence-link-v1", source, [1], source_definition_hash]`, the
+  source as event and parent) points to a sealed kind-2 object
+  (`[ns, "g3-evidence-bytes-v1", payer, [2], hash]`) whose bytes hash to the
+  source's `source_definition_hash` (`SHA-256(bytes)`). petri's wrapper
+  (`"ameba-oracle-source-definition-v1" || 0 || u32 LE length || text`) is
+  stripped, and so is a web proof's frozen selector ending the text (`;
+  Evidence: web proof, selector <64 hex>`, "Oracle source candidates");
+  text whose `schema` is `amoeba.comparison-series.v1` is parsed as a series
+  (`series`), anything else is not one. The links and objects
+  ride in the two `getMultipleAccounts` the locators already take (no extra
+  call), and a definition, named by its hash, is read once and kept in
+  memory for good. One whose link or object is not on chain is looked for
+  again at the next read. Months on part numbers read none.
+* **Routing** (`routing`, the crate's `route_series_in_month`): the month's
+  listed sources (its inventory) in source-id order (the chain keeps no
+  proposal order, so this is the order anyone can rebuild from chain
+  state), stage open while the month takes sources (SourceSubmission,
+  Scramble) and committed from the freeze on, each source committed when it
+  is in the recipe. A series registered under another bucket than its
+  series names is `WRONG_PRODUCT` (`field: "bucket"`). A definition on
+  chain that is not a series is `NEEDS_METADATA` (`field: "definition"`,
+  "not a comparison series"); a source whose definition object is not on
+  chain (a dev-bootstrapped source has only its locator link) has `series`
+  and `routing` `null`, as petri routes it. Routing classifies; it never
+  removes a source from the inventory.
 
 ### `GET /v1/oracle/catalog`
 
@@ -1784,7 +1876,8 @@ and freshness), for the research service.
   "releaseTag": "localnet-dev",
   "releaseCommit": "<oracle source commit>",
   "periods": { "RAMX-1793491200": "<Period>", "NANDX-1793491200": "<Period>" },
-  "months":  { "RAMX-1793491200": "<OracleMonth>", "NANDX-1793491200": "<OracleMonth>" }
+  "months":  { "RAMX-1793491200": "<OracleMonth>", "NANDX-1793491200": "<OracleMonth>" },
+  "sponsorLookupTables": { "RAMX-1796083200": "<address lookup table>" }
 }
 ```
 
@@ -1795,7 +1888,13 @@ optional (reported as `unreleased` and `unknown`). **[added]**
 older `forming` (symbols) mark the series that form the ordinary way; they
 are in `periods` and `months` too and are served like any series. The
 service reads them only to take a forming series' changes in place
-("Deployment changes"). The section drives
+("Deployment changes"). **[added 2026-10-21]** `sponsorLookupTables`
+(written by `futures-ops open-month` and `sponsor-table`) names a month's
+sponsorship lookup table, owned by the address lookup table program, which
+holds the month's period, month, coverage manifest, reward schedule, carry
+period, the system program, the oracle's gate when it is governed, then
+every SKU pool by bucket id; an entry that is not a series key and an
+address is left out (logged). The section drives
 `programs.oracle`, the index months and the `/v1/oracle/*` reads.
 `FUTURES_ORACLE_PROGRAM` names the oracle program for the reads only (not the
 index) while the manifest has no `oracle` section.
@@ -1820,13 +1919,38 @@ the status below; every reply has `Cache-Control: no-store`. Until the
 database is ready every route but `GET /oracle/sponsorships` answers 503
 `ORACLE_CANDIDATE_STORE_UNAVAILABLE`.
 
+**[added 2026-10-21] Only the oracle's products.** These routes serve the
+products and months the oracle serves: those of the manifest's
+`oracle.periods` (every one while it lists none, or with
+`FUTURES_DISCOVER_INSTRUMENTS=1`), read on each request, so a month that
+`open-month` or `list-next` adds is served at once. A candidate whose
+`marketId` (any case) is not one of those products is refused at
+submission (422 `ORACLE_SPONSOR_REJECTED`, "`<MARKET>` isn't one of the
+oracle's products."); one stored before is in no list or feed page and is
+not found by its content hash (404, so it can't be sponsored either) while
+its product isn't served. Nothing is deleted. `GET /oracle/sponsorships`
+lists only the served months' agreements. A product a dev-chain rehearsal
+left on chain reaches no page.
+
 ```text
 Agent     = { agentId (64 hex), payoutAuthority (base58 pubkey), createdAt (ms) }
 Details   = { marketId, expiryId, bucketId, canonicalUrl, sourceType, productDefinition,
               priceField, region, currency, evidence }            // all strings
 Candidate = { agentId, payoutAuthority, contentHash, duplicateKey, details: Details,
               sourceDefinition, sourceTypeHash, canonicalLocatorHash, sourceDefinitionHash,
-              createdAt (ms), expiresAt (ms), observation: null }
+              authentication?: Authentication,                  // [added 2026-10-20]
+              createdAt (ms), expiresAt (ms), observation: null,
+              series: SeriesDefinition | null, routing: Routing | null }   // [added]
+Authentication = {                                // what the API's own verification found
+  method ("web_proof"), bundleDigest, proofDigest, observationId, submissionId,   // 64 hex each
+  trust ("development"|"production"), serverTrust ("mozilla_roots"|"development_root"),
+  notary: { name, alg ("secp256k1"), key (hex) }, verifierPolicy, verifierPolicyDigest,
+  selectorDigest, manifestHash, locator (the proven https URL),
+  price: { text (as the source printed it), atoms (string, six decimals) },
+  currency: { value, provenance } | null, unit: { value, provenance } | null,
+                                   // provenance "authenticated" or "contributor_annotation"
+  evidenceType ("catalog_price"|"published_benchmark"), witnessedAt (unix s, notary-attested
+  session start), sourceObservedAt? (the date the record printed, text), verifiedAt (unix s) }
 ```
 
 ### `POST /oracle/agents`
@@ -1846,7 +1970,8 @@ registrations per hour per client address (SHA-256 of the peer IP), and
 ### `POST /oracle/source-candidates`
 
 `Authorization: Bearer <credential>`; body `Details` (exactly the ten
-fields, each a string, at most 16384 bytes). `201 { duplicate: false,
+fields, each a string, at most 16384 bytes), optionally with
+`authentication: { bundleDigest }` beside them. `201 { duplicate: false,
 candidate }`, or `200 { duplicate: true, candidate }` with the earlier
 candidate of the same `marketId`, `expiryId`, `bucketId` and `canonicalUrl`
 (its attribution is kept). Rules: ids 1-64 of `[A-Za-z0-9_-]`, `bucketId` a
@@ -1860,6 +1985,83 @@ futures label month).
 Limits: 60 submissions per agent per hour (duplicates count), 100 pending
 candidates per agent, 50000 in all; a candidate expires from the list after
 7 days and is deleted 90 days later.
+
+**[added 2026-10-20] Authenticated evidence.** `authentication` is exactly
+`{ "bundleDigest": "<64 lowercase hex>" }`, the digest of a bundle uploaded
+to `POST /oracle/evidence`; any other key in it (a `verified` flag, an
+envelope, a trust level) or another value is 400
+`ORACLE_EVIDENCE_INPUT_INVALID`, and nothing a client says about the
+evidence is read or stored. The details are checked first, by the rules
+above (a proven page is still refused if its URL is not public). Then the
+API loads the stored bundle (422 `ORACLE_EVIDENCE_REJECTED` if none was
+uploaded), verifies it again under its current policy, and checks it fits
+the candidate (422 `ORACLE_EVIDENCE_REJECTED` with the reason otherwise):
+the proof's locator (`https://<server><path and query>`) must equal
+`canonicalUrl`; a proof bound to a wallet must be bound to the agent's
+`payoutAuthority`; quotations and transaction records are not admitted as
+sources. Each observation is credited once per scope
+(`candidate:<marketId>:<expiryId>:<bucketId>`, the stored expiry id): a
+candidate whose `submissionId` an earlier candidate already holds is `200
+{ duplicate: true, candidate }` with that earlier candidate and its
+attribution (whatever its URL or agent); the same bundle in another bucket
+is another submission. The stored candidate's `authentication` is built only
+from the API's own verification. Its source definition freezes the proof's
+extraction selector, so a later update's proof can be checked against the
+same series: `sourceDefinition` ends with `; Evidence: web proof, selector
+<selectorDigest>` (and `sourceDefinitionHash` covers that text), and
+`contentHash` takes `selectorDigest` as a thirteenth field. A candidate
+without `authentication` hashes and reads exactly as before.
+
+**[added] A candidate with a comparison series.** The body may add
+`series`, a comparison series (`amoeba.comparison-series.v1`, the crate's
+`SeriesDefinition`: unknown fields are refused, 422). Then only `marketId`,
+`expiryId` and `evidence` are required, and:
+
+* `canonicalUrl` is the series' `origin.locator`, `sourceType` its source
+  type (`comparison-series/v1:<evidenceClass>`) and `bucketId` the hex of its
+  bucket's id (the label zero-padded to 32 bytes); a given value must be the
+  same (422 otherwise). Left out, `productDefinition` is the bucket and the
+  row (`"RAMX DDR5 16Gb: DDR5 16Gb (2Gx8) 4800/5600"`), `priceField` the
+  `statistic`, `region` the `geography` value (or state) and `currency` the
+  series' currency; given, they are kept. The usual detail rules apply to
+  the result.
+* `sourceDefinition` is the series' definition text (compact JSON, unset
+  fields left out; at most 4058 bytes, what a source's definition object
+  holds, else 422), committed like any definition
+  (`sourceDefinitionHash` = SHA-256 of petri's wrapper of that text), and
+  `series` is the series as stored.
+* `contentHash` commits to the details and the definition text
+  (`ameba-oracle-series-candidate-content-v1`), `duplicateKey` to
+  `marketId`, `expiryId`, `bucketId`, `canonicalUrl` and the definition text
+  (`ameba-oracle-series-candidate-dedupe-v1`): the same series for the same
+  month is one candidate whoever submits it; another row, statistic or scope
+  on the same page is another.
+* `routing` is computed when it is stored and kept with it: against its
+  month as the last oracle read served it (`route_series_in_month` over the
+  month's listed sources, as a new proposal: before the freeze it fits or
+  repeats one; from the freeze on it is `OUTSIDE_COMMITTED_SERIES`); a month
+  on part numbers adds `OUTSIDE_COMMITTED_SERIES` (`field: "expiryId"`) to
+  the series' own routing; a month not served yet routes the series on its
+  own (`route_series`); a market without commodity buckets is
+  `WRONG_PRODUCT`. Routing never refuses a candidate.
+
+A candidate without `series` is checked, committed and stored exactly as
+before; its `series` and `routing` are `null`. The list, the feed and
+`GET …/:contentHash` return both fields for every candidate.
+
+**[added] A series and a web proof.** A candidate may carry both. Its
+source definition is then the series' definition text followed by `;
+Evidence: web proof, selector <selectorDigest>` (the selector ends the text,
+where the keeper reads it; the series' text and the selector together fit
+4058 bytes, else 422), `sourceDefinitionHash` covers that text, and
+`contentHash` commits to it as the series form's thirteenth field. The
+`duplicateKey` stays the series' (its definition text without the
+selector): evidence never makes a candidate new, so the same series with
+and without a proof is one candidate, and a proof's submission id is
+credited once per scope as above. The proof must fit the candidate the
+series made (its `canonicalUrl` is the series' `origin.locator`). A source
+whose definition carries a selector is read as its series all the same
+(the oracle snapshot strips the trailing selector before parsing).
 
 ### `GET /oracle/source-candidates?marketId&expiryId&agentId&after&limit`
 
@@ -1875,8 +2077,9 @@ a bad `limit` is 400 `ORACLE_CANDIDATE_PAGE_INVALID`.
 
 ### `GET /oracle/source-candidates/recent?limit&before` [added]
 
-The live feed of what researchers submit: every stored candidate, newest
-first, for a page that polls the first page and pages back with the cursor.
+The live feed of what researchers submit: every stored candidate of the
+oracle's products, newest first, for a page that polls the first page and
+pages back with the cursor.
 
 ```text
 200 { candidates: FeedItem[], nextCursor (string|null), onChainObservedAt (ms|null) }
@@ -1934,11 +2137,12 @@ skipped, an unfinished one resumes).
 
 ```text
 200 { sponsorship: {
-  candidate, sponsor, marketId ("REHX"), expiryId ("REHX-202612"), sku (the bucket's label | null),
+  candidate, sponsor, marketId ("ramx"), expiryId ("RAMX-202612"), sku (the bucket's label | null),
   period, month, source, agreement, bondAtoms, collateralAtoms, outstandingAtoms, researcher, agentId,
   evidence: { locator, definition },          // the sponsor's evidence objects
+  lookupTable (the month's table the activation resolves through | null),   // [added 2026-10-21]
   blockhash, lastValidBlockHeight,
-  transactions: [{ label, steps: [name], transaction (base64, unsigned) }] } }
+  transactions: [{ label, steps: [name], version ("legacy"|"v0"), transaction (base64, unsigned) }] } }
 ```
 
 * **Reads.** The candidate's period: the oracle's periods whose product is
@@ -1947,8 +2151,9 @@ skipped, an unfinished one resumes).
   expiry. Then, in one read, its month, SKU coverage manifest, the product's
   SKU reward pool, the sponsor's oracle collateral, the source (id: the
   content hash), its agreement, the sponsor's two evidence objects and its
-  exposure to the researcher; and,
-  for a month outside the governed SKU set, the month's sources.
+  exposure to the researcher, and the month's lookup table when the
+  manifest names one; and, for a month outside the governed SKU set, the
+  month's sources.
 * **Refusals**, in this order: the commitments (`sourceTypeHash`,
   `canonicalLocatorHash`, `sourceDefinitionHash`) must match the details (422
   `ORACLE_SPONSOR_REJECTED`); no period or month, a month not in
@@ -1967,6 +2172,22 @@ skipped, an unfinished one resumes).
   three 192-byte `writeEvidence` chunks per transaction, none for an object
   already sealed; then `sponsorSource` (`SponsoredActivate`, source id = the
   content hash, the pool's exact `listing_bond`, the SKU index and proof).
+  **[added]** A series candidate's definition upload is its definition text
+  in the same wrapper, so the hash it registered is the one sealed. The SKU
+  proof is against whichever governed set (part numbers or commodity
+  buckets) reproduces the month's coverage root. A month of more than one
+  SKU needs proof nodes a legacy transaction can't carry next to the
+  activation's accounts (RAMX's four-bucket chip month's legacy
+  `sponsorSource` is 1234 bytes ungated). **[added 2026-10-21]** So a month whose manifest
+  entry names a lookup table (`oracle.sponsorLookupTables`) gets its
+  `sponsorSource` as a **v0** transaction (`version: "v0"`) that resolves
+  every account the table holds through it: the governed four-bucket RAMX
+  chip month's is 1071 bytes. The uploads stay legacy (`version: "legacy"`).
+  Deserialize each as a versioned transaction (`VersionedTransaction`);
+  `/rpc/sendTransaction` relays either. A table that is not an active
+  lookup table on chain (missing, another owner, deactivated) leaves the
+  activation legacy (logged), so an oversize one is refused with 422 as
+  before.
   Terms: funding 0 (sponsor cash), the cluster's split (`/v1/config`
   `sponsorship`: 80/20 with a fifth of the researcher's part held in their
   reserve, or on mainnet-beta the legacy half), `maximumBond` = the bond, `maximumOutstanding` =
@@ -1985,9 +2206,10 @@ skipped, an unfinished one resumes).
 ### `GET /oracle/sponsorships?funder`
 
 `200 { sponsorships: Sponsorship[] }`: every agreement of the oracle program
-(`SourceSponsorship`, 320 bytes, marker `ORSPONS1`, at its canonical address),
-or with `funder` (a wallet; the funder is at byte 73) the ones it paid for, by
-agreement address. Read from chain on each request.
+(`SourceSponsorship`, 320 bytes, marker `ORSPONS1`, at its canonical address)
+in a served month (its `month`), or with `funder` (a wallet; the funder is at
+byte 73) the ones it paid for, by agreement address. Read from chain on each
+request.
 
 ```text
 Sponsorship = { agreement, source, month, candidate (content hash), funder, reserve, bucketId, sku,
@@ -1999,18 +2221,18 @@ Another parameter, or a `funder` that is not a wallet, is 400
 
 | Status | Code |
 |---|---|
-| 400 | `INVALID_JSON`, `INVALID_REQUEST_ENCODING`, `INCOMPLETE_REQUEST_BODY`, `ORACLE_AGENT_INPUT_INVALID`, `ORACLE_CANDIDATE_QUERY_INVALID`, `ORACLE_CANDIDATE_PAGE_INVALID`, `ORACLE_SPONSOR_INPUT_INVALID` |
-| 401 | `ORACLE_AGENT_UNAUTHORIZED` (missing, malformed or unknown credential) |
+| 400 | `INVALID_JSON`, `INVALID_REQUEST_ENCODING`, `INCOMPLETE_REQUEST_BODY`, `ORACLE_AGENT_INPUT_INVALID`, `ORACLE_CANDIDATE_QUERY_INVALID`, `ORACLE_CANDIDATE_PAGE_INVALID`, `ORACLE_SPONSOR_INPUT_INVALID`, `ORACLE_EVIDENCE_INPUT_INVALID`, `ORACLE_OBSERVATION_INPUT_INVALID`, `ORACLE_OBSERVATION_QUERY_INVALID` |
+| 401 | `ORACLE_AGENT_UNAUTHORIZED` (missing, malformed or unknown credential), `ORACLE_OBSERVATION_UNAUTHORIZED` (an observation record not signed by its claim's claimant) |
 | 403 | `ORACLE_AGENT_BINDING_MISMATCH` |
-| 404 | `ORACLE_AGENT_NOT_FOUND`, `ORACLE_CANDIDATE_NOT_FOUND` |
+| 404 | `ORACLE_AGENT_NOT_FOUND`, `ORACLE_CANDIDATE_NOT_FOUND`, `ORACLE_OBSERVATION_MONTH_NOT_FOUND`, `ORACLE_OBSERVATION_SOURCE_NOT_FOUND` |
 | 405 | `METHOD_NOT_ALLOWED` |
 | 409 | `ORACLE_SPONSOR_CLOSED`, `ORACLE_SPONSOR_EXISTS`, `ORACLE_SPONSOR_COLLATERAL` |
 | 413 | `REQUEST_TOO_LARGE`, `ORACLE_CANDIDATE_TOO_LARGE` |
 | 415 | `UNSUPPORTED_MEDIA_TYPE` |
-| 422 | `ORACLE_SPONSOR_REJECTED` (invalid payout authority or candidate; a candidate that can't be sponsored as it is) |
+| 422 | `ORACLE_SPONSOR_REJECTED` (invalid payout authority or candidate; a candidate that can't be sponsored as it is), `ORACLE_EVIDENCE_REJECTED` (the named bundle was not uploaded, does not verify or does not fit the candidate), `ORACLE_OBSERVATION_UNVERIFIED` |
 | 429 | `ORACLE_CANDIDATE_RATE_LIMIT`, `ORACLE_CANDIDATE_CAPACITY` |
-| 500 | `ORACLE_CANDIDATE_STORE_FAILED` |
-| 503 | `ORACLE_CANDIDATE_STORE_UNAVAILABLE`, `ORACLE_AGENT_CAPACITY`, `ORACLE_SPONSOR_UNAVAILABLE`, `ORACLE_CANDIDATE_DECISION_UNAVAILABLE` |
+| 500 | `ORACLE_CANDIDATE_STORE_FAILED`, `ORACLE_EVIDENCE_VERIFY_FAILED` |
+| 503 | `ORACLE_CANDIDATE_STORE_UNAVAILABLE`, `ORACLE_AGENT_CAPACITY`, `ORACLE_SPONSOR_UNAVAILABLE`, `ORACLE_CANDIDATE_DECISION_UNAVAILABLE`, `ORACLE_OBSERVATION_UNAVAILABLE` |
 
 The old server answered every `ORACLE_*` refusal as `CURRENT_REQUEST_FAILED`
 with the message `current request failed` (same statuses); this service
@@ -2023,6 +2245,202 @@ the old server's `oracle-candidates-*.sqlite` (read-only) into
 `FUTURES_DATABASE_URL` and prints the counts: agents keep their credentials;
 candidates are re-admitted (per-strike expiry ids mapped as above, earliest
 kept on a collision); rate windows are not imported. It is idempotent.
+
+## Oracle observations [added]
+
+Observation records: the metadata of one opening or update print of a
+comparison-series source (the commodity spec's
+`amoeba.series-observation.v1`: its period, publication, release and
+evidence), which the chain doesn't hold. Each is bound to the print's claim
+on chain, routed (the crate's `route_observation`) and kept in Postgres
+(`futures.oracle_series_observations`; a redeploy keeps it). Same paths,
+envelopes and headers as "Oracle source candidates" (at the root;
+`{ ok: true, data: { protocol, … } }`). **[changed 2026-10-21] Signed by
+the claimant** (the user's decision): a record carries `signer` and
+`signature`, and only the wallet that made the claim can record it; its
+value and evidence must be the claim's too, so it can't change what the
+print says.
+
+```text
+Record = { sourceId (hex), claim (base58), marketId ("ramx"), expiryId ("RAMX-202611"),
+           observation: Observation, routing: Routing, recordedAt (ms),
+           signer (base58 | null), signature (base58 | null),     // null: kept before records were signed
+           chain: { kind ("opening"|"update"), sourceAddress, sourceStatus, committed (in the recipe),
+                    claimStatus ("Accepted", "Revealed", …), attempt (opening; else null),
+                    claimId (update, hex; else null), claimant, valueAtoms (string), sourceTime (unix s),
+                    evidence ("archive"|"hash"|null), slot (string) } }
+```
+
+### `POST /oracle/observations`
+
+Body (at most 16384 bytes, `Content-Type: application/json`), exactly:
+
+```json
+{ "marketId": "ramx", "expiryId": "RAMX-202611", "sourceId": "<64 hex>", "claim": "<base58>",
+  "observation": { "schema": "amoeba.series-observation.v1", "observationId": "…", "rawPrice": "5.25", … },
+  "signer": "<base58 wallet>", "signature": "<base58 ed25519 signature>" }
+```
+
+**The signature** is the claimant's ed25519 signature, as a wallet signs a
+message, over `ameba_commodity_spec::observation_record_message(marketId,
+expiryId, sourceId, claim, observation)`: the UTF-8 domain
+`amoeba-observation-record-v1\n`, then the compact JSON
+`{"marketId","expiryId","sourceId","claim","observation"}` of the fields as
+sent (the observation in its canonical field order, unset fields left out).
+No hash. A signature that doesn't verify over those bytes for `signer` is
+401 `ORACLE_OBSERVATION_UNAUTHORIZED` before anything is read; so is a
+`signer` that isn't the claim's claimant on chain (the opening claim's or
+update claim's `claimant`). A missing or malformed `signer` or
+`signature` is 400 `ORACLE_OBSERVATION_INPUT_INVALID`. Nothing refused is
+kept.
+
+`201 { duplicate: false, observation: Record }`, or `200 { duplicate: true,
+observation: Record }` with the stored record of the same claim (an opening
+claim once per attempt) or of the same source and `observationId`.
+
+* **The month** is the served month of `marketId` and `expiryId` as the
+  last oracle read found it (404 `ORACLE_OBSERVATION_MONTH_NOT_FOUND`
+  otherwise, also before the first read).
+* **On chain**, one `getMultipleAccounts` reads the source (its PDA under
+  the month, verified as the snapshot verifies sources; 404
+  `ORACLE_OBSERVATION_SOURCE_NOT_FOUND`) and the claim, which must be the
+  oracle's and either the source's opening claim (its PDA
+  `[ns, "oracle_opening_claim", month, source]`, initialized, a print made:
+  not `Empty`) or one of its update claims (`UpdateClaimV2` at its PDA
+  `[ns, "oracle-update-claim-v2", month, source, claimant, claimId]`, layout
+  marker `UC2` v4, of this month, source and source id, revealed: not `Open`
+  or `Committed`, a reveal time and a value). Then:
+  `price_atoms(rawPrice)` (6 decimals) must be the claim's value (the
+  opening state or the update's new state); `evidenceReference`, when given,
+  must be the claim's archived capture (its archive URL: `archive_url_hash`
+  of it is the claim's, and the opening or update evidence commitment over
+  the month, source, value, source time, the source's locator and definition
+  hashes and that URL is the claim's `evidence_hash`), or the hex of that
+  `evidence_hash`. Else 422 `ORACLE_OBSERVATION_UNVERIFIED`; nothing is
+  kept. The source's definition is read too unless it is kept already
+  ("Commodity buckets").
+* **Routing** (`route_observation`), stored with the record: the series is
+  the source's definition (not a series, or not on chain: the record is
+  kept all the same, `NEEDS_METADATA`, `field: "series"`), committed when
+  the source is in the month's recipe, the expiry date the month's
+  (`YYYY-MM-DD` of its expiry), the prior observations the source's
+  earlier records (their `releaseId` and `referencePeriodEnd`, in the order
+  they were kept). A source
+  registered under another bucket than its series names is `WRONG_PRODUCT`.
+  Routing never refuses a record.
+* A chain read that fails is 503 `ORACLE_OBSERVATION_UNAVAILABLE`.
+
+### `GET /oracle/observations?expiryId&sourceId`
+
+`200 { items: Record[] }`: the records of a month (`expiryId` as served,
+`RAMX-202611`) and/or a source (`sourceId`, 64 lowercase hex), in the order
+they were kept. At least one of the two; a repeated parameter takes its last
+value. No parameter, another parameter or a malformed `sourceId` is 400
+`ORACLE_OBSERVATION_QUERY_INVALID`. Any other method is 405.
+
+## Oracle evidence [added 2026-10-20]
+
+Authenticated evidence for oracle sources (the design is
+[evidence/README.md](../evidence/README.md)): a contributor proves what an
+HTTPS source showed them, a signed-in page too, as a web-proof bundle
+(`amoeba-evidence-bundle-v1`: a TLSNotary presentation and an extraction
+manifest), uploads it here and names it in a source candidate. **Trust
+model:** a bundle authenticates only if a notary the verifier policy lists
+(`/v1/config` `evidence.webProof.notaryKeys`) attested the TLS session and
+the server's certificate chains to Mozilla's roots, so trusting the result
+means trusting that notary not to collude with the prover; a development
+notary or test root makes the whole result `development` trust, never
+production evidence. Authentication is not the oracle's decision: an
+authenticated quote is still a quote, and the chain's challenge window and
+council stay the enforcement path.
+
+**The API verifies every bundle itself** with the verifier petri and anyone
+else runs (`amoeba_evidence::verify_bundle`, under the policy `/v1/config`
+names) and ignores what clients claim: a bundle carrying a `verified` key or
+an envelope is refused by its format, and every field below is recomputed
+from the presentation and the manifest. These paths are at the API root,
+like the candidates; replies are plain JSON (no `{ ok, data }` envelope)
+with `Cache-Control: no-store`, refusals `{ error, code, verification? }`.
+Stored in Postgres (`futures.oracle_evidence`: digest, proof digest,
+observation id, method, trust, the verification as it was at upload, the
+bundle bytes; `futures.oracle_evidence_submissions`: submission id, scope,
+observation id, bundle digest, target candidate). Nothing deletes from them.
+
+```text
+Verification = amoeba-evidence-verification-v1 {
+  format, stages: { received, provenance, extraction, eligibility: { outcome, reason? } },
+                  // outcome "passed"|"failed"|"unsupported"|"not_checked"
+  envelope?: { format: "amoeba-authenticated-evidence-v1", authentication, origin, extraction,
+               observation, times: { witnessedAt, sourceObservedAt?, submittedAt? }, observationId,
+               submissionId?, annotations? },
+  disclosure?: { serverName, request, hiddenRequestHeaders, responseHeaders, body },
+  bundleDigest? }        // evidence/crates/evidence/src/lib.rs; times are { value (unix s, text), provenance }
+```
+
+### `POST /oracle/evidence`
+
+The body is the bundle JSON (`Content-Type: application/json`, at most
+2 MiB, the verifier policy's bound on hostile input; no credential): a web
+proof (`method: "web_proof"`), a DKIM-signed message (`"email_dkim"`) or a
+zero-knowledge proof about one that carries no message (`"email_dkim_zk"`,
+verified in-process against the compiled-in circuit key; `evidence/README.md`).
+The API verifies it (received, provenance, extraction; eligibility is checked
+where it is used). Not authenticated: `422 { error, code:
+"EVIDENCE_NOT_AUTHENTICATED", verification }`, and nothing is stored.
+Authenticated: stored under its digest, the envelope's
+`times.submittedAt = { value: <unix s>, provenance: "recorder_clock" }` (the
+API's clock), and
+
+```text
+200 { bundleDigest, proofDigest, observationId, trust ("development"|"production"),
+      stored: true, duplicate (false), artifact: "/oracle/evidence/<bundleDigest>", verification }
+```
+
+The digest covers the method, backend, presentation (the message, or the
+proof and its claims) and canonical manifest, not the annotations or the
+JSON's spacing: a re-upload of the same bundle is
+the stored record (`duplicate: true`, the first upload's bytes, verification
+and `submittedAt`). Other refusals: 413 `EVIDENCE_TOO_LARGE`, 415
+`UNSUPPORTED_MEDIA_TYPE`, 400 `INCOMPLETE_REQUEST_BODY`, 503
+`EVIDENCE_STORE_UNAVAILABLE` (no database yet), 500 `EVIDENCE_STORE_FAILED`
+or `EVIDENCE_VERIFY_FAILED`.
+
+### `GET /oracle/evidence/:digest`
+
+The stored bundle, byte for byte as first uploaded (`Content-Type:
+application/json`, `Cache-Control: public, max-age=31536000, immutable`: a
+digest's bytes never change). The public artifact anyone fetches and
+re-verifies; no credential. 404 `EVIDENCE_NOT_FOUND`, 400
+`EVIDENCE_DIGEST_INVALID` (not 64 lowercase hex), 503 without a database.
+
+### `GET /oracle/evidence/:digest/verification`
+
+The stored bundle verified again now, under the current policy:
+
+```text
+200 { bundleDigest, authenticated (bool), verification,
+      record: { bundleDigest, proofDigest, observationId, method, trust, createdAt (unix s),
+                verification },             // as stored at upload
+      submissions: [{ submissionId, scope, observationId, target (candidate content hash),
+                      createdAt (unix s) }] }
+```
+
+404, 400 and 503 as above.
+
+### `GET /oracle/notary`
+
+A WebSocket (`Upgrade: websocket`) to the API host's notary, the one at
+`FUTURES_NOTARY_ADDR` (default `127.0.0.1:4520`; never an address the client
+names). Binary (and text) message payloads go to the notary as bytes, and
+the notary's bytes come back as binary messages, uninterpreted: the
+prover ↔ notary protocol (`evidence/crates/webproof/src/wire.rs`), which
+petri's prover speaks to a `ws://` or `wss://` notary URL
+(`amoeba_webproof::transport`). The socket closes
+when the notary closes; when the client stops sending, the notary's input
+is closed and its last bytes still arrive. 503 `NOTARY_UNAVAILABLE` before
+the upgrade when the notary can't be reached. The notary bounds its own
+messages and sessions; the bridge adds no timeouts or limits of its own
+(axum's default WebSocket message size applies).
 
 ## Browser RPC gateway [added]
 
@@ -2165,7 +2583,10 @@ The service reads the deployment manifest every 5 s.
   * a forming series (in `formingSeries`, or of a product in `forming`) with
     no futures market leaving `oracle.periods` and `oracle.months`, as
     `futures-ops unlist-month` takes it out: it leaves `/v1/oracle/*` and
-    the reference index at their next read.
+    the reference index at their next read;
+  * **[added 2026-10-21]** any change to `oracle.sponsorLookupTables` (a
+    month's table added, replaced or removed): `/v1/config` and the next
+    prepared sponsorship use the map as it stands.
 * **Any other change** (programs, keys, accounts, the oracle or futures
   program, a listed entry changed or removed, also pruning fields the
   service ignores): the service logs what changed and exits with status 75
@@ -2205,6 +2626,8 @@ what was missing. Markets that leave the manifest stay readable (see
 * Each submit costs the sponsor one fee even when the transaction fails,
   because preflight is skipped.
 * Prepared messages expire after 90 s.
+* Evidence bundles (`POST /oracle/evidence`) are at most 2 MiB, the
+  verifier policy's bound on hostile input; there is no rate limit.
 
 
 ## Leaderboard

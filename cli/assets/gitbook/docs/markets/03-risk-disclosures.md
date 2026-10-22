@@ -41,8 +41,10 @@ See [Earn](https://docs.amoeba.farm/earn/02-earn/).
 - Price sources can be wrong, stale, duplicated, manipulated, unavailable or mis-matched to a product. Medians, public evidence and challenges reduce these risks but do not remove them, especially when several sources share an error. In the launch month every bucket has a single source, all on one website, so each bucket's settlement value is confirmed by the council from the values recorded for it.
 - The final value is each source's median over a five-weekday window before expiry, then the median across sources. It can differ from the last live print, an intraday extreme, or a value you saw outside that window.
 - The index measures movement from each source's opening value. A wrong opening value can distort everything after it.
-- RAMX and NANDX are defined benchmarks. They are not complete indexes of the memory or storage market. What you actually pay or receive for hardware can move differently because of specification, volume, region, supplier terms or timing. A position is not a perfect hedge.
-- Positions settle in USDC. They give you no right to RAM, drives, inventory or physical delivery.
+- RAMX, NANDX, and BATX are defined benchmarks. They are not complete indexes of the memory, storage or battery market. What you actually pay or receive for hardware can move differently because of specification, volume, region, supplier terms or timing. A position is not a perfect hedge.
+- BATX measures price changes in Chinese yuan. Settling in USDC adds no currency return, so a cost you pay in another currency can move differently.
+- BATX is a prototype. No publisher's prices are licensed for its settlement yet. A BATX bucket with fewer than three eligible sources goes to the council.
+- Positions settle in USDC. They give you no right to RAM, drives, battery cells, inventory or physical delivery.
 
 ## Settlement timing and payouts
 

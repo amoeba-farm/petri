@@ -40,6 +40,9 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
             }
             _ => {}
         },
+        Event::Paste(value) if app.view == View::Evidence && app.proofs.ticket.is_some() => {
+            app.proofs.paste(&value)
+        }
         Event::Paste(value) => app.edit(&value, false),
         Event::Key(key) if key.kind != KeyEventKind::Release => {
             if key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c') {
@@ -166,6 +169,11 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
             }
             if app.view == View::Fund && app.fund.ticket.is_some() {
                 app.fund.key(key);
+                return None;
+            }
+            if app.view == View::Evidence && app.proofs.ticket.is_some() {
+                let months = app.fund.snap.months.clone();
+                app.proofs.key(key, &months);
                 return None;
             }
             if app.view == View::Markets {

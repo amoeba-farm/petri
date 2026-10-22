@@ -139,7 +139,7 @@ fn fetch(
                     &months[&a.month]
                 }
             };
-            let product = skus::decode_label(&a.bucket_id)
+            let product = skus::id_name(&skus::hex(&a.bucket_id))
                 .unwrap_or_else(|| format!("Unnamed product {}", &skus::hex(&a.bucket_id)[..6]));
             let month = month_name(expiry).unwrap_or_else(|| expiry.clone());
             earnings.push(Earning {

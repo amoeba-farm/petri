@@ -2,9 +2,9 @@
 
 Plain definitions of the terms used in Amoeba Farm, using the web app’s own labels.
 
-## RAMX / NANDX
+## RAMX / NANDX / BATX
 
-The two indexes. RAMX follows a memory-module (DRAM) price benchmark. NANDX follows a NAND flash price benchmark. Both settle in USDC.
+The three indexes. RAMX follows a DRAM memory chip contract-price benchmark. NANDX follows a NAND flash wafer contract-price benchmark. Their launch month, Oct 26, follows memory module and storage prices instead. BATX, a prototype, follows China domestic industrial prices of new lithium-ion battery cells in yuan. Its first month is Nov 26. All three settle in USDC.
 
 ## Index
 
@@ -184,15 +184,27 @@ The system that forms each month's source list and computes the final index.
 
 ## SKU
 
-One exact product identity in a market's governed manifest. RAMX lists 52 and NANDX lists 48.
+One exact product identity in a market's governed manifest. From the months expiring after 2026-11-01 each bucket is one SKU: RAMX, NANDX and BATX list 4 each. The launch month's manifests list 52 and 48 part numbers.
 
 ## Bucket
 
-A group of SKUs with a fixed weight in the index. Every eligible source in a bucket counts equally.
+A product with a fixed weight in the index: a commodity such as DDR5 16Gb chips, 1Tb TLC wafers or LFP storage cells, or in the launch month a row of part numbers. Every eligible source in a bucket counts equally, and the bucket moves by their median. See [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/).
 
 ## Source
 
-A public price page admitted for a bucket. Its movement is measured from its opening value.
+A public price admitted for a bucket. Its movement is measured from its opening value.
+
+## Comparison series
+
+A source of a month on chip, wafer or battery-cell buckets: one defined price-assessment row, or one recurring direct quote, with its price basis, statistic, unit, currency, period and terms fixed before it reports. RAMX and NANDX count contract prices only. It is compared only with its own opening value.
+
+## Observation
+
+One published price of a comparison series for one period, with its evidence. Reading the same release again is not a new observation.
+
+## Routing status
+
+What the oracle's rules make of a series or an observation, such as **Counts this month**, **Fits the bucket** or **Not a contract price**. Only **Counts this month** counts toward settlement. See [Evidence rules](https://docs.amoeba.farm/reference/02-evidence-rules/#routing-statuses).
 
 ## Scramble / Challenge / Freeze / Opening / Game Mode
 

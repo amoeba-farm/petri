@@ -3,7 +3,10 @@
 //! signed by the attached wallet (see [`super::send`]).
 
 use ameba_oracle::{
-    constants::{ORACLE_OPENING_ARCHIVE_URL_PREFIX, ORACLE_SCRAMBLE_WINDOW_SECONDS},
+    constants::{
+        ORACLE_EVIDENCE_RECORD_PREFIX, ORACLE_OPENING_ARCHIVE_URL_PREFIX,
+        ORACLE_SCRAMBLE_WINDOW_SECONDS,
+    },
     instruction::{
         self as ix, ChallengeOracleOpeningClaimParams, ChallengeOracleSourceParams,
         ChallengeOracleUpdateClaimParams, CommitOracleUpdateClaimV2Params, PrelistingEscrow,
@@ -45,9 +48,9 @@ const SOURCE_ID_DOMAIN: &[u8] = b"ameba-petri-source-id-v1";
 /// Bytes per evidence chunk (the program's limit) and chunks per transaction.
 const CHUNK: usize = 192;
 const CHUNKS_PER_TX: usize = 3;
-const OBJECT_HEADER: usize = 76;
+pub(super) const OBJECT_HEADER: usize = 76;
 
-fn usdc_amount(text: &str, what: &str) -> Result<u64> {
+pub(super) fn usdc_amount(text: &str, what: &str) -> Result<u64> {
     let atoms = parse_usdc(text)?;
     if atoms == 0 {
         bail(format!("{what} must be more than zero"))?;
@@ -128,7 +131,123 @@ pub fn evidence_preimage(kind: EvidenceKind, text: &str) -> Result<(u8, Vec<u8>,
             archive_time(text)?;
             (3, text.as_bytes().to_vec(), ix::archive_url_hash(text))
         }
+        // Committed like an archive URL, under the same domain.
+        EvidenceKind::Record => {
+            amoeba_evidence::parse_onchain_record(text)
+                .ok_or_else(|| Error::msg("not an amoeba-evidence-v1 record"))?;
+            (4, text.as_bytes().to_vec(), ix::archive_url_hash(text))
+        }
     })
+}
+
+/// What an opening, update or challenge cites: a Wayback archive URL
+/// (kind 3), or a web proof bundle, cited as its authenticated evidence
+/// record (kind 4, `crate::evidence::onchain`).
+#[derive(Clone, Copy, Debug)]
+pub enum Cite<'a> {
+    Archive(&'a str),
+    Proof(&'a str),
+}
+
+impl<'a> Cite<'a> {
+    pub fn of(archive_url: &'a Option<String>, evidence: &'a Option<String>) -> Self {
+        match (archive_url, evidence) {
+            (_, Some(bundle)) => Self::Proof(bundle),
+            (Some(url), None) => Self::Archive(url),
+            (None, None) => Self::Archive(""),
+        }
+    }
+}
+
+/// The cited text and what it carries, resolved for one source.
+pub(super) struct Cited {
+    pub text: String,
+    pub kind: EvidenceKind,
+    pub time: u64,
+    pub state: u64,
+    /// The proof's bundle digest (to publish with the claim).
+    pub bundle: Option<String>,
+}
+
+pub(super) fn cite(
+    ctx: &Ctx,
+    oracle: &Oracle,
+    month: &MonthRef,
+    source: &SourceRef,
+    cited: Cite,
+    value: Option<&str>,
+    signer: &Pubkey,
+) -> Result<Cited> {
+    match cited {
+        Cite::Archive(url) => Ok(Cited {
+            time: archive_time(url)?,
+            state: value_atoms(value.ok_or_else(|| Error::msg("give --value"))?)?,
+            text: url.to_string(),
+            kind: EvidenceKind::Archive,
+            bundle: None,
+        }),
+        Cite::Proof(bundle) => {
+            let r = crate::evidence::onchain::record(
+                ctx,
+                &oracle.program,
+                &month.address,
+                &source.state.source_id,
+                &source.state.canonical_locator_hash,
+                signer,
+                bundle,
+            )?;
+            if let Some(v) = value
+                && value_atoms(v)? != r.atoms
+            {
+                bail(format!(
+                    "--value {v} is not what the proof shows ({}); leave --value out to use it",
+                    r.price
+                ))?;
+            }
+            Ok(Cited {
+                text: r.record,
+                kind: EvidenceKind::Record,
+                time: r.time,
+                state: r.atoms,
+                bundle: Some(r.digest),
+            })
+        }
+    }
+}
+
+/// The cited time and page of an archive URL or an evidence record.
+fn archive_parts(text: &str) -> Result<(u64, String)> {
+    if text.starts_with(ORACLE_EVIDENCE_RECORD_PREFIX) {
+        let (_, time, _, page) = amoeba_evidence::parse_onchain_record(text)
+            .ok_or_else(|| Error::msg("not an amoeba-evidence-v1 record"))?;
+        return Ok((time, page.to_string()));
+    }
+    let time = archive_time(text)?;
+    Ok((
+        time,
+        text[ORACLE_OPENING_ARCHIVE_URL_PREFIX.len() + 15..].to_string(),
+    ))
+}
+
+fn cited_kind(text: &str) -> EvidenceKind {
+    if text.starts_with(ORACLE_EVIDENCE_RECORD_PREFIX) {
+        EvidenceKind::Record
+    } else {
+        EvidenceKind::Archive
+    }
+}
+
+/// The text a definition object's bytes hold: they are
+/// `domain || 0 || u32-LE length || text` (see [`evidence_preimage`]).
+pub(super) fn definition_text(body: &[u8]) -> Option<String> {
+    let mut prefix = SOURCE_DEFINITION_DOMAIN.as_bytes().to_vec();
+    prefix.push(0);
+    let rest = body.strip_prefix(prefix.as_slice())?;
+    let (length, text) = rest.split_at_checked(4)?;
+    let length = u32::from_le_bytes(length.try_into().ok()?) as usize;
+    (length == text.len())
+        .then(|| String::from_utf8(text.to_vec()).ok())
+        .flatten()
 }
 
 /// What an evidence object on chain says about itself.
@@ -223,6 +342,7 @@ fn kind_name(kind: u8) -> &'static str {
         1 => "locator",
         2 => "definition",
         3 => "archive",
+        4 => "evidence record",
         _ => "unknown",
     }
 }
@@ -262,6 +382,7 @@ fn source_json(source: &SourceRef) -> Value {
         "source": source.address.to_string(),
         "sourceId": hex(&source.state.source_id),
         "bucket": source.bucket_label(),
+        "bucketName": source.bucket_name(),
         "status": format!("{:?}", source.state.status),
         "currentState": trim_decimal(u128::from(source.state.current_state), 6),
     })
@@ -534,31 +655,79 @@ pub fn source_propose(
     source_id: Option<&str>,
 ) -> Result<Report> {
     let oracle = Oracle::new(ctx)?;
-    let proposer = ctx.wallet_pubkey()?;
     let month = oracle.month(&target.market, target.expiry.as_deref())?;
     let bucket_id = skus::parse_bucket(bucket)?;
-    let (sku_index, sku_proof) = oracle.sku_proof(&month, &bucket_id)?;
     let definition = read_body(definition, definition_file)?;
+    let listing_bond = usdc_amount(bond, "the listing bond")?;
+    let source_id = source_id
+        .map(|id| parse_hex32(id, "source id"))
+        .transpose()?;
+    let mut write = propose_write(
+        &oracle,
+        &month,
+        &Proposal {
+            bucket_id,
+            url,
+            source_type,
+            definition: &definition,
+            listing_bond,
+            source_id,
+        },
+    )?;
+    // A chip month's sources count as comparison series only.
+    if oracle.chip_product(&month).ok().flatten().is_some()
+        && !ameba_commodity_spec::SeriesDefinition::claims_schema(&definition)
+    {
+        write.review.push(format!(
+            "{} is on chip buckets: a source counts once its definition is a comparison series (`petri oracle series template`, then `petri oracle series propose`)",
+            month.period.expiry_id()
+        ));
+    }
+    send::run(ctx, p, write, target.send.simulate)
+}
+
+/// What a source proposal registers.
+pub(super) struct Proposal<'a> {
+    pub bucket_id: [u8; 32],
+    pub url: &'a str,
+    pub source_type: &'a str,
+    pub definition: &'a str,
+    pub listing_bond: u64,
+    /// Derived from the month, bucket and URL when None.
+    pub source_id: Option<[u8; 32]>,
+}
+
+/// The source proposal to review and send: its locator and definition
+/// evidence, then the proposal with its bond and SKU proof (`sources
+/// propose`, `series propose`).
+pub(super) fn propose_write(
+    oracle: &Oracle,
+    month: &MonthRef,
+    proposal: &Proposal,
+) -> Result<Write> {
+    let proposer = oracle.ctx.wallet_pubkey()?;
+    let bucket_id = proposal.bucket_id;
+    let url = proposal.url;
+    let (sku_index, sku_proof) = oracle.sku_proof(month, &bucket_id)?;
     let (_, locator_bytes, locator_hash) = evidence_preimage(EvidenceKind::Locator, url)?;
     let (_, definition_bytes, definition_hash) =
-        evidence_preimage(EvidenceKind::Definition, &definition)?;
-    let source_id = match source_id {
-        Some(id) => parse_hex32(id, "source id")?,
-        None => hashv(&[
+        evidence_preimage(EvidenceKind::Definition, proposal.definition)?;
+    let source_id = proposal.source_id.unwrap_or_else(|| {
+        hashv(&[
             SOURCE_ID_DOMAIN,
             month.address.as_ref(),
             &bucket_id,
             &locator_hash,
         ])
-        .to_bytes(),
-    };
-    let listing_bond = usdc_amount(bond, "the listing bond")?;
+        .to_bytes()
+    });
+    let listing_bond = proposal.listing_bond;
     let source = ix::find_oracle_source_address(&oracle.program, &month.address, &source_id);
     let mut txs = Vec::new();
     let (locator_object, locator_txs, _) =
-        evidence_txs(&oracle, &proposer, 1, &locator_bytes, locator_hash)?;
+        evidence_txs(oracle, &proposer, 1, &locator_bytes, locator_hash)?;
     let (definition_object, definition_txs, _) =
-        evidence_txs(&oracle, &proposer, 2, &definition_bytes, definition_hash)?;
+        evidence_txs(oracle, &proposer, 2, &definition_bytes, definition_hash)?;
     txs.extend(locator_txs);
     txs.extend(definition_txs);
     txs.push(Tx::one(
@@ -572,7 +741,7 @@ pub fn source_propose(
             ProposeOracleSourceV3Params {
                 source_id,
                 bucket_id,
-                source_type_hash: semantic_hash(SOURCE_TYPE_DOMAIN, source_type),
+                source_type_hash: semantic_hash(SOURCE_TYPE_DOMAIN, proposal.source_type),
                 canonical_locator_hash: locator_hash,
                 source_definition_hash: definition_hash,
                 listing_bond,
@@ -581,25 +750,24 @@ pub fn source_propose(
             },
         ),
     ));
-    let write = Write {
+    Ok(Write {
         action: "oracle.sources.propose",
         title: format!(
             "Propose a {} source for {} with a {} USDC listing bond",
-            skus::decode_label(&bucket_id).unwrap_or_else(|| hex(&bucket_id)),
+            skus::bucket_name(&bucket_id),
             month.period.expiry_id(),
             usdc(listing_bond)
         ),
         review: vec![
-            month_line(&month),
+            month_line(month),
             format!("URL {url}"),
             format!("Source {source} (id {})", hex(&source_id)),
             format!("Evidence: locator {locator_object}, definition {definition_object}"),
             "The bond is debited from your oracle collateral".to_string(),
         ],
-        details: json!({"month": month_json(&month), "source": source.to_string(), "sourceId": hex(&source_id), "bondAtoms": listing_bond.to_string()}),
+        details: json!({"month": month_json(month), "source": source.to_string(), "sourceId": hex(&source_id), "bondAtoms": listing_bond.to_string()}),
         txs,
-    };
-    send::run(ctx, p, write, target.send.simulate)
+    })
 }
 
 pub fn source_support(
@@ -624,7 +792,7 @@ pub fn source_support(
         ),
         review: vec![
             month_line(&month),
-            format!("Bucket {}", source.bucket_label()),
+            format!("Bucket {}", source.bucket_name()),
         ],
         details: json!({"month": month_json(&month), "source": source_json(&source), "stakeAtoms": stake.to_string()}),
         txs: vec![Tx::one(
@@ -712,7 +880,7 @@ pub fn source_challenge(
 
 // -------------------------------------------------------------------- prints
 
-fn opening_claim(
+pub(super) fn opening_claim(
     oracle: &Oracle,
     month: &MonthRef,
     source: &SourceRef,
@@ -782,7 +950,7 @@ fn check_opening(
             at(now)
         ))?;
     }
-    let captured = archive_time(archive_url)?;
+    let (captured, page) = archive_parts(archive_url)?;
     if captured < start {
         bail(format!(
             "the archive was captured at {}, before the Opening began at {}: archive the page again",
@@ -799,7 +967,6 @@ fn check_opening(
             at(captured)
         ))?;
     }
-    let page = &archive_url[ORACLE_OPENING_ARCHIVE_URL_PREFIX.len() + 15..];
     if hashv(&[b"locator", page.as_bytes()]).to_bytes() != *locator_hash {
         bail(format!(
             "{page} is not this source's page: archive its URL exactly as the source names it"
@@ -820,8 +987,8 @@ pub fn print_opening(
     p: Paint,
     target: &Target,
     source: &str,
-    value: &str,
-    archive_url: &str,
+    value: Option<&str>,
+    cited: Cite,
     stake: &str,
     challenge_id: Option<&str>,
 ) -> Result<Report> {
@@ -829,8 +996,7 @@ pub fn print_opening(
     let actor = ctx.wallet_pubkey()?;
     let month = oracle.month(&target.market, target.expiry.as_deref())?;
     let source = oracle.source(&month, source)?;
-    let state = value_atoms(value)?;
-    let source_time = archive_time(archive_url)?;
+    let c = cite(ctx, &oracle, &month, &source, cited, value, &actor)?;
     let amount = usdc_amount(
         stake,
         if challenge_id.is_some() {
@@ -839,10 +1005,40 @@ pub fn print_opening(
             "the stake"
         },
     )?;
+    let write = opening_write(
+        &oracle,
+        &month,
+        &source,
+        &c,
+        amount,
+        challenge_id,
+        target.send.simulate,
+    )?;
+    send::run(ctx, p, write, target.send.simulate)
+}
+
+/// An opening print (or, with `challenge_id`, a challenge of one) to review
+/// and send: its evidence (a Wayback archive, or a web proof's evidence
+/// record, published unless only simulating), then the claim. An opening is
+/// held to the oracle's rules first ([`check_opening`]).
+#[allow(clippy::too_many_arguments)]
+pub(super) fn opening_write(
+    oracle: &Oracle,
+    month: &MonthRef,
+    source: &SourceRef,
+    c: &Cited,
+    amount: u64,
+    challenge_id: Option<&str>,
+    simulate: bool,
+) -> Result<Write> {
+    let ctx = oracle.ctx;
+    let actor = ctx.wallet_pubkey()?;
+    let (state, source_time, archive_url) = (c.state, c.time, c.text.as_str());
+    let value = trim_decimal(u128::from(state), 6);
     let challenging = challenge_id.is_some();
     if !challenging {
         let bond = oracle
-            .sku_pool(&month, &source.state.bucket_id)?
+            .sku_pool(month, &source.state.bucket_id)?
             .opening_bond;
         let now = u64::try_from(ctx.rpc.clock()?.unix_timestamp).unwrap_or(0);
         check_opening(
@@ -854,8 +1050,14 @@ pub fn print_opening(
             bond,
         )?;
     }
-    let (_, bytes, hash) = evidence_preimage(EvidenceKind::Archive, archive_url)?;
-    let (archive_object, mut txs, _) = evidence_txs(&oracle, &actor, 3, &bytes, hash)?;
+    let (kind, bytes, hash) = evidence_preimage(c.kind, archive_url)?;
+    let (archive_object, mut txs, _) = evidence_txs(oracle, &actor, kind, &bytes, hash)?;
+    if let Some(digest) = &c.bundle
+        && !simulate
+    {
+        // Anyone checking the print fetches the proof by its digest.
+        crate::evidence::onchain::publish(ctx, digest)?;
+    }
     let (name, ixn) = if challenging {
         let challenge_id = id_or_random(challenge_id.filter(|c| !c.is_empty()), "challenge id")?;
         (
@@ -904,7 +1106,7 @@ pub fn print_opening(
         )
     };
     txs.push(Tx::one(name, ixn));
-    let write = Write {
+    Ok(Write {
         action: if challenging {
             "oracle.prints.challenge"
         } else {
@@ -922,13 +1124,12 @@ pub fn print_opening(
             if challenging { "bond" } else { "stake" }
         ),
         review: vec![
-            month_line(&month),
+            month_line(month),
             format!("Archive {archive_url} (object {archive_object})"),
         ],
-        details: json!({"month": month_json(&month), "source": source_json(&source), "valueAtoms": state.to_string(), "sourceTime": source_time}),
+        details: json!({"month": month_json(month), "source": source_json(source), "valueAtoms": state.to_string(), "sourceTime": source_time}),
         txs,
-    };
-    send::run(ctx, p, write, target.send.simulate)
+    })
 }
 
 pub fn print_finalize(ctx: &Ctx, p: Paint, target: &Target, source: &str) -> Result<Report> {
@@ -1060,7 +1261,7 @@ pub fn print_finalize_phase(ctx: &Ctx, p: Paint, target: &Target) -> Result<Repo
 
 // ------------------------------------------------------------------- updates
 
-fn update_claim(oracle: &Oracle, claim: &str) -> Result<(Pubkey, OracleUpdateClaimV2)> {
+pub(super) fn update_claim(oracle: &Oracle, claim: &str) -> Result<(Pubkey, OracleUpdateClaimV2)> {
     let key = oracle.ctx.parse_pubkey(claim, "update claim")?;
     let account = oracle.ctx.rpc.account(&key)?;
     let state: OracleUpdateClaimV2 = decode(
@@ -1102,17 +1303,45 @@ pub fn update_commit(
     p: Paint,
     target: &Target,
     source: &str,
-    value: &str,
-    archive_url: &str,
+    value: Option<&str>,
+    cited: Cite,
     stake: &str,
 ) -> Result<Report> {
     let oracle = Oracle::new(ctx)?;
-    let claimant = ctx.wallet_pubkey()?;
     let month = oracle.month(&target.market, target.expiry.as_deref())?;
     let source = oracle.source(&month, source)?;
-    let new_state = value_atoms(value)?;
-    let source_time = archive_time(archive_url)?;
+    let claimant = ctx.wallet_pubkey()?;
+    let c = cite(ctx, &oracle, &month, &source, cited, value, &claimant)?;
     let stake = usdc_amount(stake, "the stake")?;
+    let (write, _) = update_commit_write(
+        &oracle,
+        &month,
+        &source,
+        &c,
+        stake,
+        target.send.simulate,
+        None,
+    )?;
+    send::run(ctx, p, write, target.send.simulate)
+}
+
+/// A sealed update commit to review and send, and its claim address. Unless
+/// only simulating, its reveal material (with the web proof it cites, if any,
+/// and `observation`, the record to store once it is revealed) is saved to
+/// Petri's private claims file first.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn update_commit_write(
+    oracle: &Oracle,
+    month: &MonthRef,
+    source: &SourceRef,
+    c: &Cited,
+    stake: u64,
+    simulate: bool,
+    observation: Option<claims::PendingObservation>,
+) -> Result<(Write, Pubkey)> {
+    let claimant = oracle.ctx.wallet_pubkey()?;
+    let (new_state, source_time, archive_url) = (c.state, c.time, c.text.as_str());
+    let value = trim_decimal(u128::from(new_state), 6);
     let s = &source.state;
     let evidence_hash = ix::update_evidence_hash(
         &month.address,
@@ -1147,7 +1376,7 @@ pub fn update_commit(
         &claimant,
         &claim_id,
     );
-    let saved_to = if target.send.simulate {
+    let saved_to = if simulate {
         None
     } else {
         Some(claims::save(
@@ -1165,6 +1394,8 @@ pub fn update_commit(
                 archive_url: archive_url.to_string(),
                 secret_salt: hex(&salt),
                 revealed: false,
+                evidence_bundle: c.bundle.clone(),
+                observation,
             },
         )?)
     };
@@ -1172,19 +1403,19 @@ pub fn update_commit(
         action: "oracle.updates.commit",
         title: format!("Commit a sealed update of source {} with a {} USDC stake", source.address, usdc(stake)),
         review: vec![
-            month_line(&month),
+            month_line(month),
             format!("{} → {value} at {source_time}", trim_decimal(u128::from(s.current_state), 6)),
             format!("Claim {claim}; reveal it later with `petri oracle updates reveal {claim}`"),
             "Only the commitment goes on chain now; the value, archive URL and salt stay in Petri's private file".to_string(),
         ],
         details: json!({
-            "month": month_json(&month), "source": source_json(&source), "claim": claim.to_string(),
+            "month": month_json(month), "source": source_json(source), "claim": claim.to_string(),
             "claimId": hex(&claim_id), "stakeAtoms": stake.to_string(),
             "revealMaterial": saved_to.map(|p| p.display().to_string()),
         }),
         txs: vec![Tx::one("commitUpdate", ix::commit_oracle_update_claim_v3(&oracle.program, &claimant, &month.period.address, &month.address, &source.address, &s.bucket_id, CommitOracleUpdateClaimV2Params { claim_id, commit_hash, stake }))],
     };
-    send::run(ctx, p, write, target.send.simulate)
+    Ok((write, claim))
 }
 
 pub fn update_reveal(ctx: &Ctx, p: Paint, claim: &str, send: &SendArgs) -> Result<Report> {
@@ -1217,8 +1448,16 @@ pub fn update_reveal(ctx: &Ctx, p: Paint, claim: &str, send: &SendArgs) -> Resul
             .ok_or_else(|| Error::msg("the claim's period is not a period of this oracle"))?;
         oracle.month_of(period)?
     };
-    let (_, bytes, hash) = evidence_preimage(EvidenceKind::Archive, &saved.archive_url)?;
-    let (archive_object, mut txs, _) = evidence_txs(&oracle, &claimant, 3, &bytes, hash)?;
+    let (kind, bytes, hash) =
+        evidence_preimage(cited_kind(&saved.archive_url), &saved.archive_url)?;
+    let (archive_object, mut txs, _) = evidence_txs(&oracle, &claimant, kind, &bytes, hash)?;
+    if let Some(digest) = &saved.evidence_bundle
+        && !send.simulate
+    {
+        // Revealed, the claim names the proof: publish it so anyone can
+        // check it during the challenge window.
+        crate::evidence::onchain::publish(ctx, digest)?;
+    }
     txs.push(Tx::one(
         "revealUpdate",
         ix::reveal_oracle_update_claim_v3(
@@ -1251,9 +1490,14 @@ pub fn update_reveal(ctx: &Ctx, p: Paint, claim: &str, send: &SendArgs) -> Resul
         txs,
     };
     let simulate = send.simulate;
-    let report = send::run(ctx, p, write, simulate)?;
+    let mut report = send::run(ctx, p, write, simulate)?;
     if !simulate {
         claims::mark_revealed(&key.to_string())?;
+        // An update sent by `petri oracle observe`: its observation record goes
+        // to the API now that the claim is revealed.
+        if let Some(pending) = &saved.observation {
+            super::observe::record_after_send(ctx, &mut report, pending, &key, &claimant);
+        }
     }
     Ok(report)
 }
@@ -1264,8 +1508,8 @@ pub fn update_challenge(
     p: Paint,
     target: &Target,
     claim: &str,
-    value: &str,
-    archive_url: &str,
+    value: Option<&str>,
+    cited: Cite,
     bond: &str,
     challenge_id: Option<&str>,
 ) -> Result<Report> {
@@ -1274,8 +1518,9 @@ pub fn update_challenge(
     let (key, state) = update_claim(&oracle, claim)?;
     let month = claim_month(&oracle, target, &state.claim.month)?;
     let source = oracle.source(&month, &state.claim.source.to_string())?;
-    let alternative = value_atoms(value)?;
-    let source_time = archive_time(archive_url)?;
+    let c = cite(ctx, &oracle, &month, &source, cited, value, &challenger)?;
+    let (alternative, source_time, archive_url) = (c.state, c.time, c.text.as_str());
+    let value = trim_decimal(u128::from(alternative), 6);
     let bond = usdc_amount(bond, "the bond")?;
     let s = &source.state;
     let evidence_hash = ix::update_evidence_hash(
@@ -1289,8 +1534,13 @@ pub fn update_challenge(
         archive_url,
     );
     let challenge_id = id_or_random(challenge_id, "challenge id")?;
-    let (_, bytes, hash) = evidence_preimage(EvidenceKind::Archive, archive_url)?;
-    let (_, mut txs, _) = evidence_txs(&oracle, &challenger, 3, &bytes, hash)?;
+    let (kind, bytes, hash) = evidence_preimage(c.kind, archive_url)?;
+    let (_, mut txs, _) = evidence_txs(&oracle, &challenger, kind, &bytes, hash)?;
+    if let Some(digest) = &c.bundle
+        && !target.send.simulate
+    {
+        crate::evidence::onchain::publish(ctx, digest)?;
+    }
     txs.push(Tx::one(
         "challengeUpdate",
         ix::challenge_oracle_update_claim_v2(

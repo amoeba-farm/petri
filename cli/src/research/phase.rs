@@ -47,6 +47,52 @@ pub struct Source {
     pub url: Option<String>,
     /// "Candidate", "Active", "Frozen", …
     pub status: String,
+    /// Its 64-hex id and its address.
+    pub id: String,
+    pub address: Option<String>,
+    /// Whether it counts, on a chip month: the API's routing, else petri's own
+    /// of its definition on chain (fund.rs).
+    pub checked: Option<Checked>,
+}
+
+/// A routing by the commodity spec, as the views show it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Checked {
+    pub status: ameba_commodity_spec::Status,
+    /// What decided it, when it does not fit.
+    pub reason: Option<String>,
+}
+
+impl Checked {
+    pub fn of(routing: &ameba_commodity_spec::Routing) -> Self {
+        Self {
+            status: routing.status,
+            reason: (!routing.status.admissible())
+                .then(|| routing.deciding().next().map(|r| r.message.clone()))
+                .flatten(),
+        }
+    }
+
+    /// A document's `routing`, as the API gives it.
+    pub fn from_api(v: &Value) -> Option<Self> {
+        let status = ameba_commodity_spec::Status::parse(v["routing"]["status"].as_str()?)?;
+        let reason = (!status.admissible())
+            .then(|| {
+                v["routing"]["reasons"]
+                    .as_array()?
+                    .iter()
+                    .find(|r| r["status"].as_str() == Some(status.as_str()))?["message"]
+                    .as_str()
+                    .map(super::model::safe)
+            })
+            .flatten();
+        Some(Self { status, reason })
+    }
+
+    /// "fits the bucket", "missing details".
+    pub fn words(&self) -> String {
+        self.status.summary().to_lowercase()
+    }
 }
 
 const DAY: i64 = 86_400;
@@ -68,10 +114,12 @@ fn atoms(v: &Value) -> Option<u64> {
     v.as_str()?.parse().ok()
 }
 
+/// A bucket's display label: the API's `bucketName` ("DDR5 16Gb" on a chip
+/// month), else its `bucketLabel`.
 fn label(v: &Value) -> Option<String> {
-    v["bucketLabel"]
-        .as_str()
-        .filter(|l| !l.is_empty())
+    ["bucketName", "bucketLabel"]
+        .iter()
+        .find_map(|key| v[*key].as_str().filter(|l| !l.is_empty()))
         .map(str::to_string)
 }
 
@@ -91,6 +139,9 @@ fn sources(snapshot: &Value, market: &str, expiry: &str) -> Vec<Source> {
                 label: label(s),
                 url: s["canonicalLocator"]["url"].as_str().map(str::to_string),
                 status: s["status"].as_str().unwrap_or_default().to_string(),
+                id: s["sourceId"].as_str().unwrap_or_default().to_string(),
+                address: s["sourceAddress"].as_str().map(str::to_string),
+                checked: Checked::from_api(s),
             })
         })
         .collect()
@@ -130,6 +181,27 @@ pub fn months(snapshot: &Value) -> Vec<Month> {
             })
         })
         .collect()
+}
+
+impl Month {
+    /// The commodity product of a chip month: one whose products (or
+    /// sources) are commodity chip buckets. None on part numbers.
+    pub fn chip_product(&self) -> Option<ameba_commodity_spec::Product> {
+        let chips = self
+            .skus
+            .iter()
+            .map(|k| k.bucket.as_str())
+            .chain(self.sources.iter().map(|s| s.bucket.as_str()))
+            .any(|bucket| {
+                crate::oracle::skus::parse_hex32(bucket, "bucket")
+                    .ok()
+                    .and_then(|id| crate::oracle::skus::chip_bucket(&id))
+                    .is_some()
+            });
+        chips
+            .then(|| ameba_commodity_spec::Product::from_symbol(&self.market))
+            .flatten()
+    }
 }
 
 /// The steps of a month's life, in order.

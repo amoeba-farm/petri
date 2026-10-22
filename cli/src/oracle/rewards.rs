@@ -1076,7 +1076,10 @@ fn read_frozen(oracle: &Oracle, wallet: &Pubkey, facts: &mut Facts) -> Result<()
 }
 
 fn product(bucket: &[u8; 32]) -> String {
-    skus::decode_label(bucket).unwrap_or_else(|| hex(bucket)[..8].to_string())
+    skus::chip_bucket(bucket)
+        .map(|b| b.name.to_string())
+        .or_else(|| skus::decode_label(bucket))
+        .unwrap_or_else(|| hex(bucket)[..8].to_string())
 }
 
 /// `petri oracle rewards [MARKET]`.
