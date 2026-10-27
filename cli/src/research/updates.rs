@@ -104,6 +104,8 @@ impl Updates {
     }
 }
 
+/// Running bots don't hold an update back: quitting takes their ladders down
+/// and the new petri starts them again from `bots/.running`.
 pub fn safe_to_restart(app: &super::model::App, idle: Duration) -> bool {
     app.modal.is_none()
         && app.markets.ticket.is_none()
@@ -118,11 +120,7 @@ mod tests {
     use super::*;
     #[test]
     fn restart_waits_for_forms_pending_saves_network_and_idle() {
-        let mut app = super::super::model::App::new(
-            "petri".into(),
-            "research".into(),
-            "http://127.0.0.1:4185".into(),
-        );
+        let mut app = super::super::model::App::new("petri".into(), "http://127.0.0.1:4185".into());
         let idle = Duration::from_secs(30);
         assert!(safe_to_restart(&app, idle));
         assert!(!safe_to_restart(&app, Duration::ZERO));

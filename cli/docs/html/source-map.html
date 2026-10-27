@@ -80,10 +80,6 @@
     </style>
   </head>
   <body>
-    <p>Agent execution uses <a href="../../src/mcp_action_bridge.rs">resident typed Rust dispatch</a>
-    through <a href="../../scripts/petri-action-bridge.mjs">the bounded MCP transport</a>.
-    <a href="../../scripts/check-petri-action-bridge.mjs">Transport checks</a> cover process reuse and uncertain outcomes.
-    Futures trades are never MCP actions; agents read futures data and call the read-only quote.</p>
     <main>
       <h1>Petri CLI Source Map</h1>
       <p class="muted">
@@ -183,7 +179,7 @@
           </tr>
           <tr>
             <td><a href="../../src/research/mod.rs">src/research/mod.rs</a></td>
-            <td>Terminal UI: the Markets view and the oracle research tabs Connect, Activity, Evidence and Rewards.</td>
+            <td>Terminal UI: the Markets and Bots views and the oracle research tabs Connect, Activity, Evidence and Rewards.</td>
             <td>Rendering stays free of network and storage effects.</td>
           </tr>
           <tr>
@@ -197,13 +193,33 @@
             <td>Owns no trading logic: tickets call <code>futures::trade</code>'s prepare and send steps, quote before <code>y</code> sends, and use the CLI's 2% slippage default. The leverage keys step through the site's leverages that fit the market's price.</td>
           </tr>
           <tr>
+            <td><a href="../../src/research/bots.rs">src/research/bots.rs</a></td>
+            <td>TUI Bots view: the bots in petri's <code>bots/</code> folder, start (after a yes) and stop, weights edited in place, a new ladder bot for a picked market. Its worker owns the bot host: it picks up a running bot's file edits, reads the bots' markets every two seconds, runs them and sends what they propose. <code>petri bots</code> (<code>write</code>, <code>read</code>, <code>remove</code>, <code>publish</code>, <code>discover</code>, <code>show</code>, <code>install</code>, <code>leaderboard</code>) and <code>petri bots serve</code> (JSON lines) drive the same worker without a terminal, and a running bot's lock in <code>bots/.locks/</code> keeps one bot to one petri. Starting a bot funds its own wallet up to its budget and registers its run; each look it reads the bot's wallet, moves a product bot to its next month and brings old months' cash home; stopping it sweeps the bot wallet's USDC back. <code>bots/.running</code> restarts running bots with the next worker. The contract is <a href="../bots.md">docs/bots.md</a>.</td>
+            <td>Owns no trading logic: bots propose, <code>bots::send</code> checks, signs (with the bot's wallet) and sends. Stopping a bot or quitting petri takes its ladder down first; updates wait while a bot runs.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/compose/mod.rs">src/compose/</a></td>
+            <td>The runtime bots run on (Cordis's model, arXiv 2608.25512): components inject and provide keys; every effect is kept with its inverse; a component runs while what it injects is provided and is undone when it goes; realms keep subtrees apart; <code>loader.rs</code> reconciles rows by id.</td>
+            <td>No network, storage or UI. Synchronous: one transition at a time, each to completion. <code>compose/tests.rs</code> checks the paper's properties one by one.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/bots/mod.rs">src/bots/</a></td>
+            <td>Trading bots: bundle files (<code>bundle.rs</code>), the host's keys and feeds (<code>keys.rs</code>, <code>feeds.rs</code>), the parts (<code>weights.rs</code>, <code>signals.rs</code>, <code>ladder.rs</code>: the house maker's ladder for one wallet, fitted to the book's room; <code>script.rs</code>: <code>strategy/script</code>, a Rhai script in a sandbox of pure packages with a 5,000,000-operation limit a tick), the host (<code>host.rs</code>), each bot's own wallet and its funding and sweep plans (<code>wallet.rs</code>), the futures API's bot registry and GitHub files (<code>registry.rs</code>) and the network side (<code>send.rs</code>: reads, sends through <code>futures::trade</code>'s order paths, settling and sweeping old months).</td>
+            <td>Parts never see a key, signer or client. <code>send.rs</code> reads the market fresh from chain, checks post-only and the program's ladder-arc count before any cash moves, and sends on the local route through <code>exec::send_local</code>. The ladder math is the futures client's <code>pricing</code>, shared with <code>futures-maker</code>.</td>
+          </tr>
+          <tr>
             <td><a href="../../src/research/nav.rs">src/research/nav.rs</a>, <a href="../../src/research/research_page.rs">src/research/research_page.rs</a></td>
             <td>TUI Research view: the navigator (products, months, categories, one category's tasks) built from the oracle's months (<code>phase.rs</code>) and the workspace's work in them, each agent's feed, and following an agent's work; <code>research_page.rs</code> draws it beside the agent's page.</td>
             <td>Displays only: its writes are the owner's Research this, Stop researching and Directive (<code>/v1/owner/work/focus</code>, <code>/v1/owner/work/refine</code>).</td>
           </tr>
           <tr>
-            <td><a href="../../src/research/runtime.rs">src/research/runtime.rs and research/</a></td>
-            <td>Embedded Node 24 research service and CLI; private bootstrap pipe.</td>
+            <td><a href="../../src/research/agent/mod.rs">src/research/agent/</a></td>
+            <td>An agent's research commands and its MCP server (<code>petri research agent|session|work|activity|rewards|mcp</code>), the workspace's only research MCP.</td>
+            <td>Talks only to the local workspace service; submits source candidates through it, never to the chain.</td>
+          </tr>
+          <tr>
+            <td><a href="../../src/research/service/mod.rs">src/research/service/</a>, <a href="../../src/research/workspace.rs">src/research/workspace.rs</a></td>
+            <td>The workspace service (<code>petri research serve</code>, a detached petri process) and its owner commands: <code>workspace.sqlite</code>, sealed credentials, the <code>/v1</code> routes, and the ping and restart handover that lets a newer petri replace an older one on its port.</td>
             <td>Passes the futures API as the candidate store and oracle read endpoint. Private state stays outside application code.</td>
           </tr>
           <tr>
@@ -213,7 +229,7 @@
           </tr>
           <tr>
             <td><a href="../../src/release_update/">src/release_update/</a></td>
-            <td>Preview release validation, bounded extraction, staging, replacement and recovery.</td>
+            <td>Preview release validation, bounded extraction, staging, replacement and recovery. On Windows a running <code>petri.exe</code> is moved aside, not overwritten, and the leftover is deleted later.</td>
             <td>Never execute downloaded scripts or touch wallets, config or agent registration.</td>
           </tr>
           <tr>
@@ -223,23 +239,18 @@
           </tr>
           <tr>
             <td><a href="../../src/agent_protocol.rs">src/agent_protocol.rs</a></td>
-            <td>MCP/agent manifest.</td>
-            <td>Lists the same tool names as the stdio server.</td>
+            <td><code>petri mcp manifest</code>: how agents connect to Amoeba's hosted MCP server (the futures API's <code>/mcp</code>).</td>
+            <td>Names the URL, each assistant's entry and the signing boundary; the tools are the server's.</td>
           </tr>
           <tr>
-            <td><a href="../../src/mcp_actions.rs">src/mcp_actions.rs, src/mcp_action_bridge.rs</a></td>
-            <td>Resident <code>wallet.address</code> action and the MCP signer boundary.</td>
-            <td>No action signs or sends.</td>
+            <td><a href="../../src/read_only.rs">src/read_only.rs</a></td>
+            <td><code>PETRI_MCP_READ_ONLY=1</code>: petri run by an agent.</td>
+            <td>No key read, no signing, no update.</td>
           </tr>
           <tr>
             <td><a href="../../src/mcp_setup.rs">src/mcp_setup.rs</a></td>
-            <td>Owned user-level MCP status, enable, repair, disable.</td>
-            <td>Preserve unrelated settings; refuse an unowned <code>petri</code> entry.</td>
-          </tr>
-          <tr>
-            <td><a href="../../scripts/petri-mcp-server.mjs">scripts/petri-mcp-server.mjs</a></td>
-            <td>MCP stdio wrapper over <code>petri --json</code> reads.</td>
-            <td>Reject undeclared and flag-like arguments; strip signer and provider environment.</td>
+            <td>Registers the hosted MCP server by URL in Claude Code and Codex: status, enable, repair, disable.</td>
+            <td>Changes only its own <code>petri</code> entry (an Amoeba API's <code>/mcp</code>, or the old local server's marked entry, which repair replaces and whose files it removes); preserves unrelated settings.</td>
           </tr>
           <tr>
             <td><a href="../../scripts/petri-launcher.mjs">scripts/petri-launcher.mjs</a></td>
@@ -263,16 +274,17 @@
       <ul>
         <li><code>main</code> dispatches <code>tui</code> and <code>research</code> first. The Markets view builds its own futures context from the shared <code>src/futures/</code> code.</li>
         <li><code>src/research/</code> owns the terminal session and layout; UI code reads state and emits intent, and its worker performs authenticated local HTTP requests.</li>
-        <li><code>research/service/</code> owns private local research state. The futures API's candidate store is the authority for submitted candidates.</li>
+        <li>The Bots view's worker (<code>src/research/bots.rs</code>) is separate: it runs the bot host and sends only through <code>bots::send</code>.</li>
+        <li><code>src/research/service/</code> owns private local research state. The futures API's candidate store is the authority for submitted candidates.</li>
       </ul>
 
       <h2>External Contracts</h2>
       <ul>
-        <li>The futures API (<code>--api</code>, contract in <code>../api/API.md</code>) serves the market views under <code>/v1/markets</code>, <code>/v1/quote</code> and <code>/v1/accounts</code> (markets, depth, trades, candles, quotes, accounts and history), sponsored preparation and submission, the dev faucet, the oracle documents <code>/v1/oracle/public-snapshot</code> and <code>/v1/oracle/catalog</code>, the candidate store at <code>/oracle/agents</code> and <code>/oracle/source-candidates</code>, and the observation records at <code>/oracle/observations</code> (<code>petri oracle observe</code>).</li>
+        <li>The futures API (<code>--api</code>, contract in <code>../api/API.md</code>) serves the market views under <code>/v1/markets</code>, <code>/v1/quote</code> and <code>/v1/accounts</code> (markets, depth, trades, candles, quotes, accounts and history), sponsored preparation and submission, the dev faucet, the hosted MCP server at <code>/mcp</code> (what <code>petri mcp enable</code> registers), the oracle documents <code>/v1/oracle/public-snapshot</code> and <code>/v1/oracle/catalog</code>, the candidate store at <code>/oracle/agents</code> and <code>/oracle/source-candidates</code>, and the observation records at <code>/oracle/observations</code> (<code>petri oracle observe</code>).</li>
         <li>The Solana RPC (<code>--rpc</code>) serves account reads, simulation and sending.</li>
         <li>Program ids come from the trusted deployment (<code>--deployment</code> manifest, else the API's <code>/v1/config</code>).</li>
         <li>Futures instructions come from the futures client crate (<code>ameba_sdk_futures::futures</code>); oracle instructions, PDAs and layouts from the <code>ameba_oracle</code> crate of the monorepo (<code>../oracle</code>, a path dependency in <code>Cargo.toml</code>).</li>
-        <li>One-click MCP setup owns only marked <code>petri</code> entries in <code>${CODEX_HOME:-$HOME/.codex}/config.toml</code> and <code>$HOME/.claude.json</code>, and installs no boot daemon.</li>
+        <li>MCP setup owns only its own <code>petri</code> entry in <code>${CODEX_HOME:-$HOME/.codex}/config.toml</code> and <code>$HOME/.claude.json</code>, registers a URL, and runs nothing locally.</li>
       </ul>
 
       <h2>Validation</h2>
@@ -281,16 +293,16 @@
         documented API views, and tamper with every field of a sponsored transaction to prove the
         check refuses it. Oracle tests pin the governed SKU roots, check Merkle proofs against the
         program's verification, error names against the crate's variants, evidence commitments
-        against the program and the candidate store, and the grammar of every command. MCP checks
-        cover the tool list, schemas, refusals and the read-only boundary.
+        against the program and the candidate store, and the grammar of every command. MCP setup
+        tests cover registering, repairing (from the old local server too) and removing the entry
+        without touching other settings; the hosted server's tools are tested in the API.
+        Bot tests check the runtime's properties (<code>compose/tests.rs</code>) and the ladder.
       </p>
       <p>
         Run <a href="../../scripts/devloop.sh">scripts/devloop.sh</a> before handing off code. Run
         <a href="../../scripts/check-petri-launcher.mjs">scripts/check-petri-launcher.mjs</a>
         and <a href="../../scripts/check-petri-packaging.mjs">scripts/check-petri-packaging.mjs</a>
-        when changing launcher or app packaging, and
-        <a href="../../scripts/check-petri-mcp-server.mjs">scripts/check-petri-mcp-server.mjs</a>
-        when changing the MCP wrapper or manifest. For visible TUI changes, also run the native
+        when changing launcher or app packaging. For visible TUI changes, also run the native
         Windows ConPTY harness or the documented Unix PTY smoke. Live checks against the dev
         localnet are described in <a href="../localnet-dev.md">localnet-dev.md</a>.
       </p>

@@ -23,8 +23,30 @@ foreach ($Line in Get-Content -LiteralPath (Join-Path $Package 'SHA256SUMS')) {
 }
 $InstallRoot = [IO.Path]::GetFullPath($InstallRoot)
 New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
+# A petri still running from the installed petri.exe (another window, an
+# agent's MCP server) keeps it from being replaced, but Windows lets it be
+# renamed: it moves aside under the name the in-app updater uses, and keeps
+# running until it exits. Earlier ones nothing runs from any more go now.
+Get-ChildItem -LiteralPath $InstallRoot -Filter '.petri-retired-*' -File -Force -ErrorAction SilentlyContinue |
+  Where-Object { $_.Name -match '^\.petri-retired-[0-9a-f]{32}$' } |
+  Remove-Item -Force -ErrorAction SilentlyContinue
 foreach ($Name in @('petri.exe','Petri.cmd','Petri.ico','LICENSE','THIRD_PARTY_NOTICES.md','THIRD_PARTY_LICENSES.md','README.txt')) {
-  Copy-Item -LiteralPath (Join-Path $Package $Name) -Destination (Join-Path $InstallRoot $Name) -Force
+  $Destination = Join-Path $InstallRoot $Name
+  $Retired = $null
+  if ($Name -eq 'petri.exe' -and (Test-Path -LiteralPath $Destination)) {
+    $Retired = Join-Path $InstallRoot ('.petri-retired-' + [Guid]::NewGuid().ToString('N'))
+    [IO.File]::Move($Destination, $Retired)
+  }
+  try {
+    Copy-Item -LiteralPath (Join-Path $Package $Name) -Destination $Destination -Force
+  } catch {
+    if ($Retired) {
+      Remove-Item -LiteralPath $Destination -Force -ErrorAction SilentlyContinue
+      [IO.File]::Move($Retired, $Destination)
+    }
+    throw
+  }
+  if ($Retired) { Remove-Item -LiteralPath $Retired -Force -ErrorAction SilentlyContinue }
 }
 if (Test-Path -LiteralPath (Join-Path $Package 'petri-update.json')) {
   Copy-Item -LiteralPath (Join-Path $Package 'petri-update.json') -Destination (Join-Path $InstallRoot 'petri-update.json') -Force

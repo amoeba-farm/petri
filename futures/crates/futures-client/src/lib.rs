@@ -8,8 +8,11 @@
 //! * Unit helpers between entry prices, premiums and fine units, and
 //!   [`error_name`] for the program's errors.
 //! * [`governance`]: binds instructions to the controller's gate epochs.
+//! * [`pricing`]: the maker's normal-model fair values, ladders and lot
+//!   sizing (the treasury maker's and petri's bots').
 //! * [`oracle`]: the oracle `Period` layout and readers the markets settle on.
 pub mod governance;
+pub mod pricing;
 
 /// Oracle `Period` layout and readers, for consumers that decode periods.
 pub use ameba_oracle_interface as oracle;
@@ -1687,6 +1690,33 @@ impl Book {
             .iter()
             .map(|m| u128::from(m.lots) * u128::from(payoff::set_value(m.lo, m.hi, self.header.k)))
             .sum()
+    }
+
+    /// How many ladder arcs the book holds once `owner`'s ladder `l` is
+    /// posted, as `Quote` counts them against
+    /// `processor::MAX_BOOK_LADDER_ARCS` (beyond it: `MakerCapacity`);
+    /// `None` without a maker slot for it, or on overflow.
+    pub fn quote_arcs(
+        &self,
+        owner: &Pubkey,
+        l: &Ladder,
+        core: Core,
+        knots: &[Knot],
+    ) -> Option<usize> {
+        let h = self.header;
+        let mut data = self.data.clone();
+        let m = match self.trader_of(owner) {
+            Some((_, t)) if t.maker > 0 => t.maker - 1,
+            _ => (0..h.maker_cap).find(|&m| !Maker::read(&data, h.maker_off(m)).used)?,
+        };
+        state::write_ladder(&mut data, &h, m, l, core, knots)?;
+        let mut mk = Maker::read(&data, h.maker_off(m));
+        mk.used = true;
+        mk.seq = h.next_seq + 1;
+        mk.lo = l.lo;
+        mk.hi = l.hi;
+        mk.write(&mut data, h.maker_off(m));
+        Some(state::ladder_arcs(&data, &h))
     }
 
     /// As [`Book::quote_proposal`], for [`Market::quote_core`].

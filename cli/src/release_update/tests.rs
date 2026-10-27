@@ -347,3 +347,106 @@ fn concurrent_changes_and_nonordinary_target_paths_are_not_overwritten() {
         assert!(platform::plain(&linked, false).is_err());
     }
 }
+
+fn retired_files(root: &Path) -> Vec<PathBuf> {
+    fs::read_dir(root)
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| {
+            path.file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with(".petri-retired-")
+        })
+        .collect()
+}
+
+#[test]
+fn a_file_moved_aside_keeps_its_contents_until_tidied() {
+    let fixture = Fixture::new();
+    let root = &fixture.0;
+    fs::write(root.join("petri.exe"), b"old-petri.exe").unwrap();
+    fs::write(root.join("new"), b"new-petri.exe").unwrap();
+    fs::write(root.join(".petri-retired-not-ours"), b"kept").unwrap();
+    fs::write(root.join("user-config.json"), b"kept").unwrap();
+    install::test_move_aside(&root.join("new"), &root.join("petri.exe")).unwrap();
+    assert_eq!(fs::read(root.join("petri.exe")).unwrap(), b"new-petri.exe");
+    let retired: Vec<_> = retired_files(root)
+        .into_iter()
+        .filter(|path| !path.ends_with(".petri-retired-not-ours"))
+        .collect();
+    assert_eq!(retired.len(), 1);
+    assert_eq!(fs::read(&retired[0]).unwrap(), b"old-petri.exe");
+    install::test_tidy_retired(root);
+    assert!(!retired[0].exists());
+    assert!(root.join(".petri-retired-not-ours").exists());
+    assert!(root.join("user-config.json").exists());
+    // A failed swap puts the installed file back.
+    assert!(install::test_move_aside(&root.join("missing"), &root.join("petri.exe")).is_err());
+    assert_eq!(fs::read(root.join("petri.exe")).unwrap(), b"new-petri.exe");
+}
+
+/// The case `replace` exists for: an update while another petri runs (a
+/// second window, an agent's MCP server). Windows refuses to replace or
+/// delete a running executable but lets it be renamed: the swap goes
+/// through, and the running process keeps going.
+#[cfg(windows)]
+#[test]
+fn an_executable_that_is_running_is_replaced() {
+    let fixture = Fixture::new();
+    let root = &fixture.0;
+    let system = std::env::var_os("SystemRoot").unwrap();
+    let ping = Path::new(&system).join("System32").join("PING.EXE");
+    let target = root.join("petri.exe");
+    fs::copy(&ping, &target).unwrap();
+    let mut running = std::process::Command::new(&target)
+        .args(["-n", "120", "127.0.0.1"])
+        .stdout(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    std::thread::sleep(std::time::Duration::from_millis(500));
+    // The move aside itself, on the running file.
+    fs::write(root.join("new"), b"new-petri.exe").unwrap();
+    install::test_move_aside(&root.join("new"), &target).unwrap();
+    assert_eq!(fs::read(&target).unwrap(), b"new-petri.exe");
+    assert!(
+        running.try_wait().unwrap().is_none(),
+        "the running petri was stopped"
+    );
+    let retired = retired_files(root);
+    assert_eq!(retired.len(), 1);
+    install::test_tidy_retired(root);
+    assert!(
+        retired[0].exists(),
+        "a running executable cannot be deleted"
+    );
+    // And `replace`, as an update calls it, over a petri running from it.
+    fs::copy(&ping, root.join("second.exe")).unwrap();
+    fs::rename(root.join("second.exe"), &target).unwrap();
+    let mut second = std::process::Command::new(&target)
+        .args(["-n", "120", "127.0.0.1"])
+        .stdout(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    std::thread::sleep(std::time::Duration::from_millis(500));
+    fs::write(root.join("newer"), b"newer-petri.exe").unwrap();
+    install::test_replace(&root.join("newer"), &target).unwrap();
+    assert_eq!(fs::read(&target).unwrap(), b"newer-petri.exe");
+    assert!(
+        second.try_wait().unwrap().is_none(),
+        "the running petri was stopped"
+    );
+    for child in [&mut running, &mut second] {
+        child.kill().unwrap();
+        child.wait().unwrap();
+    }
+    // Windows lets go of an exited program's file a moment later.
+    for _ in 0..50 {
+        install::test_tidy_retired(root);
+        if retired_files(root).is_empty() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+    assert!(retired_files(root).is_empty());
+}

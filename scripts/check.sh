@@ -34,7 +34,7 @@ JOBS="${JOBS:-$(( ($(nproc) + 1) / 2 ))}"
 AGAVE_BIN="${AGAVE_BIN:-$HOME/.local/share/solana/install/releases/4.0.0/solana-release/bin}"
 export PATH="$AGAVE_BIN:$PATH"
 export CARGO_BUILD_JOBS="$JOBS"
-ALL=(governance oracle evidence futures api sdk cli web research docs ops-dashboard)
+ALL=(governance oracle evidence futures chain api sdk cli web research docs ops-dashboard plugins)
 # Node tests in research/ that fail on main today (pre-existing; the research
 # oracle reader test expects a catalog shape the API no longer serves).
 # Skipped in the gating run, then run and reported; fix and remove.
@@ -280,6 +280,20 @@ check_evidence() {
   (subtarget msrv-1.93 && run cargo +1.93.1 check --locked -j "$JOBS" -p amoeba-evidence)
 }
 
+check_chain() {
+  cd "$root/chain"
+  run cargo fmt --all -- --check
+  run clippy --workspace --all-targets --locked -j "$JOBS" -- -D warnings
+  run cargo test --workspace --locked -j "$JOBS"
+  # The oracle mirror is its own workspace (futures-ops and its RPC crates
+  # stay out of the node's build); in a worktree it shares futures-ops' cache.
+  (cd oracle-mirror \
+    && if [ -n "${AMEBA_CARGO_CACHE:-}" ]; then shared_cargo_env futures-ops "$PWD"; else subtarget oracle-mirror; fi \
+    && run cargo fmt -- --check \
+    && run clippy --all-targets --locked -j "$JOBS" -- -D warnings \
+    && run cargo test --locked -j "$JOBS")
+}
+
 check_futures() {
   cd "$root/futures"
   run cargo fmt --all -- --check
@@ -335,10 +349,9 @@ check_sdk() {
 
 check_cli() {
   cd "$root/cli"
-  # The MCP server check runs target/debug/petri unless told otherwise. In an
-  # agent worktree CARGO_TARGET_DIR is cli/target too, the worktree's own
-  # (shared_cargo_env: only intermediates go to the shared cache).
-  run env CARGO_BUILD_JOBS="$JOBS" ${CARGO_TARGET_DIR:+PETRI_MCP_PETRI_BIN="$CARGO_TARGET_DIR/debug/petri"} scripts/devloop.sh
+  # In an agent worktree CARGO_TARGET_DIR is cli/target too, the worktree's
+  # own (shared_cargo_env: only intermediates go to the shared cache).
+  run env CARGO_BUILD_JOBS="$JOBS" scripts/devloop.sh
   # devloop's petri has a release build's features: no dev faucet.
   no_faucet "${CARGO_TARGET_DIR:-$PWD/target}/debug/petri"
   # The license corpus the release packages ship must match Cargo.lock (the
@@ -387,6 +400,13 @@ check_ops-dashboard() {
   for file in server.mjs lib/*.mjs public/*.mjs test/*.mjs; do run node --check "$file"; done
   run bash -n deploy/install.sh
   run node --test test/*.test.mjs
+}
+
+check_plugins() {
+  cd "$root/plugins/petri"
+  npm_install --ignore-scripts
+  run npm run check
+  run npm test
 }
 
 check_docs() {

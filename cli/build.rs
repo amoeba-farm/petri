@@ -1,4 +1,3 @@
-use sha2::{Digest, Sha256};
 use std::process::Command;
 
 fn main() {
@@ -21,8 +20,6 @@ fn main() {
         "PETRI_RELEASE_REPOSITORY must be a GitHub owner/name"
     );
     println!("cargo:rustc-env=PETRI_RELEASE_REPOSITORY={release_repository}");
-    let output = std::path::PathBuf::from(std::env::var_os("OUT_DIR").expect("Cargo OUT_DIR"));
-    embed_research(&output);
     for git_path in ["HEAD", "index", "packed-refs"] {
         emit_git_rerun_path(git_path);
     }
@@ -81,42 +78,4 @@ fn git_stdout(args: &[&str]) -> Option<String> {
         .and_then(|output| String::from_utf8(output.stdout).ok())
         .map(|value| value.trim().to_string())
         .filter(|value| !value.is_empty())
-}
-
-fn embed_research(output: &std::path::Path) {
-    let root = std::path::PathBuf::from(std::env::var_os("CARGO_MANIFEST_DIR").unwrap());
-    let mut files = Vec::new();
-    for part in ["bin", "client", "service"] {
-        let directory = root.join("research").join(part);
-        println!("cargo:rerun-if-changed={}", directory.display());
-        for entry in std::fs::read_dir(directory).expect("research sources") {
-            let path = entry.unwrap().path();
-            if path.extension().is_some_and(|ext| ext == "mjs") {
-                files.push(path);
-            }
-        }
-    }
-    files.sort();
-    let mut digest = Sha256::new();
-    let mut source = String::from("const FILES: &[(&str, &[u8])] = &[\n");
-    for path in files {
-        let relative = path
-            .strip_prefix(root.join("research"))
-            .unwrap()
-            .to_string_lossy()
-            .replace('\\', "/");
-        let bytes = std::fs::read(&path).unwrap();
-        digest.update(relative.as_bytes());
-        digest.update([0]);
-        digest.update(&bytes);
-        source.push_str(&format!(
-            "    ({relative:?}, include_bytes!({:?})),\n",
-            path.to_string_lossy()
-        ));
-    }
-    source.push_str(&format!(
-        "];\nconst BUNDLE_ID: &str = {:?};\n",
-        format!("{:x}", digest.finalize())
-    ));
-    std::fs::write(output.join("research-bundle.rs"), source).expect("embed research service");
 }

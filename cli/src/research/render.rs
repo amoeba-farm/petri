@@ -126,11 +126,42 @@ fn fund_view(frame: &mut Frame, app: &mut App, screen: Rect, body: Rect) {
             false,
         );
     }
+    // A review's Send, as y or Enter.
+    if let Some(at) = drawn.send {
+        button(frame, app, at, "Send", Action::FundSend, false);
+    }
     if let Some(ticket) = drawn.ticket {
         outside(app, screen, ticket, Action::CloseFundTicket);
     }
 }
 
+/// The Bots view: the bots beside the shown one (bots.rs).
+fn bots_view(frame: &mut Frame, app: &mut App, body: Rect) {
+    use crate::research::bots;
+    let mut main = body;
+    if body.width >= 72 {
+        let shown = bots::sidebar(frame, &app.bots, Rect::new(body.x, body.y, 22, body.height));
+        for (index, area) in shown.into_iter().enumerate() {
+            register(app, area, Action::Bot(index));
+        }
+        main = Rect::new(body.x + 25, body.y, body.width - 25, body.height);
+    }
+    let inner = panel(frame, main, None);
+    let content = Rect::new(
+        inner.x + 1,
+        inner.y,
+        inner.width.saturating_sub(2),
+        inner.height,
+    );
+    let markets = app.markets.snap.markets.clone();
+    let drawn = bots::content(frame, &app.bots, &markets, content);
+    for (area, action) in drawn.rows {
+        register(app, area, action);
+    }
+    for (area, title, action) in drawn.buttons {
+        button(frame, app, area, title, action, false);
+    }
+}
 /// Clicks anywhere on `screen` outside a pop-up's `box_` close it, as on a
 /// web page: `close` covers the four sides around the box.
 fn outside(app: &mut App, screen: Rect, box_: Rect, close: Action) {
@@ -262,7 +293,7 @@ fn header(frame: &mut Frame, area: Rect, view: View) {
         Paragraph::new(Line::from(vec![
             Span::styled("PETRI", strong()),
             Span::styled(
-                if view == View::Markets {
+                if matches!(view, View::Markets | View::Bots) {
                     "    Capped futures"
                 } else {
                     "    Oracle research"
@@ -274,8 +305,10 @@ fn header(frame: &mut Frame, area: Rect, view: View) {
     );
 }
 
+/// The tabs on `area`'s first row; where even the short labels don't fit,
+/// the rest go on its second.
 fn tabs(frame: &mut Frame, app: &mut App, area: Rect) {
-    let mut x = area.x;
+    let (mut x, mut y) = (area.x, area.y);
     let full: u16 = View::ALL
         .iter()
         .map(|v| v.label().len() as u16 + 4)
@@ -287,11 +320,15 @@ fn tabs(frame: &mut Frame, app: &mut App, area: Rect) {
         } else {
             view.label()
         };
-        let width = (title.len() as u16 + 2).min(area.right().saturating_sub(x));
+        let mut width = (title.len() as u16 + 2).min(area.right().saturating_sub(x));
+        if width < title.len() as u16 + 2 && x > area.x && y + 1 < area.bottom() {
+            (x, y) = (area.x, y + 1);
+            width = (title.len() as u16 + 2).min(area.width);
+        }
         if width < 3 {
             break;
         }
-        let rect = Rect::new(x, area.y, width, 1);
+        let rect = Rect::new(x, y, width, 1);
         let focused = register(app, rect, Action::View(view));
         let selected = app.view == view;
         let style = if selected {
@@ -312,12 +349,14 @@ fn tabs(frame: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn footer(frame: &mut Frame, app: &App, area: Rect) {
-    let content = if app.status.is_empty() && app.view == View::Markets {
+    let content = if app.status.is_empty() && matches!(app.view, View::Markets | View::Bots) {
         let mut spans = Vec::new();
-        for (i, (key, label)) in crate::research::markets::footer_hint()
-            .into_iter()
-            .enumerate()
-        {
+        let hint = if app.view == View::Bots {
+            crate::research::bots::footer_hint(&app.bots)
+        } else {
+            crate::research::markets::footer_hint()
+        };
+        for (i, (key, label)) in hint.into_iter().enumerate() {
             if i > 0 {
                 spans.push(Span::styled(" · ", Style::default().fg(DIM)));
             }
@@ -333,7 +372,7 @@ fn footer(frame: &mut Frame, app: &App, area: Rect) {
             Span::styled(" · ", separator),
             Span::styled("Enter", key),
             Span::styled(" · ", separator),
-            Span::styled("m/c/a/e/r/f", key),
+            Span::styled("m/o/c/a/e/r/f", key),
             Span::styled(" · ", separator),
             Span::styled("↑/↓", key),
             Span::styled(" Agents", muted()),
@@ -396,7 +435,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         .split(workspace);
     header(frame, rows[0], app.view);
     let body = rows[4];
-    tabs(frame, app, rows[2]);
+    // The tabs may take the blank row below them on a narrow terminal.
+    tabs(
+        frame,
+        app,
+        Rect::new(rows[2].x, rows[2].y, rows[2].width, 2),
+    );
     let mut main = body;
     if app.view == View::Fund {
         fund_view(frame, app, area, body);
@@ -441,6 +485,14 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             let parent = Rect::new(area.x + 1, area.y + 1, area.width - 2, area.height - 2);
             modal_view(frame, app, parent, modal);
         }
+        if app.focus >= app.hits.len() {
+            app.focus = 0;
+        }
+        return;
+    }
+    if app.view == View::Bots {
+        bots_view(frame, app, body);
+        footer(frame, app, rows[6]);
         if app.focus >= app.hits.len() {
             app.focus = 0;
         }
@@ -517,6 +569,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             for (at, click) in drawn.buttons {
                 register(app, at, Action::ProofClick(click));
             }
+            for (at, title, click) in drawn.footer {
+                button(frame, app, at, &title, Action::ProofClick(click), false);
+            }
+            if let Some(t) = &mut app.proofs.ticket {
+                t.scroll = t.scroll.min(drawn.max_scroll);
+            }
         }
         footer(frame, app, rows[6]);
         if let Some(modal) = app.modal.clone() {
@@ -547,7 +605,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     }
     match app.view {
         // Drawn earlier, without the agents beside them.
-        View::Markets | View::Fund => {}
+        View::Markets | View::Bots | View::Fund => {}
         View::Connect => connect(frame, app, content),
         View::Activity => activity(frame, app, content),
         // Drawn above, with your proofs.

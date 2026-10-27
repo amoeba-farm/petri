@@ -11,7 +11,8 @@ market's lot value, `petri market` shows it) for every point the index settles
 above the range's low end, up to its high end, and a short pays the rest. You pay up front, that is the most you can
 lose, and nothing is ever liquidated. Use CLI commands for markets, the book, quotes, trades,
 positions, and the oracle's months, sources and evidence. `petri tui` opens
-the terminal interface. [Command guide](docs/amoeba-cli-command-guide.md) ·
+the terminal interface: the markets, your trading bots and oracle research.
+[Command guide](docs/amoeba-cli-command-guide.md) ·
 [Oracle research guide](docs/oracle-research.md).
 
 The executable is `petri`; Amoeba remains the company and product name.
@@ -38,7 +39,7 @@ On Linux, [install from source](#install-from-source).
 
 Open `Petri.cmd` on Windows or `Petri.app` on macOS. Petri opens in a terminal.
 From an existing terminal, use `petri tui` for the interface or `petri --help` for commands.
-Rust is not required to launch; the oracle research workspace needs Node.js 24 on `PATH`.
+Neither Rust nor Node.js is required: Petri is one executable.
 
 Windows requires Microsoft's [Visual C++ v14 x64 runtime](https://aka.ms/vc14/vc_redist.x64.exe).
 Install it first if it is not already installed, especially if Windows reports
@@ -91,7 +92,8 @@ petri update --restart
 
 The oracle TUI checks for updates at startup and every six hours. Installed preview
 apps automatically verify, install, and reopen after 30 seconds without input,
-when no form, save, or request is active. The existing status line shows progress.
+when no form, save, or request is active and no bot is running. The existing
+status line shows progress.
 `petri tui --no-update-check` or `PETRI_UPDATE_CHECK=0` disables automatic updates.
 The CLI's explicit `petri update` command still asks for confirmation; `--yes`
 approves it non-interactively. Source builds use the manual Git/Rust updater.
@@ -189,8 +191,8 @@ Oracle writes are reviewed, confirmed (or `--yes`) and signed by your wallet;
 
 Released public source lives at `amoeba-farm/petri`, with the folders petri builds
 from by path: the SDK (`sdk/`), the futures and oracle crates (`futures/`, `oracle/`)
-and the governance interface. Install Rust 1.93.1, Node.js 24 (for the research
-workspace), and native compiler prerequisites, then:
+and the governance interface. Install Rust 1.93.1 and native compiler
+prerequisites (a C compiler: SQLite builds from source), then:
 
 ```bash
 git clone https://github.com/amoeba-farm/petri.git
@@ -263,7 +265,10 @@ Oracle writes show the month, source, amounts and every transaction they will
 send before you confirm. A sealed update's value, archive URL and salt stay in
 a private file until you reveal it.
 
-MCP supplies read-only inspection. It cannot sign or submit transactions.
+Agents connected through MCP never sign: the hosted server prepares a
+transaction for the owner's wallet, and that wallet signs it. Bots in the TUI's
+Bots tab never see a key either: they propose, and petri checks each proposal
+against the market read from chain before it signs with your wallet.
 
 ## Configuration
 
@@ -292,22 +297,20 @@ keypair is set. It never prints keypair contents.
 
 ## MCP and connected agents
 
-Open **Connect your AI agent** in Petri, or run `petri mcp enable`, to connect
-Petri with supported AI agents. Petri can work with tools such as Claude Code,
-Codex, Gemini, and other supported agents; one-click setup currently manages
-the compatible local Codex and Claude Code registrations. The MCP tools are
-read-only: markets, charts, the book, trades, quotes, positions, balances
-and history, and the oracle's months, sources and candidates. `wallet.address`
-reads the locally connected public identity; owner-scoped reads take an
-explicit owner. Trades and oracle writes are run by you in a terminal; keys and
-private salts are never sent to an agent.
+Amoeba runs an MCP server for AI agents: the futures API's `/mcp`
+(`https://api.amoeba.farm/mcp`). `petri mcp enable` registers it by URL in
+Claude Code and Codex; any other agent that speaks MCP over HTTP can add the
+same URL. Its tools read the markets (book, depth, trades, candles, the
+index, quotes), a wallet's positions, history, Earn and stake, and the
+oracle's months, sources and candidates. To trade, `prepare_order` builds the
+order for the owner's wallet: an agent holding that wallet signs it and sends
+it back (`submit_transaction`, `send_transaction`), or a person opens its review
+link and places it from their own wallet on the site. The server never signs.
 
-If Petri detects a broken managed connection, select **Repair Petri MCP** or run
-`petri mcp repair`. Repair diagnoses the connection and rebuilds it in place
-without requiring a disconnect first.
-
-MCP setup requires Node.js on `PATH`. Petri writes only its owned user-level
-registration and does not install a startup daemon.
+`petri mcp status` shows the connection, `petri mcp repair` rebuilds it in
+place (an entry from petri's earlier local server becomes the hosted one), and
+`petri mcp disable` removes it. Petri writes only its own `petri` entry and
+installs nothing else.
 
 ## Build the release binary
 

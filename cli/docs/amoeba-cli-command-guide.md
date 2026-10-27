@@ -83,6 +83,7 @@ cancel <MARKET> <#|all>
 deposit <MARKET> <USD>
 withdraw <MARKET> <USD|all>
 history [OWNER] [--limit N]
+bots …                                  see "Trading bots"
 
 wallet [OWNER]
 wallet address
@@ -387,6 +388,97 @@ close order holds those lots), token errors as `Token…`.
 Petri asks before every order, close, cancel, deposit and withdrawal. `--yes`
 skips only the prompt, never the checks. Without a terminal to ask on, a
 command that needs confirmation refuses unless you pass `--yes`.
+
+## Trading bots
+
+The TUI's Bots tab (`o`) runs trading bots you build, or an agent writes for
+you in the chat. A bot is one file in `bots/` beside petri's config
+(`~/.config/amoeba/petri/bots/<id>.toml`; `%APPDATA%\amoeba\petri\bots\`
+on Windows): its `[bot]` settings (`id`, `market`, and optionally `name`,
+`about` (its thesis, one line), `author`, `budget` and `from`) and its rows,
+each a part. The contract between petri, the futures API and the plugin is
+[bots.md](bots.md).
+
+- `weights`: the numbers it quotes with, the house maker's knobs: `budget`
+  (the most USDC it uses), `fraction`, `spread_bps`, `vol`, `half_width`,
+  `tiers`, `tier_bps`, `tier_ratio` and `skew`.
+- `signal/normal-fair`: what each step of the grid is worth, normal around
+  the index.
+- `signal/inventory-skew`: leans its prices against what its ladder holds.
+- `strategy/ladder`: the house maker's ladder on the bot's cash, post-only,
+  requoting when the fair value or its holdings move or some of it trades.
+- `strategy/script`: a Rhai script (`source`, inline) whose `fn tick(m)`
+  runs on every look with the market and the bot's wallet in `m`, and opens,
+  closes and cancels with `long(#{...})`, `short(#{...})`, `close(#{...})`
+  and `cancel()` (the keys of `petri long`, `short` and `close`). It runs
+  sandboxed: no files, network, clock or keys, and at most 5,000,000
+  operations a tick. Its orders go through the same checks as `petri long`.
+
+`market` is a month (`ramx-nov26`), which the bot never leaves, or a product
+(`nandx`): the bot trades the product's front month that trades now and moves
+to the next one when that month stops trading; the cash of its earlier months
+comes back to its wallet as they settle.
+
+**Each bot trades from a wallet of its own**, `bots/.wallets/<id>.json`, made
+on its first start and never deleted by petri. Starting a bot tops that
+wallet up to the bot's budget (`[bot] budget`, else its weights' `budget`,
+else 100 USDC) from your wallet, with 0.02 SOL for its fees, and registers
+the run with Amoeba's bot registry so its results on chain count for it.
+Stopping it takes its ladder and orders down and moves its USDC back to your
+wallet; its open positions stay in its wallet. A running bot runs again when
+petri next starts (`bots/.running`); a stop or a remove ends that.
+
+**+ New bot** writes a ladder bot for the market you pick; it trades only
+once you start it, and starting asks first. Edit a weight on the page (Enter)
+or in the file: a running bot picks the change up as it is saved, restarting
+only the parts that use it, and a change that doesn't build leaves it running
+as it was and says why. Petri's updates wait while a bot runs.
+
+A market's book holds 1,024 ladder arcs (one per step, side and tier) across
+all its ladders. A bot takes only the room the other ladders, the house
+maker's included, leave at full depth: it narrows its ladder to fit (the core
+alone, fewer tiers, then fewer steps) and says so.
+
+Parts never see a key, a signer or a client. They read the market's feeds and
+propose; petri checks each proposal against the market read fresh from
+chain, signs it with the bot's wallet and sends it.
+
+The same bots from the command line, for agents and other front ends (JSON
+with `--json`):
+
+```bash
+petri bots                         # every bot: its wallet, holdings, P&L and why one can't run
+petri bots write dip.toml          # check a bot's file and save it as bots/<id>.toml (- reads stdin)
+petri bots read dip                # its file as it is now, to change and write back
+petri bots remove dip              # delete its file (a petri running it stops it); its wallet stays
+petri bots publish dip             # to Amoeba's bot registry, signed by your wallet (its author)
+petri bots publish dip --github me/bots   # the same file on GitHub: a verified listing
+petri bots discover --sort pnl --days 30  # published bots (--market M, --sort pnl|new|runs)
+petri bots show dip-buyer          # one published bot, with its file
+petri bots install dip-buyer       # a published bot as a new bot here (--market M)
+petri bots install github:me/bots  # one from GitHub (petri-bot.toml at HEAD unless /PATH, @REF)
+petri bots leaderboard --days 7    # published bots ranked by their runs' real P&L
+petri bots new ramx                # a ladder bot for a market; it trades only once started
+petri bots set ladder-ramx-nov26 budget 250
+petri bots serve                   # run bots without a terminal (below)
+```
+
+`petri bots serve` is the Bots tab's worker without a terminal. Each stdin
+line is one JSON command: `{"start":ID,"budget":N}` (budget optional, saved
+to the bot's file first), `{"stop":ID}`,
+`{"set":{"bot":ID,"knob":NAME,"value":N}}`, `{"new":MARKET}`,
+`{"write":TEXT}`, `{"remove":ID}`, `{"publish":ID}` (or
+`{"publish":{"id":ID,"github":"OWNER/REPO"}}`),
+`{"install":{"id":REGID,"market":M}}` (`REGID` may be `github:...`) or
+`{"shutdown":true}`. Each stdout line is `{"bots":[...]}` after every command
+and every look (two seconds), `{"note":TEXT}` (a refused command),
+`{"created":ID}`, `{"written":ID}`, `{"removed":ID}`, `{"published":{...}}`,
+`{"installed":ID}`, and `{"down":true}` last. Closing stdin is a shutdown:
+every bot stops, its ladder and orders come down and its USDC goes back to
+your wallet before `down` (it starts again with the next worker). A send
+takes as long as the chain does, and a stop waits for the send in flight. A
+bot runs in one petri at a time: while the TUI or a serve runs it (a lock in
+`bots/.locks/`), another petri's start says so instead.
 
 ## Oracle
 
@@ -707,7 +799,7 @@ deployment's operators (`futures-ops` on the dev localnet), not by Petri.
 
 Build with Rust 1.93.1 from the Amoeba monorepo: the futures SDK (`../sdk`) and
 the oracle program crate (`../oracle`) are path dependencies in `Cargo.toml`. The research workspace runs
-on Node.js 24 (`node` on `PATH`, or `PETRI_RESEARCH_NODE`). Preview packages are
+in petri itself, and nothing in petri needs Node.js. Preview packages are
 not publisher-signed or Apple-notarized; verify their checksums before opening.
 
 ```bash
@@ -981,11 +1073,9 @@ Source checkouts update only through an explicit `petri update` command.
 
 ### Setup for users
 
-MCP is the local connection that lets supported AI agents use Petri's public
-market and oracle reads. Petri can work with Claude Code, Codex, Gemini, and
-other supported agents. One-click setup currently manages the compatible local
-Codex and Claude Code registrations without requiring users to edit an agent
-configuration file:
+Amoeba's MCP server is hosted: the futures API's `/mcp` (api/API.md, "MCP";
+`https://api.amoeba.farm/mcp`, or `<--api>/mcp`). Petri registers it by URL in
+Claude Code and Codex without anyone editing an agent's configuration:
 
 ```bash
 petri mcp status
@@ -994,48 +1084,41 @@ petri mcp repair
 petri mcp disable
 ```
 
-Enable registers Petri in both assistants' user-level settings:
+Enable registers the server as `petri` in both assistants' user-level
+settings, by URL:
 
-- Codex: `${CODEX_HOME:-$HOME/.codex}/config.toml`
-- Claude Code: `$HOME/.claude.json`
+- Codex: `${CODEX_HOME:-$HOME/.codex}/config.toml`: `url`, and
+  `default_tools_approval_mode = "writes"`, so Codex asks before the two tools
+  that send
+- Claude Code: `$HOME/.claude.json`: `{ "type": "http", "url": … }`
 
-The registration survives a reboot and is available across projects. It does
-not install a login item or an operating-system daemon. Petri disables only its
-owned entries (marked `PETRI_MCP_MANAGED_BY=petri-tui-v1`) and refuses to
-overwrite an unmarked MCP server already named `petri`. `petri mcp repair`
-diagnoses and rebuilds the owned connection in place.
+The registration survives a reboot and is available across projects; nothing
+runs locally. Petri changes only its own entry: a URL entry for an Amoeba
+API's `/mcp`, or the local Node server's it set up before (marked
+`PETRI_MCP_MANAGED_BY=petri-tui-v1`), which `petri mcp repair` replaces along
+with that server's files. Any other MCP server named `petri` is left alone.
 
-The MCP surface is read-only. Assistants start with `market.list` and
-`market.show`, then `market.chart`, `futures.book`, `futures.trades` and
-`futures.quote` (a price; nothing is signed). Oracle reads are
-`oracle.read_months`, `oracle.read_latest`, `oracle.read_history`,
-`oracle.read_catalog`, `oracle.read_sources`, `oracle.read_recipe` and
-`oracle.read_candidates`. Owner-scoped reads (`futures.positions`,
-`wallet.balance`, `oracle.read_collateral`, `history.read`) require an explicit
-`ownerPubkey`. `wallet.address` reads the connected wallet's public key. Trades
-and oracle writes sign with the user's local wallet and are run by the user in
-a terminal; no MCP tool signs or sends. Research agents submit source
-candidates through the research workspace (`petri research mcp`).
+The tools (the server's `tools/list`): `markets_list`, `market_show`,
+`market_book`, `market_depth`, `market_trades`, `market_candles`,
+`market_index` and `quote` (a price; nothing is signed); a wallet's
+`account`, `account_history`, `wallet_usdc`, `account_earn`, `account_stake`
+and `portfolio` (by its public key); `earn`, `stake`, `news`, `config`; the
+oracle's `oracle_catalog`, `oracle_months`, `oracle_sources` and
+`oracle_candidates`. To act, `prepare_order` and `prepare_transaction` build a
+transaction for the owner's wallet, with `howToSign` and a `reviewLink` to the
+site's ticket; `submit_transaction` (sponsored) and `send_transaction`
+(owner-paid) relay what that wallet signed; `transaction_status` and
+`transaction_wait` follow it. The server never signs. Research agents submit
+source candidates through the research workspace (`petri research mcp`).
 
-MCP schemas reject undeclared arguments and flag-like values before Petri is
-launched, and the child process runs with `PETRI_MCP_READ_ONLY=1`.
+`PETRI_MCP_READ_ONLY=1` makes petri itself read-only for an agent that runs
+its commands: no key read, no signing, no update.
 
 ### `mcp manifest`
 
-Prints the agent/MCP manifest: the same tool names the stdio server lists, the
-CLI form each read wraps, and the signing boundary.
+Prints how agents connect: the hosted server's URL and transport, the entry
+each assistant gets, and the signing boundary.
 
 ```bash
 petri --json mcp manifest
 ```
-
-### Stdio MCP wrapper
-
-```bash
-node scripts/petri-mcp-server.mjs
-node scripts/check-petri-mcp-server.mjs
-```
-
-The wrapper targets MCP protocol `2025-06-18`, exposes tool titles,
-annotations and output schemas, and returns `structuredContent` plus text. The
-CLI setup flow embeds it and materializes a stable per-user copy.

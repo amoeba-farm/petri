@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "454426daa6e6fa64e46803f0db721f3794408e85",
+  "sourceCommit": "a4f54e59ef90ec5348a18fb5c12826c4bb3ad816",
   "component": "cli",
-  "cliVersion": "0.1.17",
-  "publicationType": "source of the signed petri v0.1.17 release and of ameba-sdk 0.4.0 on npm",
+  "cliVersion": "0.1.18",
+  "publicationType": "source of the signed petri v0.1.18 release and of ameba-sdk 0.4.0 on npm",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
   "deployedContractSourceCommit": "c723db77",
-  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from c723db77, the oracle from 4caf83f0); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
+  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from c723db77, the oracle from da0e9143); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
   "retainedPublicLegalFiles": [
     ".gitattributes",
     ".gitignore",
@@ -20,7 +20,7 @@
   "mirroredFiles": [
     {
       "path": ".github/workflows/cli-preview.yml",
-      "sha256": "bdff24b61f7825c2805eb6299cc0c0b1c15a0b544d032e3e3a0e80c0b79dae5a",
+      "sha256": "39edba402669b40d654b0c9c8da54dc2cc99b90cd142bb361efaad970d935637",
       "executable": false
     },
     {
@@ -35,7 +35,12 @@
     },
     {
       "path": "api/API.md",
-      "sha256": "126eb7f9f50793df94c1d5690bccbc802d877135955bb6b7c7dbc58370b3c6e6",
+      "sha256": "4e2646ca8ec2b1f302735fdff298793a027ecdcdfe94b6ae4b3a2ddb157e25de",
+      "executable": false
+    },
+    {
+      "path": "cli/.cargo/config.toml",
+      "sha256": "9a1cc3d22bbcb0ef444d7b1a37797f8e6d2d6d29eb158ef0d3ed7f8309f67cde",
       "executable": false
     },
     {
@@ -50,17 +55,17 @@
     },
     {
       "path": "cli/AGENTS.md",
-      "sha256": "8b1fcf6c1cc58cfc4c22951d1dab5bc8f05fd8ef39dec8f6f43067dd74d907c6",
+      "sha256": "25afa250a1b37411e450974bfd7252a9a1809598faa98274186a0236acf3339a",
       "executable": false
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "19f78a8021aad37ef80fcb8be29b4c3d4a6971c61f08e9468e49765f1afb59cb",
+      "sha256": "77f1a1b893134785ae8d0cc9173e6068b58a82a006a63ea573f12b61373af1b8",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "6163c75635778b11d15bf37b36591c8e57d471699df1236697be0dca5c532bf5",
+      "sha256": "35a0dafae80d6f7283cbe946089df47eb4a7767aa8a2d4209b935b2d8e6d9afd",
       "executable": false
     },
     {
@@ -80,7 +85,7 @@
     },
     {
       "path": "cli/README.md",
-      "sha256": "0ef91a7ba804760dbb2349630b3d92679e0389182168f7459690ca0a1a23475b",
+      "sha256": "e8a3e6a953276ff598c9a40f6b1adbc09a36794048368fabae65b31284663605",
       "executable": false
     },
     {
@@ -100,12 +105,12 @@
     },
     {
       "path": "cli/TESTING.md",
-      "sha256": "4f5227f60819d8329d20aafbdc478696327461cfa1e9e4175a5bb0a68665e58e",
+      "sha256": "37d88914ae3bf2b13c30e346f7e3e8b3ce2a360e77be02faafe515b8eaf1a2bf",
       "executable": false
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "213e275ef088a65d5fc3cc70cbb73fc4bada79b495a3d4ccc8699f599d43dfb1",
+      "sha256": "26778e014a88cb3fe054cccab91f7dc960db4ebc213c3014b0cab6cd6c33ecfd",
       "executable": false
     },
     {
@@ -170,7 +175,7 @@
     },
     {
       "path": "cli/assets/gitbook/docs/getting-started/04-claude-code-codex.md",
-      "sha256": "46b3b9cceb245b41565e0f849fcc7d46a5aaf3b5aeae7b1c15ed9b33b4dbffef",
+      "sha256": "23b39e74cafbd9c60f500f6b05d191d5acf5e33dc0e26d74cb6d17e70a011739",
       "executable": false
     },
     {
@@ -240,17 +245,22 @@
     },
     {
       "path": "cli/build.rs",
-      "sha256": "e922f2098ad26ebe46f5b15b26c0557936937b5217a7a89e771748a1d3850a1b",
+      "sha256": "a629dfbe29b77691c60a2dadd7693eae94847be6c71fe1e1d654ef232e9c56a1",
       "executable": false
     },
     {
       "path": "cli/docs/amoeba-cli-command-guide.md",
-      "sha256": "9448fa66dcd15c754aad7ce28bb91ff26f39f80e880d4fee665152525e9fa63a",
+      "sha256": "4fe92f597c94b2f8a606597b4d078d51ec0d7fd8aab404fc444f0acf2fe6aba8",
+      "executable": false
+    },
+    {
+      "path": "cli/docs/bots.md",
+      "sha256": "2c2bacfadec90ddea0cbe108cd41174c55ea92d65670f27ca537260c97c5118c",
       "executable": false
     },
     {
       "path": "cli/docs/ci/petri-cli-ci.yml",
-      "sha256": "2824b8fa477b0834c4200557daf29f9dd39ee81c87aa690999055a6863f595c7",
+      "sha256": "768498f211a4f2a19e03f405459dbac9de6c701cb97e38769ad503ad133f79dc",
       "executable": false
     },
     {
@@ -260,12 +270,12 @@
     },
     {
       "path": "cli/docs/html/index.html",
-      "sha256": "cb81ef2f6a627b20ff133f3473bb70336531de88e587b174187eaeba833f5b73",
+      "sha256": "da8264e85e117ea8e64327c83416dd79504e6684e5de2111c25c20447b01f94b",
       "executable": false
     },
     {
       "path": "cli/docs/html/source-map.html",
-      "sha256": "6b4cd152aac30cfcf8d1fd843aad55a318e58dec5c83eef344ec7e453d8d23e2",
+      "sha256": "a9e17bdd2eb5ff9e192eabee8fb3eb01ecbd34ef8066b568c67e421c075c72f0",
       "executable": false
     },
     {
@@ -275,12 +285,12 @@
     },
     {
       "path": "cli/docs/mcp-agent-protocol.md",
-      "sha256": "175544afc9b7aaf645f476959ea655630e6a83300aa855507943ab9921096aa9",
+      "sha256": "4302bc2f3a5fb1dc9373abd3da09c7e0a09071ddd6be95a5c4b320c07a0593e6",
       "executable": false
     },
     {
       "path": "cli/docs/oracle-research.md",
-      "sha256": "9c0e8e80fbf21f50d462dbe3d5daf58979b42ccbf09295a88c7dbc69412e8142",
+      "sha256": "29037c727aadf4dded276650c5472f272da70f9fcdd9b351808468b93047ce22",
       "executable": false
     },
     {
@@ -300,132 +310,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "050920afe681bf222f0d432eba2e26520bd23983731cd8cb748c9689adb3c24c",
-      "executable": false
-    },
-    {
-      "path": "cli/research/ORIGIN.json",
-      "sha256": "234d18c4cd1c6790800d965da04e065b17d554a6c9a2d8f3c62d58bbfa1c31ce",
-      "executable": false
-    },
-    {
-      "path": "cli/research/bin/desktop.mjs",
-      "sha256": "119b2ec9701d3da28a00f91cacf76eca76bbcc53a0f0aafabc847c8255f6ddd6",
-      "executable": false
-    },
-    {
-      "path": "cli/research/bin/petri.mjs",
-      "sha256": "ef21af85fa392b6e0b7ed1a040e424ff553aeb5bf4686b2a2e1133f15043cca5",
-      "executable": false
-    },
-    {
-      "path": "cli/research/client/agent.mjs",
-      "sha256": "8a4db33d888041693a0f11bea933dac03029a648d837040a4d05947ec541362b",
-      "executable": false
-    },
-    {
-      "path": "cli/research/client/http.mjs",
-      "sha256": "23b59793dbbc2526327ffc61f124e6225ad0068ec3b9539d58a141f60ff99a89",
-      "executable": false
-    },
-    {
-      "path": "cli/research/client/mcp.mjs",
-      "sha256": "15577afa7af65d06fede9f020b1d9a3114c807eb103b4681c7f9f6560bf1551b",
-      "executable": false
-    },
-    {
-      "path": "cli/research/client/steps.mjs",
-      "sha256": "797ae1ea5c671ede67b55051d93d28ca0b14ad13f9b05cb10e90659f49387643",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/application.mjs",
-      "sha256": "8832992c5ae75efc2b3a2f39d59bddf327351f5d3b1b6b869b5bffedc13d69d5",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/auth-store.mjs",
-      "sha256": "4094ed16599a3ae1527b47ccb2ceecd901a983ae58266177fd7f60809cd090d7",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/coverage-policy.mjs",
-      "sha256": "99d6b77e21541389330b6855b9ff4bed07b7903395b361bd68d0c4fc9ed89d5e",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/database.mjs",
-      "sha256": "9623ef025923bb16723a65eff980258f71c0a6c19f297314a4fd07084d05a09b",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/directive-store.mjs",
-      "sha256": "7426ab21eceb0dc464c664025b6fc97ddd8ba2f6d6f02e1c36cbfcaacbf01c47",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/discovery.mjs",
-      "sha256": "1d079dfdbb60f1512db8fcf0be2d15c94be139889d6a564f41dcd44349bd1cb0",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/evidence.mjs",
-      "sha256": "31e67a18b7c809ec9da8d9a2d282f06e57fa2954e5814a9c97a28d0ab24813a7",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/lifecycle.mjs",
-      "sha256": "cba1c868b30533ed51d2f045d9f8b1f2644425ed02c4f702a39f528cde3eafd6",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/security.mjs",
-      "sha256": "0ad706a5c362f3c4c09be5c8f376bb630e5bd7412816c4650ed25444bf14711b",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/server.mjs",
-      "sha256": "5d877a34879da7e012aa08a338f81058b8563ce277f64d97ebb8c7e5901a50ec",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/upstream.mjs",
-      "sha256": "2df0be07972f7860feabd4528b6cbdfd5bc1e9968ec8e3e7730a3e2f28a58cb4",
-      "executable": false
-    },
-    {
-      "path": "cli/research/service/work-store.mjs",
-      "sha256": "59068537a50250de34322124dede13372cf9e235543eba8452a013d6a88eba3e",
-      "executable": false
-    },
-    {
-      "path": "cli/research/test/coverage-fixture.mjs",
-      "sha256": "bb0f6e5aa9605fcd64ba939aa477f36d9d047969d25e10805d9469271e38c9ef",
-      "executable": false
-    },
-    {
-      "path": "cli/research/test/discovery.test.mjs",
-      "sha256": "5bc5bded965ac5430af7ff0cff84facdf1ae2ff0e381baa534a7001be0ba85d2",
-      "executable": false
-    },
-    {
-      "path": "cli/research/test/feed.test.mjs",
-      "sha256": "fb030bca45b749829f55c3a6080d879a804727504a8bfbe7f6a10a2b4ba3100a",
-      "executable": false
-    },
-    {
-      "path": "cli/research/test/lean-integration.test.mjs",
-      "sha256": "8a4f3998e09bf407473eb7ebcaabb321d44bc7c632bbfd41bb0e66bec4142c22",
-      "executable": false
-    },
-    {
-      "path": "cli/research/test/transport.test.mjs",
-      "sha256": "63801330ad3eac72a3185f162b97c5a6d741ecc43883a9ddbf53a1359b20a38c",
-      "executable": false
-    },
-    {
-      "path": "cli/research/test/workspace.test.mjs",
-      "sha256": "b7a5cc3088984a3208d7a8e0222d527ae9719f9b81b2507d3bd39e7fafb7e61f",
+      "sha256": "fc0d4353a05a7586d30b57374320df7f51e1d175f683478d806f81f5174324a7",
       "executable": false
     },
     {
@@ -439,11 +324,6 @@
       "executable": false
     },
     {
-      "path": "cli/scripts/check-petri-action-bridge.mjs",
-      "sha256": "7a1dde3b962aca4743738a6f9532968b28a93d94d14dfaf1134d948f71e3675f",
-      "executable": false
-    },
-    {
       "path": "cli/scripts/check-petri-defaults.mjs",
       "sha256": "ea7794cd6557532af25a4a3cb3973dec5ee8769d2adda651275f5d2e756864a5",
       "executable": false
@@ -454,18 +334,13 @@
       "executable": false
     },
     {
-      "path": "cli/scripts/check-petri-mcp-server.mjs",
-      "sha256": "2f5a9880381dd905a67b272591179a1bf68fe5ec8cc55f39620cbaa3e9414519",
-      "executable": false
-    },
-    {
       "path": "cli/scripts/check-petri-packaging.mjs",
       "sha256": "376c3e93e7a4499730fb3622c0299e34af1ca4a40a944f2078e9d3e9156e48a8",
       "executable": false
     },
     {
       "path": "cli/scripts/check-petri-research.mjs",
-      "sha256": "fa5748176c0c21abb061a411b9d53984d02eb6940013f2b393ae228695755799",
+      "sha256": "bbbb594557d0bec1c9882b888f4161e62641391d8a5c30c3e868786614286346",
       "executable": false
     },
     {
@@ -485,7 +360,7 @@
     },
     {
       "path": "cli/scripts/devloop.sh",
-      "sha256": "1c1e60623d46e204a2a538ccd78849e61c0f5d5b8141321a76cdf58c9cfc0238",
+      "sha256": "3f983a52ff7cdde0d9bddbc851214f00d90f82224434a50b486e236363f52a1a",
       "executable": true
     },
     {
@@ -515,7 +390,7 @@
     },
     {
       "path": "cli/scripts/install-preview.ps1",
-      "sha256": "26ff18f17fc5d946f379302c5057e792c6eb557c958d6db44e351ff01b5d238a",
+      "sha256": "ca559c828452fa27bf4efc0d81b3da5056d4e9945ef32f479d58badc4c3b4c57",
       "executable": false
     },
     {
@@ -539,11 +414,6 @@
       "executable": false
     },
     {
-      "path": "cli/scripts/petri-action-bridge.mjs",
-      "sha256": "f0b9ed0941ba0fd40ba3d70ebfa46b0459a53ad6b9a24a421599dc5e966bc763",
-      "executable": false
-    },
-    {
       "path": "cli/scripts/petri-launcher.mjs",
       "sha256": "900062c4aae6dc78711adc3f30047fc57fc1f0bce4ce37d2a71bdf9dc4dd8623",
       "executable": false
@@ -554,18 +424,78 @@
       "executable": false
     },
     {
-      "path": "cli/scripts/petri-mcp-server.mjs",
-      "sha256": "37d1e7b574e6f9dc5992a1a0ad2ca108aaa105650c00694d7f1753320cd1245f",
-      "executable": false
-    },
-    {
       "path": "cli/src/agent_protocol.rs",
-      "sha256": "b12e50684636f671014bfddfeec1ed4861252872c73d2ef8b33a0b89df5655e3",
+      "sha256": "5420bedcccfb38272bcd04aadb34da130f7cdd692f64d1841508d04c7846f65e",
       "executable": false
     },
     {
       "path": "cli/src/backend.rs",
       "sha256": "e5f4765c786a473e890b8e54d1e37ab6621b8ba9bcc4096355af2557d50ef270",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/bundle.rs",
+      "sha256": "6aa7d8ad1ba89d43405d8824bbb070d863b8678d64759fb01cc550a33b6bc21b",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/feeds.rs",
+      "sha256": "382373ee1b9fc2cd262d3d02a376dc1e23eafe04dbccc174814684c0dbb1e74e",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/host.rs",
+      "sha256": "f5b440355f7ab1df5081f43c4f71ef5b37d522a1c7ebb492f31a8e39498dc9f7",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/keys.rs",
+      "sha256": "145b217e9cd929d9fec82d96199d30530a2055055deefd4d179d90812fcc105c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/ladder.rs",
+      "sha256": "70a4d934e77280b46557366998c494348e0c9c29a9059ffbe209890ff2545162",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/mod.rs",
+      "sha256": "4a7ab157494debf25a6364b1479b4fa8c593783036eb47eb1d83fd8c8ecb8037",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/registry.rs",
+      "sha256": "cdd21aca03c510c4a6f8c0e5af3cd44e2e499e979f3c2eacdda5876f0ca7d1ef",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/script.rs",
+      "sha256": "e4ea6b47f4147bf2f4aa9b7b3429804513eac33d163c07abc481cd9f73fb9f1a",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/send.rs",
+      "sha256": "32be9d66b5e00c649a36fa60e2261887a39d53c589f94d95fd1ac5f7da729c8a",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/signals.rs",
+      "sha256": "b11545790ca2d0e44a40ae7f7844188356ab6efc11038df1c5281a48b0bffa53",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/tests.rs",
+      "sha256": "463cc78e06217e572550f5b2b1c176f5710472c8abd931a746c64bec1f8c9672",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/wallet.rs",
+      "sha256": "8cc7ce069dc7e45ac71b626d1cd00ae9b275d57bf5dfb12f83fd4739eb346902",
+      "executable": false
+    },
+    {
+      "path": "cli/src/bots/weights.rs",
+      "sha256": "e39be481d57b789f3d4147691cba9804f656f9ac9d67a9c21317088c84048b48",
       "executable": false
     },
     {
@@ -580,12 +510,27 @@
     },
     {
       "path": "cli/src/cli.rs",
-      "sha256": "f4c59812e9affab01ed5c7a3f4c7a8dab7c99caed0c93cd775dbcbc944a352ff",
+      "sha256": "8f042c7932280e371b23d56211a49fa2a0ca14510ec1878c7778fb1b9e8677e6",
+      "executable": false
+    },
+    {
+      "path": "cli/src/compose/loader.rs",
+      "sha256": "6857b1dcd9e6b6c7300a0bc2dadd7050ad445bc09d3c45f6287693ce63cc6974",
+      "executable": false
+    },
+    {
+      "path": "cli/src/compose/mod.rs",
+      "sha256": "7ee383e1262a207a8bb9a47dbee42c8ee58505d1e63d856d80e60e27b8dd5d13",
+      "executable": false
+    },
+    {
+      "path": "cli/src/compose/tests.rs",
+      "sha256": "c3ea509a321d5da4ecdeaeb9432bd85c54c0b5ba566a7422248d9860e4c06b0e",
       "executable": false
     },
     {
       "path": "cli/src/endpoints.rs",
-      "sha256": "e4f7c19277421f66bad862ae3783fe83c28b4b798a1eee3ba6347316e0fd6488",
+      "sha256": "a5b6f776c6db6b539917153ea6085e6cb9233b640967f6746352c6af7ea769e5",
       "executable": false
     },
     {
@@ -670,7 +615,7 @@
     },
     {
       "path": "cli/src/futures/mod.rs",
-      "sha256": "bd94c9bee01436ed7248cb774d168d270752d33ed7e394520b5cfd28bbc50a2b",
+      "sha256": "521568d9ed94034c10997f909bc1f31992fada45a29001b8a347fb42cbf02e26",
       "executable": false
     },
     {
@@ -700,7 +645,7 @@
     },
     {
       "path": "cli/src/futures/trade.rs",
-      "sha256": "9b16acdd592c5df0ea3c950d6d6913b87f66b331d34a7ded87c82eabe214a49b",
+      "sha256": "50c11a2754de503c30aeff636f6674a94c4fb4dff5704e6bd93e1dfed29a302b",
       "executable": false
     },
     {
@@ -725,22 +670,12 @@
     },
     {
       "path": "cli/src/main.rs",
-      "sha256": "785a48dd191dbc782f69a91e3fa336bf963c73f65b9b6ab4e5aa58d678f943e1",
-      "executable": false
-    },
-    {
-      "path": "cli/src/mcp_action_bridge.rs",
-      "sha256": "c827a25b29764f0467aa9c3468372eb4a06a03d9e8dbae3a581ce64f45dfebc0",
-      "executable": false
-    },
-    {
-      "path": "cli/src/mcp_actions.rs",
-      "sha256": "d58b0de1b9601d46cf0a281994e1dc6aed0c724520e0b9caf4b4897ebce8bcce",
+      "sha256": "79d7970414879586077b5b3a3589220e1c61c85ca0f81c006840cd45fe091c60",
       "executable": false
     },
     {
       "path": "cli/src/mcp_setup.rs",
-      "sha256": "25ba43d66ff342a5ea19fe71585a419f25e6c87fd859371611e48b617ed5b223",
+      "sha256": "15a8900f896f9cbaa97c1496622d830422e6c795f4df0ac89a6e0e7e5dc7f079",
       "executable": false
     },
     {
@@ -820,7 +755,12 @@
     },
     {
       "path": "cli/src/petri_config.rs",
-      "sha256": "c6dfe818eef5e43c2ac708ca2abbc77765286560df3a43414c88dbf89c6cbece",
+      "sha256": "dbcced1dc7d1ac42c9a929bc3dd5922c71f57561f71aa0ed8d2fabc408e52f87",
+      "executable": false
+    },
+    {
+      "path": "cli/src/read_only.rs",
+      "sha256": "f8d3e7651f5f7953526c3b00c955dc0b71ecd7463d521a1bcad3b220a6048fbf",
       "executable": false
     },
     {
@@ -830,7 +770,7 @@
     },
     {
       "path": "cli/src/release_update/install.rs",
-      "sha256": "a28599a10236339bbe105dca9942e7e4dd38f51911f5e24609db90871f8b089c",
+      "sha256": "8baee1fd4f75c9e970b28d431126d2fc2e31ce26414168aa6a8425d3e984e259",
       "executable": false
     },
     {
@@ -845,12 +785,47 @@
     },
     {
       "path": "cli/src/release_update/tests.rs",
-      "sha256": "865de466cbe1c2412d133632ac9018fa304c7b9df80f40c6d0e708e61e6add52",
+      "sha256": "3eb089e51c289ea5be7fa957b1082de2e3579260a221f038d2c1487fb2694369",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/agent/client.rs",
+      "sha256": "f5f65607ca3a6cafa1b4ff06b5ea8dbfbb9f6e1bfdeaab6958cdd9632a67f905",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/agent/mcp.rs",
+      "sha256": "989b3bb0736bdc5b2744922d0048e7994ae448f3b66dbf65b248ee388f9a9dc7",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/agent/mod.rs",
+      "sha256": "eef145527df903369a5b69812d917e031a372c3773c32ede926f531dc99c4d47",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/agent/steps-fixtures.json",
+      "sha256": "cd725fee26fe26d5dfa763a2eed77983995e77b6a7e652130eb8639186fe7726",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/agent/steps.rs",
+      "sha256": "d0a2bd0a26215a6ec90373237d171f9dfd71ee0e37072b9692b7c69010522274",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/agent/tests.rs",
+      "sha256": "773211f2dfc09965417597206bbafa180148169884ba11e3c8c72a67621461e9",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/bots.rs",
+      "sha256": "c8ecbc2ae341d49757ba11bd652d42da142b5c873031b8ad6bce873e02a22af7",
       "executable": false
     },
     {
       "path": "cli/src/research/fund.rs",
-      "sha256": "872614ecb0bff2503e3b83c9669fd948c5fdb6889f8d15d619b8e52406752bfd",
+      "sha256": "06f6ffdf40690a263b8862bfdd4119cbc44fa451a7fcd8feb9573272b1c1eadc",
       "executable": false
     },
     {
@@ -860,7 +835,7 @@
     },
     {
       "path": "cli/src/research/input.rs",
-      "sha256": "70d34df1523b1d7e16af59f9542b5f1a758caf6aab6a540ffc960a8611807128",
+      "sha256": "9155eb8739bcc184741d066d9edbc5569555965f5e7b13a0144cb2ceda8b188c",
       "executable": false
     },
     {
@@ -875,12 +850,12 @@
     },
     {
       "path": "cli/src/research/mod.rs",
-      "sha256": "79c9dbf37fe8cb06e6530bfb51529b8b33c5582bc053ac1325e5497823b0ab23",
+      "sha256": "1d04487adc35d9fad12262df015c685f339941c1e6c8f1f0e036bde9818bb2bc",
       "executable": false
     },
     {
       "path": "cli/src/research/model.rs",
-      "sha256": "954e88df108fb5f2c7dd24dc2d298d8c4886ab46fa564796232b90c7a6e57ebf",
+      "sha256": "1960df590d6dbfc440829a00b652c4083e2c29f0bc88eacfa43c96fa36cce6a7",
       "executable": false
     },
     {
@@ -895,12 +870,12 @@
     },
     {
       "path": "cli/src/research/proofs.rs",
-      "sha256": "a0f418ace25d5a9ecb4f23ac9ba044215fbe21b7011f311d1efa92ae220e26c6",
+      "sha256": "68ed7b6817d6a67f79c4c69458174f16c3d46344f18e7d081793e0b2c407533a",
       "executable": false
     },
     {
       "path": "cli/src/research/render.rs",
-      "sha256": "e5e6a4d3da580b243e870072a2752ad335d373f7eeaaa09011fae3c88a259d3d",
+      "sha256": "62daf10f3689adcfd6db16c0793defd27745d48e98760dcd9dc6ad38c0896430",
       "executable": false
     },
     {
@@ -915,17 +890,87 @@
     },
     {
       "path": "cli/src/research/runtime.rs",
-      "sha256": "bd596fb127217d25e112d15e3d7df1cb7a8cf5cc231a66c6713eb8271bebe214",
+      "sha256": "b7d7046d56753a26f70a34974340dede1bd119807b8617a7743c1c67f4f36094",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/app.rs",
+      "sha256": "53627049fcdd776f7a1e5620b47e775590842d21bd5e6fac1da32f73981f7dad",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/auth.rs",
+      "sha256": "dafe4bcb4160632c1bcfc7aa47af5f8272b3eadacaa14ed6cfcdccf9af55c90c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/coverage-fixtures.json",
+      "sha256": "1729803a25ffb6ba6c97da81a0bcd815d4bd4af80d867beb90038b9b7f074307",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/coverage.rs",
+      "sha256": "8473db440f3ef4caeff0b31ec2d46df03a1898cdbb88093e72623813e2ebde21",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/db.rs",
+      "sha256": "0f167e969468eb09e027cda81041b9346afdc22e3702c5eec0f02566fb7d8028",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/directives.rs",
+      "sha256": "d4a369c2a1702031c9340dfb58f9e67b2e9e2d0e6bd493e7ab417a17727a1d29",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/http.rs",
+      "sha256": "a70beb396d83831d1ca9e220341624fc2570b1c4d51fb164025d99c69b6985bd",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/mod.rs",
+      "sha256": "e53e06638ec82604a57971692025e39ccdbec4ad610a5d80a412393b9ee62778",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/ordered.rs",
+      "sha256": "f2866bf0f7929546090d701bd1e1eec180ffc9861c87bfdd10be54529bc72e46",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/tests.rs",
+      "sha256": "ef4d235f2c474137a1717c0b4695617d9f07ee314d51cdd433de477d312d7573",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/upstream.rs",
+      "sha256": "ef143c4c0f18489e50af399490038ec0aed9199e6380f0df60116e33969472a0",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/vault.rs",
+      "sha256": "c4c44efc70e164a66dda5807c70c62dc3d5f97f6e8b5e7461ce713185b670a0c",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/service/work.rs",
+      "sha256": "9cd8019245ea2e2a2570417d6b20fa5fbda84b088e00dcbc5d148784eb75ce51",
       "executable": false
     },
     {
       "path": "cli/src/research/tests.rs",
-      "sha256": "fe75b601ae560f285076563c6113481340e421ddb5c5f629964ba9c43d2c473a",
+      "sha256": "087e7e2a6558aa0eae254b23dfb75781a8c7dd45e21aa6d67408dea3dddb2acc",
       "executable": false
     },
     {
       "path": "cli/src/research/updates.rs",
-      "sha256": "ad8a093b038f6fad2540f48a34c7943cbedfcc2d540cfc14b6a9f99608b947fc",
+      "sha256": "835623c801cd889881819982f1c819e97e7e59c64399a9d9385df19a2f51cbe0",
+      "executable": false
+    },
+    {
+      "path": "cli/src/research/workspace.rs",
+      "sha256": "e62ffb91d0ff6132d5f83fa81e7c5cae6014cd660b5231d20e40694d7c610881",
       "executable": false
     },
     {
@@ -940,7 +985,7 @@
     },
     {
       "path": "cli/src/wallet_signer.rs",
-      "sha256": "4e11a1199f9c43a82ab5268f112d2edd751750546f361109c373f0e6c750850a",
+      "sha256": "b59c888fe6351485b4415b35a2b045cb26f08b8a309134c8da942bbe86426cbb",
       "executable": false
     },
     {
@@ -1314,12 +1359,22 @@
     },
     {
       "path": "futures/crates/futures-client/src/lib.rs",
-      "sha256": "c135bdb5c652b78a65e97ed1418d68b5df60476019c23724b92da9076cf15eb2",
+      "sha256": "5054fd4b4aef56e923515548ca9c97ec6ce7ef3905b1298838c93968f22410a2",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-client/src/pricing.rs",
+      "sha256": "028b25858f9ea998d9c9d2b10aceeb7cb61d655de508f057056fb64b097663c6",
       "executable": false
     },
     {
       "path": "futures/crates/futures-math/Cargo.toml",
-      "sha256": "2d9151d6ad80c93b691f4e6287df73368f017cd8bf71301d263ceb58da6e84f8",
+      "sha256": "b7ce7f115c8f3dfe0fa53d38ec5918fdab07a2211f360890bc8fc1b8d59be1bd",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/benches/solve.rs",
+      "sha256": "16bc00235ae9ba7e559717b0cda2a91361ac92b44952bf5fd50f62fe566ca307",
       "executable": false
     },
     {
@@ -1339,7 +1394,7 @@
     },
     {
       "path": "futures/crates/futures-math/src/solve.rs",
-      "sha256": "4b4d238a7336242dafcadec2b1f710d8abd10fc4a891407ef38733f048d33729",
+      "sha256": "bfee7697b91765d304c1cfacac3be4a9ede82464c3b4345b549677d7ddd5f1fe",
       "executable": false
     },
     {
@@ -1350,6 +1405,26 @@
     {
       "path": "futures/crates/futures-math/tests/brute.rs",
       "sha256": "66ca795d21760f27c351d9d98c7d2f353790e3c7428ee2cfd1e6460a220ceda9",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/tests/equivalence.rs",
+      "sha256": "4abdfb4aeb03f2a50da5cf94ae6bf3eb5595b080a209a7313c9825808f35a0a8",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/tests/support/books.rs",
+      "sha256": "786e26ceea54fb3487af39585fe44ba310f6822ce117c07c981f2aef8d922f28",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/tests/support/mod.rs",
+      "sha256": "09cd41e52d5ca4d7caca62b6cb082d29ed7d68067b65afe3085164f1017a6649",
+      "executable": false
+    },
+    {
+      "path": "futures/crates/futures-math/tests/support/reference.rs",
+      "sha256": "7d4e436bd04e2ddd9aa1919ba9fc15b6af2bb2a80f2e6cdeb3e0fe2c0762ecbf",
       "executable": false
     },
     {
@@ -3219,7 +3294,7 @@
     },
     {
       "path": "scripts/check.sh",
-      "sha256": "7273b76ce3826a01cdba30f8dce0f6bf67bce5505ab4f6b88a8e85a1d6252167",
+      "sha256": "a0ceae737ccbe5764a52ae4cfaae781850018e4426c41ff71db769cdb661fc4f",
       "executable": true
     },
     {
@@ -3680,6 +3755,6 @@
   ],
   "lineEndingQualification": "2 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.0",
-  "sourceRelease": "release/2026-10-22-nandx-chips",
-  "deployedOracleSourceCommit": "4caf83f0"
+  "sourceRelease": "release/2026-10-27-petri-deepseek",
+  "deployedOracleSourceCommit": "da0e9143"
 }

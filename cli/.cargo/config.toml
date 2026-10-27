@@ -1,0 +1,7 @@
+[env]
+# C code for the Windows GNU target (petri-live's cross-build of petri.exe on
+# the dev VM, scripts/petri-live.sh): the VM's mingw-w64 headers default to
+# Windows XP (_WIN32_WINNT 0x502), which lacks what SQLite's source uses
+# (GetTickCount64, research/service). Windows 7 is the floor; release builds
+# use MSVC and its own headers.
+CFLAGS_x86_64_pc_windows_gnu = "-D_WIN32_WINNT=0x0601"

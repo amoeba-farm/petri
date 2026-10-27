@@ -160,8 +160,13 @@ pub fn resolve(ctx: &Ctx, query: &str, expiry: Option<&str>) -> Result<api::Mark
 
 /// The command-line name of a market: `ramx-nov26`.
 pub fn slug(m: &api::MarketView) -> String {
-    let mut parts = m.label.split_whitespace();
-    let symbol = parts.next().unwrap_or(&m.symbol).to_ascii_lowercase();
+    slug_of(&m.label, &m.symbol)
+}
+
+/// [`slug`] of a market's label and symbol.
+pub fn slug_of(label: &str, symbol: &str) -> String {
+    let mut parts = label.split_whitespace();
+    let symbol = parts.next().unwrap_or(symbol).to_ascii_lowercase();
     let rest: String = parts.collect::<String>().to_ascii_lowercase();
     if rest.is_empty() {
         symbol

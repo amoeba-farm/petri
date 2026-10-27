@@ -2,8 +2,9 @@
 
 The canonical runtime is now bundled in the `petri` executable. Open it with
 `petri tui`; use `petri research` for research automation. Installed preview apps
-automatically update the CLI, TUI, and service together. Source builds require
-Node 24 and update only through an explicit command.
+automatically update the CLI, TUI, and service together. The workspace service,
+an agent's commands and its MCP server are all petri's own: research needs no
+Node. Source builds update only through an explicit command.
 
 The existing `%LOCALAPPDATA%/PetriResearch` workspace (or `PETRI_RESEARCH_HOME`)
 is preserved across application updates. The app can restart its authenticated
@@ -47,30 +48,33 @@ Conversations stay in the connected agent's harness.
 
 ## Source layout
 
-- `research/service/`: local workspace authentication, persistence, API, upstream client.
-- `research/client/`: shared agent client, private profile storage and MCP adapter.
-- `research/bin/`: research CLI, service startup, and private desktop bootstrap.
+- `src/research/service/`: the workspace service (`petri research serve`, `owner`):
+  authentication, persistence (`workspace.sqlite`), the loopback API, discovery and
+  the futures API client.
+- `src/research/agent/`: an agent's commands (`petri research agent|work|mcp`), its
+  private profile and the MCP server.
 - `src/research/`: Rust TUI; all mouse and keyboard actions share one handler.
-- `research/test/`: authentication, attribution, persistence and protocol regressions.
 
 ## Open Petri
 
-Installed preview builds include Node 24 and all research application code.
 From a terminal:
 
 ```sh
 petri tui
 ```
 
-The launcher starts the local workspace service and opens the TUI. Closing the
-TUI leaves the service running so connected agents can continue working.
+The launcher starts the local workspace service (`petri research serve`, in the
+background) and opens the TUI. Closing the TUI leaves the service running so
+connected agents can continue working. A newer petri replaces it on its next
+start: the old one finishes its requests and hands over the same workspace.
 The service listens on `http://127.0.0.1:4185`. The development candidate API is
 `http://127.0.0.1:4184`; that separate Amoeba backend must be running before
 agent approval, candidate submission or reward observation can succeed.
 
-For a source build on another machine, install Node.js 24 and Rust, run
-`cargo build --locked --bin petri`, then `target/debug/petri tui`. There are no npm
-dependencies. This is a local application; a hosted service is not included.
+For a source build on another machine, install Rust and a C compiler (SQLite
+builds from source), run `cargo build --locked --bin petri`, then
+`target/debug/petri tui`. This is a local application; a hosted service is not
+included.
 
 ## Connect an agent and direct research
 
@@ -124,11 +128,11 @@ Any harness able to invoke a local command can use the JSON CLI. A harness with
 stdio MCP support can use the same operations through MCP. Provider accounts
 and model credentials stay with that harness.
 
-The setup message's command uses the private bundled Node runtime and a stable
-agent launcher, with the current workspace URL and agent name. This leaves the
-Petri executable free to update while agents are connected. New agent sessions
-load the current application code; existing sessions finish with their loaded
-client.
+The setup message's command runs this petri (`petri research ...`), with the
+current workspace URL and agent name. Petri still updates while agents are
+connected: on Windows an update moves the running executable aside, an agent
+running from it keeps that version until it exits, and a later update deletes
+it. New agent sessions run the current petri.
 
 Give each independently running agent its own name/profile. An identity can be
 resumed after restarting its harness. Profiles default to
@@ -157,7 +161,7 @@ An 80×24 terminal works; 100×32 gives the connection form more room.
 
 ## CLI and MCP
 
-Run these from this checkout, or substitute the absolute path to `bin/petri.mjs`.
+Run these with petri (the setup message names its full path).
 Every CLI result is JSON; credentials are saved privately rather than printed.
 
 ```powershell
@@ -399,16 +403,10 @@ Use a separate state directory for a different backend. The service supports
 same-machine clients; remote workspace hosting and remote login are not packaged.
 
 ```powershell
-node --test research/test/*.test.mjs
 cargo fmt -- --check
 cargo test --locked --bin petri
 cargo build --locked --bin petri
 ```
-
-The optional real Lean integration test requires a backend checkout with its
-`oracle_sponsorship_decision` executable already built. Set
-`PETRI_TEST_LEAN_BACKEND` to that checkout and rerun the Node tests. It creates
-an ephemeral local candidate service and in-memory database.
 
 Tests cover coverage discovery, unknown versus confirmed shortage, stable work
 identity, resolution/reopening, directive scope and pause, immutable run context,

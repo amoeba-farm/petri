@@ -1,28 +1,31 @@
+//! Petri connects AI agents (Claude Code and Codex) to Amoeba's hosted MCP
+//! server, the futures API's `/mcp` (api/API.md, "MCP"): registered by URL
+//! as the `petri` server in each agent's user configuration. Petri writes
+//! only its own entry: one it set up (a URL entry for an Amoeba API's `/mcp`,
+//! or the local Node server's it set up before, marked in its env, which is
+//! replaced along with that server's files). Anyone else's `petri` entry is
+//! left alone, and nothing is written when any file would not parse.
 use std::{
     env,
     error::Error,
     ffi::OsString,
     fmt, fs,
     fs::{OpenOptions, Permissions},
-    io::{self, Read, Write},
+    io::{self, Write},
     path::{Path, PathBuf},
-    process::{Command, Stdio},
-    thread,
-    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 use serde_json::{Map as JsonMap, Value as JsonValue, json};
-use toml_edit::{Array, DocumentMut, Item, Table, value};
+use toml_edit::{DocumentMut, Item, Table, value};
 
 const SERVER_NAME: &str = "petri";
-const MANAGED_BY_ENV: &str = "PETRI_MCP_MANAGED_BY";
-const MANAGED_BY_VALUE: &str = "petri-tui-v1";
-const PETRI_BIN_ENV: &str = "PETRI_MCP_PETRI_BIN";
-const RETIRED_TRANSACTION_MODE_ENV: &str = "PETRI_MCP_TRANSACTION_MODE";
-const SERVER_FILE_NAME: &str = "petri-mcp-server.mjs";
-const SERVER_SOURCE: &str = include_str!("../scripts/petri-mcp-server.mjs");
-const BRIDGE_FILE_NAME: &str = "petri-action-bridge.mjs";
-const BRIDGE_SOURCE: &str = include_str!("../scripts/petri-action-bridge.mjs");
+/// What marked the entries of the local Node server petri set up before
+/// the hosted one (until 2026-10-26).
+const LEGACY_MANAGED_BY_ENV: &str = "PETRI_MCP_MANAGED_BY";
+const LEGACY_MANAGED_BY_VALUE: &str = "petri-tui-v1";
+/// That server's files, removed when its entries are replaced.
+const LEGACY_RUNTIME_FILES: [&str; 2] = ["petri-mcp-server.mjs", "petri-action-bridge.mjs"];
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum McpClientState {
@@ -47,7 +50,6 @@ impl McpClientState {
 pub(crate) struct McpSetupStatus {
     pub(crate) codex: McpClientState,
     pub(crate) claude: McpClientState,
-    pub(crate) runtime_ready: bool,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -100,11 +102,6 @@ impl McpSetupStatus {
     pub(crate) fn needs_repair(&self) -> bool {
         matches!(self.codex, McpClientState::NeedsRepair)
             || matches!(self.claude, McpClientState::NeedsRepair)
-            || (!self.runtime_ready
-                && matches!(
-                    (self.codex, self.claude),
-                    (McpClientState::Enabled, _) | (_, McpClientState::Enabled)
-                ))
     }
 }
 
@@ -137,14 +134,15 @@ impl Error for McpSetupError {}
 struct SetupLocations {
     codex_config: PathBuf,
     claude_config: PathBuf,
-    runtime_script: PathBuf,
+    /// Where the local Node server's files were (`LEGACY_RUNTIME_FILES`).
+    legacy_runtime: PathBuf,
 }
 
+/// Where the entries go and the server they name.
 #[derive(Clone, Debug)]
-struct RuntimeSpec {
+struct Spec {
     locations: SetupLocations,
-    node_bin: PathBuf,
-    petri_bin: PathBuf,
+    url: String,
 }
 
 #[derive(Clone, Debug)]
@@ -160,74 +158,47 @@ struct PreparedFile {
     desired: Option<Vec<u8>>,
 }
 
-pub(crate) fn status() -> Result<McpSetupStatus, McpSetupError> {
-    status_with_locations(&resolve_locations()?)
+/// The hosted MCP server of the futures API at `api`.
+pub(crate) fn server_url(api: &str) -> String {
+    format!("{}/mcp", api.trim_end_matches('/'))
 }
 
-pub(crate) fn enable() -> Result<McpSetupStatus, McpSetupError> {
-    let locations = resolve_locations()?;
-    let spec = RuntimeSpec {
-        node_bin: resolve_node_bin()?,
-        petri_bin: resolve_petri_bin()?,
-        locations,
-    };
-    preflight_server(&spec)?;
-    enable_with_spec(&spec)
+fn spec(api: &str) -> Result<Spec, McpSetupError> {
+    Ok(Spec {
+        locations: resolve_locations()?,
+        url: server_url(api),
+    })
 }
 
-pub(crate) fn repair() -> Result<McpRepairResult, McpSetupError> {
-    let locations = resolve_locations()?;
-    let current = status_with_locations(&locations)?;
-    if current.is_fully_enabled() && current.runtime_ready {
-        return Ok(McpRepairResult {
-            status: current,
-            outcome: McpRepairOutcome::AlreadyHealthy,
-        });
-    }
-    ensure_repairable(&current)?;
-    let spec = RuntimeSpec {
-        node_bin: resolve_node_bin()?,
-        petri_bin: resolve_petri_bin()?,
-        locations,
-    };
-    repair_with_spec(&spec, true)
+pub(crate) fn status(api: &str) -> Result<McpSetupStatus, McpSetupError> {
+    status_with_spec(&spec(api)?)
 }
 
-pub(crate) fn disable() -> Result<McpSetupStatus, McpSetupError> {
-    disable_with_locations(&resolve_locations()?)
+pub(crate) fn enable(api: &str) -> Result<McpSetupStatus, McpSetupError> {
+    enable_with_spec(&spec(api)?)
 }
 
-fn enable_with_spec(spec: &RuntimeSpec) -> Result<McpSetupStatus, McpSetupError> {
-    require_file(&spec.node_bin, "Node executable")?;
-    require_file(&spec.petri_bin, "Petri executable")?;
+pub(crate) fn repair(api: &str) -> Result<McpRepairResult, McpSetupError> {
+    repair_with_spec(&spec(api)?)
+}
 
-    let runtime = capture_file(&spec.locations.runtime_script)?;
-    let bridge = capture_file(
-        &spec
-            .locations
-            .runtime_script
-            .with_file_name(BRIDGE_FILE_NAME),
-    )?;
+pub(crate) fn disable(api: &str) -> Result<McpSetupStatus, McpSetupError> {
+    disable_with_spec(&spec(api)?)
+}
+
+fn enable_with_spec(spec: &Spec) -> Result<McpSetupStatus, McpSetupError> {
     let codex = capture_file(&spec.locations.codex_config)?;
     let claude = capture_file(&spec.locations.claude_config)?;
 
     let mut codex_doc = parse_codex(&codex)?;
-    ensure_codex_entry_is_available(&codex_doc)?;
-    set_codex_enabled(&mut codex_doc, spec)?;
+    ensure_codex_entry_is_available(&codex_doc, &spec.url)?;
+    set_codex_enabled(&mut codex_doc, &spec.url)?;
 
     let mut claude_doc = parse_claude(&claude)?;
-    ensure_claude_entry_is_available(&claude_doc)?;
-    set_claude_enabled(&mut claude_doc, spec)?;
+    ensure_claude_entry_is_available(&claude_doc, &spec.url)?;
+    set_claude_enabled(&mut claude_doc, &spec.url)?;
 
-    let prepared = vec![
-        PreparedFile {
-            snapshot: bridge,
-            desired: Some(BRIDGE_SOURCE.as_bytes().to_vec()),
-        },
-        PreparedFile {
-            snapshot: runtime,
-            desired: Some(SERVER_SOURCE.as_bytes().to_vec()),
-        },
+    let mut prepared = vec![
         PreparedFile {
             snapshot: codex,
             desired: Some(codex_doc.to_string().into_bytes()),
@@ -237,28 +208,84 @@ fn enable_with_spec(spec: &RuntimeSpec) -> Result<McpSetupStatus, McpSetupError>
             desired: Some(render_json(&claude_doc)?),
         },
     ];
+    // The local server's files go with its entries.
+    for name in LEGACY_RUNTIME_FILES {
+        let snapshot = capture_file(&spec.locations.legacy_runtime.join(name))?;
+        if snapshot.contents.is_some() {
+            prepared.push(PreparedFile {
+                snapshot,
+                desired: None,
+            });
+        }
+    }
     commit_prepared(&prepared)?;
-    status_with_locations(&spec.locations)
+    status_with_spec(spec)
 }
 
-fn repair_with_spec(
-    spec: &RuntimeSpec,
-    run_preflight: bool,
-) -> Result<McpRepairResult, McpSetupError> {
-    let current = status_with_locations(&spec.locations)?;
-    if current.is_fully_enabled() && current.runtime_ready {
+/// Moves agents off the local Node server petri set up before v0.1.18 onto
+/// the hosted one, so updating petri doesn't leave them without it (that
+/// server's commands are gone). Only petri's own old entries that are switched
+/// on change, each agent keeps whether it had one, and the old server's files
+/// go once no entry names them. The TUI runs it at start; true when it moved one.
+pub(crate) fn migrate_legacy(api: &str) -> Result<bool, McpSetupError> {
+    migrate_legacy_with_spec(&spec(api)?)
+}
+
+fn migrate_legacy_with_spec(spec: &Spec) -> Result<bool, McpSetupError> {
+    let codex = capture_file(&spec.locations.codex_config)?;
+    let claude = capture_file(&spec.locations.claude_config)?;
+    let mut codex_doc = parse_codex(&codex)?;
+    let mut claude_doc = parse_claude(&claude)?;
+    let codex_entry = codex_entry(&codex_doc)?.filter(|item| codex_entry_legacy(item));
+    let claude_entry = claude_entry(&claude_doc)?.filter(|entry| claude_entry_legacy(entry));
+    let codex_on =
+        codex_entry.is_some_and(|item| item.get("enabled").and_then(Item::as_bool) != Some(false));
+    let claude_on = claude_entry.is_some();
+    if !codex_on && !claude_on {
+        return Ok(false);
+    }
+    let leftover = codex_entry.is_some() && !codex_on;
+    let mut prepared = Vec::new();
+    if codex_on {
+        set_codex_enabled(&mut codex_doc, &spec.url)?;
+        prepared.push(PreparedFile {
+            snapshot: codex,
+            desired: Some(codex_doc.to_string().into_bytes()),
+        });
+    }
+    if claude_on {
+        set_claude_enabled(&mut claude_doc, &spec.url)?;
+        prepared.push(PreparedFile {
+            snapshot: claude,
+            desired: Some(render_json(&claude_doc)?),
+        });
+    }
+    if !leftover {
+        for name in LEGACY_RUNTIME_FILES {
+            let snapshot = capture_file(&spec.locations.legacy_runtime.join(name))?;
+            if snapshot.contents.is_some() {
+                prepared.push(PreparedFile {
+                    snapshot,
+                    desired: None,
+                });
+            }
+        }
+    }
+    commit_prepared(&prepared)?;
+    Ok(true)
+}
+
+fn repair_with_spec(spec: &Spec) -> Result<McpRepairResult, McpSetupError> {
+    let current = status_with_spec(spec)?;
+    if current.is_fully_enabled() {
         return Ok(McpRepairResult {
             status: current,
             outcome: McpRepairOutcome::AlreadyHealthy,
         });
     }
     ensure_repairable(&current)?;
-
-    if run_preflight {
-        preflight_server(spec)?;
-    }
     let status = enable_with_spec(spec)?;
-    if !status.is_fully_enabled() || !status.runtime_ready {
+    if !status.is_fully_enabled() {
         return Err(McpSetupError::new(
             "Petri rebuilt the owned connection, but its health check still did not pass.",
         ));
@@ -277,21 +304,21 @@ fn ensure_repairable(status: &McpSetupStatus) -> Result<(), McpSetupError> {
     }
     if !status.needs_repair() && !status.is_partially_enabled() {
         return Err(McpSetupError::new(
-            "The Petri connection is not enabled. Use Enable Petri MCP to connect it.",
+            "The Petri connection is not enabled. Run petri mcp enable to connect it.",
         ));
     }
     Ok(())
 }
 
-fn disable_with_locations(locations: &SetupLocations) -> Result<McpSetupStatus, McpSetupError> {
-    let codex = capture_file(&locations.codex_config)?;
-    let claude = capture_file(&locations.claude_config)?;
+fn disable_with_spec(spec: &Spec) -> Result<McpSetupStatus, McpSetupError> {
+    let codex = capture_file(&spec.locations.codex_config)?;
+    let claude = capture_file(&spec.locations.claude_config)?;
 
     let mut codex_doc = parse_codex(&codex)?;
-    let codex_changed = set_codex_disabled(&mut codex_doc)?;
+    let codex_changed = set_codex_disabled(&mut codex_doc, &spec.url)?;
 
     let mut claude_doc = parse_claude(&claude)?;
-    let claude_changed = remove_claude_entry(&mut claude_doc)?;
+    let claude_changed = remove_claude_entry(&mut claude_doc, &spec.url)?;
 
     let codex_desired = if codex_changed {
         Some(codex_doc.to_string().into_bytes())
@@ -314,40 +341,25 @@ fn disable_with_locations(locations: &SetupLocations) -> Result<McpSetupStatus, 
             desired: claude_desired,
         },
     ])?;
-    status_with_locations(locations)
+    status_with_spec(spec)
 }
 
-fn status_with_locations(locations: &SetupLocations) -> Result<McpSetupStatus, McpSetupError> {
-    let runtime_ready = fs::read(&locations.runtime_script)
-        .map(|contents| contents == SERVER_SOURCE.as_bytes())
-        .unwrap_or(false)
-        && fs::read(locations.runtime_script.with_file_name(BRIDGE_FILE_NAME))
-            .map(|contents| contents == BRIDGE_SOURCE.as_bytes())
-            .unwrap_or(false);
-    let codex = capture_file(&locations.codex_config)?;
-    let claude = capture_file(&locations.claude_config)?;
+fn status_with_spec(spec: &Spec) -> Result<McpSetupStatus, McpSetupError> {
+    let codex = capture_file(&spec.locations.codex_config)?;
+    let claude = capture_file(&spec.locations.claude_config)?;
     let codex_doc = parse_codex(&codex)?;
     let claude_doc = parse_claude(&claude)?;
-
-    let codex_state = codex_state(&codex_doc, locations, runtime_ready)?;
-    let claude_state = claude_state(&claude_doc, locations, runtime_ready)?;
-
     Ok(McpSetupStatus {
-        codex: codex_state,
-        claude: claude_state,
-        runtime_ready,
+        codex: codex_state(&codex_doc, &spec.url)?,
+        claude: claude_state(&claude_doc, &spec.url)?,
     })
 }
 
-fn codex_state(
-    document: &DocumentMut,
-    locations: &SetupLocations,
-    runtime_ready: bool,
-) -> Result<McpClientState, McpSetupError> {
+fn codex_state(document: &DocumentMut, url: &str) -> Result<McpClientState, McpSetupError> {
     let Some(item) = codex_entry(document)? else {
         return Ok(McpClientState::Disabled);
     };
-    if !codex_entry_owned(item) {
+    if !codex_entry_owned(item, url) {
         return Ok(McpClientState::Conflict);
     }
     let Some(table) = item.as_table() else {
@@ -360,44 +372,14 @@ fn codex_state(
     {
         return Ok(McpClientState::Disabled);
     }
-
-    let healthy = runtime_ready
-        && item_path_exists(table.get("command").and_then(Item::as_str))
-        && table
-            .get("args")
-            .and_then(Item::as_array)
-            .is_some_and(|args| {
-                args.len() == 1
-                    && args
-                        .get(0)
-                        .and_then(|argument| argument.as_str())
-                        .is_some_and(|argument| {
-                            same_path_text(argument, &locations.runtime_script)
-                                && Path::new(argument).is_file()
-                        })
-            })
-        && table.get("cwd").and_then(Item::as_str).is_some_and(|cwd| {
-            Path::new(cwd).is_dir()
-                && locations
-                    .runtime_script
-                    .parent()
-                    .is_some_and(|runtime_dir| same_path_text(cwd, runtime_dir))
-        })
+    // The hosted server for this petri's API, with nothing of a local one.
+    let healthy = table.get("url").and_then(Item::as_str) == Some(url)
+        && !table.contains_key("command")
+        && !table.contains_key("env")
         && table
             .get("default_tools_approval_mode")
             .and_then(Item::as_str)
-            == Some("writes")
-        && table
-            .get("env")
-            .and_then(Item::as_table)
-            .and_then(|env_table| env_table.get(PETRI_BIN_ENV))
-            .and_then(Item::as_str)
-            .is_some_and(|path| Path::new(path).is_file())
-        && table
-            .get("env")
-            .and_then(Item::as_table)
-            .is_some_and(|env_table| !env_table.contains_key(RETIRED_TRANSACTION_MODE_ENV));
-
+            == Some("writes");
     Ok(if healthy {
         McpClientState::Enabled
     } else {
@@ -405,41 +387,17 @@ fn codex_state(
     })
 }
 
-fn claude_state(
-    document: &JsonValue,
-    locations: &SetupLocations,
-    runtime_ready: bool,
-) -> Result<McpClientState, McpSetupError> {
+fn claude_state(document: &JsonValue, url: &str) -> Result<McpClientState, McpSetupError> {
     let Some(entry) = claude_entry(document)? else {
         return Ok(McpClientState::Disabled);
     };
-    if !claude_entry_owned(entry) {
+    if !claude_entry_owned(entry, url) {
         return Ok(McpClientState::Conflict);
     }
-    let healthy = runtime_ready
-        && entry.get("type").and_then(JsonValue::as_str) == Some("stdio")
-        && item_path_exists(entry.get("command").and_then(JsonValue::as_str))
-        && entry
-            .get("args")
-            .and_then(JsonValue::as_array)
-            .is_some_and(|args| {
-                args.len() == 1
-                    && args[0].as_str().is_some_and(|argument| {
-                        same_path_text(argument, &locations.runtime_script)
-                            && Path::new(argument).is_file()
-                    })
-            })
-        && entry
-            .get("env")
-            .and_then(JsonValue::as_object)
-            .and_then(|env_map| env_map.get(PETRI_BIN_ENV))
-            .and_then(JsonValue::as_str)
-            .is_some_and(|path| Path::new(path).is_file())
-        && entry
-            .get("env")
-            .and_then(JsonValue::as_object)
-            .is_some_and(|env_map| !env_map.contains_key(RETIRED_TRANSACTION_MODE_ENV));
-
+    let healthy = entry.get("type").and_then(JsonValue::as_str) == Some("http")
+        && entry.get("url").and_then(JsonValue::as_str) == Some(url)
+        && entry.get("command").is_none()
+        && entry.get("env").is_none();
     Ok(if healthy {
         McpClientState::Enabled
     } else {
@@ -447,33 +405,20 @@ fn claude_state(
     })
 }
 
-fn set_codex_enabled(document: &mut DocumentMut, spec: &RuntimeSpec) -> Result<(), McpSetupError> {
+fn set_codex_enabled(document: &mut DocumentMut, url: &str) -> Result<(), McpSetupError> {
     let servers = codex_servers_mut(document)?;
     let mut server = Table::new();
-    server.insert("command", value(path_text(&spec.node_bin)));
-    let mut args = Array::new();
-    args.push(path_text(&spec.locations.runtime_script));
-    server.insert("args", value(args));
-    let runtime_dir = spec
-        .locations
-        .runtime_script
-        .parent()
-        .ok_or_else(|| McpSetupError::new("Petri MCP runtime path has no parent directory."))?;
-    server.insert("cwd", value(path_text(runtime_dir)));
+    server.insert("url", value(url));
     server.insert("enabled", value(true));
     server.insert("required", value(false));
+    // Codex asks before a tool that is not read-only (the relays).
     server.insert("default_tools_approval_mode", value("writes"));
-
-    let mut server_env = Table::new();
-    server_env.insert(PETRI_BIN_ENV, value(path_text(&spec.petri_bin)));
-    server_env.insert(MANAGED_BY_ENV, value(MANAGED_BY_VALUE));
-    server.insert("env", Item::Table(server_env));
     servers.insert(SERVER_NAME, Item::Table(server));
     Ok(())
 }
 
-fn set_codex_disabled(document: &mut DocumentMut) -> Result<bool, McpSetupError> {
-    if codex_entry(document)?.is_some_and(|entry| !codex_entry_owned(entry)) {
+fn set_codex_disabled(document: &mut DocumentMut, url: &str) -> Result<bool, McpSetupError> {
+    if codex_entry(document)?.is_some_and(|entry| !codex_entry_owned(entry, url)) {
         return Ok(false);
     }
     let Some(servers) = codex_servers_mut_if_present(document)? else {
@@ -494,25 +439,17 @@ fn set_codex_disabled(document: &mut DocumentMut) -> Result<bool, McpSetupError>
     Ok(true)
 }
 
-fn set_claude_enabled(document: &mut JsonValue, spec: &RuntimeSpec) -> Result<(), McpSetupError> {
+fn set_claude_enabled(document: &mut JsonValue, url: &str) -> Result<(), McpSetupError> {
     let servers = claude_servers_mut(document)?;
     servers.insert(
         SERVER_NAME.to_string(),
-        json!({
-            "type": "stdio",
-            "command": path_text(&spec.node_bin),
-            "args": [path_text(&spec.locations.runtime_script)],
-            "env": {
-                PETRI_BIN_ENV: path_text(&spec.petri_bin),
-                MANAGED_BY_ENV: MANAGED_BY_VALUE,
-            }
-        }),
+        json!({ "type": "http", "url": url }),
     );
     Ok(())
 }
 
-fn remove_claude_entry(document: &mut JsonValue) -> Result<bool, McpSetupError> {
-    if claude_entry(document)?.is_some_and(|entry| !claude_entry_owned(entry)) {
+fn remove_claude_entry(document: &mut JsonValue, url: &str) -> Result<bool, McpSetupError> {
+    if claude_entry(document)?.is_some_and(|entry| !claude_entry_owned(entry, url)) {
         return Ok(false);
     }
     let Some(root) = document.as_object_mut() else {
@@ -531,226 +468,8 @@ fn remove_claude_entry(document: &mut JsonValue) -> Result<bool, McpSetupError> 
     Ok(servers.remove(SERVER_NAME).is_some())
 }
 
-fn preflight_server(spec: &RuntimeSpec) -> Result<(), McpSetupError> {
-    require_file(&spec.node_bin, "Node executable")?;
-    require_file(&spec.petri_bin, "Petri executable")?;
-    let runtime_dir = spec
-        .locations
-        .runtime_script
-        .parent()
-        .ok_or_else(|| McpSetupError::new("Petri MCP runtime path has no parent directory."))?;
-    ensure_private_directory(runtime_dir)?;
-    let (smoke_path, mut smoke_file) =
-        create_temporary_file(&spec.locations.runtime_script, "smoke")?;
-    // The preflight is self-contained and never overwrites a live companion.
-    use base64::Engine as _;
-    let bridge_url = base64::engine::general_purpose::STANDARD.encode(BRIDGE_SOURCE);
-    let smoke_source = SERVER_SOURCE.replace(
-        "import { ResidentPetri } from './petri-action-bridge.mjs';",
-        &format!(
-            "const {{ ResidentPetri }} = await import('data:text/javascript;base64,{bridge_url}');"
-        ),
-    );
-    smoke_file
-        .write_all(smoke_source.as_bytes())
-        .and_then(|_| smoke_file.sync_all())
-        .map_err(|error| {
-            let _ = fs::remove_file(&smoke_path);
-            McpSetupError::io(
-                "Cannot prepare the Petri MCP self-check at",
-                &smoke_path,
-                error,
-            )
-        })?;
-    drop(smoke_file);
-    set_private_file_permissions(&smoke_path)?;
-
-    let result = run_server_preflight(spec, &smoke_path, runtime_dir);
-    let _ = fs::remove_file(&smoke_path);
-    result
-}
-
-fn run_server_preflight(
-    spec: &RuntimeSpec,
-    smoke_path: &Path,
-    runtime_dir: &Path,
-) -> Result<(), McpSetupError> {
-    let mut child = Command::new(&spec.node_bin)
-        .arg(smoke_path)
-        .current_dir(runtime_dir)
-        .env(PETRI_BIN_ENV, &spec.petri_bin)
-        .env(MANAGED_BY_ENV, MANAGED_BY_VALUE)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .map_err(|error| {
-            McpSetupError::new(format!(
-                "Petri MCP could not start with Node.js at {}: {error}",
-                spec.node_bin.display()
-            ))
-        })?;
-    let mut stdout_pipe = child.stdout.take().ok_or_else(|| {
-        McpSetupError::new("Petri MCP self-check could not open the server output stream.")
-    })?;
-    let mut stderr_pipe = child.stderr.take().ok_or_else(|| {
-        McpSetupError::new("Petri MCP self-check could not open the server error stream.")
-    })?;
-    let stdout_reader = thread::spawn(move || {
-        let mut output = Vec::new();
-        stdout_pipe.read_to_end(&mut output).map(|_| output)
-    });
-    let stderr_reader = thread::spawn(move || {
-        let mut output = Vec::new();
-        stderr_pipe.read_to_end(&mut output).map(|_| output)
-    });
-
-    let requests = concat!(
-        "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"petri-setup-check\",\"version\":\"0.1.0\"}}}\n",
-        "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\",\"params\":{}}\n",
-        "{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"petri.mcp_manifest\",\"arguments\":{}}}\n",
-    );
-    let mut stdin = child.stdin.take().ok_or_else(|| {
-        McpSetupError::new("Petri MCP self-check could not open the server input stream.")
-    })?;
-    if let Err(error) = stdin.write_all(requests.as_bytes()) {
-        let _ = child.kill();
-        let _ = child.wait();
-        return Err(McpSetupError::new(format!(
-            "Petri MCP self-check could not send a request: {error}"
-        )));
-    }
-    drop(stdin);
-
-    let deadline = Instant::now() + Duration::from_secs(8);
-    let exit_status = loop {
-        match child.try_wait() {
-            Ok(Some(status)) => break status,
-            Ok(None) if Instant::now() < deadline => thread::sleep(Duration::from_millis(20)),
-            Ok(None) => {
-                let _ = child.kill();
-                let _ = child.wait();
-                let _ = stdout_reader.join();
-                let _ = stderr_reader.join();
-                return Err(McpSetupError::new(
-                    "Petri MCP self-check timed out before the server became ready.",
-                ));
-            }
-            Err(error) => {
-                let _ = child.kill();
-                let _ = child.wait();
-                let _ = stdout_reader.join();
-                let _ = stderr_reader.join();
-                return Err(McpSetupError::new(format!(
-                    "Petri MCP self-check could not read the server status: {error}"
-                )));
-            }
-        }
-    };
-    let stdout = stdout_reader
-        .join()
-        .map_err(|_| McpSetupError::new("Petri MCP self-check output reader stopped."))?
-        .map_err(|error| {
-            McpSetupError::new(format!(
-                "Petri MCP self-check could not read the server response: {error}"
-            ))
-        })?;
-    let stderr = stderr_reader
-        .join()
-        .map_err(|_| McpSetupError::new("Petri MCP self-check error reader stopped."))?
-        .map_err(|error| {
-            McpSetupError::new(format!(
-                "Petri MCP self-check could not read the server error output: {error}"
-            ))
-        })?;
-    if !exit_status.success() {
-        let stderr = String::from_utf8_lossy(&stderr);
-        return Err(McpSetupError::new(format!(
-            "Petri MCP self-check failed{}.",
-            short_process_detail(&stderr)
-        )));
-    }
-    validate_preflight_output(&stdout)
-}
-
-fn validate_preflight_output(stdout: &[u8]) -> Result<(), McpSetupError> {
-    let text = std::str::from_utf8(stdout).map_err(|error| {
-        McpSetupError::new(format!(
-            "Petri MCP self-check returned unreadable output: {error}"
-        ))
-    })?;
-    let responses = text
-        .lines()
-        .filter(|line| !line.trim().is_empty())
-        .map(serde_json::from_str::<JsonValue>)
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|error| {
-            McpSetupError::new(format!(
-                "Petri MCP self-check returned invalid JSON: {error}"
-            ))
-        })?;
-    let response = |id: u64| {
-        responses
-            .iter()
-            .find(|response| response.get("id").and_then(JsonValue::as_u64) == Some(id))
-            .ok_or_else(|| {
-                McpSetupError::new(format!(
-                    "Petri MCP self-check did not return response {id}."
-                ))
-            })
-    };
-    for id in 1..=3 {
-        if response(id)?.get("error").is_some() {
-            return Err(McpSetupError::new(format!(
-                "Petri MCP self-check response {id} reported an error."
-            )));
-        }
-    }
-    if response(1)?
-        .pointer("/result/serverInfo/name")
-        .and_then(JsonValue::as_str)
-        != Some("petri-mcp")
-    {
-        return Err(McpSetupError::new(
-            "Petri MCP self-check did not initialize the Petri server.",
-        ));
-    }
-    if !response(2)?
-        .pointer("/result/tools")
-        .and_then(JsonValue::as_array)
-        .is_some_and(|tools| {
-            tools.iter().any(|tool| {
-                tool.get("name").and_then(JsonValue::as_str) == Some("petri.mcp_manifest")
-            })
-        })
-    {
-        return Err(McpSetupError::new(
-            "Petri MCP self-check could not discover Petri tools.",
-        ));
-    }
-    if response(3)?
-        .pointer("/result/structuredContent/protocol/name")
-        .and_then(JsonValue::as_str)
-        != Some("petri-agent-protocol")
-    {
-        return Err(McpSetupError::new(
-            "Petri MCP self-check could not call the Petri manifest tool.",
-        ));
-    }
-    Ok(())
-}
-
-fn short_process_detail(stderr: &str) -> String {
-    let detail = stderr.trim().replace(['\r', '\n'], " ");
-    if detail.is_empty() {
-        String::new()
-    } else {
-        format!(": {}", detail.chars().take(240).collect::<String>())
-    }
-}
-
-fn ensure_codex_entry_is_available(document: &DocumentMut) -> Result<(), McpSetupError> {
-    if codex_entry(document)?.is_some_and(|item| !codex_entry_owned(item)) {
+fn ensure_codex_entry_is_available(document: &DocumentMut, url: &str) -> Result<(), McpSetupError> {
+    if codex_entry(document)?.is_some_and(|item| !codex_entry_owned(item, url)) {
         return Err(McpSetupError::new(
             "Codex already has a Petri MCP entry that this TUI does not own. It was left unchanged.",
         ));
@@ -758,8 +477,8 @@ fn ensure_codex_entry_is_available(document: &DocumentMut) -> Result<(), McpSetu
     Ok(())
 }
 
-fn ensure_claude_entry_is_available(document: &JsonValue) -> Result<(), McpSetupError> {
-    if claude_entry(document)?.is_some_and(|entry| !claude_entry_owned(entry)) {
+fn ensure_claude_entry_is_available(document: &JsonValue, url: &str) -> Result<(), McpSetupError> {
+    if claude_entry(document)?.is_some_and(|entry| !claude_entry_owned(entry, url)) {
         return Err(McpSetupError::new(
             "Claude Code already has a Petri MCP entry that this TUI does not own. It was left unchanged.",
         ));
@@ -779,13 +498,25 @@ fn codex_entry(document: &DocumentMut) -> Result<Option<&Item>, McpSetupError> {
     Ok(servers.get(SERVER_NAME))
 }
 
-fn codex_entry_owned(item: &Item) -> bool {
+/// The local Node server's entry, marked in its env.
+fn codex_entry_legacy(item: &Item) -> bool {
     item.as_table()
         .and_then(|table| table.get("env"))
         .and_then(Item::as_table)
-        .and_then(|server_env| server_env.get(MANAGED_BY_ENV))
+        .and_then(|server_env| server_env.get(LEGACY_MANAGED_BY_ENV))
         .and_then(Item::as_str)
-        == Some(MANAGED_BY_VALUE)
+        == Some(LEGACY_MANAGED_BY_VALUE)
+}
+
+fn codex_entry_owned(item: &Item, url: &str) -> bool {
+    let Some(table) = item.as_table() else {
+        return false;
+    };
+    codex_entry_legacy(item)
+        || table
+            .get("url")
+            .and_then(Item::as_str)
+            .is_some_and(|entry| amoeba_url(entry, url))
 }
 
 fn codex_servers_mut(document: &mut DocumentMut) -> Result<&mut Table, McpSetupError> {
@@ -830,13 +561,38 @@ fn claude_entry(document: &JsonValue) -> Result<Option<&JsonValue>, McpSetupErro
     Ok(servers.get(SERVER_NAME))
 }
 
-fn claude_entry_owned(entry: &JsonValue) -> bool {
+fn claude_entry_legacy(entry: &JsonValue) -> bool {
     entry
         .get("env")
         .and_then(JsonValue::as_object)
-        .and_then(|server_env| server_env.get(MANAGED_BY_ENV))
+        .and_then(|server_env| server_env.get(LEGACY_MANAGED_BY_ENV))
         .and_then(JsonValue::as_str)
-        == Some(MANAGED_BY_VALUE)
+        == Some(LEGACY_MANAGED_BY_VALUE)
+}
+
+fn claude_entry_owned(entry: &JsonValue, url: &str) -> bool {
+    claude_entry_legacy(entry)
+        || entry
+            .get("url")
+            .and_then(JsonValue::as_str)
+            .is_some_and(|entry| amoeba_url(entry, url))
+}
+
+/// Whether `entry` is an Amoeba futures API's MCP server: `url` (this
+/// petri's), the production API's, or a loopback API's `/mcp` (a dev one).
+fn amoeba_url(entry: &str, url: &str) -> bool {
+    if entry == url {
+        return true;
+    }
+    let Ok(parsed) = reqwest::Url::parse(entry) else {
+        return false;
+    };
+    parsed.path() == "/mcp"
+        && match parsed.host_str() {
+            Some("api.amoeba.farm") => parsed.scheme() == "https",
+            Some("127.0.0.1" | "localhost" | "[::1]") => true,
+            _ => false,
+        }
 }
 
 fn claude_servers_mut(
@@ -1144,43 +900,8 @@ fn resolve_locations() -> Result<SetupLocations, McpSetupError> {
     Ok(SetupLocations {
         codex_config: absolute_path(codex_home.join("config.toml"))?,
         claude_config: absolute_path(home.join(".claude.json"))?,
-        runtime_script: absolute_path(runtime_root.join("mcp").join(SERVER_FILE_NAME))?,
+        legacy_runtime: absolute_path(runtime_root.join("mcp"))?,
     })
-}
-
-fn resolve_node_bin() -> Result<PathBuf, McpSetupError> {
-    if let Some(path) = nonempty_env_path("PETRI_MCP_NODE_BIN") {
-        return canonical_file(path, "Node executable");
-    }
-    let path = env::var_os("PATH").ok_or_else(|| {
-        McpSetupError::new("Node could not be found because PATH is not available.")
-    })?;
-    let executable_names: &[&str] = if cfg!(windows) {
-        &["node.exe", "node"]
-    } else {
-        &["node"]
-    };
-    for directory in env::split_paths(&path) {
-        for executable_name in executable_names {
-            let candidate = directory.join(executable_name);
-            if candidate.is_file() {
-                return canonical_file(candidate, "Node executable");
-            }
-        }
-    }
-    Err(McpSetupError::new(
-        "Petri MCP needs Node.js, but no Node executable was found on this computer.",
-    ))
-}
-
-fn resolve_petri_bin() -> Result<PathBuf, McpSetupError> {
-    if let Some(path) = nonempty_env_path(PETRI_BIN_ENV) {
-        return canonical_file(path, "Petri executable");
-    }
-    let path = env::current_exe().map_err(|error| {
-        McpSetupError::new(format!("Cannot locate the Petri executable: {error}"))
-    })?;
-    canonical_file(path, "Petri executable")
 }
 
 fn home_dir() -> Result<PathBuf, McpSetupError> {
@@ -1222,35 +943,6 @@ fn absolute_path(path: PathBuf) -> Result<PathBuf, McpSetupError> {
         .map_err(|error| McpSetupError::new(format!("Cannot resolve an absolute path: {error}")))
 }
 
-fn canonical_file(path: PathBuf, label: &str) -> Result<PathBuf, McpSetupError> {
-    require_file(&path, label)?;
-    fs::canonicalize(&path)
-        .map_err(|error| McpSetupError::io(&format!("Cannot resolve {label} at"), &path, error))
-}
-
-fn require_file(path: &Path, label: &str) -> Result<(), McpSetupError> {
-    if path.is_file() {
-        Ok(())
-    } else {
-        Err(McpSetupError::new(format!(
-            "{label} is unavailable at {}.",
-            path.display()
-        )))
-    }
-}
-
-fn item_path_exists(path: Option<&str>) -> bool {
-    path.is_some_and(|path| Path::new(path).is_file())
-}
-
-fn same_path_text(text: &str, path: &Path) -> bool {
-    text == path_text(path)
-}
-
-fn path_text(path: &Path) -> String {
-    path.to_string_lossy().into_owned()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1282,19 +974,16 @@ mod tests {
         }
     }
 
-    fn test_spec(root: &TestDir) -> RuntimeSpec {
-        let node_bin = root.join("runtime with spaces/node executable");
-        let petri_bin = root.join("runtime with spaces/petri executable");
-        write_test_file(&node_bin, b"node");
-        write_test_file(&petri_bin, b"petri");
-        RuntimeSpec {
+    const URL: &str = "https://api.amoeba.farm/mcp";
+
+    fn test_spec(root: &TestDir) -> Spec {
+        Spec {
             locations: SetupLocations {
                 codex_config: root.join("codex home/config.toml"),
                 claude_config: root.join("claude home/.claude.json"),
-                runtime_script: root.join("Petri MCP Runtime/petri-mcp-server.mjs"),
+                legacy_runtime: root.join("Petri MCP Runtime"),
             },
-            node_bin,
-            petri_bin,
+            url: URL.into(),
         }
     }
 
@@ -1303,8 +992,34 @@ mod tests {
         fs::write(path, contents).expect("write test file");
     }
 
+    fn claude(spec: &Spec) -> JsonValue {
+        serde_json::from_slice(&fs::read(&spec.locations.claude_config).expect("Claude config"))
+            .expect("parse Claude config")
+    }
+
+    fn codex_petri(spec: &Spec) -> Table {
+        let codex =
+            parse_codex(&capture_file(&spec.locations.codex_config).expect("capture Codex"))
+                .expect("parse Codex config");
+        codex_entry(&codex)
+            .expect("Codex entry lookup")
+            .expect("Codex Petri entry")
+            .as_table()
+            .expect("Codex Petri table")
+            .clone()
+    }
+
     #[test]
-    fn enable_preserves_other_config_and_is_idempotent() {
+    fn the_hosted_server_is_the_api_s_mcp_path() {
+        assert_eq!(server_url("https://api.amoeba.farm"), URL);
+        assert_eq!(
+            server_url("http://127.0.0.1:4500/"),
+            "http://127.0.0.1:4500/mcp"
+        );
+    }
+
+    #[test]
+    fn enable_registers_the_hosted_server_by_url_preserves_other_config_and_is_idempotent() {
         let root = TestDir::new("preserve");
         let spec = test_spec(&root);
         write_test_file(
@@ -1327,28 +1042,26 @@ command = "/other/server"
 
         let status = enable_with_spec(&spec).expect("enable Petri MCP");
         assert!(status.is_fully_enabled());
-        assert!(status.runtime_ready);
 
         let codex_text = fs::read_to_string(&spec.locations.codex_config).expect("Codex config");
         assert!(codex_text.contains("# keep this comment"));
         assert!(codex_text.contains("[mcp_servers.other]"));
-        assert!(codex_text.contains("[mcp_servers.petri]"));
-        assert!(codex_text.contains(MANAGED_BY_VALUE));
+        let petri = codex_petri(&spec);
+        assert_eq!(petri.get("url").and_then(Item::as_str), Some(URL));
+        assert_eq!(
+            petri
+                .get("default_tools_approval_mode")
+                .and_then(Item::as_str),
+            Some("writes")
+        );
+        assert!(petri.get("command").is_none());
 
-        let claude: JsonValue = serde_json::from_slice(
-            &fs::read(&spec.locations.claude_config).expect("Claude config"),
-        )
-        .expect("parse Claude config");
+        let claude = claude(&spec);
         assert!(claude.pointer("/projects/~1keep~1me").is_some());
         assert!(claude.pointer("/mcpServers/other").is_some());
         assert_eq!(
-            claude.pointer("/mcpServers/petri/env/PETRI_MCP_MANAGED_BY"),
-            Some(&json!(MANAGED_BY_VALUE))
-        );
-        assert!(
-            claude
-                .pointer("/mcpServers/petri/env/PETRI_MCP_TRANSACTION_MODE")
-                .is_none()
+            claude.pointer("/mcpServers/petri"),
+            Some(&json!({ "type": "http", "url": URL }))
         );
 
         let codex_once = fs::read(&spec.locations.codex_config).expect("Codex once");
@@ -1369,18 +1082,13 @@ command = "/other/server"
         let root = TestDir::new("repair healthy");
         let spec = test_spec(&root);
         enable_with_spec(&spec).expect("enable Petri MCP");
-        let runtime_before = fs::read(&spec.locations.runtime_script).expect("runtime before");
         let codex_before = fs::read(&spec.locations.codex_config).expect("Codex before");
         let claude_before = fs::read(&spec.locations.claude_config).expect("Claude before");
 
-        let result = repair_with_spec(&spec, false).expect("diagnose healthy connection");
+        let result = repair_with_spec(&spec).expect("diagnose healthy connection");
 
         assert_eq!(result.outcome, McpRepairOutcome::AlreadyHealthy);
         assert!(result.status.is_fully_enabled());
-        assert_eq!(
-            fs::read(&spec.locations.runtime_script).expect("runtime after"),
-            runtime_before
-        );
         assert_eq!(
             fs::read(&spec.locations.codex_config).expect("Codex after"),
             codex_before
@@ -1392,24 +1100,138 @@ command = "/other/server"
     }
 
     #[test]
-    fn repair_rebuilds_an_owned_broken_connection_in_place() {
-        let root = TestDir::new("repair owned");
+    fn the_local_node_servers_entries_are_replaced_by_the_hosted_one_and_its_files_removed() {
+        let root = TestDir::new("legacy");
         let spec = test_spec(&root);
-        enable_with_spec(&spec).expect("enable Petri MCP");
-        write_test_file(&spec.locations.runtime_script, b"outdated runtime");
+        let script = spec.locations.legacy_runtime.join("petri-mcp-server.mjs");
+        let bridge = spec
+            .locations
+            .legacy_runtime
+            .join("petri-action-bridge.mjs");
+        write_test_file(&script, b"// the old server");
+        write_test_file(&bridge, b"// its bridge");
+        let unrelated = spec.locations.legacy_runtime.join("notes.txt");
+        write_test_file(&unrelated, b"keep");
+        write_test_file(
+            &spec.locations.codex_config,
+            format!(
+                "[mcp_servers.petri]\ncommand = \"/usr/bin/node\"\nargs = [\"{}\"]\nenabled = true\ndefault_tools_approval_mode = \"writes\"\n\n[mcp_servers.petri.env]\nPETRI_MCP_PETRI_BIN = \"/opt/petri\"\nPETRI_MCP_MANAGED_BY = \"petri-tui-v1\"\n",
+                script.display()
+            )
+            .as_bytes(),
+        );
+        write_test_file(
+            &spec.locations.claude_config,
+            serde_json::to_vec(&json!({ "mcpServers": { "petri": { "type": "stdio", "command": "/usr/bin/node",
+                "args": [script.display().to_string()], "env": { "PETRI_MCP_PETRI_BIN": "/opt/petri", "PETRI_MCP_MANAGED_BY": "petri-tui-v1" } },
+                "other": { "command": "keep" } } }))
+            .unwrap()
+            .as_slice(),
+        );
 
-        let broken = status_with_locations(&spec.locations).expect("broken status");
-        assert!(broken.needs_repair());
-        assert!(broken.has_enabled_managed_entry());
-
-        let result = repair_with_spec(&spec, false).expect("repair owned connection");
-
-        assert_eq!(result.outcome, McpRepairOutcome::Repaired);
-        assert!(result.status.is_fully_enabled());
-        assert!(result.status.runtime_ready);
+        let before = status_with_spec(&spec).expect("legacy status");
         assert_eq!(
-            fs::read(&spec.locations.runtime_script).expect("repaired runtime"),
-            SERVER_SOURCE.as_bytes()
+            (before.codex, before.claude),
+            (McpClientState::NeedsRepair, McpClientState::NeedsRepair)
+        );
+        assert!(before.has_enabled_managed_entry());
+
+        let repaired = repair_with_spec(&spec).expect("repair the legacy connection");
+        assert_eq!(repaired.outcome, McpRepairOutcome::Repaired);
+        assert!(repaired.status.is_fully_enabled());
+        let petri = codex_petri(&spec);
+        assert_eq!(petri.get("url").and_then(Item::as_str), Some(URL));
+        assert!(petri.get("command").is_none() && petri.get("env").is_none());
+        let claude = claude(&spec);
+        assert_eq!(
+            claude.pointer("/mcpServers/petri"),
+            Some(&json!({ "type": "http", "url": URL }))
+        );
+        assert_eq!(
+            claude.pointer("/mcpServers/other/command"),
+            Some(&json!("keep"))
+        );
+        assert!(!script.exists() && !bridge.exists());
+        assert!(unrelated.exists());
+    }
+
+    #[test]
+    fn an_update_moves_only_the_old_node_entries_and_leaves_everything_else() {
+        let root = TestDir::new("migrate");
+        let spec = test_spec(&root);
+        let script = spec.locations.legacy_runtime.join("petri-mcp-server.mjs");
+        write_test_file(&script, b"// the old server");
+        // Claude Code had the old server; Codex had nothing.
+        write_test_file(
+            &spec.locations.claude_config,
+            serde_json::to_vec(&json!({ "mcpServers": { "petri": { "type": "stdio", "command": "/usr/bin/node",
+                "args": [script.display().to_string()], "env": { "PETRI_MCP_MANAGED_BY": "petri-tui-v1" } },
+                "other": { "command": "keep" } } }))
+            .unwrap()
+            .as_slice(),
+        );
+        assert!(migrate_legacy_with_spec(&spec).expect("migrate"));
+        let claude = claude(&spec);
+        assert_eq!(
+            claude.pointer("/mcpServers/petri"),
+            Some(&json!({ "type": "http", "url": URL }))
+        );
+        assert_eq!(
+            claude.pointer("/mcpServers/other/command"),
+            Some(&json!("keep"))
+        );
+        assert!(
+            !spec.locations.codex_config.exists(),
+            "no Codex entry was made"
+        );
+        assert!(!script.exists());
+        // Run again: nothing old is left, nothing changes.
+        let before = fs::read(&spec.locations.claude_config).unwrap();
+        assert!(!migrate_legacy_with_spec(&spec).expect("again"));
+        assert_eq!(fs::read(&spec.locations.claude_config).unwrap(), before);
+
+        // A hosted entry for a dev API and someone else's entry stay as they are.
+        let other = TestDir::new("migrate other");
+        let spec = test_spec(&other);
+        let dev = b"[mcp_servers.petri]\nurl = \"http://127.0.0.1:4500/mcp\"\nenabled = true\n";
+        write_test_file(&spec.locations.codex_config, dev);
+        write_test_file(
+            &spec.locations.claude_config,
+            serde_json::to_vec(
+                &json!({ "mcpServers": { "petri": { "command": "someone-elses" } } }),
+            )
+            .unwrap()
+            .as_slice(),
+        );
+        assert!(!migrate_legacy_with_spec(&spec).expect("nothing to move"));
+        assert_eq!(fs::read(&spec.locations.codex_config).unwrap(), dev);
+    }
+
+    #[test]
+    fn an_entry_for_another_amoeba_api_is_owned_and_repaired_to_this_one() {
+        let root = TestDir::new("other api");
+        let spec = test_spec(&root);
+        let dev = Spec {
+            url: "http://127.0.0.1:4500/mcp".into(),
+            ..test_spec(&root)
+        };
+        enable_with_spec(&dev).expect("enable for the dev API");
+        assert!(
+            status_with_spec(&dev)
+                .expect("dev status")
+                .is_fully_enabled()
+        );
+
+        let status = status_with_spec(&spec).expect("status for production");
+        assert_eq!(
+            (status.codex, status.claude),
+            (McpClientState::NeedsRepair, McpClientState::NeedsRepair)
+        );
+        let repaired = repair_with_spec(&spec).expect("repair to production");
+        assert!(repaired.status.is_fully_enabled());
+        assert_eq!(
+            claude(&spec).pointer("/mcpServers/petri/url"),
+            Some(&json!(URL))
         );
     }
 
@@ -1424,7 +1246,7 @@ command = "/someone/elses/server"
         write_test_file(&spec.locations.codex_config, codex_original);
         write_test_file(&spec.locations.claude_config, claude_original);
 
-        let error = repair_with_spec(&spec, false).expect_err("unowned repair must fail");
+        let error = repair_with_spec(&spec).expect_err("unowned repair must fail");
 
         assert!(error.to_string().contains("does not own"));
         assert_eq!(
@@ -1435,57 +1257,47 @@ command = "/someone/elses/server"
             fs::read(&spec.locations.claude_config).expect("unchanged Claude"),
             claude_original
         );
-        assert!(!spec.locations.runtime_script.exists());
     }
 
     #[test]
-    fn retired_transaction_mode_requires_repair_and_is_removed() {
-        let root = TestDir::new("retired transaction mode");
+    fn someone_elses_url_entry_is_theirs() {
+        let root = TestDir::new("their url");
         let spec = test_spec(&root);
-        enable_with_spec(&spec).expect("enable Petri MCP");
-
-        let mut codex =
-            parse_codex(&capture_file(&spec.locations.codex_config).expect("capture Codex config"))
-                .expect("parse Codex config");
-        codex_servers_mut_if_present(&mut codex)
-            .expect("Codex servers")
-            .expect("Codex server table")
-            .get_mut(SERVER_NAME)
-            .and_then(Item::as_table_mut)
-            .and_then(|table| table.get_mut("env"))
-            .and_then(Item::as_table_mut)
-            .expect("Codex Petri env")
-            .insert(RETIRED_TRANSACTION_MODE_ENV, value("multi_step"));
-        write_test_file(&spec.locations.codex_config, codex.to_string().as_bytes());
-
-        let claude = capture_file(&spec.locations.claude_config).expect("capture Claude config");
-        let mut claude_doc = parse_claude(&claude).expect("parse Claude config");
-        claude_doc
-            .pointer_mut("/mcpServers/petri/env")
-            .and_then(JsonValue::as_object_mut)
-            .expect("Claude Petri env")
-            .insert(
-                RETIRED_TRANSACTION_MODE_ENV.to_string(),
-                json!("multi_step"),
-            );
-        write_test_file(
-            &spec.locations.claude_config,
-            &render_json(&claude_doc).expect("render retired Claude config"),
+        let claude_original =
+            br#"{"mcpServers":{"petri":{"type":"http","url":"https://petri.example/mcp"}}}"#;
+        write_test_file(&spec.locations.claude_config, claude_original);
+        assert_eq!(
+            status_with_spec(&spec).expect("status").claude,
+            McpClientState::Conflict
         );
-
-        let status = status_with_locations(&spec.locations).expect("read retired status");
-        assert_eq!(status.codex, McpClientState::NeedsRepair);
-        assert_eq!(status.claude, McpClientState::NeedsRepair);
-        assert!(status.needs_repair());
-
-        let repaired = repair_with_spec(&spec, false).expect("repair retired mode");
-        assert_eq!(repaired.outcome, McpRepairOutcome::Repaired);
-        assert!(repaired.status.is_fully_enabled());
-        let codex_text = fs::read_to_string(&spec.locations.codex_config).expect("Codex repaired");
-        let claude_text =
-            fs::read_to_string(&spec.locations.claude_config).expect("Claude repaired");
-        assert!(!codex_text.contains(RETIRED_TRANSACTION_MODE_ENV));
-        assert!(!claude_text.contains(RETIRED_TRANSACTION_MODE_ENV));
+        assert!(
+            enable_with_spec(&spec)
+                .expect_err("their entry")
+                .to_string()
+                .contains("does not own")
+        );
+        assert_eq!(
+            fs::read(&spec.locations.claude_config).expect("unchanged"),
+            claude_original
+        );
+        for (url, owned) in [
+            (URL, true),
+            ("https://api.amoeba.farm/mcp", true),
+            ("http://api.amoeba.farm/mcp", false),
+            ("http://localhost:4500/mcp", true),
+            ("https://api.amoeba.farm/other", false),
+            ("https://api.amoeba.farm.example/mcp", false),
+        ] {
+            assert_eq!(
+                amoeba_url(url, "https://staging.example/mcp"),
+                owned,
+                "{url}"
+            );
+        }
+        assert!(amoeba_url(
+            "https://staging.example/mcp",
+            "https://staging.example/mcp"
+        ));
     }
 
     #[test]
@@ -1494,25 +1306,17 @@ command = "/someone/elses/server"
         let spec = test_spec(&root);
         enable_with_spec(&spec).expect("enable Petri MCP");
 
-        let status = disable_with_locations(&spec.locations).expect("disable Petri MCP");
+        let status = disable_with_spec(&spec).expect("disable Petri MCP");
         assert_eq!(status.codex, McpClientState::Disabled);
         assert_eq!(status.claude, McpClientState::Disabled);
         assert!(!status.is_fully_enabled());
-
-        let codex =
-            parse_codex(&capture_file(&spec.locations.codex_config).expect("capture Codex config"))
-                .expect("parse Codex config");
-        let petri = codex_entry(&codex)
-            .expect("read Codex entry")
-            .expect("Codex entry remains")
-            .as_table()
-            .expect("Codex Petri table");
-        assert_eq!(petri.get("enabled").and_then(Item::as_bool), Some(false));
-
-        let claude = parse_claude(
-            &capture_file(&spec.locations.claude_config).expect("capture Claude config"),
-        )
-        .expect("parse Claude config");
+        assert_eq!(
+            codex_petri(&spec).get("enabled").and_then(Item::as_bool),
+            Some(false)
+        );
+        let claude =
+            parse_claude(&capture_file(&spec.locations.claude_config).expect("capture Claude"))
+                .expect("parse Claude config");
         assert!(claude_entry(&claude).expect("read Claude entry").is_none());
 
         let enabled_again = enable_with_spec(&spec).expect("re-enable Petri MCP");
@@ -1528,7 +1332,7 @@ command = "/someone/elses/server"
             br#"{"mcpServers":{"petri":{"type":"stdio","command":"someone-else"}}}"#;
         write_test_file(&spec.locations.claude_config, unowned_claude);
 
-        let status = disable_with_locations(&spec.locations).expect("disable owned Codex entry");
+        let status = disable_with_spec(&spec).expect("disable owned Codex entry");
 
         assert_eq!(status.codex, McpClientState::Disabled);
         assert_eq!(status.claude, McpClientState::Conflict);
@@ -1559,50 +1363,42 @@ command = "/someone/elses/server"
             Path::new("../dotfiles/codex.toml"),
             &spec.locations.codex_config,
         )
-        .expect("create Codex config symlink");
+        .expect("Codex symlink");
         symlink(
             Path::new("../dotfiles/claude.json"),
             &spec.locations.claude_config,
         )
-        .expect("create Claude config symlink");
+        .expect("Claude symlink");
 
         enable_with_spec(&spec).expect("enable through config symlinks");
-        assert!(
-            fs::symlink_metadata(&spec.locations.codex_config)
-                .expect("Codex symlink metadata")
-                .file_type()
-                .is_symlink()
-        );
-        assert!(
-            fs::symlink_metadata(&spec.locations.claude_config)
-                .expect("Claude symlink metadata")
-                .file_type()
-                .is_symlink()
-        );
+        for link in [&spec.locations.codex_config, &spec.locations.claude_config] {
+            assert!(
+                fs::symlink_metadata(link)
+                    .expect("symlink metadata")
+                    .file_type()
+                    .is_symlink()
+            );
+        }
         assert!(
             fs::read_to_string(&codex_target)
-                .expect("updated Codex target")
+                .expect("Codex target")
                 .contains("[mcp_servers.petri]")
         );
         assert!(
             fs::read_to_string(&claude_target)
-                .expect("updated Claude target")
+                .expect("Claude target")
                 .contains("\"petri\"")
         );
 
-        disable_with_locations(&spec.locations).expect("disable through config symlinks");
-        assert!(
-            fs::symlink_metadata(&spec.locations.codex_config)
-                .expect("Codex symlink remains")
-                .file_type()
-                .is_symlink()
-        );
-        assert!(
-            fs::symlink_metadata(&spec.locations.claude_config)
-                .expect("Claude symlink remains")
-                .file_type()
-                .is_symlink()
-        );
+        disable_with_spec(&spec).expect("disable through config symlinks");
+        for link in [&spec.locations.codex_config, &spec.locations.claude_config] {
+            assert!(
+                fs::symlink_metadata(link)
+                    .expect("symlink remains")
+                    .file_type()
+                    .is_symlink()
+            );
+        }
     }
 
     #[test]
@@ -1613,6 +1409,8 @@ command = "/someone/elses/server"
         let claude_original = br#"{"projects":{"keep":true}}"#;
         write_test_file(&spec.locations.codex_config, malformed);
         write_test_file(&spec.locations.claude_config, claude_original);
+        let script = spec.locations.legacy_runtime.join("petri-mcp-server.mjs");
+        write_test_file(&script, b"// the old server");
 
         let error = enable_with_spec(&spec).expect_err("malformed TOML should fail");
         assert!(
@@ -1628,7 +1426,7 @@ command = "/someone/elses/server"
             fs::read(&spec.locations.claude_config).expect("unchanged Claude"),
             claude_original
         );
-        assert!(!spec.locations.runtime_script.exists());
+        assert!(script.exists());
     }
 
     #[test]
@@ -1652,79 +1450,6 @@ command = "/someone/elses/server"
             fs::read(&spec.locations.claude_config).expect("unchanged Claude"),
             claude_original
         );
-        assert!(!spec.locations.runtime_script.exists());
-    }
-
-    #[test]
-    fn paths_with_spaces_round_trip_through_both_formats() {
-        let root = TestDir::new("path spaces");
-        let spec = test_spec(&root);
-        let status = enable_with_spec(&spec).expect("enable with spaced paths");
-        assert!(status.is_fully_enabled());
-
-        let codex =
-            parse_codex(&capture_file(&spec.locations.codex_config).expect("capture Codex config"))
-                .expect("parse Codex config");
-        let codex_petri = codex_entry(&codex)
-            .expect("Codex entry lookup")
-            .expect("Codex Petri entry")
-            .as_table()
-            .expect("Codex Petri table");
-        assert_eq!(
-            codex_petri.get("command").and_then(Item::as_str),
-            Some(path_text(&spec.node_bin).as_str())
-        );
-        assert_eq!(
-            codex_petri
-                .get("args")
-                .and_then(Item::as_array)
-                .and_then(|args| args.get(0))
-                .and_then(|argument| argument.as_str()),
-            Some(path_text(&spec.locations.runtime_script).as_str())
-        );
-
-        let claude: JsonValue = serde_json::from_slice(
-            &fs::read(&spec.locations.claude_config).expect("Claude config"),
-        )
-        .expect("parse Claude config");
-        assert_eq!(
-            claude.pointer("/mcpServers/petri/command"),
-            Some(&json!(path_text(&spec.node_bin)))
-        );
-        assert_eq!(
-            claude.pointer("/mcpServers/petri/args/0"),
-            Some(&json!(path_text(&spec.locations.runtime_script)))
-        );
-    }
-
-    #[test]
-    fn enabled_registration_with_missing_binary_needs_repair() {
-        let root = TestDir::new("repair");
-        let spec = test_spec(&root);
-        enable_with_spec(&spec).expect("enable Petri MCP");
-        fs::remove_file(&spec.node_bin).expect("remove Node test binary");
-
-        let status = status_with_locations(&spec.locations).expect("read repair status");
-        assert_eq!(status.codex, McpClientState::NeedsRepair);
-        assert_eq!(status.claude, McpClientState::NeedsRepair);
-        assert!(status.needs_repair());
-    }
-
-    #[test]
-    fn protocol_preflight_requires_initialize_tools_and_manifest_results() {
-        let valid = concat!(
-            "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"serverInfo\":{\"name\":\"petri-mcp\"}}}\n",
-            "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"tools\":[{\"name\":\"petri.mcp_manifest\"}]}}\n",
-            "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{\"structuredContent\":{\"protocol\":{\"name\":\"petri-agent-protocol\"}}}}\n",
-        );
-        validate_preflight_output(valid.as_bytes()).expect("valid protocol preflight");
-
-        let missing_tools = concat!(
-            "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"serverInfo\":{\"name\":\"petri-mcp\"}}}\n",
-            "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"tools\":[]}}\n",
-            "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{\"structuredContent\":{\"protocol\":{\"name\":\"petri-agent-protocol\"}}}}\n",
-        );
-        assert!(validate_preflight_output(missing_tools.as_bytes()).is_err());
     }
 
     #[test]

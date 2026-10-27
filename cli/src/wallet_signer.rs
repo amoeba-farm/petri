@@ -14,7 +14,7 @@ const HARDWARE_WALLET_CONNECT_HINT: &str =
     "connect and unlock your hardware wallet, open the Solana app, close Ledger Live, then retry";
 
 fn mcp_signer_access_blocked() -> bool {
-    crate::mcp_actions::identity_blocked()
+    crate::read_only::identity_blocked()
 }
 
 #[cfg(unix)]
@@ -241,9 +241,7 @@ fn open_local_keypair_file(path: &str) -> std::io::Result<std::fs::File> {
 }
 
 pub(crate) fn signer_pubkey_from_path(path: &str) -> Result<String, CliError> {
-    let owner = read_signer_pubkey_from_path(path)?;
-    crate::mcp_actions::check_owner(&owner)?;
-    Ok(owner)
+    read_signer_pubkey_from_path(path)
 }
 
 fn read_signer_pubkey_from_path(path: &str) -> Result<String, CliError> {
@@ -284,7 +282,7 @@ fn read_signer_pubkey_from_path(path: &str) -> Result<String, CliError> {
 }
 
 pub(crate) fn load_signer(config: &OnchainConfig) -> Result<Box<dyn Signer>, CliError> {
-    if crate::mcp_actions::signing_blocked() {
+    if crate::read_only::signing_blocked() {
         return Err(CliError::new(
             "MCP signing requires explicit authorization for one exact reviewed operation",
         ));

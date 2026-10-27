@@ -46,5 +46,4 @@ jobs:
         run: |
           node scripts/check-petri-launcher.mjs
           node scripts/check-petri-packaging.mjs
-          node scripts/check-petri-mcp-server.mjs
           node scripts/check-bundled-gitbook.mjs

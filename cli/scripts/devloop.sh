@@ -6,8 +6,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-1}"
 NODE_BINARY="${NODE_BINARY:-node}"
 
-"${NODE_BINARY}" scripts/check-petri-action-bridge.mjs
-"${NODE_BINARY}" --test research/test/*.test.mjs
 cargo fmt -- --check
 cargo check --locked --bin petri -j "${CARGO_BUILD_JOBS}"
 cargo test --locked -j "${CARGO_BUILD_JOBS}" -- --test-threads=1
@@ -20,5 +18,3 @@ cargo build --locked --bin petri -j "${CARGO_BUILD_JOBS}"
 # A build without dev-chain, as a release is, defaults to production.
 "${NODE_BINARY}" scripts/check-petri-defaults.mjs "${CARGO_TARGET_DIR:-target}/debug/petri" production
 "${NODE_BINARY}" scripts/check-petri-research.mjs "${CARGO_TARGET_DIR:-target}/debug/petri"
-PETRI_MCP_PETRI_BIN="${CARGO_TARGET_DIR:-target}/debug/petri" \
-  "${NODE_BINARY}" scripts/check-petri-mcp-server.mjs

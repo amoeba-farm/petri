@@ -12,8 +12,7 @@ use serde_json::json;
 
 fn app() -> App {
     let mut app = App::new(
-        "C:/Petri runtime/node.exe".into(),
-        "C:/Petri runtime/research-runtime/agent.mjs".into(),
+        "& 'C:/Petri runtime/petri.exe'".into(),
         "http://127.0.0.1:4185".into(),
     );
     let agent = json!({"id":"ab".repeat(32),"name":"cedar","harness":"Claude Code","payoutAuthority":"public-address","revokedAt":null});
@@ -548,8 +547,8 @@ fn generated_setup_has_no_owner_credential_and_preserves_paths() {
     let setup = app.agent_setup();
     // A message for the agent's terminal, with the exact login command in it.
     assert!(setup.starts_with("Connect to my Petri oracle research workspace"));
-    assert!(setup.contains("C:/Petri runtime/node.exe"));
-    assert!(setup.contains("C:/Petri runtime/research-runtime/agent.mjs"));
+    assert!(setup.contains("& 'C:/Petri runtime/petri.exe' 'research' 'agent' 'login'"));
+    assert!(!setup.contains("node"));
     assert!(setup.contains(&app.command()));
     assert!(setup.contains("Codex"));
     assert!(!setup.contains("OWNER_TOKEN"));
@@ -605,9 +604,9 @@ fn the_start_message_gets_a_connected_agent_researching() {
     let agent = app.snapshot.agents[0].clone();
     let message = app.start_message(&agent);
     assert!(message.contains("as the agent \"cedar\""), "{message}");
-    assert!(message.contains("C:/Petri runtime/node.exe"), "{message}");
     assert!(
-        message.contains("'work' 'next' '--agent' 'cedar'"),
+        message
+            .contains("& 'C:/Petri runtime/petri.exe' 'research' 'work' 'next' '--agent' 'cedar'"),
         "{message}"
     );
     assert!(!message.contains("login"), "{message}");
@@ -892,8 +891,9 @@ fn workspace_opens_directly_and_controls_keep_spacing() {
             .iter()
             .filter(|h| matches!(h.action, Action::View(_)))
             .collect();
+        // Apart on a row; a narrow terminal's second row starts afresh.
         for pair in tabs.windows(2) {
-            assert!(pair[1].area.x >= pair[0].area.right() + 2);
+            assert!(pair[1].area.y > pair[0].area.y || pair[1].area.x >= pair[0].area.right() + 2);
         }
         assert_eq!(
             input::handle(
@@ -1096,7 +1096,7 @@ fn the_feed_keeps_its_newest_in_view_unless_scrolled_up() {
 }
 
 fn markets_app() -> App {
-    let mut app = App::new(String::new(), String::new(), String::new());
+    let mut app = App::new(String::new(), String::new());
     let market = json!({"market":"CgB3mTWzDVfTmYtgKjTXUwGSSPd39bPsCk7e7RbCxuqg","symbol":"RAMX","label":"RAMX Oct 26",
         "expiryTs":1793491200u64,"status":"open","tradable":true,"grid":200,"k":"10000","stepValue":"1",
         "valueDecimals":6,"lotUsdPerPoint":"0.01","index":{"value":"102.05","ts":1791794605},
@@ -1228,7 +1228,7 @@ fn an_unreachable_api_keeps_the_markets_shown_and_says_only_offline() {
 
 #[test]
 fn markets_never_read_show_no_loading_text_then_a_plain_line() {
-    let mut app = App::new(String::new(), String::new(), String::new());
+    let mut app = App::new(String::new(), String::new());
     let screen = draw(&mut app, 120, 40);
     assert!(!screen.contains("Loading"), "{screen}");
     app.markets.take_snapshot(failed_read());
@@ -1473,6 +1473,13 @@ fn adding_funds_reviews_before_the_wallet_signs() {
         screen.contains("Deposit 12.5 USDC") && screen.contains("y/Enter send"),
         "{screen}"
     );
+    // Send, by click as by y or Enter.
+    assert!(draw(&mut app, 120, 40).contains("[Send]"));
+    click(&mut app, &Action::FundSend);
+    assert_eq!(app.fund.ticket.as_ref().unwrap().stage, Stage::Working);
+    app.fund.reply(Reply::Prepared(Ok(vec![
+        "Deposit 12.5 USDC into oracle collateral".into(),
+    ])));
     input::handle(&mut app, key(KeyCode::Char('y')));
     assert_eq!(app.fund.ticket.as_ref().unwrap().stage, Stage::Working);
     app.fund.reply(Reply::Sent(Ok(vec![
@@ -1709,7 +1716,7 @@ fn switching_agents_shows_each_ones_last_read_at_once() {
 
 #[test]
 fn research_views_draw_nothing_before_the_first_read() {
-    let mut app = App::new(String::new(), String::new(), String::new());
+    let mut app = App::new(String::new(), String::new());
     for view in [View::Connect, View::Activity, View::Evidence, View::Rewards] {
         app.view = view;
         let screen = draw(&mut app, 100, 32);
@@ -2329,7 +2336,7 @@ fn the_navigator_takes_the_width_without_agents_and_stacks_when_narrow() {
 
 #[test]
 fn an_owner_action_while_another_is_out_is_quietly_ignored() {
-    let mut app = App::new(String::new(), String::new(), String::new());
+    let mut app = App::new(String::new(), String::new());
     app.post(
         "/v1/owner/work/focus",
         json!({"workId": "w1", "focused": true}),
@@ -2483,6 +2490,125 @@ fn the_evidence_view_lets_you_prove_and_submit_by_hand() {
         Some(Action::ProofClick(Click::Nothing))
     );
     assert_eq!(click_at(&mut app, 0, 0), Some(Action::CloseProof));
+}
+
+#[test]
+fn an_update_reads_as_an_update_and_says_when_the_notary_saw_it() {
+    use super::proofs::{Click, Kind, Slot, Stage, UpdateTarget, seen, update_lines};
+    // The notary's session time reads as a UTC date, as the preview has it.
+    assert_eq!(seen("1792950000"), "2026-10-25 17:40 UTC");
+    assert_eq!(seen("not a time"), "not a time");
+    let mut app = app();
+    app.view = View::Evidence;
+    app.loaded = true;
+    app.proofs.list = vec![proof_entry()];
+    app.proofs.open(Kind::Show("ab".repeat(32)));
+    let slot = Slot {
+        market: "ramx".into(),
+        expiry: "RAMX-202610".into(),
+        bucket: "cd".repeat(32),
+        title: "RAMX · Oct 2026 · DDR5 RDIMM 64GB (source 6fnpbW9j…)".into(),
+        update: Some(UpdateTarget {
+            source: "6fnpbW9jSource".into(),
+            stake: 1_000_000,
+        }),
+    };
+    // Its choice is of the sources it can update.
+    app.proofs.ticket.as_mut().unwrap().stage = Stage::Choose("ab".repeat(32), vec![slot.clone()]);
+    let screen = draw(&mut app, 110, 32);
+    assert!(
+        screen.contains("Which source does this proof update?")
+            && !screen.contains("Which product is this a source for?"),
+        "{screen}"
+    );
+    app.proofs.ticket.as_mut().unwrap().stage = Stage::Review(
+        "ab".repeat(32),
+        slot,
+        update_lines("468.00", "1792950000", 1_000_000),
+    );
+    let screen = draw(&mut app, 110, 32);
+    for text in [
+        "Update for RAMX · Oct 2026 · DDR5 RDIMM 64GB (source 6fnpbW9j…)",
+        "New value: 468.00 (the proven price)",
+        "Seen: 2026-10-25 17:40 UTC (the notary's session time)",
+        "Stake: 1.00 USDC from your oracle collateral",
+        "[ Submit ]",
+    ] {
+        assert!(screen.contains(text), "missing {text}:\n{screen}");
+    }
+    assert!(
+        !screen.contains("Source candidate") && !screen.contains("1792950000"),
+        "{screen}"
+    );
+    click(&mut app, &Action::ProofClick(Click::Confirm));
+    assert_eq!(app.proofs.ticket.as_ref().unwrap().stage, Stage::Working);
+}
+
+#[test]
+fn a_long_proof_keeps_its_submit_buttons_and_scrolls_under_them() {
+    use super::proofs::{Click, Kind, Stage};
+    let long: Vec<ratatui::text::Line<'static>> = (1..=40)
+        .map(|i| ratatui::text::Line::raw(format!("preview line {i}")))
+        .collect();
+    let wheel = |app: &mut App, kind| {
+        let at = app
+            .hits
+            .iter()
+            .find(|h| h.action == Action::ProofClick(Click::Nothing))
+            .unwrap()
+            .area;
+        input::handle(
+            app,
+            Event::Mouse(MouseEvent {
+                kind,
+                column: at.x + 2,
+                row: at.y + 2,
+                modifiers: KeyModifiers::NONE,
+            }),
+        );
+    };
+    for (width, height) in [(80, 24), (128, 36)] {
+        let mut app = app();
+        app.view = View::Evidence;
+        app.loaded = true;
+        app.proofs.open(Kind::Show("ab".repeat(32)));
+        app.proofs.ticket.as_mut().unwrap().stage =
+            Stage::Preview(long.clone(), Some("ab".repeat(32)));
+        let screen = draw(&mut app, width, height);
+        // Both buttons, on screen and clickable, under text that does not fit.
+        for button in [
+            "[ Submit as a source ]",
+            "[ Submit as an update ]",
+            "↑↓ more",
+        ] {
+            assert!(
+                screen.contains(button),
+                "{width}x{height}: {button}\n{screen}"
+            );
+        }
+        assert!(screen.contains("preview line 1\n") || screen.contains("preview line 1 "));
+        assert!(!screen.contains("preview line 40"), "{screen}");
+        // The wheel over it, and ↓, scroll the text; the buttons stay.
+        wheel(&mut app, MouseEventKind::ScrollDown);
+        let screen = draw(&mut app, width, height);
+        assert_eq!(app.proofs.ticket.as_ref().unwrap().scroll, 3);
+        assert!(!screen.contains("preview line 3 "), "{screen}");
+        for _ in 0..60 {
+            input::handle(&mut app, Event::Key(KeyEvent::from(KeyCode::Down)));
+        }
+        let screen = draw(&mut app, width, height);
+        assert!(
+            screen.contains("preview line 40") && screen.contains("[ Submit as an update ]"),
+            "{screen}"
+        );
+        // Held at its end, so one ↑ moves it at once.
+        let end = app.proofs.ticket.as_ref().unwrap().scroll;
+        input::handle(&mut app, Event::Key(KeyEvent::from(KeyCode::Up)));
+        assert_eq!(app.proofs.ticket.as_ref().unwrap().scroll, end - 1);
+        draw(&mut app, width, height);
+        click(&mut app, &Action::ProofClick(Click::SubmitUpdate));
+        assert_eq!(app.proofs.ticket.as_ref().unwrap().stage, Stage::Working);
+    }
 }
 
 #[test]

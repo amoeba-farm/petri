@@ -11,7 +11,18 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
             MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
                 let down = mouse.kind == MouseEventKind::ScrollDown;
                 let at = (mouse.column, mouse.row).into();
-                if app.modal.is_none() && app.sidebar.contains(at) {
+                if app.modal.is_none()
+                    && app.view == View::Evidence
+                    && let Some(t) = &mut app.proofs.ticket
+                {
+                    // An open proof's text scrolls under its buttons, wherever
+                    // the wheel is (the pop-up can cover the agents' list).
+                    t.scroll = if down {
+                        t.scroll.saturating_add(3)
+                    } else {
+                        t.scroll.saturating_sub(3)
+                    };
+                } else if app.modal.is_none() && app.sidebar.contains(at) {
                     app.agent_scroll = if down {
                         app.agent_scroll.saturating_add(1)
                     } else {
@@ -187,6 +198,12 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
                 app.proofs.key(key, &months);
                 return None;
             }
+            if app.view == View::Bots {
+                let markets = app.markets.snap.markets.clone();
+                if app.bots.key(key, &markets) {
+                    return None;
+                }
+            }
             if app.view == View::Markets {
                 if app.markets.ticket.is_some() {
                     if key.code == KeyCode::Char('q')
@@ -207,6 +224,7 @@ pub fn handle(app: &mut App, event: Event) -> Option<Action> {
             match key.code {
                 KeyCode::Char('q') | KeyCode::Esc => return Some(Action::Quit),
                 KeyCode::Char('m') => return Some(Action::View(View::Markets)),
+                KeyCode::Char('o') => return Some(Action::View(View::Bots)),
                 KeyCode::Char('c') => return Some(Action::View(View::Connect)),
                 KeyCode::Char('a') => return Some(Action::View(View::Activity)),
                 KeyCode::Char('e') => return Some(Action::View(View::Evidence)),

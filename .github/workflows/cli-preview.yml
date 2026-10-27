@@ -77,6 +77,15 @@ jobs:
           export PETRI_CONFIG_PATH="$RUNNER_TEMP/petri-launch-smoke/config.json"
           target/release/petri --json config show
           node scripts/check-petri-defaults.mjs target/release/petri production
+      # Updates replace petri.exe while another petri runs from it (a second
+      # window, an agent's MCP server): only a real Windows can show that.
+      - name: Check updates replace a running petri.exe
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_ENCODED_RUSTFLAGS="--remap-path-prefix=$GITHUB_WORKSPACE=."$'\x1f'"--remap-path-prefix=$HOME=<home>"
+          cargo test --release --locked --bin petri release_update::tests -j3
       - name: Package explicit unsigned preview
         run: node scripts/package-petri-preview.mjs
       - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830

@@ -593,6 +593,16 @@ impl Fund {
         });
     }
 
+    /// Sends the reviewed write (Send, y or Enter).
+    pub fn confirm(&mut self) {
+        if let Some(t) = &mut self.ticket
+            && matches!(t.stage, Stage::Review(_))
+        {
+            t.stage = Stage::Working;
+            self.send_command(Command::Send);
+        }
+    }
+
     /// A key while the ticket is open.
     pub fn key(&mut self, key: KeyEvent) {
         let Some(mut ticket) = self.ticket.clone() else {
@@ -609,8 +619,8 @@ impl Fund {
             }
             (Stage::Working, _) => return,
             (Stage::Review(_), KeyCode::Char('y') | KeyCode::Enter) => {
-                ticket.stage = Stage::Working;
-                self.send_command(Command::Send);
+                self.confirm();
+                return;
             }
             (Stage::Edit, KeyCode::Enter) if !ticket.amount.is_empty() => {
                 ticket.stage = Stage::Working;
@@ -690,6 +700,8 @@ pub struct Drawn {
     pub finds: Vec<(Rect, String, usize)>,
     /// The ticket's box, when one is open.
     pub ticket: Option<Rect>,
+    /// Its Send, while it shows a review (render.rs draws the button).
+    pub send: Option<Rect>,
 }
 
 /// The finds and your sources, below the balance row (render.rs draws that,
@@ -838,7 +850,9 @@ pub fn content(frame: &mut Frame, f: &Fund, area: Rect) -> Drawn {
         y += 1;
     }
     if let Some(ticket) = &f.ticket {
-        drawn.ticket = Some(draw_ticket(frame, f, ticket, area));
+        let (rect, send) = draw_ticket(frame, f, ticket, area);
+        drawn.ticket = Some(rect);
+        drawn.send = send;
     }
     drawn
 }
@@ -879,7 +893,8 @@ pub(super) fn wrapped_rows(text: &str, width: usize) -> usize {
     rows
 }
 
-fn draw_ticket(frame: &mut Frame, f: &Fund, ticket: &Ticket, area: Rect) -> Rect {
+/// The ticket over `area`: its box, and its Send's place while it reviews.
+fn draw_ticket(frame: &mut Frame, f: &Fund, ticket: &Ticket, area: Rect) -> (Rect, Option<Rect>) {
     let (title, verb) = match ticket.kind {
         Kind::Deposit => ("ADD FUNDS", "Add"),
         Kind::Withdraw => ("WITHDRAW", "Withdraw"),
@@ -939,12 +954,14 @@ fn draw_ticket(frame: &mut Frame, f: &Fund, ticket: &Ticket, area: Rect) -> Rect
         }
     };
     let width = area.width.min(64);
+    // A review's Send gets a row of its own over the hint.
+    let send = u16::from(matches!(ticket.stage, Stage::Review(_)));
     // Borders, the one-cell margins and the hint row around the wrapped text.
     let rows: usize = lines
         .iter()
         .map(|l| wrapped_rows(&l.to_string(), usize::from(width.saturating_sub(4))))
         .sum();
-    let height = (rows as u16 + 3).max(5).min(area.height);
+    let height = (rows as u16 + 3 + send).max(5).min(area.height);
     let rect = Rect::new(
         area.x + (area.width - width) / 2,
         area.bottom().saturating_sub(height),
@@ -969,7 +986,7 @@ fn draw_ticket(frame: &mut Frame, f: &Fund, ticket: &Ticket, area: Rect) -> Rect
             inner.x + 1,
             inner.y,
             inner.width.saturating_sub(2),
-            inner.height.saturating_sub(1),
+            inner.height.saturating_sub(1 + send),
         ),
     );
     put(
@@ -978,5 +995,7 @@ fn draw_ticket(frame: &mut Frame, f: &Fund, ticket: &Ticket, area: Rect) -> Rect
         inner.bottom().saturating_sub(1),
         Line::styled(format!(" {hint}"), Style::default().fg(DIM)),
     );
-    rect
+    let button = (send > 0 && inner.height > 2)
+        .then(|| Rect::new(inner.x + 1, inner.bottom() - 2, 6, 1).intersection(inner));
+    (rect, button)
 }

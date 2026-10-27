@@ -820,6 +820,18 @@ pub struct ClosePlan {
 /// Prices closing `owner`'s positions (`petri close` and the TUI's close
 /// ticket). Refuses when none of them can close now.
 pub fn prepare_close(ctx: &Ctx, p: Paint, owner: &Pubkey, a: &CloseArgs) -> Result<ClosePlan> {
+    prepare_close_where(ctx, p, owner, a, |_, _| true)
+}
+
+/// As [`prepare_close`], of the positions `a` names that `keep` keeps (a
+/// bot's `close` with a range or side).
+pub fn prepare_close_where(
+    ctx: &Ctx,
+    p: Paint,
+    owner: &Pubkey,
+    a: &CloseArgs,
+    keep: impl Fn(&Grid, &api::ClaimView) -> bool,
+) -> Result<ClosePlan> {
     let m = resolve(ctx, &a.market.market, a.market.expiry.as_deref())?;
     let grid = Grid::of_view(&m)?;
     let bps = parse_percent_bps(&a.slippage).map_err(Error::msg)?;
@@ -844,6 +856,7 @@ pub fn prepare_close(ctx: &Ctx, p: Paint, owner: &Pubkey, a: &CloseArgs) -> Resu
             mine.claims.clone()
         }
     };
+    let claims: Vec<api::ClaimView> = claims.into_iter().filter(|c| keep(&grid, c)).collect();
     if claims.is_empty() {
         bail(format!("you have no positions in {}", m.label))?;
     }

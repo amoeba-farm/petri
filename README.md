@@ -6,13 +6,13 @@ source dependencies they build against. Start with [Petri's guide](cli/README.md
 or [the SDK](sdk/README.md).
 
 The source is mirrored from Amoeba monorepo commit
-`454426daa6e6fa64e46803f0db721f3794408e85` (release `2026-10-22-nandx-chips`);
-its CLI version is `0.1.17` and its SDK version `0.4.0`. Unsigned v0.1.17 preview
+`a4f54e59ef90ec5348a18fb5c12826c4bb3ad816` (release `2026-10-27-petri-deepseek`);
+its CLI version is `0.1.18` and its SDK version `0.4.0`. Unsigned v0.1.18 preview
 packages for Windows and macOS are built from this commit by the Preview binaries
 workflow and published on this repository's Releases page. The v0.1.9 and earlier previews contain older code
 for a retired deployment.
 
-Build from `cli/` with Rust 1.93.1: `cargo build --release --locked`.
+Build from `cli/` with Rust 1.95.0: `cargo build --release --locked`.
 The `sdk/`, `futures/`, `oracle/`, and `governance/` directories preserve upstream
 Cargo path dependencies; `api/API.md` is the futures API's HTTP contract. No private deployment files, keys or environment files
 are included. See [source provenance](PUBLIC_SOURCE_PROVENANCE.json).

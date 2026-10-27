@@ -37,7 +37,7 @@ pub fn oracle_candidate(content_hash: &str) -> String {
     )
 }
 
-fn percent_encode(value: &str) -> String {
+pub(crate) fn percent_encode(value: &str) -> String {
     let mut output = String::with_capacity(value.len());
     for byte in value.as_bytes() {
         match *byte {

@@ -5,6 +5,8 @@ use serde_json::Value;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum View {
     Markets,
+    /// Trading bots you build and run (bots.rs).
+    Bots,
     Connect,
     Activity,
     Evidence,
@@ -13,8 +15,9 @@ pub enum View {
     Fund,
 }
 impl View {
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 7] = [
         Self::Markets,
+        Self::Bots,
         Self::Connect,
         Self::Activity,
         Self::Evidence,
@@ -25,6 +28,7 @@ impl View {
     pub fn short_label(self) -> &'static str {
         match self {
             Self::Markets => "Mkt",
+            Self::Bots => "Bots",
             Self::Connect => "Conn",
             Self::Activity => "Act",
             Self::Evidence => "Evid",
@@ -35,6 +39,7 @@ impl View {
     pub fn label(self) -> &'static str {
         match self {
             Self::Markets => "Markets",
+            Self::Bots => "Bots",
             Self::Connect => "Connect",
             Self::Activity => "Research",
             Self::Evidence => "Evidence",
@@ -157,6 +162,17 @@ pub enum Action {
     Market(usize),
     /// Closes the Markets view's ticket, as Esc does (a click outside it).
     CloseTicket,
+    /// A bot in the Bots view's list, by its place there (after the last:
+    /// a new bot).
+    Bot(usize),
+    /// Start (after a yes) or stop the shown bot.
+    BotToggle,
+    /// The answer to starting it.
+    BotAnswer(bool),
+    /// Edit the shown bot's weight, by its place in the list.
+    BotWeight(usize),
+    /// A new bot on this open market (`bots::open`).
+    NewBot(usize),
     /// A find in the Fund view's list, by its place there.
     ShowFind(usize),
     /// The Evidence view's own proofs: open a pop-up (proofs.rs).
@@ -173,6 +189,8 @@ pub enum Action {
     FundTicket(crate::research::fund::Kind),
     /// Closes the Fund view's ticket (a click outside it).
     CloseFundTicket,
+    /// Sends the Fund ticket's reviewed write (its Send, as y or Enter).
+    FundSend,
     /// Sponsor the find with this content hash (from its pop-up).
     Sponsor(String),
     Agent(String),
@@ -279,10 +297,11 @@ pub struct App {
     /// While a frame draws: whether the controls now registered are the open
     /// modal's (render::modal_view), the only ones the pointer highlights then.
     pub drawing_modal: bool,
-    pub node_path: String,
-    pub cli_path: String,
+    /// How an agent's shell runs this petri (runtime::petri_command).
+    pub petri: String,
     pub base_url: String,
     pub markets: crate::research::markets::Markets,
+    pub bots: crate::research::bots::Bots,
     pub fund: crate::research::fund::Fund,
     /// Your own web proofs in the Evidence view (proofs.rs).
     pub proofs: crate::research::proofs::Proofs,
@@ -298,7 +317,7 @@ impl App {
         "Kimi Code",
         "Gemini CLI",
     ];
-    pub fn new(node_path: String, cli_path: String, base_url: String) -> Self {
+    pub fn new(petri: String, base_url: String) -> Self {
         Self {
             view: View::Markets,
             snapshot: Snapshot::default(),
@@ -327,10 +346,10 @@ impl App {
             refresh: true,
             pointer: None,
             drawing_modal: false,
-            node_path,
-            cli_path,
+            petri,
             base_url,
             markets: Default::default(),
+            bots: Default::default(),
             fund: Default::default(),
             proofs: Default::default(),
             rewards: Default::default(),
@@ -430,9 +449,15 @@ impl App {
                 Action::View(_)
                     | Action::Market(_)
                     | Action::CloseTicket
+                    | Action::Bot(_)
+                    | Action::BotToggle
+                    | Action::BotAnswer(_)
+                    | Action::BotWeight(_)
+                    | Action::NewBot(_)
                     | Action::ShowFind(_)
                     | Action::FundTicket(_)
                     | Action::CloseFundTicket
+                    | Action::FundSend
                     | Action::ProofTicket(_)
                     | Action::ShowProof(_)
                     | Action::ProofScroll(_)
@@ -463,6 +488,14 @@ impl App {
                 self.focus = 0;
             }
             Action::Market(index) => self.markets.show(index),
+            Action::Bot(index) => self.bots.select(index),
+            Action::BotToggle => self.bots.toggle(),
+            Action::BotAnswer(start) => self.bots.answer(start),
+            Action::BotWeight(index) => self.bots.edit(index),
+            Action::NewBot(index) => {
+                let markets = self.markets.snap.markets.clone();
+                self.bots.create(&markets, index);
+            }
             Action::CloseTicket => self.markets.ticket = None,
             Action::ShowFind(index) => {
                 self.form_focus = 0;
@@ -507,6 +540,7 @@ impl App {
                 }
             }
             Action::CloseFundTicket => self.fund.ticket = None,
+            Action::FundSend => self.fund.confirm(),
             Action::Sponsor(hash) => {
                 self.modal = None;
                 self.fund.open(crate::research::fund::Kind::Sponsor(hash));
@@ -774,18 +808,18 @@ impl App {
     pub fn activity_of(&self, id: &str) -> Option<&Activity> {
         self.snapshot.activity.iter().find(|a| a.agent_id == id)
     }
-    /// The agent's research command line with these arguments.
+    /// The agent's research command line with these arguments: this
+    /// petri's `research` commands (research/agent/).
     fn agent_command(&self, rest: Vec<String>) -> String {
-        let mut args = vec![self.cli_path.clone()];
+        let mut args = vec!["research".to_string()];
         args.extend(rest);
         #[cfg(not(windows))]
         let quote = |value: &str| format!("'{}'", value.replace('\'', "'\"'\"'"));
         #[cfg(windows)]
         let quote = |value: &str| format!("'{}'", value.replace('\'', "''"));
         format!(
-            "{}{} {}",
-            if cfg!(windows) { "& " } else { "" },
-            quote(&self.node_path),
+            "{} {}",
+            self.petri,
             args.iter().map(|s| quote(s)).collect::<Vec<_>>().join(" ")
         )
     }

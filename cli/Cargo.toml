@@ -1,6 +1,6 @@
 [package]
 name = "amoeba"
-version = "0.1.17"
+version = "0.1.18"
 edition = "2024"
 description = "Petri, the open-source Rust CLI and terminal interface for Amoeba markets"
 license = "Apache-2.0"
@@ -36,6 +36,11 @@ ameba_oracle = { path = "../oracle/programs/ameba_oracle", features = ["no-entry
 amoeba-evidence = { path = "../evidence/crates/evidence" }
 amoeba-webproof = { path = "../evidence/crates/webproof" }
 hex = "0.4"
+# The research workspace service (src/research/service/): its SQLite file,
+# kept as the Node service wrote it (`workspace.sqlite`, WAL), and the
+# AES-256-GCM sealing of its stored credentials (already in the lock).
+rusqlite = { version = "0.41", features = ["bundled"] }
+aes-gcm = "0.9"
 tokio = { version = "1", features = ["rt-multi-thread", "net", "time"] }
 # The commodity buckets of the chip months (RAMX and NANDX expiring after
 # 2026-11-01), their comparison series and observations, and the routing of
@@ -43,6 +48,11 @@ tokio = { version = "1", features = ["rt-multi-thread", "net", "time"] }
 # by path, as the API uses it).
 ameba-commodity-spec = { path = "../oracle/crates/commodity-spec" }
 ratatui = "0.29.0"
+# Bots' strategy scripts (`strategy/script`, src/bots/script.rs): Rhai on
+# its raw engine with only pure packages. `sync` makes the engine Send, as
+# the compose runtime's components must be.
+# no_closure: a script can make no shared values, which the size limits refuse.
+rhai = { version = "1.27.0", features = ["sync", "no_closure"] }
 reqwest = { version = "0.12.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
@@ -86,7 +96,6 @@ windows-sys = { version = "0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_F
 solana-ed25519-program = "2.2.3"
 
 [build-dependencies]
-sha2 = "=0.10.9"
 winresource = "0.1.31"
 
 [patch.crates-io]

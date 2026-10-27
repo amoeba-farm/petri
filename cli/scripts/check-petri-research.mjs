@@ -1,7 +1,7 @@
 // Offline binary smoke: disposable workspace, loopback oracle, no installer,
 // wallet, external API, submission, or user-owned configuration.
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
+import { execFile, spawnSync } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdtempSync, readFileSync, rmSync, existsSync } from 'node:fs';
 import http from 'node:http';
@@ -28,7 +28,7 @@ await new Promise(resolve => reservation.close(resolve));
 const env = { ...process.env, PETRI_CONFIG_PATH: path.join(root, 'config', 'petri.toml'),
   PETRI_RESEARCH_HOME: path.join(root, 'state'), PETRI_RESEARCH_UPSTREAM: address,
   PETRI_RESEARCH_ORACLE_URL: address, PETRI_RESEARCH_PORT: String(port),
-  PETRI_RESEARCH_NODE: process.execPath, PETRI_UPDATE_CHECK: '0',
+  PETRI_UPDATE_CHECK: '0',
   PETRI_API_URL: address, NODE_OPTIONS: '', NODE_PATH: '' };
 const run = async args => {
   console.log(`Checking petri ${args.join(' ')}`);
@@ -50,14 +50,18 @@ try {
   assert.equal(snapshot.ok, true);
   assert.deepEqual(snapshot.data.agents, []);
   assert(!JSON.stringify(snapshot).includes('ownerToken'));
-  const runtime = path.join(root, 'config', 'research-runtime');
-  const current = JSON.parse(readFileSync(path.join(runtime, 'current.json'), 'utf8'));
-  assert.match(current.bundleId, /^[a-f0-9]{64}$/);
-  const agent = await execute(process.execPath, [path.join(runtime, 'agent.mjs'), '--help'],
-    { env, windowsHide: true, timeout: 10000 });
-  assert.match(agent.stdout, /research work submit/);
+  // An agent's commands and MCP server are petri's own.
+  const status = await execute(binary, ['research', 'agent', 'status', '--name', 'smoke'], { env, windowsHide: true, timeout: 10000 })
+    .then(() => null, error => error);
+  assert(status, 'an agent without a login is refused');
+  assert.equal(JSON.parse(status.stderr).error.code, 'LOGIN_REQUIRED');
+  const mcp = spawnSync(binary, ['research', 'mcp', '--agent', 'smoke'], { env, windowsHide: true, timeout: 10000,
+    input: `${JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18' } })}\n${JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' })}\n` });
+  const [initialized, listed] = mcp.stdout.toString().trim().split('\n').map(line => JSON.parse(line));
+  assert.equal(initialized.result.serverInfo.name, 'petri-research');
+  assert.equal(listed.result.tools.length, 11);
   assert(requests.every(request => ['GET /v1/oracle/catalog', 'GET /v1/oracle/public-snapshot'].includes(request)));
-  console.log('Petri research binary smoke passed: CLI retained, oracle views rendered, private bootstrap and stable agent launcher work.');
+  console.log('Petri research binary smoke passed: CLI retained, oracle views rendered, the workspace service, agent commands and their MCP server work.');
 } finally {
   const ownerFile = path.join(root, 'state', 'owner.json');
   if (existsSync(ownerFile)) {

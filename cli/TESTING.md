@@ -9,7 +9,6 @@ cargo check --locked --bin petri
 cargo test --locked
 node scripts/check-petri-launcher.mjs
 node scripts/check-petri-packaging.mjs
-node scripts/check-petri-mcp-server.mjs
 ```
 
 ## Native Windows ConPTY TUI Harness

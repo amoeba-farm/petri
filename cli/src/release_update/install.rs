@@ -286,6 +286,9 @@ pub(super) fn stage_and_launch(release: &Release, restart: bool) -> Result<()> {
         platform::create_private_directory(&storage)?;
     }
     platform::owned_directory(&storage)?;
+    if release.platform == Platform::WindowsX64 {
+        tidy_retired(&root);
+    }
     let name = format!(".petri-update-{}", nonce()?);
     let stage = storage.join(&name);
     // Exclusive update ownership; never remove somebody else's pending lock.
@@ -430,6 +433,63 @@ fn target_hash(root: &Path, name: &str) -> Result<Option<String>> {
     }
 }
 
+/// What an application file moved aside by `replace` is named: this, then
+/// 32 hex digits.
+const RETIRED: &str = ".petri-retired-";
+
+fn retired_name(value: &str) -> bool {
+    value.strip_prefix(RETIRED).is_some_and(|s| {
+        s.len() == 32
+            && s.bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    })
+}
+
+/// Puts `source` in place of `target`, both in one installation. Windows
+/// refuses to replace a running program's executable, but it lets one be
+/// renamed: so there, when the plain rename fails (another petri runs from
+/// `target`: a second window, an agent's MCP server or research command),
+/// the installed file moves aside to a retired name in its own directory,
+/// on the same volume, and `source` takes its place. A petri still running
+/// from it keeps the old version until it exits; `tidy_retired` deletes it
+/// after that. Only that fallback leaves `target` briefly missing, between
+/// two renames.
+fn replace(source: &Path, target: &Path) -> std::io::Result<()> {
+    match fs::rename(source, target) {
+        Err(_) if cfg!(windows) && fs::symlink_metadata(target).is_ok() => {
+            move_aside_and_replace(source, target)
+        }
+        result => result,
+    }
+}
+
+fn move_aside_and_replace(source: &Path, target: &Path) -> std::io::Result<()> {
+    let name = nonce().map_err(std::io::Error::other)?;
+    let aside = target.with_file_name(format!("{RETIRED}{name}"));
+    fs::rename(target, &aside)?;
+    if let Err(error) = fs::rename(source, target) {
+        let _ = fs::rename(&aside, target);
+        return Err(error);
+    }
+    Ok(())
+}
+
+/// Deletes the files `replace` moved aside in `directory` that nothing runs
+/// from any more. Windows refuses to delete one still running, which then
+/// stays for a later update.
+fn tidy_retired(directory: &Path) {
+    let Ok(entries) = fs::read_dir(directory) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        if entry.file_name().to_str().is_some_and(retired_name)
+            && entry.file_type().is_ok_and(|kind| kind.is_file())
+        {
+            let _ = fs::remove_file(entry.path());
+        }
+    }
+}
+
 fn rollback(stage: &Path, root: &Path, plan: &Plan) -> Result<()> {
     // Validate all targets first. Never overwrite a user's concurrent file change.
     for (name, new) in &plan.files {
@@ -454,7 +514,7 @@ fn rollback(stage: &Path, root: &Path, plan: &Plan) -> Result<()> {
             }
             let replacement = restore.join(name);
             copy_durable(&source, &replacement)?;
-            fs::rename(&replacement, &target).map_err(|_| "Could not restore an application file. Close other Petri windows and run petri update recover.")?;
+            replace(&replacement, &target).map_err(|_| "Could not restore an application file. Close other Petri windows and run petri update recover.")?;
         } else {
             fs::remove_file(&target)
                 .map_err(|_| "Could not remove a file added by the interrupted update.")?;
@@ -495,8 +555,9 @@ fn install_files(
             fs::create_dir_all(target.parent().ok_or("Invalid application path.")?)
                 .map_err(|_| "Could not create an application directory.")?;
             // Backup copies already exist. Same-volume rename replaces each file
-            // atomically, so a crash never leaves the executable missing.
-            fs::rename(package.join(name), &target).map_err(
+            // atomically, so a crash never leaves the executable missing
+            // (while another petri runs from it on Windows, see `replace`).
+            replace(&package.join(name), &target).map_err(
                 |_| "An application file is locked. Close other Petri windows before retrying.",
             )?;
         }
@@ -579,6 +640,9 @@ pub(super) fn run_helper(recovering: bool) -> Result<()> {
                     }
                 }
             }
+            if plan.platform == Platform::WindowsX64 {
+                tidy_retired(&root);
+            }
             release_lock(storage, name)?;
             if plan.restart {
                 platform::restart(&root, plan.platform)?;
@@ -637,6 +701,21 @@ pub(super) fn launch_recovery(platform: Platform, restart: bool) -> Result<()> {
     }
     save_plan(&stage, &plan)?;
     launch(&stage, &plan, true)
+}
+
+#[cfg(test)]
+pub(super) fn test_move_aside(source: &Path, target: &Path) -> std::io::Result<()> {
+    move_aside_and_replace(source, target)
+}
+
+#[cfg(all(test, windows))]
+pub(super) fn test_replace(source: &Path, target: &Path) -> std::io::Result<()> {
+    replace(source, target)
+}
+
+#[cfg(test)]
+pub(super) fn test_tidy_retired(directory: &Path) {
+    tidy_retired(directory)
 }
 
 #[cfg(test)]

@@ -1497,53 +1497,6 @@ fn sync_config_parent(_directory: &File) -> Result<(), String> {
     Ok(())
 }
 
-/// Locks are stable files, never renamed or removed while another process may
-/// hold them. Kernel locking is released automatically after a process crash.
-pub(crate) fn open_private_lock_file(path: &Path) -> Result<File, String> {
-    let path = normalize_config_write_path(path)?;
-    let parent = path
-        .parent()
-        .ok_or_else(|| "Lock path has no parent".to_string())?;
-    let _directory = open_or_create_config_parent(parent)?;
-    let mut options = fs::OpenOptions::new();
-    options.read(true).write(true).create(true).truncate(false);
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        options.mode(0o600).custom_flags(libc::O_NOFOLLOW);
-    }
-    #[cfg(windows)]
-    {
-        use std::os::windows::fs::OpenOptionsExt;
-        use windows_sys::Win32::Storage::FileSystem::{
-            FILE_FLAG_OPEN_REPARSE_POINT, FILE_GENERIC_READ, FILE_GENERIC_WRITE, READ_CONTROL,
-            WRITE_DAC,
-        };
-        // Setting the private ACL through this handle requires WRITE_DAC.
-        options
-            .access_mode(FILE_GENERIC_READ | FILE_GENERIC_WRITE | READ_CONTROL | WRITE_DAC)
-            .custom_flags(FILE_FLAG_OPEN_REPARSE_POINT);
-    }
-    let file = options
-        .open(&path)
-        .map_err(|_| "Could not open operation lock".to_string())?;
-    let metadata = file
-        .metadata()
-        .map_err(|_| "Could not inspect operation lock".to_string())?;
-    if !metadata.is_file() || metadata.file_type().is_symlink() {
-        return Err("Operation lock is not a regular file".into());
-    }
-    #[cfg(windows)]
-    {
-        use std::os::windows::fs::MetadataExt;
-        if metadata.file_attributes() & 0x400 != 0 {
-            return Err("Operation lock is a reparse point".into());
-        }
-    }
-    set_private_file_permissions(&file)?;
-    Ok(file)
-}
-
 /// Creates `path` and any missing parents for the owner alone (0700 on Unix),
 /// as `write_private_file` makes the folders it needs. A folder made with the
 /// umask's mode (`fs::create_dir_all`) is later refused as the non-private,
@@ -1628,28 +1581,6 @@ mod tests {
             "petri-private-config-{name}-{}-{nonce}",
             std::process::id()
         ))
-    }
-
-    #[test]
-    fn private_operation_lock_can_be_reopened_and_keeps_exclusive_locking() {
-        let directory = temp_directory("operation-lock");
-        create_private_fixture_directory(&directory);
-        let path = directory.join("operation.lock");
-        let first = open_private_lock_file(&path).expect("open private lock with ACL access");
-        first.try_lock().expect("first owner holds the kernel lock");
-        let second = open_private_lock_file(&path).expect("reopen the stable private lock");
-        assert!(second.try_lock().is_err());
-        drop(first);
-        second
-            .try_lock()
-            .expect("lock is released when the original handle closes");
-        drop(second);
-        let resolved = directory.canonicalize().unwrap();
-        assert_eq!(
-            resolved.parent().unwrap(),
-            env::temp_dir().canonicalize().unwrap()
-        );
-        fs::remove_dir_all(&resolved).unwrap();
     }
 
     /// The wallet terms cache and MCP setup make folders in Petri's own

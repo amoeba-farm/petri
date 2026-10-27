@@ -1,3 +1,5 @@
+mod agent;
+pub mod bots;
 pub mod fund;
 mod http;
 mod input;
@@ -11,9 +13,11 @@ mod render;
 mod research_page;
 pub mod rewards;
 mod runtime;
+mod service;
 #[cfg(test)]
 mod tests;
 mod updates;
+mod workspace;
 
 use crossterm::{
     event::{
@@ -89,20 +93,22 @@ fn clipboard(value: &str) -> Result<(), String> {
     }
     Ok(())
 }
-/// `petri research ...` against the futures API at `api` (candidates and
-/// oracle reads go where Petri's markets come from).
+/// `petri research ...`: an agent's commands (agent/), or the workspace
+/// service's and its owner's (service/), against the futures API at `api`
+/// (candidates and oracle reads go where Petri's markets come from).
 pub fn command(args: &[String], api: &str) -> Result<(), crate::backend::CliError> {
-    runtime::Runtime::load(api)
-        .map_err(crate::backend::CliError::new)?
-        .command(args)
+    let done = agent::run(args).unwrap_or_else(|| service::run(args, api));
+    // A failed one wrote its JSON error to stderr, the one line agents read.
+    if !done {
+        std::process::exit(1);
+    }
+    Ok(())
 }
 
-fn research_session(api: &str) -> Result<(http::Api, String, String, String), String> {
-    let runtime = runtime::Runtime::load(api)?;
-    let connection = runtime.connect()?;
-    let api = http::Api::new(connection.base_url.clone(), connection.owner_token)?;
-    let (node, entry) = runtime.agent_command();
-    Ok((api, node, entry, connection.base_url))
+fn research_session(api: &str) -> Result<(http::Api, String), String> {
+    let (base_url, owner_token) = service::connect(api)?;
+    let api = http::Api::new(base_url.clone(), owner_token)?;
+    Ok((api, base_url))
 }
 
 fn parse_view(view: &str) -> Result<View, String> {
@@ -110,7 +116,9 @@ fn parse_view(view: &str) -> Result<View, String> {
         .into_iter()
         .find(|v| v.label().eq_ignore_ascii_case(view))
         .ok_or_else(|| {
-            format!("Unknown view {view}; use markets, connect, activity, evidence or rewards.")
+            format!(
+                "Unknown view {view}; use markets, bots, connect, activity, evidence or rewards."
+            )
         })
 }
 
@@ -172,14 +180,15 @@ pub fn run(
     // Markets and Fund render without the research workspace. The TUI
     // itself opens at once and connects to the workspace in the background
     // (below): starting it can take seconds.
-    let markets_render = render_size.is_some() && matches!(view, Some(View::Markets | View::Fund));
+    let markets_render =
+        render_size.is_some() && matches!(view, Some(View::Markets | View::Bots | View::Fund));
     let (api, mut app) = if markets_render || render_size.is_none() {
-        (None, App::new(String::new(), String::new(), String::new()))
+        (None, App::new(runtime::petri_command(), String::new()))
     } else {
         match research_session(&futures.api_url.0) {
-            Ok((api, node, entry, base_url)) => (Some(api), App::new(node, entry, base_url)),
+            Ok((api, base_url)) => (Some(api), App::new(runtime::petri_command(), base_url)),
             Err(error) => {
-                let mut app = App::new(String::new(), String::new(), String::new());
+                let mut app = App::new(runtime::petri_command(), String::new());
                 app.research_error = Some(error);
                 (None, app)
             }
@@ -197,6 +206,11 @@ pub fn run(
             let ctx = crate::futures::ctx::Ctx::new(futures);
             app.markets.snap = markets::fetch(&ctx, None);
             app.markets.loaded = true;
+        } else if app.view == View::Bots {
+            let ctx = crate::futures::ctx::Ctx::new(futures.clone());
+            app.markets.snap = markets::fetch(&ctx, None);
+            app.markets.loaded = true;
+            app.bots.take_snapshot(futures);
         } else if app.view == View::Fund {
             let ctx = crate::futures::ctx::Ctx::new(futures);
             app.fund.take_snapshot(fund::fetch(&ctx));
@@ -224,6 +238,7 @@ pub fn run(
     app.fund.start(futures.clone());
     app.proofs.start(futures.clone());
     app.rewards.start(futures.clone());
+    app.bots.start(futures.clone());
     app.markets.start(futures);
     let (mut commands, mut replies) = (None, None);
     // Agents whose last read was asked for in the background, so switching
@@ -255,9 +270,7 @@ pub fn run(
     while !app.quit {
         if let Ok(result) = session.try_recv() {
             match result {
-                Ok((api, node, entry, base_url)) => {
-                    app.node_path = node;
-                    app.cli_path = entry;
+                Ok((api, base_url)) => {
                     app.base_url = base_url;
                     let (c, r) = http::worker(api);
                     commands = Some(c);
@@ -267,6 +280,7 @@ pub fn run(
             }
         }
         app.markets.tick(app.view == View::Markets);
+        app.bots.tick();
         app.fund.tick(app.view == View::Fund);
         app.proofs.tick(app.view == View::Evidence);
         app.rewards

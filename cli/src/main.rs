@@ -2,18 +2,19 @@
 
 mod agent_protocol;
 mod backend;
+mod bots;
 mod chain_identity;
 mod chart;
 mod cli;
+mod compose;
 mod endpoints;
 mod evidence;
 mod futures;
-mod mcp_action_bridge;
-mod mcp_actions;
 mod mcp_setup;
 mod onchain;
 mod oracle;
 mod petri_config;
+mod read_only;
 mod release_update;
 mod research;
 mod solana_config;
@@ -31,7 +32,8 @@ use backend::{CliError, json_string, string_at_key, terminal_safe_text};
 
 use clap::{CommandFactory, FromArgMatches};
 use cli::{
-    Cli, Command, ConfigCommand, ConfigKey, McpCommand, OutputFormat, UpdateCommand, WalletCommand,
+    BotsCommand, Cli, Command, ConfigCommand, ConfigKey, McpCommand, OutputFormat, UpdateCommand,
+    WalletCommand,
 };
 use futures::{reads, trade};
 use serde_json::{Value, json};
@@ -119,6 +121,11 @@ fn dispatch_cli(cli: Cli) -> Result<(), CliError> {
             if cli.resolved_output() == OutputFormat::Json {
                 research::command(&["owner".into(), "snapshot".into()], &settings.api_url.0)?;
             } else {
+                // Agents set up with petri's old local MCP server move to the
+                // hosted one; a config that doesn't parse is left as it is.
+                if render.is_none() {
+                    let _ = mcp_setup::migrate_legacy(&settings.api_url.0);
+                }
                 research::run(!no_update_check, render, view.as_deref(), *at, settings)
                     .map_err(CliError::new)?;
             }
@@ -127,6 +134,7 @@ fn dispatch_cli(cli: Cli) -> Result<(), CliError> {
             let settings = futures::settings::Settings::from_cli(&cli).map_err(CliError::new)?;
             research::command(args, &settings.api_url.0)?
         }
+        Command::Bots { command } => run_bots(&cli, command.as_ref())?,
         Command::Markets { market, expiry } => match market {
             None => emit_futures(&cli, reads::markets)?,
             Some(market) => {
@@ -218,48 +226,200 @@ fn dispatch_cli(cli: Cli) -> Result<(), CliError> {
     Ok(())
 }
 
-fn run_mcp(cli: &Cli, command: &McpCommand) -> Result<(), CliError> {
+/// `petri bots`: the TUI's Bots worker without a terminal (`research/bots.rs`).
+fn run_bots(cli: &Cli, command: Option<&BotsCommand>) -> Result<(), CliError> {
+    use research::bots;
+    let settings = futures::settings::Settings::from_cli(cli).map_err(CliError::new)?;
     match command {
-        McpCommand::Serve => mcp_action_bridge::serve(cli)?,
-        McpCommand::Actions => {
-            let payload = mcp_actions::manifest();
+        None | Some(BotsCommand::List) => {
+            let list = bots::list(settings);
+            let folder = bots::folder().map(|f| f.display().to_string()).ok();
+            let payload = json!({
+                "ok": true,
+                "command": "bots",
+                "folder": folder,
+                "bots": list.iter().map(bots::bot_json).collect::<Vec<_>>(),
+            });
+            let mut lines = vec![format!(
+                "Bots in {}",
+                folder.as_deref().unwrap_or("petri's bots folder")
+            )];
+            if list.is_empty() {
+                lines.push("None yet. petri bots new ramx writes one.".into());
+            }
+            for b in &list {
+                lines.push(format!(
+                    "  {:<24} {:<14} {}",
+                    b.id,
+                    b.label.as_deref().unwrap_or(&b.market),
+                    b.problem.as_deref().unwrap_or("ready")
+                ));
+            }
+            lines.push("Run them in petri's Bots tab (o), or with petri bots serve.".into());
+            emit_output(cli, &payload, render_terminal_lines(lines))
+        }
+        Some(BotsCommand::New { market }) => {
+            let id = bots::create(settings, market).map_err(CliError::new)?;
+            let payload = json!({ "ok": true, "command": "bots new", "id": id, "file": format!("bots/{id}.toml") });
             emit_output(
                 cli,
                 &payload,
-                serde_json::to_string_pretty(&payload).unwrap_or_default(),
-            )?;
+                format!("Wrote bots/{id}.toml. It trades only once you start it."),
+            )
         }
-        McpCommand::Invoke { action, .. } => {
-            mcp_actions::invoke_stdin(cli, action)?;
+        Some(BotsCommand::Set { bot, weight, value }) => {
+            bots::set(settings, bot, weight, value).map_err(CliError::new)?;
+            let payload = json!({ "ok": true, "command": "bots set", "bot": bot, "weight": weight, "value": value });
+            emit_output(cli, &payload, format!("{bot}: {weight} = {value}"))
         }
+        Some(BotsCommand::Serve) => bots::serve(settings).map_err(CliError::new),
+        Some(BotsCommand::Write { file }) => {
+            let text = if file == "-" {
+                let mut text = String::new();
+                std::io::Read::read_to_string(&mut std::io::stdin(), &mut text)
+                    .map_err(|e| CliError::new(format!("couldn't read the bundle: {e}")))?;
+                text
+            } else {
+                std::fs::read_to_string(file)
+                    .map_err(|e| CliError::new(format!("couldn't read {file}: {e}")))?
+            };
+            let (id, bot) = bots::write(settings, &text).map_err(CliError::new)?;
+            let payload = json!({ "ok": true, "command": "bots write", "written": id, "bot": bot });
+            emit_output(cli, &payload, format!("Saved bots/{id}.toml."))
+        }
+        Some(BotsCommand::Read { bot }) => {
+            let (view, text) = bots::read(settings, bot).map_err(CliError::new)?;
+            let payload = json!({ "ok": true, "command": "bots read", "bot": view, "text": text });
+            emit_output(cli, &payload, text)
+        }
+        Some(BotsCommand::Remove { bot }) => {
+            bots::remove(settings, bot).map_err(CliError::new)?;
+            let payload = json!({ "ok": true, "command": "bots remove", "removed": bot });
+            emit_output(
+                cli,
+                &payload,
+                format!("Deleted {bot}. Its wallet stays in bots/.wallets/{bot}.json."),
+            )
+        }
+        Some(BotsCommand::Publish { bot, github }) => {
+            let published =
+                bots::publish(settings, bot, github.as_deref()).map_err(CliError::new)?;
+            let plain = format!(
+                "Published {} (version {}).",
+                published["id"].as_str().unwrap_or(bot),
+                published["version"]
+            );
+            let payload = json!({ "ok": true, "command": "bots publish", "published": published });
+            emit_output(cli, &payload, plain)
+        }
+        Some(BotsCommand::Discover { market, sort, days }) => {
+            let v = bots::discover(settings, market.as_deref(), sort.as_deref(), *days)
+                .map_err(CliError::new)?;
+            let plain = render_terminal_lines(bot_lines(&v["bots"], false));
+            emit_output(cli, &v, plain)
+        }
+        Some(BotsCommand::Show { id }) => {
+            let v = bots::show(settings, id).map_err(CliError::new)?;
+            let mut lines = bot_lines(&json!([v.clone()]), false);
+            lines.push(String::new());
+            lines.extend(v["text"].as_str().unwrap_or("").lines().map(str::to_string));
+            emit_output(cli, &v, render_terminal_lines(lines))
+        }
+        Some(BotsCommand::Install { id, market }) => {
+            let (new, bot) =
+                bots::install(settings, id, market.as_deref()).map_err(CliError::new)?;
+            let payload =
+                json!({ "ok": true, "command": "bots install", "installed": new, "bot": bot });
+            emit_output(
+                cli,
+                &payload,
+                format!("Installed {id} as bots/{new}.toml. It trades only once you start it."),
+            )
+        }
+        Some(BotsCommand::Leaderboard { days }) => {
+            let v = bots::leaderboard(settings, *days).map_err(CliError::new)?;
+            let plain = render_terminal_lines(bot_lines(&v["bots"], true));
+            emit_output(cli, &v, plain)
+        }
+    }
+}
+
+/// Published bots: rank (on the board), name, id, market, runs and P&L,
+/// then the bot's thesis.
+fn bot_lines(bots: &Value, ranked: bool) -> Vec<String> {
+    let list = bots.as_array().cloned().unwrap_or_default();
+    if list.is_empty() {
+        return vec!["No bots yet.".into()];
+    }
+    let mut lines = Vec::new();
+    for b in &list {
+        let text = |key: &str| b[key].as_str().unwrap_or("").to_string();
+        let pnl = futures::atoms(&text("pnlAtoms"));
+        lines.push(format!(
+            "{}{} ({}) · {} · {} runs · {}{}",
+            if ranked {
+                format!("{:>3}. ", b["rank"].as_u64().unwrap_or(0))
+            } else {
+                String::new()
+            },
+            text("name"),
+            text("id"),
+            text("label"),
+            b["runs"].as_u64().unwrap_or(0),
+            futures::signed_money(pnl),
+            if b["verified"].as_bool() == Some(true) {
+                " · verified"
+            } else {
+                ""
+            }
+        ));
+        if let Some(about) = b["about"].as_str().filter(|a| !a.is_empty()) {
+            lines.push(format!("     {about}"));
+        }
+    }
+    lines
+}
+
+fn run_mcp(cli: &Cli, command: &McpCommand) -> Result<(), CliError> {
+    // The hosted MCP server is the futures API's this petri uses (`--api`).
+    let settings = futures::settings::Settings::from_cli(cli).map_err(CliError::new)?;
+    let api = settings.api_url.0.as_str();
+    let server = mcp_setup::server_url(api);
+    match command {
         McpCommand::Status => {
-            let status = mcp_setup::status().map_err(|error| {
+            let status = mcp_setup::status(api).map_err(|error| {
                 CliError::new(format!("could not read Petri MCP status: {error}"))
             })?;
-            let payload = mcp_setup_payload("status", &status, false);
-            emit_output(cli, &payload, render_mcp_setup_status(&status, None))?;
+            let payload = mcp_setup_payload("status", &server, &status, false);
+            emit_output(
+                cli,
+                &payload,
+                render_mcp_setup_status(&server, &status, None),
+            )?;
         }
         McpCommand::Enable => {
-            let status = mcp_setup::enable()
+            let status = mcp_setup::enable(api)
                 .map_err(|error| CliError::new(format!("could not enable Petri MCP: {error}")))?;
-            let payload = mcp_setup_payload("enable", &status, true);
+            let payload = mcp_setup_payload("enable", &server, &status, true);
             emit_output(
                 cli,
                 &payload,
                 render_mcp_setup_status(
+                    &server,
                     &status,
                     Some("Petri MCP enabled. Restart or reload an AI agent that is already open."),
                 ),
             )?;
         }
         McpCommand::Repair => {
-            let repair = mcp_setup::repair().map_err(|error| {
+            let repair = mcp_setup::repair(api).map_err(|error| {
                 CliError::new(format!(
                     "could not repair the Petri agent connection: {error}\n\nNo disconnect was attempted. If repair still cannot complete, disable only Petri's managed connection, then connect it again."
                 ))
             })?;
             let mut payload = mcp_setup_payload(
                 "repair",
+                &server,
                 &repair.status,
                 repair.outcome == mcp_setup::McpRepairOutcome::Repaired,
             );
@@ -277,24 +437,25 @@ fn run_mcp(cli: &Cli, command: &McpCommand) -> Result<(), CliError> {
             emit_output(
                 cli,
                 &payload,
-                render_mcp_setup_status(&repair.status, Some(result_message)),
+                render_mcp_setup_status(&server, &repair.status, Some(result_message)),
             )?;
         }
         McpCommand::Disable => {
-            let status = mcp_setup::disable()
+            let status = mcp_setup::disable(api)
                 .map_err(|error| CliError::new(format!("could not disable Petri MCP: {error}")))?;
-            let payload = mcp_setup_payload("disable", &status, true);
+            let payload = mcp_setup_payload("disable", &server, &status, true);
             emit_output(
                 cli,
                 &payload,
                 render_mcp_setup_status(
+                    &server,
                     &status,
                     Some("Petri MCP disabled. Restart or reload an AI agent that is already open."),
                 ),
             )?;
         }
         McpCommand::Manifest => {
-            let payload = agent_protocol::mcp_manifest();
+            let payload = agent_protocol::mcp_manifest(&server);
             emit_output(cli, &payload, agent_protocol::render_mcp_manifest(&payload))?;
         }
     }
@@ -430,17 +591,17 @@ fn run_release_update(
 
 fn mcp_setup_payload(
     action: &str,
+    url: &str,
     status: &mcp_setup::McpSetupStatus,
     restart_required: bool,
 ) -> Value {
     json!({
         "ok": true,
         "action": action,
+        "server": url,
         "codex": status.codex.as_str(),
         "claude_code": status.claude.as_str(),
-        "runtime_ready": status.runtime_ready,
-        "transaction_execution": "not_available",
-        "signing_boundary": "Petri MCP is read-only; trades and oracle writes sign with the local wallet in a terminal.",
+        "signing_boundary": "The hosted server prepares transactions for the owner's wallet and never signs; the wallet that owns them signs.",
         "fully_enabled": status.is_fully_enabled(),
         "partially_enabled": status.is_partially_enabled(),
         "needs_repair": status.needs_repair(),
@@ -450,6 +611,7 @@ fn mcp_setup_payload(
 }
 
 fn render_mcp_setup_status(
+    url: &str,
     status: &mcp_setup::McpSetupStatus,
     result_message: Option<&str>,
 ) -> String {
@@ -459,17 +621,10 @@ fn render_mcp_setup_status(
         lines.push(String::new());
     }
     lines.push("Petri MCP connection".to_string());
-    lines.push(format!("  Codex:      {}", status.codex.as_str()));
+    lines.push(format!("  Server:      {url}"));
+    lines.push(format!("  Codex:       {}", status.codex.as_str()));
     lines.push(format!("  Claude Code: {}", status.claude.as_str()));
-    lines.push(format!(
-        "  Runtime:    {}",
-        if status.runtime_ready {
-            "ready"
-        } else {
-            "not ready"
-        }
-    ));
-    lines.push("  Transactions: not available through Petri MCP".to_string());
+    lines.push("  Signing:     the owner's own wallet; the server never signs".to_string());
     if status.has_conflict() {
         lines.push("An existing unowned Petri MCP entry was left unchanged.".to_string());
     } else if status.needs_repair() {
@@ -745,6 +900,14 @@ const HELP_SHEET: &[(&str, &[(&str, &str)])] = &[
             (
                 "history [owner]",
                 "Trades, orders, deposits and settlements",
+            ),
+            (
+                "bots [write|read|serve|...]",
+                "Your trading bots: make, run, publish and install them",
+            ),
+            (
+                "bots leaderboard",
+                "Published bots ranked by their real P&L",
             ),
         ],
     ),
@@ -1114,21 +1277,9 @@ fn render_config_show(payload: &Value) -> String {
 }
 
 fn emit_output(cli: &Cli, payload: &Value, plain: String) -> Result<(), CliError> {
-    if mcp_actions::capture_output(payload) {
-        return Ok(());
-    }
     match cli.resolved_output() {
         OutputFormat::Plain => println!("{plain}"),
-        OutputFormat::Json => {
-            let public;
-            let payload = if mcp_actions::active() {
-                public = mcp_actions::public_output(payload);
-                &public
-            } else {
-                payload
-            };
-            println!("{}", json_string(payload)?);
-        }
+        OutputFormat::Json => println!("{}", json_string(payload)?),
     }
     Ok(())
 }

@@ -81,6 +81,9 @@ pub struct Ticket {
     pub focus: usize,
     pub stage: Stage,
     pub choice: usize,
+    /// The pop-up's first text row shown: a long preview scrolls (the wheel,
+    /// ↑/↓) under its buttons, which stay on their own row.
+    pub scroll: u16,
 }
 
 enum Command {
@@ -200,6 +203,14 @@ fn show(ctx: &Ctx, digest: &str) -> Stage {
     result.unwrap_or_else(|e| Stage::Failed(plain(&e.message)))
 }
 
+/// A notary's session time, unix seconds as the envelope gives it, as a UTC
+/// date ("2026-10-22 17:13 UTC"), as the proof's preview shows it.
+pub(super) fn seen(unix: &str) -> String {
+    unix.parse::<i64>()
+        .map(crate::futures::view::utc)
+        .unwrap_or_else(|_| unix.to_string())
+}
+
 /// The candidate a proof becomes for `slot`: everything but the slot comes
 /// from what the proof shows.
 fn candidate(
@@ -257,7 +268,7 @@ fn candidate(
         currency,
         product,
         env.origin.locator,
-        env.times.witnessed_at.value,
+        seen(&env.times.witnessed_at.value),
         env.authentication.notary
     );
     let mut m = serde_json::Map::new();
@@ -344,28 +355,31 @@ fn update_review(ctx: &Ctx, digest: &str, slot: Slot) -> Stage {
             .envelope
             .ok_or_else(|| crate::futures::error::Error::msg("this proof does not verify here"))?;
         let stake = slot.update.as_ref().map(|u| u.stake).unwrap_or(0);
-        Ok::<_, crate::futures::error::Error>(vec![
-            format!(
-                "New value: {} (the proven price)",
-                env.observation.price.text
-            ),
-            format!(
-                "Seen: {} (the notary's session time)",
-                env.times.witnessed_at.value
-            ),
-            format!(
-                "Stake: {} USDC from your oracle collateral",
-                crate::futures::units::usdc(stake)
-            ),
-            "Petri commits it sealed, reveals it, and publishes the proof so anyone can check it."
-                .into(),
-            "Anyone can challenge it for a day; unchallenged, it counts.".into(),
-        ])
+        Ok::<_, crate::futures::error::Error>(update_lines(
+            &env.observation.price.text,
+            &env.times.witnessed_at.value,
+            stake,
+        ))
     })();
     match result {
         Ok(lines) => Stage::Review(digest.to_string(), slot, lines),
         Err(e) => Stage::Failed(plain(&e.message)),
     }
+}
+
+/// An update's review: the proven price, when the notary saw it, the stake.
+pub(super) fn update_lines(price: &str, witnessed_at: &str, stake: u64) -> Vec<String> {
+    vec![
+        format!("New value: {price} (the proven price)"),
+        format!("Seen: {} (the notary's session time)", seen(witnessed_at)),
+        format!(
+            "Stake: {} USDC from your oracle collateral",
+            crate::futures::units::usdc(stake)
+        ),
+        "Petri commits it sealed, reveals it, and publishes the proof so anyone can check it."
+            .into(),
+        "Anyone can challenge it for a day; unchallenged, it counts.".into(),
+    ]
 }
 
 /// Commit, then reveal (the program takes a reveal one slot after the
@@ -600,6 +614,7 @@ impl Proofs {
                     if let Some(t) = &mut self.ticket {
                         t.stage = stage;
                         t.choice = 0;
+                        t.scroll = 0;
                     }
                     self.last_refresh = None;
                 }
@@ -633,6 +648,7 @@ impl Proofs {
             focus: 0,
             stage,
             choice: 0,
+            scroll: 0,
         });
     }
 
@@ -670,6 +686,7 @@ impl Proofs {
             Stage::Choose(digest.clone(), slots)
         };
         t.choice = 0;
+        t.scroll = 0;
     }
 
     /// A slot picked (click or Enter): the candidate to review.
@@ -785,6 +802,20 @@ impl Proofs {
                 self.choose(months)
             }
             (Stage::Preview(_, Some(_)), KeyCode::Char('u')) => self.choose_update(months),
+            // A long preview or review scrolls under its buttons.
+            (
+                Stage::Preview(..) | Stage::Review(..),
+                KeyCode::Up | KeyCode::Down | KeyCode::PageUp | KeyCode::PageDown,
+            ) => {
+                if let Some(t) = &mut self.ticket {
+                    t.scroll = match key.code {
+                        KeyCode::Up => t.scroll.saturating_sub(1),
+                        KeyCode::Down => t.scroll.saturating_add(1),
+                        KeyCode::PageUp => t.scroll.saturating_sub(10),
+                        _ => t.scroll.saturating_add(10),
+                    };
+                }
+            }
             (Stage::Preview(..), _) => self.ticket = None,
             (Stage::Choose(_, slots), KeyCode::Down | KeyCode::Tab) => {
                 let n = slots.len();
@@ -812,6 +843,11 @@ pub struct Drawn {
     pub ticket: Option<Rect>,
     /// Clickable rows inside it: (area, what a click does).
     pub buttons: Vec<(Rect, Click)>,
+    /// Its buttons, on their own row under the text whatever its length:
+    /// (area, title, what a click does). render.rs draws them.
+    pub footer: Vec<(Rect, String, Click)>,
+    /// How far its text scrolls (0 when it fits).
+    pub max_scroll: u16,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -850,6 +886,8 @@ pub fn draw_ticket(frame: &mut Frame, t: &Ticket, area: Rect) -> Drawn {
     let mut lines: Vec<Line<'static>> = Vec::new();
     // (line index, click) for rows that are buttons.
     let mut clicks: Vec<(usize, Click)> = Vec::new();
+    // The buttons on the row under the text.
+    let mut footer: Vec<(&str, Click)> = Vec::new();
     let hint = match &t.stage {
         Stage::Edit => {
             let labels: &[&str] = match t.kind {
@@ -893,26 +931,24 @@ pub fn draw_ticket(frame: &mut Frame, t: &Ticket, area: Rect) -> Drawn {
         Stage::Working => "",
         Stage::Preview(preview, digest) => {
             lines.extend(preview.iter().cloned());
-            lines.push(Line::raw(""));
             if digest.is_some() {
-                clicks.push((lines.len(), Click::Submit));
-                lines.push(Line::styled(
-                    "[ Submit as a source ]",
-                    Style::default().fg(ACCENT),
-                ));
-                clicks.push((lines.len(), Click::SubmitUpdate));
-                lines.push(Line::styled(
-                    "[ Submit as an update ]",
-                    Style::default().fg(ACCENT),
-                ));
+                footer = vec![
+                    ("Submit as a source", Click::Submit),
+                    ("Submit as an update", Click::SubmitUpdate),
+                ];
                 "s source · u update · Esc close"
             } else {
                 "any key closes"
             }
         }
         Stage::Choose(_, slots) => {
+            let update = slots.iter().any(|s| s.update.is_some());
             lines.push(Line::styled(
-                "Which product is this a source for?",
+                if update {
+                    "Which source does this proof update?"
+                } else {
+                    "Which product is this a source for?"
+                },
                 Style::default().fg(TEXT),
             ));
             lines.push(Line::raw(""));
@@ -932,7 +968,11 @@ pub fn draw_ticket(frame: &mut Frame, t: &Ticket, area: Rect) -> Drawn {
         }
         Stage::Review(_, slot, rows) => {
             lines.push(Line::styled(
-                format!("Source candidate for {}", slot.title),
+                if slot.update.is_some() {
+                    format!("Update for {}", slot.title)
+                } else {
+                    format!("Source candidate for {}", slot.title)
+                },
                 Style::default().fg(TEXT).add_modifier(Modifier::BOLD),
             ));
             for r in rows {
@@ -947,8 +987,7 @@ pub fn draw_ticket(frame: &mut Frame, t: &Ticket, area: Rect) -> Drawn {
                 },
                 muted,
             ));
-            clicks.push((lines.len(), Click::Confirm));
-            lines.push(Line::styled("[ Submit ]", Style::default().fg(ACCENT)));
+            footer = vec![("Submit", Click::Confirm)];
             "y/Enter submit · Esc cancel"
         }
         Stage::Done(done) => {
@@ -965,7 +1004,9 @@ pub fn draw_ticket(frame: &mut Frame, t: &Ticket, area: Rect) -> Drawn {
     };
     let width = area.width.min(84);
     let text_rows = rows_of(&lines, width);
-    let height = (text_rows + 3).max(5).min(area.height);
+    // A blank row and the buttons' row under the text, when it has buttons.
+    let foot = if footer.is_empty() { 0 } else { 2 };
+    let height = (text_rows + 3 + foot).max(5).min(area.height);
     let rect = Rect::new(
         area.x + (area.width - width) / 2,
         area.y + (area.height - height) / 2,
@@ -984,29 +1025,59 @@ pub fn draw_ticket(frame: &mut Frame, t: &Ticket, area: Rect) -> Drawn {
         ));
     let inner = block.inner(rect);
     frame.render_widget(block, rect);
+    // The text, then (when there are buttons) a blank row and the buttons'
+    // row, then the hint: the buttons are always on screen, and text that
+    // does not fit scrolls under them.
     let body = Rect::new(
         inner.x + 1,
         inner.y,
         inner.width.saturating_sub(2),
-        inner.height.saturating_sub(1),
+        inner.height.saturating_sub(1 + foot).max(1),
     );
-    // Where each line lands once wrapped, for the clickable ones.
-    let mut y = body.y;
+    drawn.max_scroll = text_rows.saturating_sub(body.height);
+    let scroll = t.scroll.min(drawn.max_scroll);
+    // Where each line lands once wrapped and scrolled, for the clickable ones.
+    let mut y = i32::from(body.y) - i32::from(scroll);
     for (i, line) in lines.iter().enumerate() {
-        let h = super::fund::wrapped_rows(&line.to_string(), usize::from(body.width)).max(1) as u16;
+        let h = super::fund::wrapped_rows(&line.to_string(), usize::from(body.width)).max(1) as i32;
         if let Some((_, click)) = clicks.iter().find(|(at, _)| *at == i)
-            && y < body.bottom()
+            && y >= i32::from(body.y)
+            && y < i32::from(body.bottom())
         {
             drawn
                 .buttons
-                .push((Rect::new(body.x, y, body.width, 1), click.clone()));
+                .push((Rect::new(body.x, y as u16, body.width, 1), click.clone()));
         }
         y += h;
     }
-    frame.render_widget(Paragraph::new(lines).wrap(Wrap { trim: false }), body);
+    frame.render_widget(
+        Paragraph::new(lines)
+            .wrap(Wrap { trim: false })
+            .scroll((scroll, 0)),
+        body,
+    );
+    if foot > 0 {
+        let row = inner.bottom().saturating_sub(2);
+        let mut x = body.x;
+        for (title, click) in footer {
+            let w = title.chars().count() as u16 + 4;
+            if x + w > body.right() {
+                break;
+            }
+            drawn
+                .footer
+                .push((Rect::new(x, row, w, 1), format!(" {title} "), click));
+            x += w + 2;
+        }
+    }
     if !hint.is_empty() {
+        let hint = if drawn.max_scroll > 0 {
+            format!(" ↑↓ more · {hint}")
+        } else {
+            format!(" {hint}")
+        };
         frame.render_widget(
-            Paragraph::new(Line::styled(format!(" {hint}"), Style::default().fg(DIM))),
+            Paragraph::new(Line::styled(hint, Style::default().fg(DIM))),
             Rect::new(inner.x, inner.bottom().saturating_sub(1), inner.width, 1),
         );
     }

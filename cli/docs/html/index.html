@@ -173,18 +173,16 @@
         <article class="card">
           <h2>MCP</h2>
           <p>
-            Users can run <code>petri mcp enable</code>, or connect from
-            <strong>Home &gt; Connect your AI agent</strong> and select
-            <strong>Enable Petri MCP</strong>. No manual server process or
-            operating-system startup service is required.
+            Amoeba's MCP server is hosted: the futures API's <code>/mcp</code>.
+            <code>petri mcp enable</code> registers its URL in Claude Code and
+            Codex; nothing runs locally.
           </p>
           <p>
-            Petri MCP is read-only: futures markets, charts, books, trades,
-            quotes, positions, balances and history, and the oracle's
-            months, sources and candidates. Trades and
-            oracle writes run only in the user's terminal. Owner-scoped reads
-            require an explicit owner public key, and every wrapper child carries
-            a Rust-enforced read-only signer boundary.
+            Agents read markets, books, trades, quotes, accounts and the
+            oracle's months, sources and candidates, and prepare orders and
+            transactions for the owner's wallet, which signs them; the server
+            never signs. <code>PETRI_MCP_READ_ONLY=1</code> keeps petri from
+            reading keys or signing when an agent runs it.
           </p>
           <p>
             Setup lifecycle, tool names and the signing boundary live in
@@ -206,7 +204,8 @@
         <li><code>src/chain_identity.rs</code> verifies the cluster (genesis), the deployed oracle and futures programs, and the oracle config's bond mint before anything is signed.</li>
         <li><code>petri tui</code>'s Markets view lists the markets and trades, closes and cancels through the same prepare and send steps as <code>petri long</code>, <code>petri close</code> and <code>petri cancel</code>.</li>
         <li>The research workspace stores candidates in the futures API's candidate store and reads the same oracle documents.</li>
-        <li><code>petri --json mcp manifest</code> publishes the MCP/tool wrapper contract.</li>
+        <li><code>petri tui</code>'s Bots view runs the bots in petri's <code>bots/</code> folder on the compose runtime (<code>src/compose/</code>); bots propose, and <code>src/bots/send.rs</code> checks each proposal against the market read from chain, signs it with the wallet and sends it.</li>
+        <li><code>petri --json mcp manifest</code> prints how agents connect to the hosted MCP server.</li>
         <li><code>scripts/petri-launcher.mjs</code> only delegates to Rust or performs installation/update work.</li>
       </ul>
 
@@ -234,16 +233,17 @@
         <li><a href="../../src/chain_identity.rs">src/chain_identity.rs</a> - deployment identity gate</li>
         <li><a href="../../src/endpoints.rs">src/endpoints.rs</a> - futures API oracle routes</li>
         <li><a href="../../src/workspace_update.rs">src/workspace_update.rs</a> - local workspace update planning and execution</li>
-        <li><a href="../../src/agent_protocol.rs">src/agent_protocol.rs</a> - MCP/agent manifest</li>
-        <li><a href="../../src/mcp_actions.rs">src/mcp_actions.rs</a> - resident <code>wallet.address</code> action and the MCP signer boundary</li>
-        <li><a href="../../src/mcp_setup.rs">src/mcp_setup.rs</a> - owned user-level MCP status, enable, repair, and disable logic</li>
-        <li><a href="../../src/research/mod.rs">src/research/</a> - terminal UI: Markets view, oracle research, and automatic installed-app updates</li>
+        <li><a href="../../src/agent_protocol.rs">src/agent_protocol.rs</a> - how agents connect (<code>petri mcp manifest</code>)</li>
+        <li><a href="../../src/mcp_setup.rs">src/mcp_setup.rs</a> - registers the hosted MCP server: status, enable, repair, disable</li>
+        <li><a href="../../src/read_only.rs">src/read_only.rs</a> - <code>PETRI_MCP_READ_ONLY=1</code>: no key read, no signing, no update</li>
+        <li><a href="../../src/research/mod.rs">src/research/</a> - terminal UI: Markets, Bots and Research views, and automatic installed-app updates</li>
         <li><a href="../../src/research/markets.rs">src/research/markets.rs</a> - TUI Markets view (the futures markets)</li>
-        <li><a href="../oracle-research.md">Oracle research guide</a> - bundled local service and agent commands</li>
+        <li><a href="../../src/research/bots.rs">src/research/bots.rs</a> - TUI Bots view and the worker that runs the bots</li>
+        <li><a href="../../src/bots/mod.rs">src/bots/</a> - trading bots: bundle files, feeds, parts, the host and the send path</li>
+        <li><a href="../../src/compose/mod.rs">src/compose/</a> - the runtime bots run on (Cordis's model)</li>
+        <li><a href="../oracle-research.md">Oracle research guide</a> - the workspace service and agent commands</li>
         <li><a href="../../src/gitbook.rs">src/gitbook.rs</a> - GitBook Help catalog source (checked by <code>scripts/check-bundled-gitbook.mjs</code>)</li>
         <li><a href="../../src/chart.rs">src/chart.rs</a> - terminal chart rendering</li>
-        <li><a href="../../scripts/petri-mcp-server.mjs">scripts/petri-mcp-server.mjs</a> - MCP stdio wrapper</li>
-        <li><a href="../../scripts/check-petri-mcp-server.mjs">scripts/check-petri-mcp-server.mjs</a> - stdio wrapper check</li>
         <li><a href="../../scripts/petri-launcher.mjs">scripts/petri-launcher.mjs</a> - repo-local Rust delegation and installation/update shim</li>
         <li><a href="../../scripts/package-petri-windows.ps1">scripts/package-petri-windows.ps1</a> - Windows release app package</li>
         <li><a href="../../scripts/package-petri-macos.sh">scripts/package-petri-macos.sh</a> - macOS <code>.app</code> package</li>

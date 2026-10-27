@@ -55,7 +55,7 @@ contracts:
 - `src/cli.rs` owns CLI shape, help text, flags, value enums, and user-facing
   command grammar.
 - `src/main.rs` owns command dispatch and plain/json output wiring.
-- `src/research/` owns the oracle TUI, terminal lifecycle, rendering, input, and automatic installed-app updates. `research/` contains the bundled Node 24 service and research CLI. Private workspace data stays outside the application bundle.
+- `src/research/` owns the oracle TUI, terminal lifecycle, rendering, input, and automatic installed-app updates. `src/research/agent/` owns an agent's research commands and its MCP server (`petri research agent|session|work|activity|rewards|mcp`), `src/research/service/` the workspace service and its owner commands (`petri research serve|owner`, the files `owner.json` and `workspace.sqlite`). Private workspace data stays outside the application. `src/mcp_setup.rs` registers Amoeba's hosted MCP server (the futures API's `/mcp`, `api/API.md`) by URL in Claude Code and Codex (`petri mcp enable|status|repair|disable`); petri runs no MCP server of its own for trading, and `PETRI_MCP_READ_ONLY=1` (`src/read_only.rs`) keeps petri from reading keys or signing under an agent.
 - `src/futures/` owns the futures commands: `mod.rs` (the trusted futures
   program, market resolution, the market read and checked from chain, order
   evaluation and plans), `shape.rs` (the range, leverage and limit math of the
@@ -78,6 +78,20 @@ contracts:
   in a build with the `dev-faucet` feature, marked `DEV-ONLY: REMOVE FOR
   PROD`; `scripts/install-dev.sh` builds the dev VM's petri with it, and
   release builds leave it off).
+- `src/compose/` owns the runtime trading bots run on (components with
+  keys, effects kept with their inverses, realms, the row loader); it has no
+  network, storage or UI. `src/bots/` owns the bots: bundle files (and
+  their hash), the host's keys and feeds, the parts (weights, signals, the
+  ladder, `script.rs`: sandboxed Rhai strategy scripts), the host, each
+  bot's own wallet (`wallet.rs`), the futures API's bot registry
+  (`registry.rs`), and `send.rs`, the only place a bot's proposal is
+  checked, signed (by the bot's wallet) and sent, through
+  `futures/trade.rs`'s order paths. `src/research/bots.rs` is the TUI's
+  Bots view and the worker that runs them; `petri bots` and `petri bots
+  serve` (JSON lines, for agents and the DeepSeek Harness plugin in
+  `plugins/petri`) drive the same worker, and a running bot's lock keeps
+  one bot to one petri. `docs/bots.md` is the contract with the API and
+  the plugin: keep it true.
 - `src/futures/trade.rs` splits each order into a prepare step (priced,
   reviewed) and a send step (`prepare_open`/`send_open`, `prepare_close`/
   `send_close`, `prepare_cancel`/`send_cancel`); the commands and the TUI's
@@ -182,10 +196,9 @@ Use the repo devloop before handoff:
 scripts/devloop.sh
 node scripts/check-petri-launcher.mjs
 node scripts/check-petri-packaging.mjs
-node --test research/test/*.test.mjs
 ```
 
-That script runs the research and MCP bridge checks, then:
+That script runs:
 
 ```bash
 cargo fmt -- --check
@@ -194,7 +207,7 @@ cargo test --locked -- --test-threads=1
 cargo clippy --locked --all-targets
 ```
 
-and finishes with the research binary smoke and the MCP server check.
+and finishes with the defaults check and the research binary smoke.
 
 For UI/TUI work, also do a small PTY smoke test when practical:
 

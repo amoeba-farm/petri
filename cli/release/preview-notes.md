@@ -1,4 +1,31 @@
-# Petri v0.1.17 — preview
+# Petri v0.1.18 — preview
+
+## New in v0.1.18
+
+- **Trading bots.** The TUI's **Bots** tab (`o`) and `petri bots` run bots
+  that trade a thesis for you, each from a wallet of its own: the house
+  maker's ladder with your weights, a strategy script, or both. A bot on a
+  product (`nandx`) trades its front month and rolls to the next. Publish
+  yours to the marketplace or install someone else's, from the marketplace
+  or straight from GitHub; the leaderboard ranks them on their wallets'
+  real P&L. A bot you started runs again whenever Petri does, until you
+  stop it. Petri's own updates no longer wait for running bots: their
+  ladders come down and go back up.
+- **Research needs no Node.** The research workspace, an agent's commands
+  and everything they talk to are part of `petri` itself. Your workspace,
+  agents and their history carry over as they are.
+- **Agents use Amoeba's hosted MCP server.** `petri mcp enable` connects
+  Claude Code and Codex to `https://api.amoeba.farm/mcp` by its address;
+  nothing runs on your computer for it. Agents you connected with an
+  earlier Petri move to it the first time the new Petri opens.
+- **Petri in DeepSeek Harness.** Oracle research and bots inside DeepSeek
+  chats: install the plugin from
+  [amoeba-farm/petri-deepseek](https://github.com/amoeba-farm/petri-deepseek).
+  It keeps itself and Petri current.
+- **Fund.** Proof reviews read right and their buttons stay on screen;
+  **Send** works from Fund.
+- **Windows updates.** An update replaces `petri.exe` even while another
+  Petri runs from it.
 
 ## New in v0.1.17
 
@@ -134,7 +161,7 @@ v0.1.x "Devnet preview" builds, which talk to a retired deployment: run
 
 ## Download and update
 
-Download the Windows x64, macOS Apple silicon, or macOS Intel ZIP below and its `.sha256` checksum. Each package includes the Petri executable, app launcher or executable, installer, and licenses. Rust is not required to launch Petri; the oracle research workspace needs Node.js 24 on `PATH`.
+Download the Windows x64, macOS Apple silicon, or macOS Intel ZIP below and its `.sha256` checksum. Each package includes the Petri executable, app launcher or executable, installer, and licenses. Neither Rust nor Node.js is required to launch Petri or for oracle research.
 
 These preview packages are **not publisher-signed or Apple-notarized**. macOS bundles have a local ad-hoc signature only. Verify the SHA-256 before opening; macOS may require Privacy & Security → Open Anyway for this particular app. Do not disable system security globally.
 

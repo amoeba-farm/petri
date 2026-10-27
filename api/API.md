@@ -40,9 +40,12 @@ rewrite sends to `http://127.0.0.1:4500/<path>`.
   | Status | Meaning |
   |---|---|
   | 400 | Bad input, or the program would refuse it (`"<name>: <reason>"`, for example `"NoLiquidity: …"`) |
+  | 401 | A signature doesn't verify (bot hub, oracle observations) **[added]** |
   | 403 | Refused to sign, or a reserved owner |
   | 404 | Unknown market, or the faucet is disabled |
+  | 409 | The bot id is another author's (`POST /v1/bots`) **[added 2026-10-26]** |
   | 410 | The prepared id is unknown, expired or already used |
+  | 413 | The body or bundle is past its protection bound **[added]** |
   | 422 | The node rejected a submitted transaction outright; `error` is `"<step>: <error name>"` and `logs` is included |
   | 429 | Rate limited; a `Retry-After` header is set |
   | 500 | Internal error, for example the sponsor failed to sign |
@@ -1578,6 +1581,38 @@ they were the only ones): the owner pays the fee, the position account
 `createAmbaAta` and `createAta`, and the transaction starts with
 `SetComputeUnitLimit(200_000)` instead of 1,400,000.
 
+## Portfolio [added 2026-10-24]
+
+What an owner's Earn deposit and stake are worth over time, in USDC, for
+the Earn page's portfolio chart. A sampler values every owner it knows every
+`FUTURES_PORTFOLIO_INTERVAL_SECS` (900 s) from one batched account read and
+keeps the rows for good (`futures.portfolio_samples`). It knows the owners
+who deposited into Earn (its events, read at start) and those who read an
+Earn or stake position, or prepare `earnDeposit` or `stake`, through this
+service (stake events are not indexed). An owner holding nothing gets no
+rows, except one when they stop holding.
+
+### `GET /v1/accounts/:owner/portfolio?from&to&points`
+
+```text
+{ owner,
+  now: { t, total, earn, stake, unclaimed, stakeAmba, unclaimedUsdc, unclaimedAmba },
+  points: [{ t, total, earn, stake, unclaimed }] }
+```
+
+* `t` is wall time (unix seconds); values are atoms as decimal strings:
+  `earn` the Earn deposit at what withdrawing every share pays now (the
+  Earn read's `valueLow`), `stake` the AMBA the stake shares hold
+  (`stakeAmba`, AMBA atoms; unstaking included) at the stake pool's average
+  price (the stake read's `value`), `unclaimed` what was earned and not
+  claimed yet: the stakers' USDC profit share (`unclaimedUsdc`) plus the
+  AMBA of both streams (`unclaimedAmba`) at that price. `total` is all
+  three. Without a stake pool, AMBA is counted but not valued.
+* `points` are the samples in `[from, to]` (default: all of them), oldest
+  first: the span they cover cut into `points` (default 1,000, at most
+  20,000) equal slices, the last sample in each; then `now` as the last
+  point unless `to` is in the past. Without a database, only `now`.
+
 ## Stream [added]
 
 ### `GET /v1/stream?market=<market>&owner=<pubkey>`
@@ -2533,6 +2568,69 @@ Refusals are `{ "ok": false, "message": string, "code": string }`:
 | 503 | `RPC_GATEWAY_TIMEOUT` | The deadline passed while waiting for capacity |
 | 504 | `UPSTREAM_TIMEOUT`, `CURRENT_EDGE_REQUEST_TIMEOUT` | The 15 s deadline passed |
 
+## MCP [added 2026-10-26]
+
+`POST /mcp`: a hosted [MCP](https://modelcontextprotocol.io) server for AI
+agents, over MCP's streamable HTTP transport (protocol `2025-06-18`;
+`2025-03-26` and `2024-11-05` are answered in their own version). Claude
+Code: `claude mcp add --transport http amoeba https://api.amoeba.farm/mcp`;
+Codex: `codex mcp add amoeba --url https://api.amoeba.farm/mcp`; `petri mcp
+enable` registers it for both.
+
+* Stateless: no session (no `Mcp-Session-Id`), no server stream (`GET /mcp`
+  and `DELETE /mcp` are 405), no authentication. A request is one JSON-RPC
+  message, or a batch of them; the answer is `application/json`. A
+  notification (or a response) is 202 with no body. A body over 64 KiB is
+  413, one that is not JSON 400 (`-32700`).
+* Methods: `initialize`, `ping`, `tools/list`, `tools/call`; any other is
+  `-32601`. An unknown tool, or arguments that do not fit its schema (an
+  unknown or missing argument, a wrong type, a value out of its enum or
+  bounds, a market, owner or signature with a character outside
+  `[A-Za-z0-9_:-]` and spaces), is `-32602`, before any route is called.
+  A market is what `/v1/markets/:market` takes: its address, label, symbol
+  or `SYMBOL-<expiryTs>`.
+* Each tool is a request to this API's own routes, made in process with the
+  caller's address (`ConnectInfo`, `cf-connecting-ip`): the same checks,
+  limits and shapes as the routes'. A tool's result is the route's JSON as
+  `structuredContent` (and as text); a refusal (non-2xx) is
+  `isError: true` with `{ ok: false, status, error: <the route's body> }`.
+* It never signs. A sponsored transaction gets the sponsor's signature at
+  `/v1/tx/submit`, only after the owner's (see there); an owner-paid one
+  goes out through `/rpc/sendTransaction`, which refuses sponsor-paid
+  packets.
+
+| Tool | Route |
+|---|---|
+| `config` | `GET /v1/config` |
+| `markets_list` (`all`) | `GET /v1/markets` |
+| `market_show`, `market_book` (`market`) | `GET /v1/markets/:market`, `.../book` |
+| `market_depth` (`market, lo, hi, max`) | `GET /v1/markets/:market/depth` |
+| `market_trades` (`market, limit, before`) | `GET /v1/markets/:market/trades` |
+| `market_candles` (`market, resolution, from, to`) | `GET /v1/markets/:market/candles` |
+| `market_index` (`market, from, to, limit`) | `GET /v1/markets/:market/index` |
+| `quote` (the `/v1/quote` body's fields; `lo`, `hi` default to the market's `suggestion`) | `POST /v1/quote` |
+| `account`, `wallet_usdc`, `account_earn`, `account_stake` (`owner`) | `GET /v1/accounts/:owner`, `/v1/wallets/:owner/usdc`, `.../earn`, `.../stake` |
+| `account_history` (`owner, limit, before, types`) | `GET /v1/accounts/:owner/history` |
+| `portfolio` (`owner, from, to, points`) | `GET /v1/accounts/:owner/portfolio` |
+| `earn`, `stake`, `news`, `oracle_catalog` | `GET /v1/earn`, `/v1/stake`, `/v1/news`, `/v1/oracle/catalog` |
+| `oracle_months`, `oracle_sources` (`market`, `expiry`) | `GET /v1/oracle/public-snapshot`: `state.months` or `sourceLinks` of that market or month, with `protocol` and `freshness` |
+| `oracle_candidates` (`marketId, expiryId, agentId, after, limit`) | `GET /oracle/source-candidates` |
+| `prepare_order` (`owner`, the order, `withdraw`, `payer`) | `POST /v1/tx/quote-prepare` |
+| `prepare_transaction` (`owner, action, params, payer`) | `POST /v1/tx/prepare` |
+| `submit_transaction` (`id, transaction`) | `POST /v1/tx/submit` |
+| `send_transaction` (`transaction`) | `POST /rpc/sendTransaction` (`{ encoding: "base64" }`): `{ signature }` |
+| `transaction_status`, `transaction_wait` (`signature`, `commitment`, `timeoutMs`) | `GET /v1/tx/:signature`, `.../wait` |
+
+`prepare_order` and `prepare_transaction` add to the route's answer
+`howToSign` (who signs it and which tool sends it: `submit_transaction` for a
+sponsored one, with its `id`; `send_transaction` for an owner-paid one, its
+`before` ones first) and, for a market, `reviewLink`: the month's page on the
+site with the ticket on the order's side
+(`<site>/trade/<symbol>?expiry=YYYY-MM&side=long|short`), where a person
+places the order from their own wallet. `<site>` is `FUTURES_SITE_URL`, else
+`https://amoeba.farm` on mainnet and `https://dev.amoeba.farm` elsewhere.
+Only `submit_transaction` and `send_transaction` are not `readOnlyHint`.
+
 ## Debug [added]
 
 `GET /v1/debug/cache/:address` returns
@@ -2636,6 +2734,12 @@ what was missing. Markets that leave the manifest stay readable (see
 * Prepared messages expire after 90 s.
 * Evidence bundles (`POST /oracle/evidence`) are at most 2 MiB, the
   verifier policy's bound on hostile input; there is no rate limit.
+* **[added 2026-10-26]** A bot bundle (`POST /v1/bots`) is at most 256 KiB
+  of text (413 beyond), a bound on hostile input; a bundle with a long
+  script is a few KiB. Its GitHub file is fetched from
+  `raw.githubusercontent.com` only (a redirect elsewhere is not followed),
+  within 30 s and at most 256 KiB, after its source passed the strict
+  character check (see "Bots"). No rate limits, caps or allowlists.
 
 
 ## Leaderboard
@@ -2649,3 +2753,172 @@ Retired markets (see "Retired markets") count like the manifest's.
 The deployment's own keys (the reserved owners: every `accounts.*` key of the manifest, the sponsor, the treasury and its Earn pools) are excluded. **[adjusted]** The retired clearing markets' cohorts no longer count. Windows are cluster time; `lastTradeAt`/`latestEventAt` are shifted by `clockOffsetSecs` (wall − cluster) for display.
 
 **[adjusted]** The 7, 30 and 90-day and all-time boards are recomputed in the background, all four from one read of the events (and one solve of each executable depth they share); the next pass starts 10 s after one ends, or twice the time the pass took when that is longer. A request answers at once with the last board (`generatedAt`, chain time, says when it was computed). Only before the first pass, or for another `days`, is a board computed on demand (another `days` is kept 5 s).
+
+## Bots [added 2026-10-26]
+
+The bot hub's registry: people publish petri trading bots (one TOML bundle
+each) and install other people's; each running bot trades from a wallet of
+its own, registered here, so its on-chain results rank the bot it runs. The
+contract with petri is `cli/docs/bots.md` ("Publishing, installing,
+ranking" and "Marketplace"); the code is `api/src/bots.rs`.
+
+* **Signatures** are ed25519 over the UTF-8 message, base58 in the body,
+  verified against the public key the body names. One that doesn't verify
+  is 401; a malformed key or signature is 400.
+* **A bundle's hash** is the SHA-256 (lowercase hex) of its text with the
+  runner's own lines left out: every line between a `[bot]` header line
+  (the line, trimmed, is exactly `[bot]`) and the next table header (any
+  line whose first non-blank character is `[`) that matches
+  `^\s*(id|market|budget|from)\s*=`. Every other line is kept as it is,
+  with its `\n` (a last line without one stays without). The hash is taken
+  over the text, never a parsed copy; `[bot] author` is hashed. The
+  contract's test vector hashes to
+  `03f3aea639cdd13e7bb4580da1df62e8a6b659d546a3204cf0d9a4697741e90a`.
+* **Kinds** are the bundle's row kinds as written (`strategy/script`,
+  `weights`, …), each once, in order, rows with `disabled = true` left out.
+* **Times** (`publishedAt`, samples' `t`, `generatedAt`, the windows) are
+  wall time, unix seconds.
+* Tables (in schema `futures`, created at startup, append-only: rows are
+  only added): `bots` (each id and its author), `bot_versions` (every
+  version with its text, signature and what was read from it),
+  `bot_verifications` (each GitHub file that verified a version),
+  `bot_runs` (every registration; the view `bot_runs_latest` is each
+  wallet's latest) and `bot_pnl_samples`.
+
+```text
+BotSummary = { id, name, about, author, market, label, symbol, kinds: string[], version, hash,
+               publishedAt, verified, github: null | { owner, repo, path, ref, url },
+               runs, runners, pnlAtoms, volumeAtoms }
+```
+
+The latest version's: `name` (`[bot] name`, else the id), `about` (the
+bot's thesis, one line), `market` (the address its `[bot] market` resolved
+to), `label` (that market's label; for a product bot, `market = "nandx"`,
+which trades the product's front month and rolls, the product symbol) and
+`symbol`. `verified`: a GitHub file verified this version (`github` names
+it, the latest when several did; `url` is its github.com page). `runs`: the
+counted runs (below), `runners` their distinct owners, `pnlAtoms` and
+`volumeAtoms` their sums (each wallet's newest sample).
+
+### `POST /v1/bots`
+
+Body `{ text, author, signature, github? }`, signed message `"amoeba bot
+publish v1\n" + hash` (the hash of `text`). → `201 { id, version, hash,
+publishedAt, verified, github }` for a new version, `200` with the existing
+version when the id already has one of this hash.
+
+* The API reads `[bot]` `id` (letters, digits, `-`, `_`), `market`,
+  `name`, `about` and `author`, and the row kinds (with `toml_edit`, the
+  parser petri uses); other settings are petri's. A text that isn't such a
+  bundle is 400.
+* `market` resolves as `/v1/markets/:market` does (address, label, symbol,
+  series key) or by petri's name for a market (`ramx-nov26`: the label's
+  words in lower case, the symbol then a dash), the manifest's markets
+  first, then retired ones. An unknown market is 400.
+* `[bot] author`, when the bundle has one, must be `author` (400 otherwise).
+* The registry id is the bundle's `id`: the first author to publish it owns
+  it; another author is 409. The ids `leaderboard` and `runs` are route
+  names under `/v1/bots/` and are 400.
+* A posted `[bot] from` line is not kept (petri publishes without it and an
+  install adds it back; it is not hashed either).
+* `github` (optional): `"OWNER/REPO[/PATH][@REF]"` (a leading `github:` is
+  allowed), PATH `petri-bot.toml` and REF `HEAD` by default. It is checked
+  before any URL is built: OWNER letters, digits and `-` (not first); REPO,
+  each PATH segment and each REF segment letters, digits, `.`, `_` and `-`,
+  none empty, `.` or `..` (400 otherwise). The API fetches
+  `https://raw.githubusercontent.com/OWNER/REPO/REF/PATH`; when the file's
+  hash is the posted text's and its `[bot] author` is `author`, the version
+  is verified (whoever controls that repository published it). A fetch that
+  fails, another bundle there, or another or no author there is 400 saying
+  which, and nothing is stored. A version verified once stays verified: a
+  later publish of the same hash without `github` answers `verified: true`.
+  Without `github`, a new version is unverified.
+
+### `GET /v1/bots?market=&sort=pnl|new|runs&days=`
+
+→ `{ bots: [BotSummary & { rank, returnBps }] }`, every published bot.
+
+* `market` filters by the latest version's market: its address, product
+  symbol (every month of it) or label (as here or as petri writes it), or
+  the market the filter resolves to.
+* `sort`: `pnl` (default; best P&L first, then volume, runs, newest), `new`
+  (the newest version first) or `runs` (most counted runs first). Another
+  value is 400.
+* `days` (7, 30, 90, …): `pnlAtoms` and `volumeAtoms` over that window, as
+  the leaderboard computes them; with `sort=pnl` the list ranks by it.
+  Absent: all time.
+* `rank` is the position in this list (1, 2, …), `returnBps` as on the
+  leaderboard.
+
+### `GET /v1/bots/:id`
+
+→ `BotSummary & { text, versions: [{ version, hash, publishedAt, verified }] }`:
+`text` is the latest version's as stored, `versions` oldest first. 404 for
+an id nobody published.
+
+### `POST /v1/bots/runs`
+
+Body `{ wallet, owner, bot, hash, name, market, walletSignature,
+ownerSignature }`, signed message `"amoeba bot run v1\n" + wallet + "\n" +
+owner + "\n" + (bot or "") + "\n" + hash` by the bot wallet
+(`walletSignature`) and by its owner, the main wallet (`ownerSignature`).
+→ `{ wallet, bot, counted }`.
+
+* `bot` is a registry id, or null (or `""`) for an unpublished bot, which
+  still gets its P&L. `hash` is the bundle's (64 lowercase hex, else 400).
+  `name` and `market` are stored as sent (null: `""`).
+* The deployment's own keys (the trader leaderboard's reserved owners and
+  the sponsor) can't register a run, as `wallet` or `owner`: 403.
+* Idempotent per wallet: the latest registration replaces the earlier ones
+  (all are kept; one that says what the latest says adds nothing).
+* `counted`: `hash` is a published version of `bot`, so the run counts for
+  that bot's ranking. It is worked out when read, so a run registered
+  before its version was published counts from then on.
+* The wallet's P&L is sampled at once (then every 5 minutes).
+
+### `GET /v1/bots/runs/:wallet?from&to&points`
+
+```text
+{ wallet, owner, bot, hash, name, market, counted, pnlAtoms, equityAtoms, depositedAtoms,
+  withdrawnAtoms, volumeAtoms, points: [{ t, pnlAtoms }] }
+```
+
+The wallet's latest registration (404 without one) and its P&L now:
+
+* **P&L** (every market, the manifest's and the retired ones):
+  `withdrawn - deposited + equity`. `deposited` and `withdrawn` sum the
+  wallet's indexed `deposit` and `withdraw` events. `equity` sums, in each
+  market where the wallet has a trader slot (its cached account), its free
+  and reserved cash, each claim valued as `/v1/accounts/:owner` shows it
+  (the executable `exit.net` for the lots the exit sells, the rest at
+  `payoutAtIndex`, else 0; no exit while the market isn't tradable or is
+  retired), and its ladder inventory valued the same way (each step's
+  inventory as a one-step claim, long or short, as the program counts it).
+* **Volume**: its fills (`take`, and `fill` of its resting orders) as the
+  trader leaderboard counts them (`lots * lo * k + premium`, the premium
+  at least zero), plus its ladder fills' premium (`ladderFill` as maker).
+* `points`: its samples in `[from, to]` (default: all of them), oldest
+  first, the span cut into `points` (default 1,000, at most 20,000) equal
+  slices, the last sample of each; then the P&L now unless `to` is in the
+  past.
+
+Every registered wallet's P&L (with its equity, deposits, withdrawals and
+volume) is sampled every 5 minutes, and when it registers, into
+`futures.bot_pnl_samples`, never cleared.
+
+### `GET /v1/bots/leaderboard?days=7|30|90`
+
+```text
+{ generatedAt, bots: [{ rank, id, name, author, label, symbol, kinds, verified, github, runs,
+                        runners, pnlAtoms, returnBps, volumeAtoms }] }
+```
+
+The bots with counted runs, best P&L first (then volume, runs, id). Only
+counted runs count: each wallet's latest registration whose hash is a
+published version of the bot it names, the deployment's own keys left out.
+P&L and volume now are each wallet's newest sample; a window's (`days`;
+absent: all time) are those less the wallet's newest sample at or before
+the window's start (`generatedAt - days * 86400`), zero without one.
+`returnBps` is that P&L over what the runs' wallets ever deposited into
+markets (their newest samples), in basis points, truncated (0 when nothing
+was deposited).

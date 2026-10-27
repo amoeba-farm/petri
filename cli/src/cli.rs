@@ -403,6 +403,14 @@ pub enum Command {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+    #[command(
+        about = "Your trading bots: make, share, rank and run them",
+        long_about = "Trading bots you build (or an agent writes for you): one file each in bots/ beside petri's config. The TUI's Bots tab (o) runs them, and `petri bots serve` runs them without a terminal for agents and other front ends. Each running bot trades from a wallet of its own: starting it tops that wallet up to its budget from yours, and stopping it takes its ladder and orders down and moves its USDC back to your wallet. Publish a bot to share it, install other people's, and see them ranked by their real results on chain."
+    )]
+    Bots {
+        #[command(subcommand)]
+        command: Option<BotsCommand>,
+    },
     #[command(about = "Open the terminal interface: markets and the oracle research workspace")]
     Tui {
         #[arg(long, help = "Don't check for updates in this session")]
@@ -430,7 +438,7 @@ pub enum Command {
         #[command(subcommand)]
         command: Option<ConfigCommand>,
     },
-    #[command(about = "Connect Petri to AI agents (read-only)")]
+    #[command(about = "Connect AI agents (Claude Code, Codex) to Amoeba's hosted MCP server")]
     Mcp {
         #[command(subcommand)]
         command: McpCommand,
@@ -449,6 +457,122 @@ pub enum Command {
         #[arg(long, help = "Reopen the terminal interface after a standalone update")]
         restart: bool,
     },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum BotsCommand {
+    #[command(about = "Every bot, its wallet, holdings, P&L and why one can't run")]
+    List,
+    #[command(
+        about = "Check a bot's file and save it as bots/<id>.toml (a running bot picks it up)",
+        long_about = "Validates a bundle (it parses, every row builds, scripts compile) and saves it as its bot's file, replacing that bot's file if it has one. A petri running the bot picks the change up."
+    )]
+    Write {
+        #[arg(
+            value_name = "FILE",
+            help = "The bundle's file, or - to read it from stdin"
+        )]
+        file: String,
+    },
+    #[command(about = "A bot's file as it is now, to change and write back")]
+    Read {
+        #[arg(value_name = "BOT")]
+        bot: String,
+    },
+    #[command(
+        about = "Delete a bot's file (a petri running it stops it); its wallet stays",
+        long_about = "Deletes the bot's file. A petri running the bot stops it as it sees the file gone: its ladder and orders come down and its USDC goes back to your wallet. Its wallet file in bots/.wallets stays, with any positions it still holds."
+    )]
+    Remove {
+        #[arg(value_name = "BOT")]
+        bot: String,
+    },
+    #[command(
+        about = "Publish a bot to Amoeba's bot registry, signed by your wallet",
+        long_about = "Publishes the bot's file (without its `from`) to Amoeba's bot registry, signed by your wallet, which becomes its author: petri writes `author` into the file first when it names none. With --github, the registry checks the same file on GitHub and marks the listing verified."
+    )]
+    Publish {
+        #[arg(value_name = "BOT")]
+        bot: String,
+        #[arg(
+            long,
+            value_name = "OWNER/REPO[/PATH][@REF]",
+            help = "The public GitHub file holding this bot [path: petri-bot.toml, ref: HEAD]"
+        )]
+        github: Option<String>,
+    },
+    #[command(about = "Published bots, best results first or by --sort")]
+    Discover {
+        #[arg(
+            long,
+            value_name = "MARKET",
+            help = "Only bots of this market: symbol, name or address"
+        )]
+        market: Option<String>,
+        #[arg(long, value_name = "SORT", value_parser = ["pnl", "new", "runs"], help = "pnl, new or runs")]
+        sort: Option<String>,
+        #[arg(
+            long,
+            value_name = "N",
+            help = "With --sort pnl: P&L over the last N days (7, 30 or 90)"
+        )]
+        days: Option<u32>,
+    },
+    #[command(about = "One published bot, with its file")]
+    Show {
+        #[arg(value_name = "ID", help = "Its registry id")]
+        id: String,
+    },
+    #[command(
+        about = "Install a published bot, or one on GitHub, as a new bot here (it trades only once started)"
+    )]
+    Install {
+        #[arg(
+            value_name = "ID",
+            help = "Its registry id, or github:OWNER/REPO[/PATH][@REF] [path: petri-bot.toml, ref: HEAD]"
+        )]
+        id: String,
+        #[arg(
+            long,
+            value_name = "MARKET",
+            help = "Run it on this market instead: symbol, name or address"
+        )]
+        market: Option<String>,
+    },
+    #[command(about = "Published bots ranked by their runs' real P&L on chain")]
+    Leaderboard {
+        #[arg(
+            long,
+            value_name = "N",
+            help = "Over the last N days (7, 30 or 90) [default: all time]"
+        )]
+        days: Option<u32>,
+    },
+    #[command(about = "Write a new ladder bot for a market (it trades only once started)")]
+    New {
+        #[arg(
+            value_name = "MARKET",
+            help = "Symbol (ramx), name (ramx-nov26) or address"
+        )]
+        market: String,
+    },
+    #[command(about = "Set one of a bot's weights in its file (a running bot picks it up)")]
+    Set {
+        #[arg(value_name = "BOT")]
+        bot: String,
+        #[arg(
+            value_name = "WEIGHT",
+            help = "budget, fraction, spread_bps, vol, half_width, tiers, tier_bps, tier_ratio or skew"
+        )]
+        weight: String,
+        #[arg(value_name = "VALUE", allow_hyphen_values = true)]
+        value: String,
+    },
+    #[command(
+        about = "Run bots without a terminal: JSON commands on stdin, the bots on stdout",
+        long_about = "Runs bots for agents and other front ends. Each stdin line is one JSON command: {\"start\":ID,\"budget\":N} (budget optional, saved to the bot's file first), {\"stop\":ID}, {\"set\":{\"bot\":ID,\"knob\":NAME,\"value\":N}}, {\"new\":MARKET}, {\"write\":TEXT}, {\"remove\":ID}, {\"publish\":ID}, {\"install\":{\"id\":REGID,\"market\":M}} or {\"shutdown\":true}. Each stdout line is {\"bots\":[...]} after every command and every look (two seconds), {\"note\":TEXT}, {\"created\":ID}, {\"written\":ID}, {\"removed\":ID}, {\"published\":{...}}, {\"installed\":ID}, and {\"down\":true} last. Closing stdin stops every bot: its ladder and orders come down and its USDC goes back to your wallet before down. A bot runs in one petri at a time."
+    )]
+    Serve,
 }
 
 #[derive(Debug, Subcommand)]
@@ -511,20 +635,6 @@ pub enum UpdateCommand {
 
 #[derive(Debug, Subcommand)]
 pub enum McpCommand {
-    #[command(hide = true, about = "Serve bounded typed public agent actions")]
-    Serve,
-    #[command(hide = true, about = "Describe typed public agent actions")]
-    Actions,
-    #[command(hide = true, about = "Invoke one typed public agent action")]
-    Invoke {
-        action: String,
-        #[arg(
-            long,
-            required = true,
-            help = "Read one bounded typed JSON request from stdin"
-        )]
-        request_stdin: bool,
-    },
     #[command(about = "Show whether the Petri agent connection is healthy")]
     Status,
     #[command(about = "Connect Petri to Claude Code and Codex")]
@@ -533,7 +643,7 @@ pub enum McpCommand {
     Repair,
     #[command(about = "Disconnect Petri from AI agents")]
     Disable,
-    #[command(about = "Print the MCP tool manifest for agent wrappers")]
+    #[command(about = "Print how agents connect to the hosted MCP server")]
     Manifest,
 }
 
