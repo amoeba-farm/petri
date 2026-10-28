@@ -381,7 +381,7 @@ pub enum Command {
     Status,
     #[command(
         about = "The index oracle: months, sources, evidence and bonds",
-        long_about = "Read the index oracle's months, sources and candidates from the futures API, and write to the oracle program: bond collateral, evidence, source proposals and supports, opening prints and updates. Writes are reviewed and confirmed (or --yes), then signed by your wallet; --simulate runs them without signing."
+        long_about = "Read the index oracle's months, sources and candidates from the futures API, and write to the oracle program: bond collateral, evidence, source proposals, supports and challenges, opening prints and updates. Writes are reviewed and confirmed (or --yes), then signed by your wallet; --simulate runs them without signing."
     )]
     Oracle {
         #[command(subcommand)]
@@ -979,6 +979,72 @@ mod tests {
         ] {
             assert!(refused(retired), "{retired:?}");
         }
+        fn challenge<'a>(extra: &[&'a str]) -> Vec<&'a str> {
+            let mut args = vec![
+                "petri",
+                "oracle",
+                "sources",
+                "challenge",
+                "ramx",
+                "--source",
+                "ab",
+            ];
+            args.extend_from_slice(extra);
+            args
+        }
+        assert!(matches!(
+            oracle(&challenge(&["--reason", "duplicate", "--comparison", "cd", "--why", "one feed"])),
+            Some(O::Sources {
+                command: Some(SourceCommand::Challenge { reason: 8, bond: None, ref why, .. }),
+                ..
+            }) if why.as_deref() == Some("one feed")
+        ));
+        // The old flags still work: a raw code, an exact bond, a hash.
+        let hash = "ab".repeat(32);
+        assert!(matches!(
+            oracle(&challenge(&[
+                "--reason",
+                "3",
+                "--bond",
+                "2.5",
+                "--evidence-hash",
+                &hash
+            ])),
+            Some(O::Sources {
+                command: Some(SourceCommand::Challenge {
+                    reason: 3,
+                    bond: Some(_),
+                    why: None,
+                    ..
+                }),
+                ..
+            })
+        ));
+        for refused_args in [
+            challenge(&["--reason", "stale"]),
+            challenge(&["--reason", "stale", "--why", "x", "--evidence-hash", &hash]),
+            challenge(&["--reason", "stale", "--why", "x", "--why-file", "why.txt"]),
+            challenge(&["--reason", "nonsense", "--why", "x"]),
+            challenge(&["--reason", "300", "--why", "x"]),
+        ] {
+            assert!(refused(&refused_args), "{refused_args:?}");
+        }
+        assert!(matches!(
+            oracle(&["petri", "oracle", "challenges", "ramx", "--owner", "x"]),
+            Some(O::Challenges {
+                market: Some(_),
+                owner: Some(_),
+                ..
+            })
+        ));
+        assert!(matches!(
+            oracle(&["petri", "oracle", "challenges"]),
+            Some(O::Challenges {
+                market: None,
+                owner: None,
+                ..
+            })
+        ));
     }
 
     #[test]

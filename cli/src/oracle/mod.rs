@@ -4,21 +4,28 @@
 //! the pinned oracle crate's instruction builders against the trusted
 //! deployment's oracle program and signed by the attached wallet. Sponsorship
 //! (tag 30/22: sponsor, settle, claim, reserve withdraw) is in `sponsor.rs`,
-//! the other reward claims (tag 174) in `rewards.rs`. Cleanup (30/24) has no
-//! command.
+//! the other reward claims (tag 174) in `rewards.rs`, source challenges (tag
+//! 161) and how they end in `challenges.rs`, opening prints (tags 162-165,
+//! 81) and how they end in `prints.rs`, Game updates (166-169, 198, 199,
+//! 201) and how they end in `updates.rs`, a wallet's bonds and stakes and
+//! their settlement (tag 169) in `stakes.rs`. Cleanup (30/24) has no command.
 
 pub mod args;
 pub mod chain;
+pub mod challenges;
 pub mod claims;
 pub mod council;
 pub mod errors;
 pub mod observe;
+pub mod prints;
 pub mod reads;
 pub mod rewards;
 pub mod send;
 pub mod series;
 pub mod skus;
 pub mod sponsor;
+pub mod stakes;
+pub mod updates;
 pub mod writes;
 
 use crate::{
@@ -119,26 +126,34 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 target,
                 source,
                 stake,
-            } => writes::source_support(ctx, p, target, source, stake),
+            } => writes::source_support(ctx, p, target, source, stake.as_deref()),
             SourceCommand::Close { target } => writes::sources_close(ctx, p, target),
             SourceCommand::Challenge {
                 target,
                 source,
                 reason,
                 bond,
+                why,
+                why_file,
                 evidence_hash,
                 comparison,
                 challenge_id,
-            } => writes::source_challenge(
+            } => challenges::challenge(
                 ctx,
                 p,
                 target,
-                source,
-                *reason,
-                bond,
-                evidence_hash,
-                comparison.as_deref(),
-                challenge_id.as_deref(),
+                &challenges::Request {
+                    source,
+                    reason: *reason,
+                    bond: bond.as_deref(),
+                    evidence: challenges::Evidence::of(
+                        why.as_deref(),
+                        why_file.as_deref(),
+                        evidence_hash.as_deref(),
+                    ),
+                    comparison: comparison.as_deref(),
+                    challenge_id: challenge_id.as_deref(),
+                },
             ),
         },
         O::Series { command } => match command {
@@ -205,6 +220,8 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 source,
                 file,
                 a.stake.as_deref(),
+                a.reveal,
+                a.accept,
                 a.send.simulate,
             )
         }
@@ -259,7 +276,22 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
             ),
             EvidenceCommand::Close { object, send } => writes::evidence_close(ctx, p, object, send),
         },
-        O::Prints { command } => match command {
+        O::Prints {
+            command: None,
+            market,
+            expiry,
+            owner,
+        } => prints::list(
+            ctx,
+            p,
+            market.as_deref(),
+            expiry.as_deref(),
+            owner.as_deref(),
+        ),
+        O::Prints {
+            command: Some(command),
+            ..
+        } => match command {
             PrintCommand::Opening {
                 target,
                 source,
@@ -267,15 +299,16 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 archive_url,
                 evidence,
                 stake,
-            } => writes::print_opening(
+                accept,
+            } => prints::print_opening(
                 ctx,
                 p,
                 target,
                 source,
                 value.as_deref(),
                 writes::Cite::of(archive_url, evidence),
-                stake,
-                None,
+                stake.as_deref(),
+                *accept,
             ),
             PrintCommand::Challenge {
                 target,
@@ -285,23 +318,36 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 evidence,
                 bond,
                 challenge_id,
-            } => writes::print_opening(
+            } => prints::challenge(
                 ctx,
                 p,
                 target,
-                source,
-                value.as_deref(),
-                writes::Cite::of(archive_url, evidence),
-                bond,
-                Some(challenge_id.as_deref().unwrap_or("")),
+                &prints::ChallengeRequest {
+                    source,
+                    value: value.as_deref(),
+                    cited: writes::Cite::of(archive_url, evidence),
+                    bond: bond.as_deref(),
+                    challenge_id: challenge_id.as_deref(),
+                },
             ),
-            PrintCommand::Finalize { target, source } => {
-                writes::print_finalize(ctx, p, target, source)
-            }
-            PrintCommand::Expire { target, source } => writes::print_expire(ctx, p, target, source),
+            PrintCommand::Finalize { target, source } => prints::finalize(ctx, p, target, source),
+            PrintCommand::Expire { target, source } => prints::expire(ctx, p, target, source),
             PrintCommand::FinalizePhase { target } => writes::print_finalize_phase(ctx, p, target),
         },
-        O::Updates { command } => match command {
+        O::Updates {
+            command: None,
+            list,
+        } => updates::list(
+            ctx,
+            p,
+            list.market.as_deref(),
+            list.expiry.as_deref(),
+            list.owner.as_deref(),
+        ),
+        O::Updates {
+            command: Some(command),
+            ..
+        } => match command {
             UpdateCommand::Commit {
                 target,
                 source,
@@ -309,16 +355,20 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 archive_url,
                 evidence,
                 stake,
-            } => writes::update_commit(
+                reveal,
+            } => updates::commit(
                 ctx,
                 p,
                 target,
-                source,
-                value.as_deref(),
-                writes::Cite::of(archive_url, evidence),
-                stake,
+                &updates::CommitRequest {
+                    source,
+                    value: value.as_deref(),
+                    cited: writes::Cite::of(archive_url, evidence),
+                    stake: stake.as_deref(),
+                    reveal: *reveal,
+                },
             ),
-            UpdateCommand::Reveal { claim, send } => writes::update_reveal(ctx, p, claim, send),
+            UpdateCommand::Reveal { claim, send } => updates::reveal(ctx, p, claim, send.simulate),
             UpdateCommand::Challenge {
                 target,
                 claim,
@@ -327,17 +377,19 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
                 evidence,
                 bond,
                 challenge_id,
-            } => writes::update_challenge(
+            } => updates::challenge(
                 ctx,
                 p,
                 target,
-                claim,
-                value.as_deref(),
-                writes::Cite::of(archive_url, evidence),
-                bond,
-                challenge_id.as_deref(),
+                &updates::ChallengeRequest {
+                    claim,
+                    value: value.as_deref(),
+                    cited: writes::Cite::of(archive_url, evidence),
+                    bond: bond.as_deref(),
+                    challenge_id: challenge_id.as_deref(),
+                },
             ),
-            UpdateCommand::Expire { target, claim } => writes::update_expire(ctx, p, target, claim),
+            UpdateCommand::Expire { target, claim } => updates::expire(ctx, p, target, claim),
         },
         O::Sponsor { candidate, send } => sponsor::sponsor(ctx, p, candidate, send),
         O::Rewards {
@@ -381,26 +433,76 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
             sponsor::reserve_withdraw_write(ctx, agent, amount)?,
             s.simulate,
         ),
+        O::Challenges {
+            market,
+            expiry,
+            owner,
+        } => challenges::list(
+            ctx,
+            p,
+            market.as_deref(),
+            expiry.as_deref(),
+            owner.as_deref(),
+        ),
+        O::Stakes {
+            command: None,
+            market,
+            expiry,
+            owner,
+            settled,
+        } => stakes::list(
+            ctx,
+            p,
+            market.as_deref(),
+            expiry.as_deref(),
+            owner.as_deref(),
+            *settled,
+        ),
         O::Stakes {
             command:
-                StakeCommand::Settle {
-                    target,
+                Some(StakeCommand::Settle {
+                    market,
+                    expiry,
+                    send,
+                    all,
                     kind,
                     source,
                     owner,
                     claim,
                     challenge,
+                }),
+            ..
+        } => {
+            if *all {
+                return stakes::settle_all(
+                    ctx,
+                    p,
+                    market.as_deref(),
+                    expiry.as_deref(),
+                    owner.as_deref(),
+                    send,
+                );
+            }
+            let (Some(market), Some(kind), Some(source)) = (market, kind, source) else {
+                return futures::error::bail(
+                    "give the month, --kind and --source: petri oracle stakes settle RAMX-202612 --kind opening-claim --source <SOURCE> (or --all)",
+                );
+            };
+            writes::stake_settle(
+                ctx,
+                p,
+                &args::Target {
+                    market: market.clone(),
+                    expiry: expiry.clone(),
+                    send: send.clone(),
                 },
-        } => writes::stake_settle(
-            ctx,
-            p,
-            target,
-            *kind,
-            source,
-            owner.as_deref(),
-            claim.as_deref(),
-            challenge.as_deref(),
-        ),
+                *kind,
+                source,
+                owner.as_deref(),
+                claim.as_deref(),
+                challenge.as_deref(),
+            )
+        }
         O::Emergency { command } => council::run(ctx, p, command),
     }
 }

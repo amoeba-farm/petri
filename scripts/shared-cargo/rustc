@@ -1,0 +1,5 @@
+#!/bin/sh
+# RUSTC_WORKSPACE_WRAPPER of scripts/shared-cargo.sh: runs rustc unchanged.
+# Cargo hashes this file's path into the workspace members' artifacts, and
+# each worktree has its own path, so each gets its own artifacts.
+exec "$@"

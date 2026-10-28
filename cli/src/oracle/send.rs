@@ -483,6 +483,23 @@ fn simulated_ok(results: &[Value], count: usize) -> bool {
 
 /// Reviews, confirms and sends `write`, or simulates it with `simulate`.
 pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Report> {
+    run_with(ctx, p, write, simulate_only, false)
+}
+
+/// Sends `write` without asking again: the second half of a step the user
+/// confirmed as a whole (`updates commit --reveal` reveals what it
+/// committed).
+pub fn run_confirmed(ctx: &Ctx, p: Paint, write: Write) -> Result<Report> {
+    run_with(ctx, p, write, false, true)
+}
+
+fn run_with(
+    ctx: &Ctx,
+    p: Paint,
+    write: Write,
+    simulate_only: bool,
+    confirmed: bool,
+) -> Result<Report> {
     let (identity, _config) = chain_identity::verify_oracle(ctx)?;
     let oracle = identity.oracle;
     let payer = ctx.wallet_pubkey()?;
@@ -564,7 +581,9 @@ pub fn run(ctx: &Ctx, p: Paint, write: Write, simulate_only: bool) -> Result<Rep
     if !ctx.s.json {
         eprintln!("{}", lines.join("\n"));
     }
-    confirm(ctx, &format!("{}?", write.title))?;
+    if !confirmed {
+        confirm(ctx, &format!("{}?", write.title))?;
+    }
     // The review went to stderr; the result lists what landed.
     let mut lines = vec![p.bold(&write.title)];
     let signer = ctx.signer()?;

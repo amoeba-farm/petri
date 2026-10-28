@@ -258,7 +258,7 @@ A proof does not change what a record is. As a source it must read a
 a source. Public pages keep their Wayback captures. For an opening or update
 of a source behind a sign-in, the proof is of the source's own URL, given
 with `--evidence <bundle>` in place of `--archive-url`
-(`petri oracle updates commit`).
+(`petri oracle updates commit --reveal`).
 
 A candidate file contains the backend's source fields:
 
@@ -338,20 +338,38 @@ Each month's oracle phase sets its work. While it takes sources
 source gap. In Opening each frozen source still without an opening value gets
 one opening task, with its product's opening bond and budget when the snapshot
 lists them; it follows the chain's phase, since the oracle takes openings until
-listing on the chain's own clock. In Game each live source gets an update task.
+listing on the chain's own clock. In Game each live source gets an update task:
+the agent commits the new value and reveals it in one step (`petri oracle
+updates commit … --reveal`, or `petri oracle observe … --reveal` on a chip
+month), since the reveal window is 150 slots, well under a minute; `petri
+oracle updates` shows how each update stands, what is open to challenge and
+which sources take one.
 A Settled month whose rewards are frozen gets one claims task, if this
 workspace's agents worked on that month. It comes up until a run on it
 finishes, and again when the owner picks it: `petri oracle rewards <month>`,
 then `petri oracle rewards claim <month> --yes` and `petri oracle sponsorships
 claim <source> --yes` for what that lists. Scramble's challenge and freeze
-days take nothing. `work next` hands out the
+days take nothing: challenging a source is the owner's own call, and `petri
+oracle challenges` lists what is open to challenge, with the exact bond. `work next` hands out the
 owner's picks first, then openings (the Opening lasts a day), then what needs
 the most, and prints that phase's petri steps for the owner's wallet: for an
 opening, read the value, archive the source's exact URL with a capture from the
-Opening's start up to the chain's clock, `petri oracle prints opening` with the
-product's opening bond, `prints finalize` 300 slots later and before listing,
-and `petri oracle stakes settle --kind opening-claim` for the bond. An opening
-or update that earns nothing this month comes up only when the owner picks it.
+Opening's start up to the chain's clock, `petri oracle prints opening` (its
+stake is the product's opening bond, which petri picks when `--stake` is left
+out), `prints finalize` once its 300 slots pass and before listing (`prints
+opening --accept` waits out the window and accepts it in one step), and
+`petri oracle stakes settle --kind opening-claim` for the bond. `petri oracle
+stakes` lists every bond and stake of the owner's still in the vault, what
+each waits for and what settles now; `petri oracle stakes settle --all`
+collects each one that pays the owner. `petri oracle prints
+<month>` shows how each of the owner's prints stands (open to challenge, ready
+to accept, challenged: the oracle authority rules on that by hand on the
+opening day), with the exact accept and settle commands, the prints of others
+still open to challenge (with the exact bond) and the sources still waiting
+for one. Challenging someone's print is the owner's own call, like a source
+challenge. A print not accepted or ruled by listing can't be any more, and
+its stake stays locked. An opening or update that earns nothing this month
+comes up only when the owner picks it.
 
 Repeated assessments update stable objectives. Fresh evidence of adequate
 coverage resolves an objective; a later shortage reopens it. Stale or failed

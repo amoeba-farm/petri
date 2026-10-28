@@ -534,23 +534,28 @@ oracle series check FILE [MONTH]          the spec's routing of a series, on its
 oracle series propose MONTH --file FILE [--bond USDC]   a series as a source (only one the spec admits)
 oracle series show MONTH                  a chip month's sources, their series and whether each counts
 oracle observe template MONTH --source ID [--out FILE]  a blank observation of a source's series
-oracle observe MONTH --source ID --file OBS.json [--stake USDC]   its opening print or a Game update
+oracle observe MONTH --source ID --file OBS.json [--stake USDC] [--reveal] [--accept]   its opening print or a Game update
 oracle observe record MONTH --source ID --claim CLAIM [--file OBS.json]   store a print's record again
 oracle sources propose MARKET --bucket SKU --url URL --source-type T
                        (--definition T | --definition-file F) --bond USDC [--source-id HEX]
-oracle sources support MARKET --source ID --stake USDC
+oracle sources support MARKET --source ID [--stake USDC]
 oracle sources close MARKET
-oracle sources challenge MARKET --source ID --reason N --bond USDC --evidence-hash HEX
-                         [--comparison ID] [--challenge-id HEX]
-oracle prints opening MARKET --source ID --value V --archive-url URL --stake USDC
-oracle prints challenge MARKET --source ID --value V --archive-url URL --bond USDC
+oracle sources challenge MARKET --source ID --reason REASON (--why TEXT | --why-file F | --evidence-hash HEX)
+                         [--bond USDC] [--comparison ID] [--challenge-id HEX]
+oracle challenges [MARKET] [--expiry E] [--owner PUBKEY]   source challenges: yours, how each stands, what is open now
+oracle prints [MARKET] [--expiry E] [--owner PUBKEY]   opening prints: yours, how each stands, what is open now
+oracle prints opening MARKET --source ID (--value V --archive-url URL | --evidence BUNDLE) [--stake USDC] [--accept]
+oracle prints challenge MARKET --source ID (--value V --archive-url URL | --evidence BUNDLE) [--bond USDC] [--challenge-id HEX]
 oracle prints finalize|expire MARKET --source ID
 oracle prints finalize-phase MARKET
-oracle updates commit MARKET --source ID --value V --archive-url URL --stake USDC
+oracle updates [MARKET] [--expiry E] [--owner PUBKEY]   Game updates: yours, how each stands, what is open now
+oracle updates commit MARKET --source ID (--value V --archive-url URL | --evidence BUNDLE) [--stake USDC] [--reveal]
 oracle updates reveal <CLAIM>
-oracle updates challenge MARKET --claim CLAIM --value V --archive-url URL --bond USDC
+oracle updates challenge MARKET --claim CLAIM (--value V --archive-url URL | --evidence BUNDLE) [--bond USDC] [--challenge-id HEX]
 oracle updates expire MARKET --claim CLAIM
+oracle stakes [MARKET] [--expiry E] [--owner PUBKEY] [--settled]   your bonds and stakes: what each waits for, where it went
 oracle stakes settle MARKET --kind KIND --source ID [--owner PUBKEY] [--claim CLAIM] [--challenge ADDRESS]
+oracle stakes settle --all [MARKET] [--owner PUBKEY]   every one of yours that pays you now
 oracle rewards [MARKET] [--expiry E] [--owner PUBKEY]   your rewards, month by month
 oracle rewards claim MARKET [--kind proposer|supporter|opening|update]
 oracle sponsor <CANDIDATE>                your collateral posts a research candidate's listing bond
@@ -601,12 +606,134 @@ whose root the month's coverage manifest commits to, or against the bucket set
 the month's sources carry when that is what it commits to (dev bootstrap
 months); it refuses when none reproduces the committed root. `--bucket` takes
 the label, the 64-hex id, or a chip bucket's name (`"DDR5 16Gb"`), and every
-view names a chip bucket by its name ("RAMX · Dec 2026 · DDR5 16Gb"). `sources support` stakes on a source;
-`sources challenge` bonds a challenge (reason codes are the program's).
+view names a chip bucket by its name ("RAMX · Dec 2026 · DDR5 16Gb"). `sources support MONTH --source ID
+[--stake USDC]` stakes on someone else's candidate source (tag 183); `--stake` may
+be left out: it is the product's support bond exactly (its SKU pool's), and
+another amount is refused, naming it. Before sending, `--simulate` included,
+Petri refuses what the program would: outside the month's placement window (while
+it takes sources, from its planned Scramble start and only while Scramble's
+review days still fit before its expiry; in Scramble, its four placement days,
+before the recipe freeze), unfunded rewards, a source that is not a candidate,
+your own source, one this wallet supports already (one stake a wallet), or too
+little collateral. The stake comes back once the source opens or is set aside,
+whatever becomes of it (`petri oracle stakes`).
+`sources challenge` bonds a challenge (below).
 `sources close` closes a month's source window (it finalizes the SKU
 coverage, which anyone may send) once every product has a supported source;
 it refuses before that, saying how many are covered. Scramble's challenge
 days, its freeze, Opening and Game then follow on the calendar.
+
+### Source challenges
+
+A challenge says a candidate source is wrong and backs that with a bond. The
+oracle takes challenges on Scramble days 5 and 6 (from 4 to 6 days after
+Scramble starts, on the chain's clock); its authority rules on day 7, by the
+Opening's start (`futures-ops resolve-challenge`, tag 185), or leaves a
+challenge to the council (30/18).
+
+`sources challenge MONTH --source ID --reason REASON (--why TEXT | --why-file
+F | --evidence-hash HEX)` (tag 161):
+
+- `--reason` takes a name or a code: `wrong-component` (1), `unavailable`
+  (2), `stale` (3), `methodology` (4), `other` (5) or `duplicate` (8), the
+  reasons of the contributor docs. The program stores the code as given and
+  reads only 8, its non-independent reason: a `duplicate` names the source it
+  duplicates with `--comparison` (another candidate of the same bucket; Petri
+  refuses a duplicate without one, and `--comparison` with any other reason),
+  its bond is on the larger support of the two, and upheld it merges the
+  source into the other. Any other number is sent as that code and shows as
+  `reason N`.
+- `--why TEXT` (or `--why-file`) says why the source is wrong. Petri first
+  writes and seals it as a public definition object (as `evidence write
+  --kind definition` does, resuming a partial draft) and commits the challenge
+  to that object's hash, so whoever rules reads it with `petri oracle evidence
+  show <OBJECT>`. The text is public and permanent. `--evidence-hash` commits
+  to evidence you published some other way instead; one of the three is
+  required.
+- `--bond` may be left out: the bond is exact, `floor(backing × bps / 10,000)`
+  held between the product's minimum and maximum (its SKU pool's challenge
+  terms, currently 20%, at least 1 and at most 10 USDC), where the backing is
+  the source's support (its listing bond does not count). Petri computes it
+  and the review shows it; a `--bond` that differs is refused, naming the
+  amount.
+- Before anything is sent, `--simulate` included, Petri checks what the
+  program will and says what fails: the month is in Scramble and inside its
+  challenge window (naming when it opens, or when it closed), the source is a
+  candidate, it has support ("nobody supports this source yet, so it can't be
+  challenged"), you are not its proposer, neither it nor the comparison has a
+  challenge or council dispute open, the comparison is another candidate of
+  the same bucket, the month's rewards are funded, and your oracle collateral
+  has the bond available.
+
+Its JSON's `details`: `challenge` (the address), `challengeId`, `month`
+(`expiryId`, `period`, `month`, `phase`), `source` (`source`, `sourceId`,
+`bucket`, `bucketName`, `status`, `currentState`), `url`, `comparison` (as
+`source`, or null), `reason` (its name, or `reason N`), `reasonCode`,
+`bondAtoms`, `evidenceHash`, `evidenceObject` (the sealed `--why` object, or
+the challenger's own definition object for `--evidence-hash` when there is
+one, else null), `rulingFromUtc` and `ruledByUtc` (Scramble day 7: from the
+window's close to the Opening's start) and `settleCommand`.
+
+How it ends, and where the bond goes once settled: upheld (the source
+rejected, or merged) pays the challenger the bond back plus the source's
+listing bond; dismissed pays the bond to the source's proposer; cancelled
+(tag 192) refunds it; one not ruled by the Opening's start settles as
+dismissed; one with the council waits for its decision. Nothing moves until
+someone settles it, which anyone may: `petri oracle stakes settle MONTH
+--kind source-challenge --source SOURCE --challenge ADDRESS` (tag 169).
+
+`challenges [MARKET] [--expiry E] [--owner PUBKEY]` reads from chain the
+owner's source challenges (the attached wallet by default; every challenge
+when there is none), as challenger or as the challenged source's proposer,
+then, for each month in its challenge window with funded rewards, the sources
+open to challenge now: candidates with support and no challenge or dispute
+open, not the owner's own, each with the bond it takes. A person reads a
+table and the settle commands under it; `--json` gives:
+
+```json
+{
+  "ok": true,
+  "owner": "7gvW…",
+  "chainTimeUtc": "2026-10-29T10:00:00.000Z",
+  "challenges": [{
+    "month": "RAMX-202701", "monthAddress": "…", "challenge": "…", "challengeId": "…",
+    "role": "challenger", "source": "…", "sourceId": "…", "url": "https://…",
+    "bucket": "DDR5_16GBIT", "bucketName": "DDR5 16Gb", "comparison": null,
+    "challenger": "7gvW…", "reason": "stale", "reasonCode": 3, "bondAtoms": "2500000",
+    "status": "waiting", "statusText": "Waiting for the ruling (day 7)", "outcome": null,
+    "paysTo": null, "rulingFromUtc": "2026-10-30T00:00:00.000Z",
+    "ruledByUtc": "2026-10-31T00:00:00.000Z", "evidenceHash": "…", "evidenceObject": "…",
+    "why": "The page has shown the same price since September", "settled": false,
+    "settleCommand": null
+  }],
+  "open": [{
+    "month": "RAMX-202701", "monthAddress": "…", "windowClosesUtc": "2026-10-30T00:00:00.000Z",
+    "ruledByUtc": "2026-10-31T00:00:00.000Z", "source": "…", "sourceId": "…", "url": "https://…",
+    "bucket": "DDR4_8GBIT", "bucketName": "DDR4 8Gb", "supportAtoms": "12500000",
+    "bondAtoms": "2500000",
+    "command": "petri oracle sources challenge RAMX-202701 --source … --reason <REASON> --why \"<TEXT>\""
+  }]
+}
+```
+
+- `role`: `challenger` or `proposer` (whose money is in it), null without an
+  owner.
+- `status`: `waiting` (Waiting for the ruling (day 7)), `council` (With the
+  council), `upheld-rejected` (Upheld — source rejected), `upheld-merged`
+  (Upheld — merged), `dismissed` (Dismissed, or "Dismissed (not ruled in
+  time)" when the Opening began unruled), `cancelled` (Cancelled) or
+  `settled` (Settled, its bond paid out); `statusText` is the words.
+- `outcome`: how it ended, one of the `status` codes above other than
+  `waiting`, `council` and `settled`; null until it is decided. `paysTo`:
+  `challenger` or `proposer`, whose collateral the bond settles into.
+- `why`: the text of the challenge's evidence when it is a sealed definition
+  object its challenger wrote (`--why`), else null; `evidenceObject` is that
+  object.
+- `settleCommand`: the exact `stakes settle` command once it is decided and
+  not yet settled, else null.
+- `open[].bondAtoms`: the bond of an ordinary challenge (a `duplicate`'s is on
+  the larger support of the two sources); null when the product has no
+  challenge terms.
 
 ### Comparison series (chip months)
 
@@ -671,7 +798,11 @@ digest, its bundle file, or its `amoeba-evidence-v1;…` record), cited as its
 evidence record and published with the print; a proof's price must be the
 observation's `rawPrice`. It then sends by phase: in Opening the opening print
 (value `price_atoms(rawPrice)`, held to the opening checks below), in Game a
-sealed update commit (reveal it with `updates reveal`). The stake defaults to the product's
+sealed update commit, held to the update checks below (Game updates). With
+`--reveal` it reveals the update as soon as the commit lands, in one step;
+without it, reveal it with `updates reveal` within 150 slots. In Opening
+`--reveal` changes nothing (an opening print has no reveal), so a caller can
+always pass it. The stake defaults to the product's
 exact opening bond or update stake. Once the print is on chain (an update once
 revealed), Petri stores its observation record with the API
 (`POST /oracle/observations`), signed by the wallet that made the claim: the
@@ -686,37 +817,542 @@ later (an update's observation stays in the private claims file until then).
 
 ### Opening prints
 
-`prints opening` submits a bonded opening value for a frozen source with its
-Wayback archive URL; the source time is the archive's capture time, and the
-archive object is written first. Before sending anything it checks the
-oracle's rules and names what fails: the month is in Opening on the chain's
-clock (from the end of Scramble's seven days to listing), the capture time is
-from the Opening's start up to the chain's clock, the archive is of the
-source's own URL, and `--stake` is the product's opening bond exactly.
-`prints challenge` bonds an alternative. `prints finalize` accepts an
-unchallenged print 300 slots after it landed (before listing), `prints
-expire` marks an unclaimed frozen source inactive (from listing), and `prints
-finalize-phase` moves the month into Game and the period to Live, once every
-frozen source is resolved and the oracle has weighted them.
+In a month's Opening, from the end of Scramble's seven days to listing on the
+chain's clock, each frozen source takes one bonded opening print: its value,
+where the source starts in Game. Anyone can submit one, bonding the product's
+opening bond from their oracle collateral. For 300 slots after it lands anyone
+but its claimant can challenge it with an alternative; after that anyone
+accepts an unchallenged one. From listing, a frozen source left without a
+print is set aside for the month.
+
+Who acts on a print:
+
+- **Accepting** (tag 165) is permissionless and done by hand: the claimant,
+  or anyone, runs `prints finalize`. No keeper or service accepts prints, on
+  dev or on mainnet.
+- **A challenged print** is ruled by the oracle authority, by hand, on the
+  opening day (tag 164, `futures-ops resolve-opening`: keep the print, take
+  the alternative, reject it so the source takes another, or set the source
+  aside). On mainnet that is the user with the authority's KMS key
+  (`3G1cL23…`); on dev an operator with the dev keys. A ruling can leave it
+  to the council instead (30/18, kind Opening). No service rules
+  automatically.
+- **Money** moves only when someone settles it (tag 169, anyone may):
+  `stakes settle --kind opening-claim` returns an accepted print's stake;
+  `stakes settle --kind opening-challenge` settles a ruled challenge, which
+  also gives a kept or replaced print a new 300-slot window before it can be
+  accepted.
+
+Where the money goes: accepted, the stake goes back to its claimant; kept,
+the challenger's bond goes to the claimant; upheld with the alternative, the
+challenger becomes the claimant (their bond is the print's stake now) and the
+first claimant's stake goes to the challenger; rejected (the source takes
+another print, or sits the month out), the challenger gets the bond back and
+the print's stake.
+
+**Nothing resolves a print at listing.** A print still waiting or
+challenged when the chain's clock reaches listing can no longer be accepted
+(165), ruled on (164) or set aside (81), and no instruction refunds it: its
+stake, and a challenger's bond, stay locked, and the month cannot enter Game
+(its period fails at expiry). A challenge the council holds can still be
+decided while the month is in Opening, but a print it keeps or replaces
+then can't be accepted either. Petri refuses a print whose window would end
+after listing, and the challenge review says when the ruling is due.
+
+`prints opening MONTH --source ID (--value V --archive-url URL | --evidence
+BUNDLE) [--stake USDC]` (tag 162) cites the source's page with a Wayback
+archive URL (the source time is its capture time) or a web proof's evidence
+record, written as an evidence object first. Before sending anything,
+`--simulate` included, it checks the oracle's rules and names what fails:
+the month is in Opening on the chain's clock, the capture time is from the
+Opening's start up to the chain's clock, the archive is of the source's own
+URL, the source is frozen and free for a print (none waiting, no opening
+yet; a rejected print's challenge settled), your collateral holds the stake,
+and the window would end before listing. `--stake` may be left out: it is
+the product's opening bond exactly, and another amount is refused, naming
+it. `oracle observe` sends the same print from an observation on a chip
+month.
+
+With `--accept` (on `prints opening`, and on `observe` in Opening) petri
+waits out the print's 300 slots after it lands, looking at the chain's slot
+and the claim every few seconds at the chain's pace, then accepts it with
+`prints finalize`'s checks, without asking again. It does not accept one
+that was challenged meanwhile (the oracle authority rules on it by hand on
+the opening day), one already accepted or rejected, or one whose window
+listing overtook. The print stands whatever happens; the JSON `details`
+say what did: `accepted` (true or false), `acceptStatus` (`accepted`,
+`challenged`, `too-late`, `not-waiting`, `failed`, `missing`, or
+`not-simulated` under `--simulate`, where nothing is on chain yet),
+`acceptText` (the plain words), `acceptSignature` (the accept's, or null:
+also null when someone else accepted it first), `acceptCommand` (the
+`prints finalize` command when it was not accepted) and, once accepted,
+`settleCommand` (the stake's `stakes settle --kind opening-claim`); `accept`
+holds the accept's own result. On a Game update `observe --accept` changes
+nothing, so a caller can always pass `--reveal --accept`.
+
+`prints challenge MONTH --source ID (--value V --archive-url URL |
+--evidence BUNDLE) [--bond USDC] [--challenge-id HEX]` (tag 163) checks first:
+the month is in Opening on the chain's clock, the source has a print, it is
+waiting (not challenged already, accepted or rejected), it is not yours (its
+claimant can't challenge it), its 300 slots have not passed, the alternative
+meets the archive rules above and differs from the print, your collateral
+holds the bond, and the challenge id is free. `--bond` may be left out: it is
+exact, `floor(stake × bps / 10,000)` held between the product's minimum and
+maximum (its SKU pool's challenge terms on the print's stake; currently 20%,
+at least 1 and at most 10 USDC), and another amount is refused, naming it.
+
+`prints finalize MONTH --source ID` (tag 165) checks that the print is
+waiting, unchallenged and past its window, and that listing has not passed:
+it says when the print can be accepted (the slot and about when), and when
+that is after listing. A challenged one names its challenge and who rules
+on it.
+
+`prints expire MONTH --source ID` (tag 81) checks that the month is in
+Opening from listing until its expiry, the source is frozen without an
+opening or a print, not every source is resolved, and nothing carries over
+from the previous month in progress. `prints finalize-phase` moves the month
+into Game and the period to Live, once every frozen source is resolved and the
+oracle authority has weighted them (`futures-ops activate-weights`).
+
+Each write's JSON `details` carry what a card needs: `month` (`expiryId`,
+`period`, `month`, `phase`), `source` (`source`, `sourceId`, `bucket`,
+`bucketName`, `status`, `currentState`), `url`, `bucketName`, `claim`,
+`value`/`valueAtoms` (the alternative's for a challenge, with `printValue`),
+`sourceTimeUtc`, `stakeAtoms` or `bondAtoms`, `evidence` (the archive URL or
+evidence record) and `evidenceObject`, `challengeDeadlineSlot`,
+`challengeableUntilUtc`, `acceptFromUtc`, `openingClosesUtc` (listing) and
+`nextCommand` (`acceptCommand` after a print, `settleCommand` after a
+challenge or an accept; a challenge also gives `challenge`, `challengeId`,
+`claimant`, `ruledBy` and `ruledByUtc`).
+
+**Times.** A print's window is counted in slots: it closes at its
+`challengeDeadlineSlot`. Petri turns slots into times on the chain's clock
+at the chain's own pace, measured over the current epoch: the Clock sysvar's
+time and the epoch's start time against the slots since the epoch's first
+slot (from the EpochSchedule sysvar), `slotMs` in the read below; under
+1,000 slots into an epoch it assumes Solana's 400 ms. Mainnet ran about 210 ms
+a slot in October 2026, so 300 slots are about a minute there; the dev chain's
+clock moves about 250 ms a slot. Those times are estimates; the slot is exact.
+
+`prints [MARKET] [--expiry E] [--owner PUBKEY]` reads from chain the owner's
+prints (the attached wallet by default; every print when there is none),
+the owner's challenges of others' prints, then the prints open to challenge
+now (others' waiting prints inside their window, in a month whose Opening is
+open, each with the exact bond) and the frozen sources still waiting for a
+print (with the opening bond and the command: `observe` on a chip month,
+`prints opening` otherwise). Without MARKET it reads every month with one
+program scan of the sources and, when there are claims, one of the
+challenges; the claims are read by their addresses. A person reads tables
+and the commands under them; `--json` gives:
+
+```json
+{
+  "ok": true,
+  "owner": "7gvW…",
+  "chainTimeUtc": "2026-11-29T01:02:03.000Z",
+  "chainSlot": 470123456,
+  "slotMs": 212,
+  "prints": [{
+    "month": "RAMX-202612", "monthAddress": "…", "claim": "…", "source": "…", "sourceId": "…",
+    "url": "https://…", "bucket": "DDR5_16GBIT", "bucketName": "DDR5 16Gb",
+    "role": "yours", "claimant": "7gvW…", "value": "3.42", "valueAtoms": "3420000",
+    "sourceTimeUtc": "2026-11-29T00:58:10.000Z", "stakeAtoms": "1000000",
+    "evidence": "https://web.archive.org/web/20261129005810/https://…",
+    "status": "challengeable", "statusText": "Open to challenge",
+    "challengeDeadlineSlot": 470123700, "challengeableUntilUtc": "2026-11-29T01:02:54.000Z",
+    "acceptFromUtc": "2026-11-29T01:02:54.000Z", "openingClosesUtc": "2026-11-30T00:00:00.000Z",
+    "acceptCommand": null, "settleCommand": null, "settled": false,
+    "challenge": null
+  }],
+  "open": [{
+    "month": "RAMX-202612", "monthAddress": "…", "claim": "…", "source": "…", "sourceId": "…",
+    "url": "https://…", "bucket": "DDR4_8GBIT", "bucketName": "DDR4 8Gb", "claimant": "…",
+    "value": "1.95", "valueAtoms": "1950000", "sourceTimeUtc": "2026-11-29T00:57:00.000Z",
+    "stakeAtoms": "1000000", "evidence": "https://web.archive.org/web/…",
+    "challengeDeadlineSlot": 470123650, "challengeableUntilUtc": "2026-11-29T01:02:44.000Z",
+    "bondAtoms": "1000000",
+    "command": "petri oracle prints challenge RAMX-202612 --source … --value <VALUE> --archive-url <ARCHIVE URL>"
+  }],
+  "unclaimed": [{
+    "month": "RAMX-202612", "monthAddress": "…", "source": "…", "sourceId": "…", "url": "https://…",
+    "bucket": "DDR4_16GBIT", "bucketName": "DDR4 16Gb", "stakeAtoms": "1000000",
+    "openingClosesUtc": "2026-11-30T00:00:00.000Z",
+    "command": "petri oracle observe RAMX-202612 --source … --file OBS.json"
+  }]
+}
+```
+
+- `role`: `yours` (your print, or an earlier print of yours a claim no longer
+  holds) or `challenging` (your challenge of someone else's print); null
+  without an owner. An earlier print comes from its evidence link: one
+  replaced by a challenger's value, or rejected before the source took
+  another; its `stakeAtoms` is the product's opening bond it posted.
+- `status`, with `statusText` its words:
+  - `challengeable` — Open to challenge: waiting, inside its 300 slots.
+  - `acceptable` — Unchallenged: anyone can accept it now (`acceptCommand`).
+  - `challenged` — Challenged: waiting for the oracle authority's ruling,
+    made by hand on the opening day.
+  - `council` — With the council.
+  - `kept` — Kept by the ruling: once the challenge settles its bond goes to
+    the claimant, and the print can be challenged again.
+  - `replaced` — The challenger's value won: once the challenge settles it is
+    the opening print, and the first claimant's stake goes to the challenger.
+  - `rejected` — Rejected: once the challenge settles, the challenger gets
+    the bond back and the print's stake.
+  - `accepted` — Accepted: its stake can go back to the claimant.
+  - `cancelled` — Called off: the stake and the bond go back (the program has
+    this outcome; no opening path reaches it today).
+  - `expired` — Not resolved before listing: nothing can accept, rule on or
+    refund it now, so its money stays locked.
+  - `settled` — its money settled; `statusText` says how ("Accepted; its
+    stake went back to the claimant", "Rejected; …", "Replaced by the
+    challenger's value; …", "Kept; the challenge bond went to the claimant").
+- A `challenging` item's `status` is the print's as it stands now; its
+  `challenge` is your challenge, with its own `status` in the same words.
+  When the print you challenged was rejected and the source took another,
+  the item's print fields (`claimant`, `value`, …) are null.
+- `challenge` (on `yours`): the challenge its standing comes from (the
+  unsettled one of its attempt, else its last), or null.
+- `challengeDeadlineSlot`, `challengeableUntilUtc` and `acceptFromUtc` are set
+  while it waits (`challengeable`, `acceptable`): the slot its window closes
+  at and about when (see Times); the print can be challenged before that slot
+  and accepted from it.
+- `acceptCommand`: the exact `prints finalize` command once it can be
+  accepted, else null. `settleCommand`: the exact `stakes settle` command once
+  its money can settle (`--kind opening-claim` for an accepted print,
+  `--kind opening-challenge --challenge …` for a ruled one), else null.
+- `evidence`: the archive URL or evidence record the print cites, read from
+  the archive object its claimant (or challenger) wrote, else null.
+- `open[].bondAtoms`: the exact bond of a challenge of that print; null when
+  the product has no challenge terms.
 
 ### Game updates
 
-`updates commit` seals a source update with a stake: only a commitment hash goes
-on chain. The value, archive URL and secret salt are saved in Petri's private
-`oracle-update-claims.json` (mode 0600, next to the config) and never printed;
-`updates reveal <CLAIM>` writes the archive evidence and reveals the claim from
-that file. `updates challenge` bonds an alternative to a revealed update, and
-`updates expire` refunds a commitment nobody revealed after its deadline. A
-month's update lane needs its finalized active-weight manifest; months formed
-by the dev bootstrap do not have one, so commits there fail with
+A Game update is a new value for an active source while its month is in Game
+(from listing to expiry, on the chain's clock). It goes on chain in two
+steps and then waits out a challenge window:
+
+1. `updates commit` (tag 166) seals it with the product's exact update stake:
+   only a commitment hash goes on chain. The value, its evidence and a secret
+   salt are saved in Petri's private `oracle-update-claims.json` (mode 0600,
+   next to the config) and never printed.
+2. `updates reveal <CLAIM>` (198) writes the evidence object (a Wayback
+   archive URL, or a web proof's evidence record) and reveals the claim from
+   that file. The program takes the reveal from one slot after the commit for
+   150 slots: about 32 seconds on mainnet at its current slot length (the
+   read's `msPerSlot` says what it is), longer on the dev chain.
+   **`--reveal`** on `updates commit` and on `observe` does both in one step:
+   once the commit lands it waits for the first reveal slot and reveals,
+   without asking again. If the reveal fails the commit still stands: the
+   command says so plainly, keeps the private file, and gives the reveal
+   command and its deadline (JSON: `"ok": false`, `error.code`
+   `ORACLE_REVEAL_FAILED`, `"revealed": false`, and in `details`
+   `revealCommand`, `revealByUtc`, `expireCommand`). Without `--reveal`
+   nothing changes: the commit prints the reveal command and its deadline.
+3. Revealed, it is open to challenge until it is accepted: `updates
+   challenge` (168) posts another value, with its own evidence, and the
+   exact bond. A claim takes one challenge.
+4. Unchallenged, it is accepted (199) once its challenge window has passed:
+   a day after its reveal on mainnet, 30 seconds on the dev chain (its
+   localnet oracle releases shorten it). Accepted, its value is the source's
+   current value.
+
+Who acts, and what happens to the money when nobody does:
+
+- **Accepting (199) is the oracle authority's instruction, sent by the
+  keeper** (`futures-keeper`: on the dev chain, and on mainnet as
+  `ameba-futures-keeper` signing with the authority's Cloud KMS key). Every
+  pass it accepts each revealed, unchallenged claim whose window has passed.
+  A claim that cites a web proof (kind 4) is accepted only once its bundle is
+  published and verifies; otherwise the keeper holds it and the operator
+  decides by hand (`futures-ops resolve-update SERIES --claim CLAIM
+  --accept`).
+- **A challenged claim is ruled by hand.** The operator, as the oracle
+  authority, accepts the claim, rejects it (the challenger's value becomes
+  the source's) or sends it to the council (`futures-ops resolve-update
+  SERIES --claim CLAIM --accept|--reject|--council`); accepting or rejecting
+  opens once the claim's challenge window has passed. The council's three of
+  five seats choose the claim, the alternative or neither (`futures-ops
+  council-case`, oracle 30/18). Nothing rules a challenged claim on its own:
+  on the dev chain the oracle simulation rules only on its own claims.
+- **Nobody reveals:** after its deadline the keeper refunds the commitment
+  (167; anyone can, with `updates expire`).
+- **Nobody accepts an unchallenged claim:** the keeper times it out (201)
+  once its source has taken another value (another update was accepted
+  first) or from a day after expiry; its stake goes back once settled.
+- **Nobody rules a challenged claim:** time alone never ends it. The stake
+  and the bond stay locked until it is ruled, or until its source takes
+  another value, when 201 times it out and both go back. Until then it also
+  holds up the month's settlement after expiry (the keeper reports it).
+- **Money moves only when someone settles it:** `stakes settle MONTH --kind
+  update-claim` (an unchallenged claim) or `--kind update-challenge` (169),
+  which anyone may send; the keeper does not. Accepted: the claimant gets the
+  stake back, and the bond too when its challenge was dismissed. Rejected for
+  the challenger's value: the challenger gets the stake and the bond. The
+  council's "neither", a timeout and an unrevealed commitment give each side
+  its own back. `petri oracle updates` prints the exact command.
+
+Before anything is sent, `--simulate` included, Petri checks what the program
+will and says what fails:
+
+- `updates commit`, and `observe` in Game: the month is in Game between
+  listing and expiry, its openings and active weights settled; the source is
+  active, has a value and has not printed at expiry; the new value differs
+  from the current one (the program refuses to reveal an unchanged value, so
+  its stake would only come back with `expire`); the evidence is of the
+  source's own page (its URL exactly as the source names it), captured from
+  listing on, not after the chain's clock (the dev chain's clock runs behind
+  wall time) and not after expiry; the stake is exactly the product's update
+  stake (its SKU pool's, 1 USDC now): `--stake` may be left out, and a
+  different amount is refused, naming the exact one; your oracle collateral
+  has it available.
+- `updates reveal`: this Petri holds the claim's reveal material, for this
+  wallet; the claim is still committed (not revealed, refunded or ended); the
+  chain is inside its window (Petri says when it opens, or that it closed and
+  the stake comes back with `updates expire`); the month still takes updates;
+  the source still has the value the claim was committed against.
+- `updates challenge`: the month takes challenges (Game, from listing to a
+  day after expiry); the claim is revealed and neither accepted nor ended; it
+  has no challenge yet (one per claim); it is not yours (the program refuses
+  a claimant's own challenge); it is not overtaken (its source has not taken
+  another value since); the alternative differs from the claim's value, and
+  its evidence holds as a commit's does; the bond is exact, `floor(stake ×
+  bps / 10,000)` of the claim's stake held between the product's minimum and
+  maximum (its SKU pool's challenge terms, currently 20%, at least 1 and at
+  most 10 USDC: 1 USDC on a 1 USDC stake): `--bond` may be left out, and a
+  different amount is refused, naming the exact one; your collateral has it
+  available; the challenge id is free.
+- `updates expire`: the claim was never revealed, its window has closed
+  (else Petri says until when it can still be revealed), and its stake has
+  not gone back yet.
+
+Each write's JSON `details` carries what a card needs: `month` (`expiryId`,
+`period`, `month`, `phase`), `monthAddress`, `source` (`source`, `sourceId`,
+`bucket`, `bucketName`, `status`, `currentState`), `sourceId`, `url`,
+`bucket`, `bucketName`, `claim`, `claimId`, the timing fields of the read
+below and `nextCommand`; besides:
+
+- commit: `prior`, `value`, `valueAtoms`, `sourceTimeUtc`, `stakeAtoms`,
+  `evidence`, `status` and `statusText`, `revealMaterial` (the private file's
+  path), `revealCommand`. With `--reveal`, `revealed` (true once it is
+  revealed) and `reveal` (the reveal's own result) sit beside `details`, and
+  `details` takes the revealed claim's `status`, `revealedUtc`,
+  `acceptFromUtc` and `nextCommand`; `--simulate --reveal` adds `reveal:
+  {"simulated": false, …}` (the claim is not on chain to reveal).
+- reveal: as commit, and `evidenceObject`.
+- challenge: `claimant`, `challenge`, `challengeId`, `prior`, `claimValue`
+  and `claimEvidence` (the claim's), `value`, `valueAtoms`, `sourceTimeUtc`
+  and `evidence` (the alternative's), `stakeAtoms`, `bondAtoms`, `status`
+  (`waiting`).
+- expire: `claimant`, `stakeAtoms`.
+
+`updates [MARKET] [--expiry E] [--owner PUBKEY]` reads from chain the owner's
+update claims (the attached wallet by default; without one, every claim whose
+money is still in escrow) and their challenges, the owner's challenges of
+others' claims, then the updates open to challenge now and the sources taking
+an update now. It reads every month with one program scan per account type
+(sources, update claims, update challenges) and batched account reads, never
+a scan per month. A person reads three tables and the commands under them;
+`--json` gives:
+
+```json
+{
+  "ok": true,
+  "owner": "6CZi…",
+  "chainTimeUtc": "2026-10-27T16:48:48.000Z",
+  "chainSlot": 462144005,
+  "msPerSlot": 212,
+  "challengeSeconds": 86400,
+  "updates": [{
+    "month": "RAMX-202610", "monthAddress": "…", "claim": "…", "claimId": "…",
+    "source": "…", "sourceId": "…", "url": "https://www.memorymarket.com/price/udimm",
+    "bucket": "60eb…", "bucketName": "60eb…", "role": "yours", "claimant": "6CZi…",
+    "prior": "193", "value": "196", "valueAtoms": "196000000",
+    "sourceTimeUtc": "2026-10-25T07:53:54.000Z", "stakeAtoms": "1000000",
+    "evidence": "https://web.archive.org/web/20261025075354/https://www.memorymarket.com/price/udimm",
+    "status": "accepted", "statusText": "Accepted: its value is the source's; its stake goes back",
+    "paysTo": "claimant",
+    "committedUtc": "…", "revealByUtc": "…", "revealedUtc": "2026-10-25T07:58:31.000Z",
+    "acceptFromUtc": "2026-10-26T07:58:31.000Z",
+    "revealCommand": null, "expireCommand": null,
+    "settleCommand": "petri oracle stakes settle RAMX-202610 --kind update-claim --source … --claim …",
+    "settled": false,
+    "challenge": null
+  }],
+  "open": [{
+    "month": "RAMX-202610", "monthAddress": "…", "claim": "…", "source": "…", "sourceId": "…",
+    "url": "https://…", "bucket": "…", "bucketName": "…", "claimant": "…",
+    "prior": "291.617", "value": "312.852", "valueAtoms": "312852000",
+    "sourceTimeUtc": "…", "evidence": "https://web.archive.org/web/…", "stakeAtoms": "1000000",
+    "acceptFromUtc": "…", "bondAtoms": "1000000",
+    "command": "petri oracle updates challenge RAMX-202610 --claim … --value <VALUE> --archive-url <URL>"
+  }],
+  "sources": [{
+    "month": "RAMX-202610", "monthAddress": "…", "source": "…", "sourceId": "…",
+    "url": "https://www.memorymarket.com/price/rdimm", "bucket": "…", "bucketName": "…",
+    "value": "485", "valueAtoms": "485000000", "sourceTimeUtc": "2026-10-13T03:00:00.000Z",
+    "stakeAtoms": "1000000",
+    "command": "petri oracle updates commit RAMX-202610 --source … --value <VALUE> --archive-url <URL> --reveal"
+  }]
+}
+```
+
+- `role`: `yours` (you made the claim) or `challenging` (you challenged
+  someone's claim); null without an owner.
+- `prior` and `value` are decimal text in the source's own units. A
+  committed claim's value is sealed until its reveal: `value`,
+  `valueAtoms`, `sourceTimeUtc` and `evidence` are null unless this Petri's
+  private file holds it, and `prior` is then the source's current value
+  (the one the reveal must be against).
+- `evidence`: the archive URL or evidence record a claim cites. A claim
+  stores only its hash; the text is read from the evidence object its
+  claimant (or challenger) sealed, kind 3 or 4, at its canonical address;
+  null when there is none, and for a settled claim (its evidence is not
+  read, so a long history costs no reads).
+- `status`, with `statusText` its words (which also say where the money
+  goes):
+  - `committed`: sealed, waiting for its reveal within 150 slots of the
+    commit.
+  - `expired`: not revealed in time; its stake goes back (the keeper refunds
+    it, or anyone with `expire`).
+  - `challengeable`: revealed and open to challenge; once its window has
+    passed ("Challenge window over") the keeper accepts it on its next pass,
+    a web proof's claim once the proof verifies.
+  - `challenged`: waiting for the oracle authority's ruling, by hand.
+  - `council`: the ruling sent it to the council.
+  - `stale`: it can no longer be accepted: its source took another value
+    first, or (unchallenged) a day after expiry passed; the keeper times it
+    out (201) and the money goes back.
+  - `accepted`: its value became the source's.
+  - `replaced`: rejected; the challenger's value stands.
+  - `rejected`: rejected with its challenge (the council's "neither"); the
+    source keeps its value.
+  - `cancelled`: timed out after its reveal (201).
+  - `settled`: its money has been paid out (for `expired`, "Not revealed in
+    time: its stake went back").
+- `paysTo`: whose collateral the money settles into: `claimant`,
+  `challenger`, or `both` (each its own back); null while undecided.
+- `revealCommand`: while the claim is committed, inside its window, in this
+  Petri's private file and its source still has the committed-against value;
+  else null. `expireCommand`: once it is unrevealed past its deadline.
+  `settleCommand`: the exact `stakes settle` command once its money can
+  settle and has not; else null.
+- `challenge`: null, or the claim's challenge: `challenge` (its address),
+  `challengeId`, `challenger`, `value`, `valueAtoms`, `sourceTimeUtc` and
+  `evidence` (the alternative's), `bondAtoms`, `status` (`waiting`,
+  `council`, `upheld`: the alternative won, `dismissed`: the claim stood,
+  `neither`, `cancelled`, `settled`) with `statusText`, `settleCommand` (the
+  claim's: one settlement pays both) and `settled`.
+- `open`: others' revealed claims open to challenge now: live (not
+  overtaken), unchallenged, in a month that takes challenges; `bondAtoms` is
+  the exact bond to challenge it, null when the product has no challenge
+  terms.
+- `sources`: the active sources with a value of the months that take an
+  update now; `value` is the source's current value and `sourceTimeUtc` the
+  time of its latest print; `stakeAtoms` the exact update stake; `command`
+  is `petri oracle observe MONTH --source SOURCE --file OBS.json --reveal` on
+  a chip month (its update is an observation of its series), `updates commit
+  … --reveal` otherwise.
+- Times: `revealedUtc` (the chain's clock at the reveal) and
+  `acceptFromUtc` (that plus the challenge window, `challengeSeconds`) are
+  exact chain times. `committedUtc` and `revealByUtc` are slot-based
+  estimates: the slot's distance from the claim's reveal (once it is
+  revealed: its slot and time are exact) or else from the chain's current
+  slot, times the chain's average slot length this epoch (`msPerSlot`: the
+  time since the epoch began, from the Clock sysvar, over the slots since
+  its first slot, from the EpochSchedule sysvar; Solana's 400 ms early in
+  an epoch). All times are on the chain's clock, `chainTimeUtc`, which on
+  the dev chain runs behind wall time.
+
+A month's update lane needs its finalized active-weight manifest; months
+formed by the dev bootstrap do not have one, so commits there fail with
 `InvalidOracleActiveWeightManifest`.
 
-### Escrow settlement
+### Bonds and stakes
 
-`stakes settle` returns a finished bond or stake to collateral
-(permissionless): `listing-bond`, `support-stake` and `source-challenge`
-(before listing), `opening-claim`, `opening-challenge`, `update-claim` and
-`update-challenge`. Claimants and challengers are read from chain.
+Every bond and stake sits in the oracle's vault while its stage runs and
+moves only when someone settles it (tag 169, anyone may; tag 167 for an
+update nobody revealed; a sponsored listing bond through `sponsorships
+settle`): back into its owner's oracle collateral, or to whoever won it.
+`stakes settle MONTH --kind KIND --source ID` settles one: `listing-bond`,
+`support-stake` and `source-challenge` (before listing), `opening-claim`,
+`opening-challenge`, `update-claim` and `update-challenge`. Claimants and
+challengers are read from chain; `--owner` names the proposer or supporter
+(the attached wallet by default).
+
+`stakes [MARKET] [--expiry E] [--owner PUBKEY] [--settled]` reads from chain
+every bond and stake of the owner (the attached wallet by default): the
+listing bonds of sources they proposed, their support stakes, source
+challenges, opening prints and opening challenges, update claims and update
+challenges, and the listing bonds they sponsored; plus, as `owed`, the bonds
+of challenges of their sources or prints that a dismissal sends to them.
+Without MARKET it reads every month: one program scan each of the sources,
+the source challenges, the opening challenges (when there are prints), the
+owner's update claims, the owner's update challenges and the owner's
+sponsorships; support positions, prints, the challenges of the owner's
+updates and the products' pools are read by address. Settled ones are left
+out when they are settled updates or update challenges (a running Game
+settles them by the thousand) or belong to a month whose period has settled
+or failed; `settledNotShown` counts them and `--settled` lists them. A
+person reads a table with the commands under it; `--json` gives:
+
+```json
+{
+  "ok": true,
+  "owner": "7gvW…",
+  "chainTimeUtc": "2026-11-29T01:02:03.000Z",
+  "stakes": [{
+    "month": "RAMX-202612", "monthAddress": "…", "kind": "opening-claim", "role": "yours",
+    "source": "…", "url": "https://…", "bucket": "DDR5_16GBIT", "bucketName": "DDR5 16Gb",
+    "claim": "…", "challenge": null, "agreement": null,
+    "amountAtoms": "1000000", "toYouAtoms": "1000000", "paysTo": "7gvW…",
+    "status": "settleable", "statusText": "Accepted: settling returns it to you",
+    "settleCommand": "petri oracle stakes settle RAMX-202612 --kind opening-claim --source …",
+    "nextCommand": null
+  }],
+  "totals": { "lockedAtoms": "2000000", "settleableAtoms": "1000000", "stuckAtoms": "0" },
+  "settledNotShown": 0
+}
+```
+
+- `kind`: `listing-bond`, `support-stake`, `source-challenge`,
+  `opening-claim`, `opening-challenge`, `update-claim`, `update-challenge`
+  (the `stakes settle --kind` names), or `sponsorship-bond`.
+- `role`: `yours` (your bond or stake), or `owed` (a challenger's bond that a
+  dismissal sends to you, as proposer or claimant).
+- `status`: `locked` (its stage runs; `statusText` says what it waits for),
+  `settleable` (decided: settling moves it now), `settled` (it left the vault;
+  `statusText` says where it went) or `stuck` (an opening print still waiting
+  or challenged at listing, the listing bonds and support stakes of its
+  source, or a frozen source left without a print past expiry: nothing can
+  move them).
+- `toYouAtoms`: what settling pays you (`0` when it goes to someone else),
+  null while undecided; `paysTo`: the wallet it settles into, once decided
+  (null when petri does not read it, as for a settled update's challenger).
+- `amountAtoms`: the bond or stake itself (for a settled listing bond, the
+  product's listing bond: a settled source keeps no amount).
+- `settleCommand`: the exact command once it is settleable, else null: `stakes
+  settle …` (one that settles through the challenge that decided it names
+  that challenge), `updates expire …` for an update nobody revealed, or
+  `sponsorships settle …`. `nextCommand`: what moves a locked one along when
+  its owner can (`prints finalize` for a print ready to accept, `updates
+  reveal` for a sealed update, `prints expire` for a frozen source left
+  without a print after listing), else null.
+- `totals`: `lockedAtoms`, your own still held while their stage runs;
+  `settleableAtoms`, what settling pays you now (yours and the `owed`);
+  `stuckAtoms`, your own that nothing can move.
+
+`stakes settle --all [MARKET] [--owner PUBKEY]` settles every one of the
+owner's whose settling pays them now, packed into as few transactions as fit
+a packet, with the attached wallet paying the fees (into `--owner`'s
+collateral when it names another wallet). Ones that pay someone else (your
+dismissed challenge, a print a challenger won) are left to whoever they pay
+and listed under `skipped`; two of yours that settle through one challenge
+are sent once. Its JSON `details` hold `owner`, `settled` (each `month`,
+`monthAddress`, `kind`, `source`, `bucketName`, `claim`, `challenge`,
+`amountAtoms`, `toYouAtoms` and the single `command` it equals), `skipped`
+(each with `paysTo`, `why` and its `command`) and `totalToYouAtoms`. With
+nothing to settle it sends nothing and says so.
 
 ### Rewards
 
@@ -837,7 +1473,7 @@ list complete):
 | --- | --- | --- |
 | `getAccountInfo` | accounts: markets, the oracle, gates, the Clock sysvar | yes |
 | `getMultipleAccounts` | accounts, up to 100 at a time | yes |
-| `getProgramAccounts` | the oracle's periods, sources, sponsorships and a wallet's reward claims | no |
+| `getProgramAccounts` | the oracle's periods, sources, challenges, opening prints' links, sponsorships and a wallet's reward claims | no |
 | `getBalance` | a wallet's SOL | yes |
 | `getSlot` | `petri status` | yes |
 | `getGenesisHash` | the deployment identity gate | yes |
@@ -916,7 +1552,7 @@ petri evidence verify <bundle>                            # every step but the o
 petri evidence import <bundle file>                       # made on another computer
 petri evidence list
 petri evidence submit <bundle> --candidate candidate.json
-petri oracle updates commit ramx --source <S> --evidence <bundle> --stake 1
+petri oracle updates commit ramx --source <S> --evidence <bundle> --reveal
 petri oracle prints opening ramx --source <S> --evidence <bundle> --stake <bond>
 petri evidence email quote.eml --manifest email-manifest.json --disclose
 ```

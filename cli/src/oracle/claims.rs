@@ -98,6 +98,12 @@ pub fn load(address: &str) -> Result<Claim> {
     })
 }
 
+/// Every claim saved in this Petri's private file, by claim address (empty
+/// when there is no file yet).
+pub fn all() -> Result<BTreeMap<String, Claim>> {
+    load_from(&path()?)
+}
+
 pub fn mark_revealed(address: &str) -> Result<()> {
     let path = path()?;
     let mut claims = load_from(&path)?;

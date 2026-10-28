@@ -84,20 +84,80 @@ pub enum OracleCommand {
         #[command(subcommand)]
         command: EvidenceCommand,
     },
-    #[command(about = "Opening prints: claim, challenge, finalize, expire, finalize the phase")]
+    #[command(
+        about = "Opening prints: yours and how each stands, the prints open to challenge and the sources waiting for one; or submit, challenge, accept, set aside",
+        args_conflicts_with_subcommands = true
+    )]
     Prints {
         #[command(subcommand)]
-        command: PrintCommand,
+        command: Option<PrintCommand>,
+        #[arg(
+            value_name = "MARKET",
+            help = "ramx (its months), a month such as RAMX-202612; all months when omitted"
+        )]
+        market: Option<String>,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+        #[arg(
+            long,
+            value_name = "PUBKEY",
+            help = "Whose prints and challenges; defaults to the attached wallet"
+        )]
+        owner: Option<String>,
     },
-    #[command(about = "Game updates: commit, reveal, challenge, expire")]
+    #[command(
+        about = "Game updates: yours and how each stands, the updates open to challenge and the sources taking one now; commit, reveal, challenge, expire",
+        args_conflicts_with_subcommands = true
+    )]
     Updates {
         #[command(subcommand)]
-        command: UpdateCommand,
+        command: Option<UpdateCommand>,
+        #[command(flatten)]
+        list: UpdateListArgs,
     },
-    #[command(about = "Settle a finished bond or stake back into your oracle collateral")]
+    #[command(
+        about = "Source challenges: yours and how each stands or ended, and the sources open to challenge now"
+    )]
+    Challenges {
+        #[arg(
+            value_name = "MARKET",
+            help = "ramx (its months), a month such as RAMX-202612; all months when omitted"
+        )]
+        market: Option<String>,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+        #[arg(
+            long,
+            value_name = "PUBKEY",
+            help = "Whose challenges (as challenger or the source's proposer); defaults to the attached wallet"
+        )]
+        owner: Option<String>,
+    },
+    #[command(
+        about = "Your bonds and stakes: what each waits for or where it went; settle one, or --all that pay you",
+        args_conflicts_with_subcommands = true
+    )]
     Stakes {
         #[command(subcommand)]
-        command: StakeCommand,
+        command: Option<StakeCommand>,
+        #[arg(
+            value_name = "MARKET",
+            help = "ramx (its months), a month such as RAMX-202612; all months when omitted"
+        )]
+        market: Option<String>,
+        #[arg(long, help = "Month for a bare symbol: dec26, 2026-12 or unix seconds")]
+        expiry: Option<String>,
+        #[arg(
+            long,
+            value_name = "PUBKEY",
+            help = "Whose bonds and stakes; defaults to the attached wallet"
+        )]
+        owner: Option<String>,
+        #[arg(
+            long,
+            help = "Also every settled one still on chain (settled updates, and months that have settled)"
+        )]
+        settled: bool,
     },
     #[command(
         about = "Sponsor a research agent's candidate: your oracle collateral posts its bond, and the researcher shares its reward"
@@ -227,7 +287,25 @@ pub enum SeriesCommand {
     },
 }
 
-/// `petri oracle observe MONTH --source ID --file OBS.json [--stake USDC]`.
+/// `petri oracle updates [MARKET] [--expiry E] [--owner PUBKEY]`.
+#[derive(Debug, Args, Clone)]
+pub struct UpdateListArgs {
+    #[arg(
+        value_name = "MARKET",
+        help = "ramx (its months), a month such as RAMX-202610; all months when omitted"
+    )]
+    pub market: Option<String>,
+    #[arg(long, help = "Month for a bare symbol: oct26, 2026-10 or unix seconds")]
+    pub expiry: Option<String>,
+    #[arg(
+        long,
+        value_name = "PUBKEY",
+        help = "Whose updates (as claimant or challenger); defaults to the attached wallet"
+    )]
+    pub owner: Option<String>,
+}
+
+/// `petri oracle observe MONTH --source ID --file OBS.json [--stake USDC] [--reveal]`.
 #[derive(Debug, Args, Clone)]
 pub struct ObserveArgs {
     #[arg(
@@ -251,6 +329,16 @@ pub struct ObserveArgs {
         help = "Stake; the product's exact opening bond or update stake when omitted"
     )]
     pub stake: Option<String>,
+    #[arg(
+        long,
+        help = "In Game, reveal the update as soon as its commit lands, in one step (the reveal window is 150 slots, well under a minute); an opening print has nothing to reveal, so there it changes nothing"
+    )]
+    pub reveal: bool,
+    #[arg(
+        long,
+        help = "In Opening, wait out the print's 300 slots (a minute or two) and accept it, unless someone challenges it first; a Game update has nothing to accept here, so there it changes nothing"
+    )]
+    pub accept: bool,
     #[command(flatten)]
     pub send: SendArgs,
 }
@@ -475,7 +563,9 @@ pub enum SourceCommand {
         #[command(flatten)]
         target: Target,
     },
-    #[command(about = "Support a source with a stake")]
+    #[command(
+        about = "Support someone's candidate source with the product's support bond (checked before anything is sent)"
+    )]
     Support {
         #[command(flatten)]
         target: Target,
@@ -485,33 +575,65 @@ pub enum SourceCommand {
             help = "64-hex source id or source address"
         )]
         source: String,
-        #[arg(long, value_name = "USDC")]
-        stake: String,
+        #[arg(
+            long,
+            value_name = "USDC",
+            help = "Stake, debited from your oracle collateral; the product's exact support bond when omitted"
+        )]
+        stake: Option<String>,
     },
-    #[command(about = "Challenge a candidate source with a bond")]
+    #[command(
+        about = "Challenge a candidate source with a bond, on Scramble days 5 and 6 (checked before anything is sent)",
+        group(
+            clap::ArgGroup::new("evidence")
+                .required(true)
+                .args(["why", "why_file", "evidence_hash"])
+        )
+    )]
     Challenge {
         #[command(flatten)]
         target: Target,
-        #[arg(long, value_name = "SOURCE")]
-        source: String,
-        #[arg(
-            long,
-            value_name = "CODE",
-            help = "Reason code (the program's challenge reasons)"
-        )]
-        reason: u8,
-        #[arg(long, value_name = "USDC")]
-        bond: String,
-        #[arg(
-            long,
-            value_name = "HEX",
-            help = "SHA-256 of the evidence behind the challenge"
-        )]
-        evidence_hash: String,
         #[arg(
             long,
             value_name = "SOURCE",
-            help = "The other source, for a non-independence challenge"
+            help = "64-hex source id or source address"
+        )]
+        source: String,
+        #[arg(
+            long,
+            value_name = "REASON",
+            value_parser = super::challenges::parse_reason,
+            help = super::challenges::REASON_HELP
+        )]
+        reason: u8,
+        #[arg(
+            long,
+            value_name = "USDC",
+            help = "Bond, debited from your oracle collateral; the exact bond the program requires when omitted"
+        )]
+        bond: Option<String>,
+        #[arg(
+            long,
+            value_name = "TEXT",
+            help = "Why the source is wrong: petri seals it as a public evidence object and commits the challenge to it, so whoever rules reads it (`petri oracle evidence show`). Public and permanent"
+        )]
+        why: Option<String>,
+        #[arg(
+            long,
+            value_name = "PATH",
+            help = "Read the --why text from a file (public and permanent)"
+        )]
+        why_file: Option<std::path::PathBuf>,
+        #[arg(
+            long,
+            value_name = "HEX",
+            help = "SHA-256 commitment of evidence you published yourself, instead of --why"
+        )]
+        evidence_hash: Option<String>,
+        #[arg(
+            long,
+            value_name = "SOURCE",
+            help = "The other source, for a `duplicate` challenge: a candidate of the same bucket"
         )]
         comparison: Option<String>,
         #[arg(long, value_name = "HEX", help = "Challenge id; random when omitted")]
@@ -521,7 +643,9 @@ pub enum SourceCommand {
 
 #[derive(Debug, Subcommand)]
 pub enum PrintCommand {
-    #[command(about = "Submit a bonded opening print with its Wayback archive")]
+    #[command(
+        about = "Submit a bonded opening print with its Wayback archive (checked before anything is sent)"
+    )]
     Opening {
         #[command(flatten)]
         target: Target,
@@ -548,22 +672,39 @@ pub enum PrintCommand {
             help = "A web proof of the source's page instead of an archive (petri evidence prove)"
         )]
         evidence: Option<String>,
-        #[arg(long, value_name = "USDC")]
-        stake: String,
+        #[arg(
+            long,
+            value_name = "USDC",
+            help = "Stake, debited from your oracle collateral; the product's exact opening bond when omitted"
+        )]
+        stake: Option<String>,
+        #[arg(
+            long,
+            help = "Wait out its 300 slots (a minute or two) and accept it, unless someone challenges it first"
+        )]
+        accept: bool,
     },
-    #[command(about = "Challenge an opening print with an alternative")]
+    #[command(
+        about = "Challenge someone's opening print with an alternative, inside its 300 slots (checked before anything is sent)"
+    )]
     Challenge {
         #[command(flatten)]
         target: Target,
         #[arg(long, value_name = "SOURCE")]
         source: String,
-        #[arg(long, value_name = "VALUE", required_unless_present = "evidence")]
+        #[arg(
+            long,
+            value_name = "VALUE",
+            required_unless_present = "evidence",
+            help = "The source's value as you read it, in its own units [default with --evidence: the proven price]"
+        )]
         value: Option<String>,
         #[arg(
             long,
             value_name = "URL",
             required_unless_present = "evidence",
-            conflicts_with = "evidence"
+            conflicts_with = "evidence",
+            help = "https://web.archive.org/web/<14-digit UTC time>/<source URL>"
         )]
         archive_url: Option<String>,
         #[arg(
@@ -572,19 +713,25 @@ pub enum PrintCommand {
             help = "A web proof of the source's page instead of an archive (petri evidence prove)"
         )]
         evidence: Option<String>,
-        #[arg(long, value_name = "USDC")]
-        bond: String,
-        #[arg(long, value_name = "HEX")]
+        #[arg(
+            long,
+            value_name = "USDC",
+            help = "Bond, debited from your oracle collateral; the exact bond the program requires when omitted"
+        )]
+        bond: Option<String>,
+        #[arg(long, value_name = "HEX", help = "Challenge id; random when omitted")]
         challenge_id: Option<String>,
     },
-    #[command(about = "Accept an unchallenged opening print after its window")]
+    #[command(
+        about = "Accept an unchallenged opening print once its 300 slots passed, before listing"
+    )]
     Finalize {
         #[command(flatten)]
         target: Target,
         #[arg(long, value_name = "SOURCE")]
         source: String,
     },
-    #[command(about = "Mark an unclaimed frozen source inactive")]
+    #[command(about = "Set aside a frozen source left without an opening print, from listing")]
     Expire {
         #[command(flatten)]
         target: Target,
@@ -603,7 +750,9 @@ pub enum PrintCommand {
 
 #[derive(Debug, Subcommand)]
 pub enum UpdateCommand {
-    #[command(about = "Commit a sealed source update with a stake; the reveal data stays private")]
+    #[command(
+        about = "Commit a sealed source update with the product's exact stake (checked before anything is sent); the reveal data stays private, and --reveal reveals it at once"
+    )]
     Commit {
         #[command(flatten)]
         target: Target,
@@ -630,10 +779,21 @@ pub enum UpdateCommand {
             help = "A web proof of the source's page instead of an archive (petri evidence prove); uploaded when you reveal"
         )]
         evidence: Option<String>,
-        #[arg(long, value_name = "USDC")]
-        stake: String,
+        #[arg(
+            long,
+            value_name = "USDC",
+            help = "Stake, debited from your oracle collateral; the product's exact update stake when omitted"
+        )]
+        stake: Option<String>,
+        #[arg(
+            long,
+            help = "Reveal it as soon as the commit lands, in one step (the reveal window is 150 slots, well under a minute)"
+        )]
+        reveal: bool,
     },
-    #[command(about = "Reveal a committed update with its Wayback archive")]
+    #[command(
+        about = "Reveal a committed update with its Wayback archive, within 150 slots of the commit"
+    )]
     Reveal {
         #[arg(
             value_name = "CLAIM",
@@ -643,19 +803,27 @@ pub enum UpdateCommand {
         #[command(flatten)]
         send: SendArgs,
     },
-    #[command(about = "Challenge a revealed update with an alternative")]
+    #[command(
+        about = "Challenge a revealed update with another value, until it is accepted (checked before anything is sent)"
+    )]
     Challenge {
         #[command(flatten)]
         target: Target,
         #[arg(long, value_name = "CLAIM", help = "Update claim address")]
         claim: String,
-        #[arg(long, value_name = "VALUE", required_unless_present = "evidence")]
+        #[arg(
+            long,
+            value_name = "VALUE",
+            required_unless_present = "evidence",
+            help = "The source's value, in its own units [default with --evidence: the proven price]"
+        )]
         value: Option<String>,
         #[arg(
             long,
             value_name = "URL",
             required_unless_present = "evidence",
-            conflicts_with = "evidence"
+            conflicts_with = "evidence",
+            help = "https://web.archive.org/web/<14-digit UTC time>/<source URL>"
         )]
         archive_url: Option<String>,
         #[arg(
@@ -664,9 +832,13 @@ pub enum UpdateCommand {
             help = "A web proof of the source's page instead of an archive (petri evidence prove)"
         )]
         evidence: Option<String>,
-        #[arg(long, value_name = "USDC")]
-        bond: String,
-        #[arg(long, value_name = "HEX")]
+        #[arg(
+            long,
+            value_name = "USDC",
+            help = "Bond, debited from your oracle collateral; the exact bond the program requires when omitted"
+        )]
+        bond: Option<String>,
+        #[arg(long, value_name = "HEX", help = "Challenge id; random when omitted")]
         challenge_id: Option<String>,
     },
     #[command(about = "Refund a commitment nobody revealed, after its deadline")]
@@ -748,18 +920,33 @@ pub enum ReserveCommand {
 
 #[derive(Debug, Subcommand)]
 pub enum StakeCommand {
-    #[command(about = "Settle one bond or stake back into oracle collateral")]
+    #[command(
+        about = "Settle one bond or stake back into oracle collateral, or --all of the owner's that pay them now"
+    )]
     Settle {
+        #[arg(
+            value_name = "MARKET",
+            help = "ramx, nandx, a month such as RAMX-202610, or a period address (with --all: all months when omitted)"
+        )]
+        market: Option<String>,
+        #[arg(long, help = "Month for a bare symbol: oct26, 2026-10 or unix seconds")]
+        expiry: Option<String>,
         #[command(flatten)]
-        target: Target,
-        #[arg(long, value_enum)]
-        kind: EscrowKind,
-        #[arg(long, value_name = "SOURCE")]
-        source: String,
+        send: SendArgs,
+        #[arg(
+            long,
+            conflicts_with_all = ["kind", "source", "claim", "challenge"],
+            help = "Every one of the owner's that settles to them now (petri oracle stakes lists them), a few to a transaction"
+        )]
+        all: bool,
+        #[arg(long, value_enum, required_unless_present = "all")]
+        kind: Option<EscrowKind>,
+        #[arg(long, value_name = "SOURCE", required_unless_present = "all")]
+        source: Option<String>,
         #[arg(
             long,
             value_name = "PUBKEY",
-            help = "Proposer or supporter; defaults to the attached wallet"
+            help = "Proposer or supporter (with --all: whose); defaults to the attached wallet"
         )]
         owner: Option<String>,
         #[arg(

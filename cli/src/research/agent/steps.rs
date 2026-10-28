@@ -246,7 +246,7 @@ pub fn assignment_steps(result: Value, flags: &Flags, own: &str) -> Value {
             lines.extend(source_proof(petri, &url, format!("- In step 3, give --evidence <bundle file> in place of --archive-url. If {petri} oracle prints opening --help does not list --evidence, report blocked.")));
             lines.extend([
                 format!("3. Submit it with the owner's wallet: {petri} oracle prints opening {month} --source {source} --value <value> --archive-url <archive URL> --stake {opening_bond} --yes ({exactly}). Submit it some minutes before listing: it can only be accepted 300 slots after it lands. The bond comes from the owner's oracle collateral; if petri says it is short, deposit the bond first: {petri} oracle collateral deposit {opening_bond} --yes"),
-                format!("4. Anyone can challenge it for 300 slots (about two minutes). Then accept it: {petri} oracle prints finalize {month} --source {source} --yes. If petri says it can't be accepted yet, wait a minute and run it again. It must be accepted before listing{until}. If it was challenged, the oracle's council decides it: report that and move on."),
+                format!("4. Anyone can challenge it for 300 slots (a minute or two). Then accept it: {petri} oracle prints finalize {month} --source {source} --yes. If petri says it can't be accepted yet, wait a minute and run it again. It must be accepted before listing{until}. If it was challenged, the oracle authority rules on it by hand on the opening day (or leaves it to the council): report that and move on."),
                 format!("5. Return the bond to the owner's collateral: {petri} oracle stakes settle {month} --kind opening-claim --source {source} --yes"),
                 format!("At listing the month enters Game, once every frozen source has its opening value or is set aside (anyone sets an unopened one aside: {petri} oracle prints expire {month} --source <source address> --yes) and the oracle has weighted its sources. Then anyone can start Game: {petri} oracle prints finalize-phase {month} --yes."),
                 report, finish, next,
@@ -279,9 +279,9 @@ pub fn assignment_steps(result: Value, flags: &Flags, own: &str) -> Value {
             ];
             lines.extend(source_proof(petri, &url, "- In step 3, give --evidence <bundle file> in place of --archive-url <snapshot URL>.".into()));
             lines.extend([
-                format!("3. Commit the update: {petri} oracle updates commit {month} --source {source} --value <value> --archive-url <snapshot URL> --stake 1 --yes (if petri names another stake for this product, use that)."),
-                format!("4. Reveal it within a minute, with the claim address commit printed: {petri} oracle updates reveal <CLAIM> --yes"),
-                "Skip the update if the value has not changed: an unchanged value earns nothing.".into(),
+                format!("3. Commit and reveal the update in one step: {petri} oracle updates commit {month} --source {source} --value <value> --archive-url <snapshot URL> --reveal --yes. Petri takes the product's exact update stake and refuses an update the oracle would refuse, saying why."),
+                format!("4. If petri says the reveal failed, reveal it before the deadline it names: {petri} oracle updates reveal <CLAIM> --yes. How it stands: {petri} oracle updates {month}"),
+                "Skip the update if the value has not changed: petri refuses an unchanged value.".into(),
                 report, finish, next,
             ]);
             lines
@@ -437,16 +437,16 @@ fn chip_steps(result: &Value, flags: &Flags, own: &str, chip: Chip) -> String {
         "update stake".into()
     };
     let amount = bond.clone().unwrap_or_else(|| "<amount>".into());
-    lines.push(format!("4. Send it with the owner's wallet: {petri} oracle observe {month} --source {source} --file obs.json --yes. Petri checks it against the spec first, takes the product's exact {stake}, and refuses one that would not count, saying why. If petri says the collateral is short: {petri} oracle collateral deposit {amount} --yes"));
+    lines.push(format!("4. Send it with the owner's wallet: {petri} oracle observe {month} --source {source} --file obs.json --reveal --yes. Petri checks it against the spec first, takes the product's exact {stake}, and refuses one that would not count, saying why. If petri says the collateral is short: {petri} oracle collateral deposit {amount} --yes"));
     if opening {
         lines.extend([
-            format!("5. Anyone can challenge it for 300 slots (about two minutes). Then accept it: {petri} oracle prints finalize {month} --source {source} --yes, before listing{until}. If it was challenged, the oracle's council decides it: report that and move on."),
+            format!("5. Anyone can challenge it for 300 slots (a minute or two). Then accept it: {petri} oracle prints finalize {month} --source {source} --yes, before listing{until}. If it was challenged, the oracle authority rules on it by hand on the opening day (or leaves it to the council): report that and move on."),
             format!("6. Return the bond to the owner's collateral: {petri} oracle stakes settle {month} --kind opening-claim --source {source} --yes"),
         ]);
     } else {
         lines.extend([
-            format!("5. Reveal it within a minute, with the claim address observe printed: {petri} oracle updates reveal <CLAIM> --yes. Its observation is recorded then."),
-            "Skip it if the price has not changed: an unchanged value earns nothing.".into(),
+            format!("5. --reveal reveals it as soon as the commit lands, and its observation is recorded then. If petri says the reveal failed, reveal it before the deadline it names: {petri} oracle updates reveal <CLAIM> --yes"),
+            "Skip it if the price has not changed: petri refuses an unchanged value.".into(),
         ]);
     }
     lines.extend([report, finish, next]);

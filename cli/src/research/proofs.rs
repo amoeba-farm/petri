@@ -382,10 +382,10 @@ pub(super) fn update_lines(price: &str, witnessed_at: &str, stake: u64) -> Vec<S
     ]
 }
 
-/// Commit, then reveal (the program takes a reveal one slot after the
-/// commit, `ORACLE_UPDATE_REVEAL_DELAY_SLOTS`), citing the proof.
+/// Commit, then reveal at once (`updates commit --reveal`: from one slot
+/// after the commit, within its 150-slot window), citing the proof.
 fn submit_update(ctx: &Ctx, digest: &str, slot: &Slot) -> Stage {
-    use crate::oracle::{args::Target, writes};
+    use crate::oracle::{args::Target, updates, writes};
     let Some(update) = &slot.update else {
         return Stage::Failed("Not an update.".into());
     };
@@ -397,29 +397,29 @@ fn submit_update(ctx: &Ctx, digest: &str, slot: &Slot) -> Stage {
         };
         let p = crate::futures::view::Paint::new(false);
         let stake = crate::futures::units::trim_decimal(u128::from(update.stake.max(1)), 6);
-        let committed = writes::update_commit(
+        let report = updates::commit(
             ctx,
             p,
             &target,
-            &update.source,
-            None,
-            writes::Cite::Proof(digest),
-            &stake,
+            &updates::CommitRequest {
+                source: &update.source,
+                value: None,
+                cited: writes::Cite::Proof(digest),
+                stake: Some(&stake),
+                reveal: true,
+            },
         )?;
-        let claim = committed.payload["details"]["claim"]
+        let claim = report.payload["details"]["claim"]
             .as_str()
             .ok_or_else(|| crate::futures::error::Error::msg("the commit named no claim"))?
             .to_string();
-        let mut last = None;
-        for _ in 0..10 {
-            match writes::update_reveal(ctx, p, &claim, &Default::default()) {
-                Ok(_) => return Ok(claim),
-                Err(e) => last = Some(e),
-            }
-            // The next slot (about 0.3-0.4 s on the dev chain).
-            std::thread::sleep(Duration::from_millis(500));
+        if report.payload["revealed"] != true {
+            let why = report.payload["error"]["message"]
+                .as_str()
+                .unwrap_or("the reveal did not land");
+            return Err(crate::futures::error::Error::msg(why));
         }
-        Err(last.unwrap_or_else(|| crate::futures::error::Error::msg("the reveal did not land")))
+        Ok(claim)
     })();
     match result {
         Ok(claim) => Stage::Done(vec![

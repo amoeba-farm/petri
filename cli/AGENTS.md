@@ -111,7 +111,19 @@ contracts:
   months and the commodity spec's routing), `observe.rs` (observations of a
   series and their API records), `send.rs` (review, simulate, sign and
   send), `writes.rs` (one handler per
-  instruction), `rewards.rs` (a wallet's rewards read from chain and their
+  instruction), `challenges.rs` (source challenges, tag 161: the reasons,
+  the exact bond and the window checked before sending, and `oracle
+  challenges`, how each stands or ended), `prints.rs` (opening prints, tags
+  162-165 and 81: the Opening's window, each print's challenge window in
+  slots and its times at the chain's measured pace, the exact stake and bond,
+  the checks before sending, and `oracle prints`, how each stands and what
+  is open now), `updates.rs` (Game updates, tags 166-169, 198, 199, 201: the
+  exact stake and bond, the windows checked before sending, `--reveal`'s
+  commit-then-reveal, and `oracle updates`, how each stands or ended),
+  `stakes.rs` (a wallet's bonds and stakes in the vault and their
+  settlement, tag 169: what each waits for or where it went, `oracle
+  stakes`, `stakes settle --all`, and the one settle builder `stakes settle`
+  shares), `rewards.rs` (a wallet's rewards read from chain and their
   claims, tag 174), `claims.rs` (private update-claim reveal material) and
   `errors.rs` (oracle error names).
 - `src/chain_identity.rs` owns the deployment identity gate: the RPC's genesis

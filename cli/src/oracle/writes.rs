@@ -4,30 +4,26 @@
 
 use ameba_oracle::{
     constants::{
-        ORACLE_EVIDENCE_RECORD_PREFIX, ORACLE_OPENING_ARCHIVE_URL_PREFIX,
-        ORACLE_SCRAMBLE_WINDOW_SECONDS,
+        ORACLE_EVIDENCE_RECORD_PREFIX, ORACLE_KILL_WINDOW_SECONDS,
+        ORACLE_OPENING_ARCHIVE_URL_PREFIX, ORACLE_OPENING_WINDOW_SECONDS,
+        ORACLE_PLACEMENT_WINDOW_SECONDS, ORACLE_RESOLUTION_FREEZE_WINDOW_SECONDS,
     },
     instruction::{
-        self as ix, ChallengeOracleOpeningClaimParams, ChallengeOracleSourceParams,
-        ChallengeOracleUpdateClaimParams, CommitOracleUpdateClaimV2Params, PrelistingEscrow,
-        ProposeOracleSourceV3Params, RevealOracleUpdateClaimV3Params,
-        SubmitOracleOpeningClaimParams, SupportOracleSourceV3Params,
+        self as ix, PrelistingEscrow, ProposeOracleSourceV3Params, SupportOracleSourceV3Params,
     },
-    processor::oracle_update_claim_v2_commitment_hash,
     state::{
-        OracleEscrowKind, OracleMonthState, OracleOpeningClaim, OracleOpeningClaimChallenge,
-        OraclePhase, OracleSourceChallenge, OracleUpdateChallenge, OracleUpdateClaimV2,
-        derive_user_collateral_pda,
+        OracleMonthState, OracleOpeningClaim, OracleOpeningClaimChallenge, OraclePhase,
+        OracleSkuCoverageManifest, OracleSourceChallenge, OracleSourceStatus,
+        OracleUpdateChallenge, OracleUpdateClaimV2, OracleUsdcRewardSchedulePhase,
     },
 };
 use chrono::NaiveDateTime;
 use serde_json::{Value, json};
-use solana_program::{hash::hashv, instruction::AccountMeta, pubkey::Pubkey};
+use solana_program::{hash::hashv, pubkey::Pubkey};
 
 use super::{
     args::{EscrowKind, EvidenceKind, SendArgs, Target},
     chain::{MonthRef, Oracle, SourceRef, decode},
-    claims,
     send::{self, Tx, Write},
     skus::{self, hex, parse_hex32},
 };
@@ -67,13 +63,13 @@ fn value_atoms(text: &str) -> Result<u64> {
         .ok_or_else(|| Error::msg(format!("`{text}` is not a positive value")))
 }
 
-fn random32() -> Result<[u8; 32]> {
+pub(super) fn random32() -> Result<[u8; 32]> {
     let mut bytes = [0u8; 32];
     getrandom::fill(&mut bytes).map_err(|e| Error::msg(format!("no randomness: {e}")))?;
     Ok(bytes)
 }
 
-fn id_or_random(text: Option<&str>, what: &str) -> Result<[u8; 32]> {
+pub(super) fn id_or_random(text: Option<&str>, what: &str) -> Result<[u8; 32]> {
     match text {
         Some(text) => parse_hex32(text, what),
         None => random32(),
@@ -216,7 +212,7 @@ pub(super) fn cite(
 }
 
 /// The cited time and page of an archive URL or an evidence record.
-fn archive_parts(text: &str) -> Result<(u64, String)> {
+pub(super) fn archive_parts(text: &str) -> Result<(u64, String)> {
     if text.starts_with(ORACLE_EVIDENCE_RECORD_PREFIX) {
         let (_, time, _, page) = amoeba_evidence::parse_onchain_record(text)
             .ok_or_else(|| Error::msg("not an amoeba-evidence-v1 record"))?;
@@ -229,7 +225,7 @@ fn archive_parts(text: &str) -> Result<(u64, String)> {
     ))
 }
 
-fn cited_kind(text: &str) -> EvidenceKind {
+pub(super) fn cited_kind(text: &str) -> EvidenceKind {
     if text.starts_with(ORACLE_EVIDENCE_RECORD_PREFIX) {
         EvidenceKind::Record
     } else {
@@ -347,7 +343,7 @@ fn kind_name(kind: u8) -> &'static str {
     }
 }
 
-fn read_body(text: Option<&str>, file: Option<&std::path::Path>) -> Result<String> {
+pub(super) fn read_body(text: Option<&str>, file: Option<&std::path::Path>) -> Result<String> {
     match (text, file) {
         (Some(text), _) => Ok(text.to_string()),
         (None, Some(path)) => std::fs::read_to_string(path)
@@ -377,7 +373,7 @@ pub(super) fn month_json(month: &MonthRef) -> Value {
     })
 }
 
-fn source_json(source: &SourceRef) -> Value {
+pub(super) fn source_json(source: &SourceRef) -> Value {
     json!({
         "source": source.address.to_string(),
         "sourceId": hex(&source.state.source_id),
@@ -770,19 +766,163 @@ pub(super) fn propose_write(
     })
 }
 
+/// When a month takes sources and support, on the chain's clock (the
+/// program's `ensure_oracle_coverage_source_submission_window`): while it
+/// takes sources, from its planned Scramble start for as long as Scramble's
+/// review days still fit before its expiry; in Scramble, on its four
+/// placement days, before the recipe freeze.
+pub(super) fn check_placement(
+    month: &OracleMonthState,
+    coverage: &OracleSkuCoverageManifest,
+    expiry: u64,
+    now: u64,
+    id: &str,
+) -> Result<()> {
+    let at = |t: u64| utc(i64::try_from(t).unwrap_or(i64::MAX));
+    if month.weight_scheme_version == 255 {
+        bail(format!(
+            "{id}'s recipe is being frozen: it takes no more support"
+        ))?;
+    }
+    match month.phase {
+        OraclePhase::SourceSubmission => {
+            let review = ORACLE_KILL_WINDOW_SECONDS
+                + ORACLE_RESOLUTION_FREEZE_WINDOW_SECONDS
+                + ORACLE_OPENING_WINDOW_SECONDS;
+            if coverage.coverage_finalized {
+                bail(format!("{id} has closed its source window"))?;
+            }
+            if now < coverage.planned_scramble_start_ts {
+                bail(format!(
+                    "{id} takes sources and support from {}; the chain's clock says {}",
+                    at(coverage.planned_scramble_start_ts),
+                    at(now)
+                ))?;
+            }
+            if now.saturating_add(review) >= expiry {
+                bail(format!(
+                    "{id} is too close to its expiry ({}) for Scramble's review days: it takes no more support",
+                    at(expiry)
+                ))?;
+            }
+        }
+        OraclePhase::Scramble => {
+            let ends = month
+                .scramble_start_ts
+                .saturating_add(ORACLE_PLACEMENT_WINDOW_SECONDS);
+            if now < month.scramble_start_ts || now >= ends {
+                bail(format!(
+                    "{id} takes support on Scramble's four placement days, from {} to {}; the chain's clock says {}",
+                    at(month.scramble_start_ts),
+                    at(ends),
+                    at(now)
+                ))?;
+            }
+        }
+        phase => bail(format!(
+            "{id} is in {phase:?}: sources are supported while the month takes sources and on Scramble's four placement days"
+        ))?,
+    }
+    Ok(())
+}
+
+/// The program's rules on a support stake (tag 183), past the calendar: a
+/// candidate of someone else's, not supported by this wallet yet, at the
+/// product's exact support bond.
+pub(super) fn check_support(
+    source: &SourceRef,
+    supporter: &Pubkey,
+    supported: bool,
+    stake: Option<u64>,
+    bond: u64,
+) -> Result<u64> {
+    if source.state.status != OracleSourceStatus::Candidate {
+        bail(format!(
+            "source {} is {:?}: only a candidate source takes support",
+            source.address, source.state.status
+        ))?;
+    }
+    if source.state.proposer == *supporter {
+        bail(format!(
+            "you proposed source {}: its proposer can't support it",
+            source.address
+        ))?;
+    }
+    if supported {
+        bail(format!(
+            "you support source {} already: one support stake a wallet",
+            source.address
+        ))?;
+    }
+    match stake {
+        Some(given) if given != bond => {
+            let exact = trim_decimal(u128::from(bond), 6);
+            bail(format!(
+                "the support stake of this product is exactly {exact} USDC: pass --stake {exact}, or leave --stake out"
+            ))
+        }
+        _ => Ok(bond),
+    }
+}
+
+/// `petri oracle sources support`: tag 183, held to the program's rules
+/// first; the stake is the product's exact support bond when `--stake` is
+/// left out.
 pub fn source_support(
     ctx: &Ctx,
     p: Paint,
     target: &Target,
     source: &str,
-    stake: &str,
+    stake: Option<&str>,
 ) -> Result<Report> {
     let oracle = Oracle::new(ctx)?;
     let supporter = ctx.wallet_pubkey()?;
     let month = oracle.month(&target.market, target.expiry.as_deref())?;
+    let id = month.period.expiry_id();
     let source = oracle.source(&month, source)?;
+    let now = u64::try_from(ctx.rpc.clock()?.unix_timestamp).unwrap_or(0);
+    check_placement(
+        &month.state,
+        &oracle.coverage(&month)?,
+        month.period.period.expiry_ts,
+        now,
+        &id,
+    )?;
+    match oracle.reward_schedule(&month)? {
+        Some(s) if s.phase == OracleUsdcRewardSchedulePhase::Funded => {}
+        Some(s) => bail(format!(
+            "{id}'s rewards are {:?}, not funded: it takes no support",
+            s.phase
+        ))?,
+        None => bail(format!(
+            "{id} has no reward schedule, so it takes no support"
+        ))?,
+    }
+    let pool = oracle.sku_pool(&month, &source.state.bucket_id)?;
+    let position = ix::find_oracle_support_address(
+        &oracle.program,
+        &month.address,
+        &source.address,
+        &supporter,
+    );
+    let stake = check_support(
+        &source,
+        &supporter,
+        ctx.rpc.account(&position)?.is_some(),
+        stake.map(|s| usdc_amount(s, "the stake")).transpose()?,
+        pool.support_bond,
+    )?;
+    let available = oracle
+        .collateral(&supporter)?
+        .map_or(0, |l| l.available_balance);
+    if available < stake {
+        bail(format!(
+            "the support stake is {} USDC and your oracle collateral has {} USDC available: deposit first (`petri oracle collateral deposit <USDC>`)",
+            usdc(stake),
+            usdc(available)
+        ))?;
+    }
     let (sku_index, sku_proof) = oracle.sku_proof(&month, &source.state.bucket_id)?;
-    let stake = usdc_amount(stake, "the stake")?;
     let write = Write {
         action: "oracle.sources.support",
         title: format!(
@@ -793,8 +933,18 @@ pub fn source_support(
         review: vec![
             month_line(&month),
             format!("Bucket {}", source.bucket_name()),
+            format!(
+                "Stake {} USDC from your oracle collateral, the product's support bond: back once the source opens or is set aside, whatever becomes of it",
+                usdc(stake)
+            ),
         ],
-        details: json!({"month": month_json(&month), "source": source_json(&source), "stakeAtoms": stake.to_string()}),
+        details: json!({
+            "month": month_json(&month),
+            "source": source_json(&source),
+            "bucketName": source.bucket_name(),
+            "stakeAtoms": stake.to_string(),
+            "position": position.to_string(),
+        }),
         txs: vec![Tx::one(
             "supportSource",
             ix::support_oracle_source_v3(
@@ -815,374 +965,22 @@ pub fn source_support(
     send::run(ctx, p, write, target.send.simulate)
 }
 
-#[allow(clippy::too_many_arguments)]
-pub fn source_challenge(
-    ctx: &Ctx,
-    p: Paint,
-    target: &Target,
-    source: &str,
-    reason: u8,
-    bond: &str,
-    evidence_hash: &str,
-    comparison: Option<&str>,
-    challenge_id: Option<&str>,
-) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let challenger = ctx.wallet_pubkey()?;
-    let month = oracle.month(&target.market, target.expiry.as_deref())?;
-    let source = oracle.source(&month, source)?;
-    let comparison = comparison.map(|c| oracle.source(&month, c)).transpose()?;
-    let challenge_id = id_or_random(challenge_id, "challenge id")?;
-    let bond = usdc_amount(bond, "the bond")?;
-    let challenge = ix::find_oracle_source_challenge_address(
-        &oracle.program,
-        &month.address,
-        &source.address,
-        &challenge_id,
-    );
-    let write = Write {
-        action: "oracle.sources.challenge",
-        title: format!(
-            "Challenge source {} with a {} USDC bond",
-            source.address,
-            usdc(bond)
-        ),
-        review: vec![
-            month_line(&month),
-            format!("Reason {reason}; challenge {challenge}"),
-        ],
-        details: json!({"month": month_json(&month), "source": source_json(&source), "challenge": challenge.to_string(), "challengeId": hex(&challenge_id)}),
-        txs: vec![Tx::one(
-            "challengeSource",
-            ix::challenge_oracle_source_v2(
-                &oracle.program,
-                &challenger,
-                &month.period.address,
-                &month.address,
-                &source.address,
-                &source.state.bucket_id,
-                comparison.as_ref().map(|c| &c.address),
-                ChallengeOracleSourceParams {
-                    challenge_id,
-                    reason,
-                    bond,
-                    evidence_hash: parse_hex32(evidence_hash, "evidence hash")?,
-                    comparison_source_id: comparison
-                        .as_ref()
-                        .map(|c| c.state.source_id)
-                        .unwrap_or([0; 32]),
-                },
-            ),
-        )],
-    };
-    send::run(ctx, p, write, target.send.simulate)
-}
-
 // -------------------------------------------------------------------- prints
 
+/// The opening claim of a source, which must have one (`stakes settle`).
 pub(super) fn opening_claim(
     oracle: &Oracle,
     month: &MonthRef,
     source: &SourceRef,
 ) -> Result<(Pubkey, OracleOpeningClaim)> {
-    let key =
-        ix::find_oracle_opening_claim_address(&oracle.program, &month.address, &source.address);
-    let account = oracle.ctx.rpc.account(&key)?;
-    let claim: OracleOpeningClaim = decode(
-        &oracle.program,
-        &key,
-        account.as_ref(),
-        OracleOpeningClaim::LEN,
-        "opening claim",
-    )?;
-    Ok((key, claim))
-}
-
-/// A month's Opening: its phase, and its start (the end of Scramble's seven
-/// days) and listing, unix seconds on the chain's clock.
-#[derive(Clone, Copy, Debug)]
-struct Opening {
-    phase: OraclePhase,
-    start: u64,
-    listing: u64,
-}
-
-impl Opening {
-    fn of(month: &OracleMonthState) -> Self {
-        Opening {
-            phase: month.phase,
-            start: month
-                .scramble_start_ts
-                .saturating_add(ORACLE_SCRAMBLE_WINDOW_SECONDS),
-            listing: month.listing_ts,
-        }
-    }
-}
-
-/// What an opening must meet, by the oracle's rules, checked before anything
-/// is sent (its archive goes on chain first): the month is in Opening and the
-/// chain's clock (`now`) between the Opening's start and listing; the archive
-/// is of the source's own page, captured from the Opening's start up to that
-/// clock; the stake is the product's opening bond.
-fn check_opening(
-    month: Opening,
-    now: u64,
-    archive_url: &str,
-    locator_hash: &[u8; 32],
-    stake: u64,
-    bond: u64,
-) -> Result<()> {
-    let at = |t: u64| utc(i64::try_from(t).unwrap_or(i64::MAX));
-    let start = month.start;
-    if month.phase != OraclePhase::Opening {
-        bail(format!(
-            "the month is in {:?}: opening values are taken in Opening, from {} to listing at {}",
-            month.phase,
-            at(start),
-            at(month.listing)
-        ))?;
-    }
-    if now < start || now >= month.listing {
-        bail(format!(
-            "the Opening runs from {} to listing at {} on the chain's clock, which says {}",
-            at(start),
-            at(month.listing),
-            at(now)
-        ))?;
-    }
-    let (captured, page) = archive_parts(archive_url)?;
-    if captured < start {
-        bail(format!(
-            "the archive was captured at {}, before the Opening began at {}: archive the page again",
-            at(captured),
-            at(start)
-        ))?;
-    }
-    if captured > now {
-        bail(format!(
-            "the archive was captured at {}, after the chain's clock ({}): use a capture from {} up to the chain's clock, or wait for the chain to pass {}",
-            at(captured),
-            at(now),
-            at(start),
-            at(captured)
-        ))?;
-    }
-    if hashv(&[b"locator", page.as_bytes()]).to_bytes() != *locator_hash {
-        bail(format!(
-            "{page} is not this source's page: archive its URL exactly as the source names it"
-        ))?;
-    }
-    if stake != bond {
-        let bond = trim_decimal(u128::from(bond), 6);
-        bail(format!(
-            "the opening bond of this product is {bond} USDC: pass --stake {bond}"
-        ))?;
-    }
-    Ok(())
-}
-
-#[allow(clippy::too_many_arguments)]
-pub fn print_opening(
-    ctx: &Ctx,
-    p: Paint,
-    target: &Target,
-    source: &str,
-    value: Option<&str>,
-    cited: Cite,
-    stake: &str,
-    challenge_id: Option<&str>,
-) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let actor = ctx.wallet_pubkey()?;
-    let month = oracle.month(&target.market, target.expiry.as_deref())?;
-    let source = oracle.source(&month, source)?;
-    let c = cite(ctx, &oracle, &month, &source, cited, value, &actor)?;
-    let amount = usdc_amount(
-        stake,
-        if challenge_id.is_some() {
-            "the bond"
-        } else {
-            "the stake"
-        },
-    )?;
-    let write = opening_write(
-        &oracle,
-        &month,
-        &source,
-        &c,
-        amount,
-        challenge_id,
-        target.send.simulate,
-    )?;
-    send::run(ctx, p, write, target.send.simulate)
-}
-
-/// An opening print (or, with `challenge_id`, a challenge of one) to review
-/// and send: its evidence (a Wayback archive, or a web proof's evidence
-/// record, published unless only simulating), then the claim. An opening is
-/// held to the oracle's rules first ([`check_opening`]).
-#[allow(clippy::too_many_arguments)]
-pub(super) fn opening_write(
-    oracle: &Oracle,
-    month: &MonthRef,
-    source: &SourceRef,
-    c: &Cited,
-    amount: u64,
-    challenge_id: Option<&str>,
-    simulate: bool,
-) -> Result<Write> {
-    let ctx = oracle.ctx;
-    let actor = ctx.wallet_pubkey()?;
-    let (state, source_time, archive_url) = (c.state, c.time, c.text.as_str());
-    let value = trim_decimal(u128::from(state), 6);
-    let challenging = challenge_id.is_some();
-    if !challenging {
-        let bond = oracle
-            .sku_pool(month, &source.state.bucket_id)?
-            .opening_bond;
-        let now = u64::try_from(ctx.rpc.clock()?.unix_timestamp).unwrap_or(0);
-        check_opening(
-            Opening::of(&month.state),
-            now,
-            archive_url,
-            &source.state.canonical_locator_hash,
-            amount,
-            bond,
-        )?;
-    }
-    let (kind, bytes, hash) = evidence_preimage(c.kind, archive_url)?;
-    let (archive_object, mut txs, _) = evidence_txs(oracle, &actor, kind, &bytes, hash)?;
-    if let Some(digest) = &c.bundle
-        && !simulate
-    {
-        // Anyone checking the print fetches the proof by its digest.
-        crate::evidence::onchain::publish(ctx, digest)?;
-    }
-    let (name, ixn) = if challenging {
-        let challenge_id = id_or_random(challenge_id.filter(|c| !c.is_empty()), "challenge id")?;
-        (
-            "challengeOpening",
-            ix::challenge_oracle_opening_claim_v2(
-                &oracle.program,
-                &actor,
-                &actor,
-                &month.period.address,
-                &month.address,
-                &source.address,
-                &source.state.bucket_id,
-                ChallengeOracleOpeningClaimParams {
-                    challenge_id,
-                    alternative_opening_state: state,
-                    alternative_source_time: source_time,
-                    bond: amount,
-                    canonical_locator_hash: source.state.canonical_locator_hash,
-                    source_definition_hash: source.state.source_definition_hash,
-                    archive_url: String::new(),
-                },
-                archive_url,
-            ),
-        )
-    } else {
-        (
-            "submitOpening",
-            ix::submit_oracle_opening_claim_v2(
-                &oracle.program,
-                &actor,
-                &actor,
-                &month.period.address,
-                &month.address,
-                &source.address,
-                &source.state.bucket_id,
-                SubmitOracleOpeningClaimParams {
-                    opening_state: state,
-                    source_time,
-                    stake: amount,
-                    canonical_locator_hash: source.state.canonical_locator_hash,
-                    source_definition_hash: source.state.source_definition_hash,
-                    archive_url: String::new(),
-                },
-                archive_url,
-            ),
-        )
-    };
-    txs.push(Tx::one(name, ixn));
-    Ok(Write {
-        action: if challenging {
-            "oracle.prints.challenge"
-        } else {
-            "oracle.prints.opening"
-        },
-        title: format!(
-            "{} {value} for source {} ({} USDC {})",
-            if challenging {
-                "Challenge the opening print with"
-            } else {
-                "Submit opening print"
-            },
+    let claim = oracle.opening_claim(source)?.ok_or_else(|| {
+        Error::msg(format!(
+            "source {} of {} has no opening print",
             source.address,
-            usdc(amount),
-            if challenging { "bond" } else { "stake" }
-        ),
-        review: vec![
-            month_line(month),
-            format!("Archive {archive_url} (object {archive_object})"),
-        ],
-        details: json!({"month": month_json(month), "source": source_json(source), "valueAtoms": state.to_string(), "sourceTime": source_time}),
-        txs,
-    })
-}
-
-pub fn print_finalize(ctx: &Ctx, p: Paint, target: &Target, source: &str) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let cranker = ctx.wallet_pubkey()?;
-    let month = oracle.month(&target.market, target.expiry.as_deref())?;
-    let source = oracle.source(&month, source)?;
-    let (claim, state) = opening_claim(&oracle, &month, &source)?;
-    let write = Write {
-        action: "oracle.prints.finalize",
-        title: format!("Accept the opening print of source {}", source.address),
-        review: vec![
-            month_line(&month),
-            format!("Claim {claim} by {}", state.claimant),
-        ],
-        details: json!({"month": month_json(&month), "source": source_json(&source), "claim": claim.to_string()}),
-        txs: vec![Tx::one(
-            "finalizeOpening",
-            ix::finalize_oracle_opening_claim_v2(
-                &oracle.program,
-                &cranker,
-                &month.period.address,
-                &month.address,
-                &source.address,
-                &state.claimant,
-            ),
-        )],
-    };
-    send::run(ctx, p, write, target.send.simulate)
-}
-
-pub fn print_expire(ctx: &Ctx, p: Paint, target: &Target, source: &str) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let cranker = ctx.wallet_pubkey()?;
-    let month = oracle.month(&target.market, target.expiry.as_deref())?;
-    let source = oracle.source(&month, source)?;
-    let write = Write {
-        action: "oracle.prints.expire",
-        title: format!("Mark unclaimed source {} inactive", source.address),
-        review: vec![month_line(&month)],
-        details: json!({"month": month_json(&month), "source": source_json(&source)}),
-        txs: vec![Tx::one(
-            "expireOpeningSource",
-            ix::expire_oracle_opening_source(
-                &oracle.program,
-                &cranker,
-                &month.period.address,
-                &month.address,
-                &source.address,
-            ),
-        )],
-    };
-    send::run(ctx, p, write, target.send.simulate)
+            month.period.expiry_id()
+        ))
+    })?;
+    Ok((claim.address, claim.state))
 }
 
 /// `petri oracle sources close`: finalizes the month's SKU coverage (184,
@@ -1287,7 +1085,11 @@ pub(super) fn update_claim(oracle: &Oracle, claim: &str) -> Result<(Pubkey, Orac
 }
 
 /// The month of a claim, checked to be the target's.
-fn claim_month(oracle: &Oracle, target: &Target, month_key: &Pubkey) -> Result<MonthRef> {
+pub(super) fn claim_month(
+    oracle: &Oracle,
+    target: &Target,
+    month_key: &Pubkey,
+) -> Result<MonthRef> {
     let month = oracle.month(&target.market, target.expiry.as_deref())?;
     if month.address != *month_key {
         bail(format!(
@@ -1298,318 +1100,7 @@ fn claim_month(oracle: &Oracle, target: &Target, month_key: &Pubkey) -> Result<M
     Ok(month)
 }
 
-pub fn update_commit(
-    ctx: &Ctx,
-    p: Paint,
-    target: &Target,
-    source: &str,
-    value: Option<&str>,
-    cited: Cite,
-    stake: &str,
-) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let month = oracle.month(&target.market, target.expiry.as_deref())?;
-    let source = oracle.source(&month, source)?;
-    let claimant = ctx.wallet_pubkey()?;
-    let c = cite(ctx, &oracle, &month, &source, cited, value, &claimant)?;
-    let stake = usdc_amount(stake, "the stake")?;
-    let (write, _) = update_commit_write(
-        &oracle,
-        &month,
-        &source,
-        &c,
-        stake,
-        target.send.simulate,
-        None,
-    )?;
-    send::run(ctx, p, write, target.send.simulate)
-}
-
-/// A sealed update commit to review and send, and its claim address. Unless
-/// only simulating, its reveal material (with the web proof it cites, if any,
-/// and `observation`, the record to store once it is revealed) is saved to
-/// Petri's private claims file first.
-#[allow(clippy::too_many_arguments)]
-pub(super) fn update_commit_write(
-    oracle: &Oracle,
-    month: &MonthRef,
-    source: &SourceRef,
-    c: &Cited,
-    stake: u64,
-    simulate: bool,
-    observation: Option<claims::PendingObservation>,
-) -> Result<(Write, Pubkey)> {
-    let claimant = oracle.ctx.wallet_pubkey()?;
-    let (new_state, source_time, archive_url) = (c.state, c.time, c.text.as_str());
-    let value = trim_decimal(u128::from(new_state), 6);
-    let s = &source.state;
-    let evidence_hash = ix::update_evidence_hash(
-        &month.address,
-        &source.address,
-        &s.source_id,
-        new_state,
-        source_time,
-        &s.canonical_locator_hash,
-        &s.source_definition_hash,
-        archive_url,
-    );
-    let claim_id = random32()?;
-    let salt = random32()?;
-    let commit_hash = oracle_update_claim_v2_commitment_hash(
-        &oracle.program,
-        &month.address,
-        &source.address,
-        &s.source_id,
-        &claimant,
-        &claim_id,
-        s.current_state,
-        new_state,
-        source_time,
-        &evidence_hash,
-        &ix::archive_url_hash(archive_url),
-        &salt,
-    );
-    let claim = ix::find_oracle_update_claim_address(
-        &oracle.program,
-        &month.address,
-        &source.address,
-        &claimant,
-        &claim_id,
-    );
-    let saved_to = if simulate {
-        None
-    } else {
-        Some(claims::save(
-            &claim.to_string(),
-            claims::Claim {
-                oracle: oracle.program.to_string(),
-                month: month.address.to_string(),
-                source: source.address.to_string(),
-                claimant: claimant.to_string(),
-                claim_id: hex(&claim_id),
-                prior_state: s.current_state,
-                new_state,
-                source_time,
-                evidence_hash: hex(&evidence_hash),
-                archive_url: archive_url.to_string(),
-                secret_salt: hex(&salt),
-                revealed: false,
-                evidence_bundle: c.bundle.clone(),
-                observation,
-            },
-        )?)
-    };
-    let write = Write {
-        action: "oracle.updates.commit",
-        title: format!("Commit a sealed update of source {} with a {} USDC stake", source.address, usdc(stake)),
-        review: vec![
-            month_line(month),
-            format!("{} → {value} at {source_time}", trim_decimal(u128::from(s.current_state), 6)),
-            format!("Claim {claim}; reveal it later with `petri oracle updates reveal {claim}`"),
-            "Only the commitment goes on chain now; the value, archive URL and salt stay in Petri's private file".to_string(),
-        ],
-        details: json!({
-            "month": month_json(month), "source": source_json(source), "claim": claim.to_string(),
-            "claimId": hex(&claim_id), "stakeAtoms": stake.to_string(),
-            "revealMaterial": saved_to.map(|p| p.display().to_string()),
-        }),
-        txs: vec![Tx::one("commitUpdate", ix::commit_oracle_update_claim_v3(&oracle.program, &claimant, &month.period.address, &month.address, &source.address, &s.bucket_id, CommitOracleUpdateClaimV2Params { claim_id, commit_hash, stake }))],
-    };
-    Ok((write, claim))
-}
-
-pub fn update_reveal(ctx: &Ctx, p: Paint, claim: &str, send: &SendArgs) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let claimant = ctx.wallet_pubkey()?;
-    let (key, state) = update_claim(&oracle, claim)?;
-    let saved = claims::load(&key.to_string())?;
-    if saved.claimant != claimant.to_string()
-        || state.claim.claimant != claimant
-        || saved.oracle != oracle.program.to_string()
-    {
-        bail(format!(
-            "update claim {key} was committed by {}, not this wallet",
-            state.claim.claimant
-        ))?;
-    }
-    let month = {
-        let month_account = ctx.rpc.account(&state.claim.month)?;
-        let month_state: ameba_oracle::state::OracleMonthState = decode(
-            &oracle.program,
-            &state.claim.month,
-            month_account.as_ref(),
-            ameba_oracle::state::OracleMonthState::LEN,
-            "oracle month",
-        )?;
-        let period = oracle
-            .periods()?
-            .into_iter()
-            .find(|p| p.address == month_state.period)
-            .ok_or_else(|| Error::msg("the claim's period is not a period of this oracle"))?;
-        oracle.month_of(period)?
-    };
-    let (kind, bytes, hash) =
-        evidence_preimage(cited_kind(&saved.archive_url), &saved.archive_url)?;
-    let (archive_object, mut txs, _) = evidence_txs(&oracle, &claimant, kind, &bytes, hash)?;
-    if let Some(digest) = &saved.evidence_bundle
-        && !send.simulate
-    {
-        // Revealed, the claim names the proof: publish it so anyone can
-        // check it during the challenge window.
-        crate::evidence::onchain::publish(ctx, digest)?;
-    }
-    txs.push(Tx::one(
-        "revealUpdate",
-        ix::reveal_oracle_update_claim_v3(
-            &oracle.program,
-            &claimant,
-            &claimant,
-            &month.period.address,
-            &month.address,
-            &state.claim.source,
-            RevealOracleUpdateClaimV3Params {
-                claim_id: state.claim.claim_id,
-                prior_state: saved.prior_state,
-                new_state: saved.new_state,
-                source_time: saved.source_time,
-                evidence_hash: parse_hex32(&saved.evidence_hash, "evidence hash")?,
-                archive_url: String::new(),
-                secret_salt: parse_hex32(&saved.secret_salt, "salt")?,
-            },
-            &saved.archive_url,
-        ),
-    ));
-    let write = Write {
-        action: "oracle.updates.reveal",
-        title: format!("Reveal update claim {key}"),
-        review: vec![
-            month_line(&month),
-            format!("Archive {} (object {archive_object})", saved.archive_url),
-        ],
-        details: json!({"month": month_json(&month), "claim": key.to_string()}),
-        txs,
-    };
-    let simulate = send.simulate;
-    let mut report = send::run(ctx, p, write, simulate)?;
-    if !simulate {
-        claims::mark_revealed(&key.to_string())?;
-        // An update sent by `petri oracle observe`: its observation record goes
-        // to the API now that the claim is revealed.
-        if let Some(pending) = &saved.observation {
-            super::observe::record_after_send(ctx, &mut report, pending, &key, &claimant);
-        }
-    }
-    Ok(report)
-}
-
-#[allow(clippy::too_many_arguments)]
-pub fn update_challenge(
-    ctx: &Ctx,
-    p: Paint,
-    target: &Target,
-    claim: &str,
-    value: Option<&str>,
-    cited: Cite,
-    bond: &str,
-    challenge_id: Option<&str>,
-) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let challenger = ctx.wallet_pubkey()?;
-    let (key, state) = update_claim(&oracle, claim)?;
-    let month = claim_month(&oracle, target, &state.claim.month)?;
-    let source = oracle.source(&month, &state.claim.source.to_string())?;
-    let c = cite(ctx, &oracle, &month, &source, cited, value, &challenger)?;
-    let (alternative, source_time, archive_url) = (c.state, c.time, c.text.as_str());
-    let value = trim_decimal(u128::from(alternative), 6);
-    let bond = usdc_amount(bond, "the bond")?;
-    let s = &source.state;
-    let evidence_hash = ix::update_evidence_hash(
-        &month.address,
-        &source.address,
-        &s.source_id,
-        alternative,
-        source_time,
-        &s.canonical_locator_hash,
-        &s.source_definition_hash,
-        archive_url,
-    );
-    let challenge_id = id_or_random(challenge_id, "challenge id")?;
-    let (kind, bytes, hash) = evidence_preimage(c.kind, archive_url)?;
-    let (_, mut txs, _) = evidence_txs(&oracle, &challenger, kind, &bytes, hash)?;
-    if let Some(digest) = &c.bundle
-        && !target.send.simulate
-    {
-        crate::evidence::onchain::publish(ctx, digest)?;
-    }
-    txs.push(Tx::one(
-        "challengeUpdate",
-        ix::challenge_oracle_update_claim_v2(
-            &oracle.program,
-            &challenger,
-            &challenger,
-            &month.period.address,
-            &month.address,
-            &source.address,
-            &s.bucket_id,
-            &key,
-            ChallengeOracleUpdateClaimParams {
-                challenge_id,
-                alternative_state: alternative,
-                alternative_source_time: source_time,
-                bond,
-                evidence_hash,
-                archive_url: String::new(),
-            },
-            archive_url,
-        ),
-    ));
-    let challenge = ix::find_oracle_update_challenge_address(
-        &oracle.program,
-        &month.address,
-        &key,
-        &challenge_id,
-    );
-    let write = Write {
-        action: "oracle.updates.challenge",
-        title: format!(
-            "Challenge update claim {key} with {value} ({} USDC bond)",
-            usdc(bond)
-        ),
-        review: vec![month_line(&month), format!("Challenge {challenge}")],
-        details: json!({"month": month_json(&month), "claim": key.to_string(), "challenge": challenge.to_string()}),
-        txs,
-    };
-    send::run(ctx, p, write, target.send.simulate)
-}
-
-pub fn update_expire(ctx: &Ctx, p: Paint, target: &Target, claim: &str) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
-    let cranker = ctx.wallet_pubkey()?;
-    let (key, state) = update_claim(&oracle, claim)?;
-    let month = claim_month(&oracle, target, &state.claim.month)?;
-    let write = Write {
-        action: "oracle.updates.expire",
-        title: format!("Refund unrevealed update claim {key}"),
-        review: vec![
-            month_line(&month),
-            format!("Claimant {}", state.claim.claimant),
-        ],
-        details: json!({"month": month_json(&month), "claim": key.to_string()}),
-        txs: vec![Tx::one(
-            "settleExpiredCommitment",
-            ix::settle_expired_oracle_update_commitment_v3(
-                &oracle.program,
-                &cranker,
-                &month.period.address,
-                &month.address,
-                &state.claim.source,
-                &key,
-                &state.claim.claimant,
-            ),
-        )],
-    };
-    send::run(ctx, p, write, target.send.simulate)
-}
+// Commits, reveals, challenges and expiry of updates: `updates.rs`.
 
 // -------------------------------------------------------------------- stakes
 
@@ -1625,6 +1116,9 @@ fn challenger_of<T: borsh::BorshDeserialize>(
     Ok(get(&state))
 }
 
+/// `petri oracle stakes settle MONTH --kind … --source …`: tag 169 on the
+/// one escrow named, its parties read from chain ([`super::stakes::Settle`]
+/// builds it, as `stakes settle --all` does).
 #[allow(clippy::too_many_arguments)]
 pub fn stake_settle(
     ctx: &Ctx,
@@ -1636,137 +1130,91 @@ pub fn stake_settle(
     claim: Option<&str>,
     challenge: Option<&str>,
 ) -> Result<Report> {
+    use super::stakes::Settle;
     let oracle = Oracle::new(ctx)?;
     let cranker = ctx.wallet_pubkey()?;
     let month = oracle.month(&target.market, target.expiry.as_deref())?;
     let source = oracle.source(&month, source)?;
     let program = oracle.program;
-    let (period, month_key) = (month.period.address, month.address);
-    let collateral = |owner: &Pubkey| derive_user_collateral_pda(&program, owner).0;
-    let instruction = match kind {
-        EscrowKind::ListingBond | EscrowKind::SupportStake | EscrowKind::SourceChallenge => {
-            let escrow = match kind {
-                EscrowKind::ListingBond => PrelistingEscrow::ListingBond {
-                    source: source.address,
-                    proposer: ctx.owner(owner)?,
-                },
-                EscrowKind::SupportStake => PrelistingEscrow::SupportStake {
-                    source: source.address,
-                    supporter: ctx.owner(owner)?,
-                },
-                _ => {
-                    let challenge =
-                        ctx.parse_pubkey(need(challenge, "--challenge")?, "challenge")?;
-                    let account = ctx.rpc.account(&challenge)?;
-                    let c: OracleSourceChallenge = decode(
-                        &program,
-                        &challenge,
-                        account.as_ref(),
-                        OracleSourceChallenge::LEN,
-                        "source challenge",
-                    )?;
-                    PrelistingEscrow::SourceChallenge {
-                        source: source.address,
-                        proposer: source.state.proposer,
-                        challenge,
-                        challenger: c.challenger,
-                        comparison_source: (c.comparison_source != Pubkey::default())
-                            .then_some(c.comparison_source),
-                    }
-                }
-            };
-            ix::settle_oracle_usdc_prelisting_escrow(
-                &program, &cranker, &period, &month_key, &escrow,
-            )
+    let settle = match kind {
+        EscrowKind::ListingBond => Settle::Prelisting(PrelistingEscrow::ListingBond {
+            source: source.address,
+            proposer: ctx.owner(owner)?,
+        }),
+        EscrowKind::SupportStake => Settle::Prelisting(PrelistingEscrow::SupportStake {
+            source: source.address,
+            supporter: ctx.owner(owner)?,
+        }),
+        EscrowKind::SourceChallenge => {
+            let challenge = ctx.parse_pubkey(need(challenge, "--challenge")?, "challenge")?;
+            let account = ctx.rpc.account(&challenge)?;
+            let c: OracleSourceChallenge = decode(
+                &program,
+                &challenge,
+                account.as_ref(),
+                OracleSourceChallenge::LEN,
+                "source challenge",
+            )?;
+            Settle::Prelisting(PrelistingEscrow::SourceChallenge {
+                source: source.address,
+                proposer: source.state.proposer,
+                challenge,
+                challenger: c.challenger,
+                comparison_source: (c.comparison_source != Pubkey::default())
+                    .then_some(c.comparison_source),
+            })
         }
         EscrowKind::OpeningClaim => {
             let (claim, state) = opening_claim(&oracle, &month, &source)?;
-            ix::settle_oracle_usdc_escrow(
-                &program,
-                OracleEscrowKind::OpeningClaim,
-                vec![
-                    AccountMeta::new_readonly(cranker, true),
-                    AccountMeta::new_readonly(period, false),
-                    AccountMeta::new_readonly(month_key, false),
-                    AccountMeta::new_readonly(source.address, false),
-                    AccountMeta::new(claim, false),
-                    AccountMeta::new(collateral(&state.claimant), false),
-                ],
-            )
+            Settle::OpeningClaim {
+                claim,
+                claimant: state.claimant,
+            }
         }
         EscrowKind::OpeningChallenge => {
             let (claim, state) = opening_claim(&oracle, &month, &source)?;
             let challenge = ctx.parse_pubkey(need(challenge, "--challenge")?, "challenge")?;
-            let challenger = challenger_of::<OracleOpeningClaimChallenge>(
-                &oracle,
-                &challenge,
-                OracleOpeningClaimChallenge::LEN,
-                "opening challenge",
-                |c| c.challenger,
-            )?;
-            ix::settle_oracle_usdc_escrow(
-                &program,
-                OracleEscrowKind::OpeningChallenge,
-                vec![
-                    AccountMeta::new_readonly(cranker, true),
-                    AccountMeta::new_readonly(period, false),
-                    AccountMeta::new_readonly(month_key, false),
-                    AccountMeta::new(source.address, false),
-                    AccountMeta::new(claim, false),
-                    AccountMeta::new(challenge, false),
-                    AccountMeta::new(collateral(&state.claimant), false),
-                    AccountMeta::new(collateral(&challenger), false),
-                ],
-            )
+            Settle::OpeningChallenge {
+                claim,
+                challenge,
+                claimant: state.claimant,
+                challenger: challenger_of::<OracleOpeningClaimChallenge>(
+                    &oracle,
+                    &challenge,
+                    OracleOpeningClaimChallenge::LEN,
+                    "opening challenge",
+                    |c| c.challenger,
+                )?,
+            }
         }
         EscrowKind::UpdateClaim => {
             let (claim, state) = update_claim(&oracle, need(claim, "--claim")?)?;
-            ix::settle_oracle_usdc_escrow(
-                &program,
-                OracleEscrowKind::UpdateClaim,
-                vec![
-                    AccountMeta::new_readonly(cranker, true),
-                    AccountMeta::new_readonly(period, false),
-                    AccountMeta::new_readonly(month_key, false),
-                    AccountMeta::new_readonly(source.address, false),
-                    AccountMeta::new(claim, false),
-                    AccountMeta::new(collateral(&state.claim.claimant), false),
-                    AccountMeta::new_readonly(
-                        ix::find_oracle_update_guard_address(&program, &month_key, &claim),
-                        false,
-                    ),
-                ],
-            )
+            Settle::UpdateClaim {
+                claim,
+                claimant: state.claim.claimant,
+            }
         }
         EscrowKind::UpdateChallenge => {
             let (claim, state) = update_claim(&oracle, need(claim, "--claim")?)?;
             let challenge = ctx.parse_pubkey(need(challenge, "--challenge")?, "challenge")?;
-            let challenger = challenger_of::<OracleUpdateChallenge>(
-                &oracle,
-                &challenge,
-                OracleUpdateChallenge::LEN,
-                "update challenge",
-                |c| c.challenger,
-            )?;
-            ix::settle_oracle_usdc_escrow(
-                &program,
-                OracleEscrowKind::UpdateChallenge,
-                vec![
-                    AccountMeta::new_readonly(cranker, true),
-                    AccountMeta::new_readonly(period, false),
-                    AccountMeta::new_readonly(month_key, false),
-                    AccountMeta::new(claim, false),
-                    AccountMeta::new(challenge, false),
-                    AccountMeta::new(collateral(&state.claim.claimant), false),
-                    AccountMeta::new(collateral(&challenger), false),
-                    AccountMeta::new(
-                        ix::find_oracle_update_guard_address(&program, &month_key, &claim),
-                        false,
-                    ),
-                ],
-            )
+            Settle::UpdateChallenge {
+                claim,
+                challenge,
+                claimant: state.claim.claimant,
+                challenger: challenger_of::<OracleUpdateChallenge>(
+                    &oracle,
+                    &challenge,
+                    OracleUpdateChallenge::LEN,
+                    "update challenge",
+                    |c| c.challenger,
+                )?,
+            }
         }
     };
+    let mut tx = Tx::new();
+    for (name, ix) in settle.steps(&program, &cranker, &month, &source.address) {
+        tx.push(&name, ix);
+    }
     let write = Write {
         action: "oracle.stakes.settle",
         title: format!("Settle the {kind:?} escrow of source {}", source.address),
@@ -1775,7 +1223,7 @@ pub fn stake_settle(
             "Settles into the owners' oracle collateral (permissionless)".to_string(),
         ],
         details: json!({"month": month_json(&month), "source": source_json(&source), "kind": format!("{kind:?}")}),
-        txs: vec![Tx::one("settleEscrow", instruction)],
+        txs: vec![tx],
     };
     send::run(ctx, p, write, target.send.simulate)
 }
@@ -1822,42 +1270,97 @@ mod tests {
     }
 
     #[test]
-    fn an_opening_meets_the_oracles_rules_before_anything_is_sent() {
+    fn support_is_taken_while_the_month_places_sources() {
         let day = 86_400;
-        // Scramble from Oct 18 00:00 UTC: the Opening runs Oct 25 to listing Oct 26.
-        let start = 1_792_281_600 + 7 * day;
-        let month = Opening {
-            phase: OraclePhase::Opening,
-            start,
-            listing: start + day,
+        let start = 1_792_281_600;
+        let month = |phase| OracleMonthState {
+            phase,
+            scramble_start_ts: start,
+            ..Default::default()
         };
-        let page = "https://example.com/ram?id=1";
-        let hash = hashv(&[b"locator", page.as_bytes()]).to_bytes();
-        // Captured Oct 25 01:00; the chain says Oct 25 02:00.
-        let url = format!("https://web.archive.org/web/20261025010000/{page}");
-        let now = start + 2 * 3600;
-        assert!(check_opening(month, now, &url, &hash, 1_000_000, 1_000_000).is_ok());
-        let fails = |month: Opening, now: u64, url: &str, stake: u64| {
-            check_opening(month, now, url, &hash, stake, 1_000_000)
+        let coverage = OracleSkuCoverageManifest {
+            planned_scramble_start_ts: start - 2 * day,
+            ..Default::default()
+        };
+        let expiry = start + 40 * day;
+        let fails = |m: &OracleMonthState, c: &OracleSkuCoverageManifest, now, expiry| {
+            check_placement(m, c, expiry, now, "RAMX-202612")
+                .unwrap_err()
+                .message
+        };
+        let taking = month(OraclePhase::SourceSubmission);
+        assert!(check_placement(&taking, &coverage, expiry, start - day, "RAMX-202612").is_ok());
+        assert!(
+            fails(&taking, &coverage, start - 3 * day, expiry)
+                .contains("takes sources and support from")
+        );
+        assert!(
+            fails(&taking, &coverage, start, start + 3 * day).contains("too close to its expiry")
+        );
+        let closed = OracleSkuCoverageManifest {
+            coverage_finalized: true,
+            ..coverage.clone()
+        };
+        assert!(fails(&taking, &closed, start, expiry).contains("closed its source window"));
+        // Scramble's four placement days.
+        let scramble = month(OraclePhase::Scramble);
+        assert!(
+            check_placement(
+                &scramble,
+                &closed,
+                expiry,
+                start + 4 * day - 1,
+                "RAMX-202612"
+            )
+            .is_ok()
+        );
+        assert!(fails(&scramble, &closed, start + 4 * day, expiry).contains("four placement days"));
+        assert!(
+            fails(&month(OraclePhase::Opening), &closed, start, expiry).contains("is in Opening")
+        );
+        let freezing = OracleMonthState {
+            weight_scheme_version: 255,
+            ..scramble
+        };
+        assert!(fails(&freezing, &closed, start, expiry).contains("being frozen"));
+    }
+
+    #[test]
+    fn a_support_stake_is_the_products_bond_on_someone_elses_candidate() {
+        let supporter = Pubkey::new_unique();
+        let source = SourceRef {
+            address: Pubkey::new_unique(),
+            state: ameba_oracle::state::OracleSourceState {
+                status: OracleSourceStatus::Candidate,
+                proposer: Pubkey::new_unique(),
+                ..Default::default()
+            },
+        };
+        assert_eq!(
+            check_support(&source, &supporter, false, None, 1_000_000).unwrap(),
+            1_000_000
+        );
+        assert_eq!(
+            check_support(&source, &supporter, false, Some(1_000_000), 1_000_000).unwrap(),
+            1_000_000
+        );
+        let fails = |s: &SourceRef, who: &Pubkey, supported, stake| {
+            check_support(s, who, supported, stake, 1_000_000)
                 .unwrap_err()
                 .message
         };
         assert!(
-            fails(month, now, &url, 2_000_000)
-                .contains("the opening bond of this product is 1 USDC: pass --stake 1")
+            fails(&source, &supporter, false, Some(2_000_000))
+                .contains("exactly 1 USDC: pass --stake 1, or leave --stake out")
         );
-        let early = format!("https://web.archive.org/web/20261024230000/{page}");
-        assert!(fails(month, now, &early, 1_000_000).contains("before the Opening began"));
-        // A capture the chain's clock has not reached yet.
-        assert!(fails(month, start + 1800, &url, 1_000_000).contains("after the chain's clock"));
-        let other = "https://web.archive.org/web/20261025010000/https://example.com/ram";
-        assert!(fails(month, now, other, 1_000_000).contains("is not this source's page"));
-        assert!(fails(month, month.listing, &url, 1_000_000).contains("on the chain's clock"));
-        let game = Opening {
-            phase: OraclePhase::Game,
-            ..month
-        };
-        assert!(fails(game, now, &url, 1_000_000).contains("the month is in Game"));
+        assert!(fails(&source, &supporter, true, None).contains("already"));
+        assert!(
+            fails(&source, &source.state.proposer, false, None)
+                .contains("its proposer can't support it")
+        );
+        let mut frozen = source.clone();
+        frozen.state.status = OracleSourceStatus::Frozen;
+        assert!(fails(&frozen, &supporter, false, None).contains("only a candidate"));
     }
 
     #[test]

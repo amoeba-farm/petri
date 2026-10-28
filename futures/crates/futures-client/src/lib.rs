@@ -1589,11 +1589,13 @@ impl Book {
             .saturating_sub(self.credit_exposure())
     }
 
-    /// What `owner`'s next `Quote` here may escrow beyond its own cash (its
-    /// free and reserved cash less its debt) at `now`: as the credit owner
-    /// while its market lends, its limit plus the least its claims and
-    /// inventory pay, less its debt; the program then keeps its exposure
-    /// within the limit. 0 for anyone else.
+    /// A floor on what `owner`'s next `Quote` here may escrow beyond its own
+    /// cash (its free and reserved cash less its debt) at `now`: as the
+    /// credit owner while its market lends, its limit plus the least its
+    /// claims and inventory pay, less its debt. The program also counts the
+    /// escrow a settlement in the band can't take (`state::credit_band`,
+    /// 2026-10-27), so it admits more: [`Book::quote_admits`] says exactly
+    /// how much. 0 for anyone else.
     pub fn credit_room(&self, owner: &Pubkey, now: u64) -> u64 {
         let h = &self.header;
         if h.credit_owner != *owner || !self.lends_at(now) {

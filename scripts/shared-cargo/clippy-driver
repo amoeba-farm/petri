@@ -1,0 +1,8 @@
+#!/bin/sh
+# shared_clippy's RUSTC_WORKSPACE_WRAPPER (scripts/shared-cargo.sh): the
+# toolchain's clippy-driver, called at this worktree's path (see ./rustc).
+# Cargo passes the rustc it runs first; clippy-driver sits next to it.
+case "$1" in
+  */*) exec "${1%/*}/clippy-driver" "$@" ;;
+  *) exec clippy-driver "$@" ;;
+esac

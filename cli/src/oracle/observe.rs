@@ -28,6 +28,7 @@ use super::{
     send,
     series::{self, Parsed},
     skus::hex,
+    updates,
     writes::{self, month_json, usdc_amount},
 };
 use crate::futures::{
@@ -195,7 +196,9 @@ fn stake(given: Option<&str>, bond: u64, what: &str) -> Result<u64> {
     }
 }
 
-/// `petri oracle observe MONTH --source ID --file OBS.json [--stake USDC]`.
+/// `petri oracle observe MONTH --source ID --file OBS.json [--stake USDC]
+/// [--reveal]`: `--reveal` reveals a Game update as soon as its commit lands;
+/// an opening print has nothing to reveal, so it changes nothing there.
 #[allow(clippy::too_many_arguments)]
 pub fn observe(
     ctx: &Ctx,
@@ -205,6 +208,8 @@ pub fn observe(
     source: &str,
     file: &Path,
     given_stake: Option<&str>,
+    reveal: bool,
+    accept: bool,
     simulate: bool,
 ) -> Result<Report> {
     let of = of(ctx, market, expiry, source)?;
@@ -265,12 +270,20 @@ pub fn observe(
     match of.month.state.phase {
         OraclePhase::Opening => {
             let amount = stake(given_stake, pool.opening_bond, "opening bond")?;
-            let mut write = writes::opening_write(
-                &of.oracle, &of.month, &of.source, &cited, amount, None, simulate,
+            let mut write = super::prints::opening_write(
+                &of.oracle,
+                &of.month,
+                &of.source,
+                &cited,
+                Some(amount),
+                simulate,
             )?;
             write.action = "oracle.observe.opening";
             write.review.insert(1, checked);
             write.review.extend(prior_note);
+            if accept {
+                write.review.push(super::prints::accept_note());
+            }
             write.details["routing"] = serde_json::to_value(&routing).unwrap_or(Value::Null);
             let mut report = send::run(ctx, p, write, simulate)?;
             if !simulate {
@@ -281,31 +294,36 @@ pub fn observe(
                 );
                 record_and_note(ctx, &mut report, &pending, &claim, &signer, Some(file));
             }
+            if accept {
+                super::prints::accept_after(ctx, p, &mut report, &of.month, &of.source, simulate);
+            }
             Ok(report)
         }
         OraclePhase::Game => {
             let amount = stake(given_stake, pool.update_min_bond, "update stake")?;
-            let (mut write, claim) = writes::update_commit_write(
+            let mut planned = updates::commit_write(
                 &of.oracle,
                 &of.month,
                 &of.source,
                 &cited,
-                amount,
+                Some(&trim_decimal(u128::from(amount), 6)),
                 simulate,
                 Some(pending),
             )?;
-            write.action = "oracle.observe.update";
-            write.review.insert(1, checked);
-            write.review.extend(prior_note);
-            write
+            planned.write.action = "oracle.observe.update";
+            planned.write.review.insert(1, checked);
+            planned.write.review.extend(prior_note);
+            planned
+                .write
                 .review
-                .push("Its observation record goes to the API once you reveal it".to_string());
-            write.details["routing"] = serde_json::to_value(&routing).unwrap_or(Value::Null);
-            let mut report = send::run(ctx, p, write, simulate)?;
-            if !simulate {
-                report.plain.push_str(&format!(
-                    "\nReveal it within a minute: petri oracle updates reveal {claim}\nIts observation is recorded with the API then."
-                ));
+                .push("Its observation record goes to the API once it is revealed".to_string());
+            planned.write.details["routing"] =
+                serde_json::to_value(&routing).unwrap_or(Value::Null);
+            let mut report = updates::send_commit(ctx, p, planned, simulate, reveal)?;
+            if !simulate && !reveal {
+                report
+                    .plain
+                    .push_str("\nIts observation is recorded with the API once it is revealed.");
             }
             Ok(report)
         }

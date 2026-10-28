@@ -2135,12 +2135,35 @@ impl StakePosition {
     }
 }
 
+/// How far either side of the reference value the credit owner's cash and
+/// credit must cover a settlement, in basis points of the reference (the
+/// user, 2026-10-27: "80-120", around a reference of 100). Beyond it a loss
+/// past the vault's cash and credit is a shortfall like any other: the
+/// buffer, then the staked AMBA, then the winners' payouts pro rata
+/// (`CreditSettle`, `SettleRecovery`).
+pub const CREDIT_BAND_BPS: u64 = 2_000;
+
+/// The grid positions whose settlement [`credit_risk`] covers: the
+/// reference ± [`CREDIT_BAND_BPS`] of it, rounded outward, within the grid.
+/// A market without a reference covers the whole grid.
+pub fn credit_band(h: &Header) -> (u16, u16) {
+    if h.ref_fine == 0 || h.k == 0 {
+        return (0, h.grid);
+    }
+    let (r, k) = (u128::from(h.ref_fine), u128::from(h.k));
+    let lo = r * u128::from(10_000 - CREDIT_BAND_BPS) / (10_000 * k);
+    let hi = (r * u128::from(10_000 + CREDIT_BAND_BPS)).div_ceil(10_000 * k);
+    let grid = u128::from(h.grid);
+    (lo.min(grid) as u16, hi.min(grid) as u16)
+}
+
 /// What the credit owner's position in this market could cost its stakers,
 /// and what carries its debt ([`credit_risk`]).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct CreditRisk {
-    /// Its debt less its free cash and the least its claims and inventory
-    /// pay at any settlement, with its escrow counted as spent (0 at best).
+    /// Its debt less its free cash and the least it holds at any settlement
+    /// in [`credit_band`]: what its claims and inventory pay there and its
+    /// reserved cash, less what its fills could give up there (0 at best).
     pub exposure: u64,
     /// Its own free and reserved cash plus the backing its claims and
     /// inventory hold: `k` times the larger of its long and short lots at
@@ -2165,15 +2188,21 @@ pub struct CreditRisk {
 /// backs). Netting and `repay` change neither the payoff less free cash nor
 /// cash plus backing held, so only that gross step counts:
 ///
-/// * **Exposure.** Escrow is already counted as spent, and a new claim
-///   pays at least nothing, so only the pieces paid from free cash can raise
-///   it: at settlement `s` each such lot costs at most `(c - pays(s))^+`
-///   more. Summed over every close-order lot and every ladder lot its
-///   step's inventory backs (the first ones to fill, best tier first; any
-///   other lot a fill turns inventory-backed pairs with that fill, a whole
-///   set: it costs `c - k <= 0`), the bound holds for every partial fill.
-///   Between grid positions payoffs are linear and these terms convex, so
-///   the least is at a grid position.
+/// * **Exposure.** At settlement `s` its reserved cash is its own, but for
+///   what a fill there could take: a lot costs its contribution `c` and
+///   becomes a claim paying `pays(s)`, so at most `(c - pays(s))^+`. For an
+///   escrowed ladder lot that is its escrow on a step that pays its side
+///   nothing (bids at or above `s`, asks below it), counted at the step's
+///   best price for every lot, a bound; until 2026-10-27 every escrow
+///   counted as spent at every `s`, which funded both ends of the grid at
+///   once. Pieces paid from free cash cost the same: every close-order lot
+///   and every ladder lot its step's inventory backs (the first ones to
+///   fill, best tier first; any other lot a fill turns inventory-backed
+///   pairs with that fill, a whole set: it costs `c - k <= 0`). The bound
+///   holds for every partial fill. Between grid positions payoffs are
+///   linear and these terms convex, so the least is at a grid position.
+///   Only the settlements in [`credit_band`] count; with no fill to come
+///   (`resting` false) nothing is given up.
 /// * **Carry.** Per step, with net position `D` (long minus short lots), a
 ///   fill adds `k` per lot to the backing held except on the side that
 ///   offsets `D`, and costs its per-step price: a ladder tier's bid, or
@@ -2237,9 +2266,14 @@ fn mul(a: i64, b: i64) -> i64 {
 /// range (the exact form then decides); otherwise exactly the exact form's
 /// values (checked over random books in the tests). With `W(x)` the long
 /// less short lots below grid position `x`, `A(x)` and `B(x)` what the
-/// inventory-backed asks and bids below it could give up, `C(x)` the close
-/// orders', `S` the short lots and `B` all of `B`, the exact form's least
-/// is `S k - B + min_x (W(x) k - A(x) + B(x) - C(x))`.
+/// inventory-backed asks and bids below it could give up, `C(x)` the
+/// orders', `S` the short lots and `B` all of `B`,
+/// `E(x)` and `F(x)` the escrowed bids and asks below it, `E` all of `E`
+/// and `R` its reserved cash, the exact form's least is `S k - B + R - E +
+/// min_x (W(x) k - A(x) + B(x) - C(x) + E(x) - F(x))` over `x` in the
+/// band. Never inlined: in one SBF frame with the exact form it overran
+/// the 4 KiB stack (2026-10-27).
+#[inline(never)]
 fn credit_risk_fast(
     b: &[u8],
     h: &Header,
@@ -2304,17 +2338,20 @@ fn credit_risk_fast(
                 lots: fast(o.lots)?,
                 c: fast(c)?,
                 per: fast(c.div_ceil(u64::from(o.hi - o.lo)))?,
-                close: (o.flags & ORDER_CLOSE != 0).then(|| {
-                    (
-                        u64::from(o.lo) * h.k,
-                        rm::payoff::set_value(o.lo, o.hi, h.k),
-                    )
-                }),
+                span: (
+                    u64::from(o.lo) * h.k,
+                    rm::payoff::set_value(o.lo, o.hi, h.k),
+                ),
             });
         }
         orders.sort_unstable_by(|p, q| q.per.cmp(&p.per));
     }
     let n = ladder.as_ref().map_or(1, |l| l.1.tiers.n());
+    // Its tiers' sizes summed per side (`StepSide::lots`).
+    let tier_sums = ladder.as_ref().map_or((0, 0), |l| {
+        let sum = |t: &TierLots| t[..n].iter().fold(0u64, |a, &q| a.saturating_add(q));
+        (sum(&l.2 .0), sum(&l.2 .1))
+    });
     let (mut long, mut short) = if orders.is_empty() {
         (Vec::new(), Vec::new())
     } else {
@@ -2330,6 +2367,11 @@ fn credit_risk_fast(
     // What the lots its inventory backs could give up below the position:
     // its asks (long inventory) and bids (short inventory).
     let (mut ask_backed, mut bid_backed) = (0i64, 0i64);
+    // The escrow of its ladder lots below the position: a fill takes an
+    // ask's there and a bid's at or above it (`bid_escrow` in all, at the
+    // end), at the step's best price for every lot, a bound.
+    let (mut bid_escrow, mut ask_escrow) = (0i64, 0i64);
+    let (band_lo, band_hi) = credit_band(h);
     let mut least = i64::MAX;
     let mut floor = 0i64;
     let mut x_k = 0u64;
@@ -2340,18 +2382,25 @@ fn credit_risk_fast(
     let mut ask_lots = [(0i64, 0i64); rm::MAX_TIERS as usize];
     for x in 0..=h.grid {
         // Settlement at grid position `x`: what it holds pays, less what its
-        // free-paid fills could give up (less the constant `S k - B`).
-        let mut g = net_k.checked_sub(ask_backed)?.checked_add(bid_backed)?;
+        // fills could give up there (less the constant `S k - B`, plus its
+        // reserved cash less every bid's escrow).
+        let mut g = net_k
+            .checked_sub(ask_backed)?
+            .checked_add(bid_backed)?
+            .checked_add(bid_escrow)?
+            .checked_sub(ask_escrow)?;
         for o in &orders {
-            if let Some((lo_k, value)) = o.close {
-                // `payoff::long_per_lot` at `x`.
-                let pays = x_k.saturating_sub(lo_k).min(value);
-                let pays = if o.long { pays } else { value - pays };
-                let lose = (o.c as u64).saturating_sub(pays) as i64;
-                g = g.checked_sub(mul(o.lots, lose))?;
-            }
+            // `payoff::long_per_lot` at `x`; an order's fill costs its
+            // contribution, from escrow or (a close order) free cash.
+            let (lo_k, value) = o.span;
+            let pays = x_k.saturating_sub(lo_k).min(value);
+            let pays = if o.long { pays } else { value - pays };
+            let lose = (o.c as u64).saturating_sub(pays) as i64;
+            g = g.checked_sub(mul(o.lots, lose))?;
         }
-        least = least.min(g);
+        if x >= band_lo && x <= band_hi {
+            least = least.min(g);
+        }
         if x == h.grid {
             break;
         }
@@ -2372,7 +2421,7 @@ fn credit_risk_fast(
                 ss = ss.checked_add(inv)?;
             }
             if *live && x >= mk.lo && x < mk.hi {
-                let side = |sizes, total, left, best| -> Option<StepSide<'_>> {
+                let side = |sizes, total, left, best, sum| -> Option<StepSide<'_>> {
                     Some(StepSide {
                         sizes,
                         n,
@@ -2381,6 +2430,7 @@ fn credit_risk_fast(
                         left: if n == 1 { fast(left)? as u64 } else { left },
                         best,
                         spread: i64::from(mk.tiers.spread),
+                        sum,
                     })
                 };
                 let bids = side(
@@ -2388,14 +2438,27 @@ fn credit_risk_fast(
                     mk.bid_total,
                     st.bid_lots,
                     fast(u64::from(st.bid))?,
+                    tier_sums.0,
                 )?;
-                let asks = side(&sizes.1, mk.ask_total, st.ask_lots, k - i64::from(st.ask))?;
-                // Long inventory backs its first asks, short its first bids.
+                let asks = side(
+                    &sizes.1,
+                    mk.ask_total,
+                    st.ask_lots,
+                    k - i64::from(st.ask),
+                    tier_sums.1,
+                )?;
+                // Long inventory backs its first asks, short its first bids;
+                // the rest are escrowed.
+                let (mut bid_q, mut ask_q) = (bids.lots(), asks.lots());
                 if st.inv > 0 {
                     ask_backed = ask_backed.checked_add(asks.prefix(inv))?;
+                    ask_q -= ask_q.min(inv);
                 } else if st.inv < 0 {
                     bid_backed = bid_backed.checked_add(bids.prefix(inv))?;
+                    bid_q -= bid_q.min(inv);
                 }
+                bid_escrow = bid_escrow.checked_add(mul(bid_q, bids.best.max(0)))?;
+                ask_escrow = ask_escrow.checked_add(mul(ask_q, asks.best.max(0)))?;
                 let crossed = u64::from(st.bid) > u64::from(st.ask).min(h.k);
                 sides = Some((bids, asks, crossed));
             }
@@ -2446,9 +2509,12 @@ fn credit_risk_fast(
         floor = floor.checked_add(least_here)?;
     }
     // Every short pays in full at the bottom of the grid; the bids its
-    // inventory backs above the position could give up.
+    // inventory backs above the position could give up; its reserved cash
+    // is its own but for the bids' escrow a fill above them takes.
     let kk = i128::from(k);
-    let least = i128::from(least) + i128::from(shorts) * kk - i128::from(bid_backed);
+    let least = i128::from(least) + i128::from(shorts) * kk - i128::from(bid_backed)
+        + i128::from(tr.reserved)
+        - i128::from(bid_escrow);
     let own = i128::from(wide) * kk;
     let debt = i128::from(h.debt) - i128::from(tr.free);
     let exposure = (debt - least).max(0);
@@ -2469,9 +2535,9 @@ struct Resting {
     /// Its contribution per lot, and per lot-step (rounded up).
     c: i64,
     per: i64,
-    /// A close order: where a long payoff on its range starts and its set's
-    /// value, in fine units.
-    close: Option<(u64, u64)>,
+    /// Where a long payoff on its range starts and its set's value, in
+    /// fine units.
+    span: (u64, u64),
 }
 
 /// One side of a live ladder step, as [`credit_risk_fast`] counts it: its
@@ -2486,6 +2552,8 @@ struct StepSide<'a> {
     left: u64,
     best: i64,
     spread: i64,
+    /// Its tiers' sizes summed (the same for every step).
+    sum: u64,
 }
 
 impl StepSide<'_> {
@@ -2516,6 +2584,16 @@ impl StepSide<'_> {
             }
             cost -= self.spread;
         }
+    }
+
+    /// Its remaining lots over every tier, as [`StepSide::each`] counts
+    /// them (without walking the tiers: the credit check reads every step).
+    fn lots(&self) -> i64 {
+        if self.n == 1 {
+            return self.left as i64;
+        }
+        let filled = self.total.saturating_sub(self.left);
+        (self.sum - filled.min(self.sum)) as i64
     }
 
     /// What its first `q` lots cost, best tier first (at most its lots).
@@ -2613,6 +2691,7 @@ fn step_least_fast(offset: &[(i64, i64)], other: &[(i64, i64)], need: i64, k: i6
 /// [`credit_risk`] in its reviewed form (c4b063e6, the re-review of
 /// 2026-10-18): two passes over the grid in `i128`. Every value
 /// [`credit_risk_fast`] can't hold, and every final market, goes here.
+#[inline(never)]
 fn credit_risk_exact(
     b: &[u8],
     h: &Header,
@@ -2723,6 +2802,14 @@ fn credit_risk_exact(
     // settlement: asks (long inventory) from the step's top up, bids (short
     // inventory) from its bottom down.
     let mut bid_backed_total = 0i128;
+    // The escrow of its ladder lots, at each step's best price for every lot
+    // (a bound): a fill takes an ask's below the position, a bid's at or
+    // above it.
+    let escrow = |lots: &TierLots, best: u64, backed: u64| -> i128 {
+        let q: u64 = lots.iter().sum();
+        i128::from(q - q.min(backed)) * i128::from(best)
+    };
+    let mut bid_escrow_total = 0i128;
     if ladder.is_some() {
         for x in 0..h.grid {
             let (bids, _, prices, inv) = step(x);
@@ -2736,6 +2823,7 @@ fn credit_risk_exact(
                 ds[xi + 1] -= q;
             }
             bid_backed_total += backed_cost(&bids, &prices[..n], inv.min(0).unsigned_abs(), |p| p);
+            bid_escrow_total += escrow(&bids, prices[0], inv.min(0).unsigned_abs());
         }
     }
     // The shorts pay in full at the bottom of the grid.
@@ -2753,23 +2841,28 @@ fn credit_risk_exact(
     let mut floor = 0i128;
     let mut ask_backed = 0i128;
     let mut bid_backed = bid_backed_total;
+    // Its ladder lots' escrow below the position (`escrow`).
+    let (mut bid_escrow, mut ask_escrow) = (0i128, 0i128);
+    let (band_lo, band_hi) = credit_band(h);
     let mut long: Vec<(i128, i128)> = Vec::with_capacity(n + orders.len());
     let mut short: Vec<(i128, i128)> = Vec::with_capacity(n + orders.len());
     for x in 0..=h.grid {
-        // Settlement at grid position `x`: what it holds pays, less what its
-        // free-paid fills could give up.
-        let mut pen = ask_backed + bid_backed;
-        for &(side, lo, hi, lots, c, close) in &orders {
-            if close {
-                let pays = i128::from(rm::payoff::long_per_lot(lo, hi, u64::from(x) * h.k, h.k));
-                let pays = match side {
-                    Side::Long => pays,
-                    Side::Short => i128::from(rm::payoff::set_value(lo, hi, h.k)) - pays,
-                };
-                pen += i128::from(lots) * (i128::from(c) - pays).max(0);
-            }
+        // Settlement at grid position `x`: what it holds pays, its reserved
+        // cash, less what its fills could give up there: the ladder lots'
+        // escrow, and an order's contribution `c` (from escrow, or a close
+        // order's from free cash) beyond what its claim pays.
+        let mut pen = ask_backed + bid_backed + (bid_escrow_total - bid_escrow) + ask_escrow;
+        for &(side, lo, hi, lots, c, _) in &orders {
+            let pays = i128::from(rm::payoff::long_per_lot(lo, hi, u64::from(x) * h.k, h.k));
+            let pays = match side {
+                Side::Long => pays,
+                Side::Short => i128::from(rm::payoff::set_value(lo, hi, h.k)) - pays,
+            };
+            pen += i128::from(lots) * (i128::from(c) - pays).max(0);
         }
-        least = least.min(v * kk - pen);
+        if x >= band_lo && x <= band_hi {
+            least = least.min(v * kk + i128::from(tr.reserved) - pen);
+        }
         if x == h.grid {
             break;
         }
@@ -2783,6 +2876,12 @@ fn credit_risk_exact(
             h.k.saturating_sub(p)
         });
         bid_backed -= backed_cost(&bids, &prices[..n], inv.min(0).unsigned_abs(), |p| p);
+        ask_escrow += escrow(
+            &asks,
+            h.k.saturating_sub(prices[n]),
+            inv.max(0).unsigned_abs(),
+        );
+        bid_escrow += escrow(&bids, prices[0], inv.min(0).unsigned_abs());
         if !resting {
             continue;
         }
@@ -3309,7 +3408,7 @@ mod tests {
     /// `credit_risk_fast` gives exactly the reviewed form's values, now and
     /// at the worst fill, over random books: claims of both sides, opening
     /// and close orders, a ladder of up to 8 tiers with inventory either
-    /// way, live or not. Lots past `FAST` make it defer to the exact form,
+    /// way, live or not, over a reference's band or the whole grid. Lots past `FAST` make it defer to the exact form,
     /// as `credit_risk` then does.
     #[test]
     fn credit_risk_matches_the_reviewed_form() {
@@ -3341,7 +3440,14 @@ mod tests {
                 maker_cap: makers,
                 claim_cap: claims,
                 k,
-                debt: next(1_000_000),
+                debt: next(3_000_000),
+                // Half the books cover a band around a reference, the rest
+                // the whole grid (no reference).
+                ref_fine: if round % 2 == 0 {
+                    next(u64::from(grid) + 1) * k
+                } else {
+                    0
+                },
                 ..Header::default()
             };
             let mut b = vec![0u8; market_len(grid, traders, orders, makers, claims)];

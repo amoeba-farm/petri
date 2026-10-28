@@ -111,7 +111,12 @@ petri oracle latest RAMX
 petri oracle recipe RAMX
 petri oracle sources RAMX
 petri oracle collateral
-petri oracle sources challenge RAMX --source <ID> ...
+petri oracle challenges RAMX
+petri oracle sources challenge RAMX --source <ID> --reason stale --why "..."
+petri oracle prints RAMX
+petri oracle stakes
+petri oracle stakes settle --all
+petri oracle prints challenge RAMX --source <ID> --value <V> --archive-url <URL>
 ```
 
 ## Allowed Public Grammar

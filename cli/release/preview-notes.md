@@ -1,4 +1,27 @@
-# Petri v0.1.18 — preview
+# Petri v0.1.19 — preview
+
+## New in v0.1.19
+
+- **Every oracle stage you take part in.** Beside proposing and supporting
+  sources, Petri now covers the rest of a month:
+  - `petri oracle challenges` lists the sources open to challenge and how
+    yours stand; `petri oracle sources challenge` challenges one.
+  - `petri oracle prints` shows the opening prints; `prints opening
+    --accept` (and `observe --accept`) sends one and accepts it once its
+    challenge window has passed, in one step.
+  - `petri oracle updates` shows the Game updates; `updates commit
+    --reveal` (and `observe --reveal`) commits an update and reveals it at
+    once, inside its short reveal window.
+  - `petri oracle stakes` shows every bond and stake of yours: locked,
+    ready to settle, or settled and where it went. `stakes settle --all`
+    settles everything that pays you.
+- **Exact amounts, refused before sending.** Every bond and stake defaults
+  to the exact amount the program takes, and Petri refuses, before
+  anything is sent, what the program would refuse: a print or update
+  outside its window, an unchanged value, evidence from the wrong page or
+  time.
+- **In DeepSeek Harness.** The Petri plugin (0.6.0) gives its agent all of
+  these, and its Oracle tab shows each month's stage and your part in it.
 
 ## New in v0.1.18
 

@@ -9,8 +9,12 @@ use ameba_oracle::{
     interface::{Period, PeriodStatus, find_period_address},
     sponsorship::{SourceSponsorship, SponsorExposure, agreement_address, exposure_address},
     state::{
-        OracleConfig, OracleMonthState, OracleSkuCoverageManifest, OracleSourceState,
+        OracleConfig, OracleMonthState, OracleOpeningClaim, OracleOpeningClaimChallenge,
+        OracleSkuCoverageManifest, OracleSourceChallenge, OracleSourceChallengeGuard,
+        OracleSourceState, OracleSupportPosition, OracleUpdateChallenge,
+        OracleUpdateChallengeGuard, OracleUpdateClaimV2, OracleUsdcRewardSchedule,
         OracleUsdcSkuPool, UserCollateral, derive_oracle_sku_coverage_manifest_pda,
+        derive_oracle_source_challenge_guard_pda, derive_oracle_update_challenge_guard_pda,
         derive_oracle_usdc_reward_schedule_pda, derive_oracle_usdc_sku_pool_pda,
         derive_user_collateral_pda, find_config_address,
     },
@@ -148,18 +152,120 @@ impl SourceRef {
     }
 }
 
-/// The role of a source's definition link (0 is its locator's).
+/// One source's opening claim (tags 162-165): its current print. The account
+/// stores neither its month nor its source (the program's compact layout), so
+/// they come from the address it is derived from, as the program binds them.
+#[derive(Clone, Debug)]
+pub struct ClaimRef {
+    pub address: Pubkey,
+    pub state: OracleOpeningClaim,
+}
+
+impl ClaimRef {
+    /// The claim at `address` for `source`, its identity bound from the
+    /// source: None unless it is the canonical, initialized claim of that
+    /// source.
+    fn bound(
+        program: &Pubkey,
+        address: Pubkey,
+        source: &SourceRef,
+        mut state: OracleOpeningClaim,
+    ) -> Option<Self> {
+        let canonical =
+            ix::find_oracle_opening_claim_address(program, &source.state.month, &source.address);
+        if address != canonical || !state.is_initialized {
+            return None;
+        }
+        state.month = source.state.month;
+        state.source = source.address;
+        state.source_id = source.state.source_id;
+        state.canonical_locator_hash = source.state.canonical_locator_hash;
+        state.source_definition_hash = source.state.source_definition_hash;
+        Some(Self { address, state })
+    }
+}
+
+/// The evidence link a submitted opening print leaves (role 2, one per tag
+/// 162): its claim, attempt, value, source time and archive object. A print
+/// that replaced it through a challenge leaves none of its own, and the claim
+/// keeps only its current print, so these are the record of earlier ones.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PrintLink {
+    pub address: Pubkey,
+    pub month: Pubkey,
+    pub source: Pubkey,
+    pub claim: Pubkey,
+    pub object: Pubkey,
+    pub attempt: u32,
+    pub value: u64,
+    pub time: u64,
+    pub evidence_hash: [u8; 32],
+}
+
+/// The role of an opening print's evidence link.
+const OPENING_ROLE: u8 = 2;
+
+/// An opening print's evidence link, read from its account (the program's
+/// `oracle_evidence::publish` layout): None unless it is a canonical role-2
+/// link of the oracle program.
+fn print_link(program: &Pubkey, address: &Pubkey, account: &Account) -> Option<PrintLink> {
+    let d = &account.data;
+    if account.owner != *program
+        || account.executable
+        || d.len() != LINK_LEN
+        || d[..5] != *b"OEL\x01\x01"
+        || d[166] != OPENING_ROLE
+        // A print's parent is its claim.
+        || d[70..102] != d[134..166]
+    {
+        return None;
+    }
+    let key = |at: usize| Pubkey::new_from_array(d[at..at + 32].try_into().unwrap());
+    let word = |at: usize| u64::from_le_bytes(d[at..at + 8].try_into().unwrap());
+    let link = PrintLink {
+        address: *address,
+        month: key(6),
+        source: key(38),
+        claim: key(70),
+        object: key(102),
+        attempt: u32::from_le_bytes(d[167..171].try_into().unwrap()),
+        value: word(171),
+        time: word(179),
+        evidence_hash: d[187..219].try_into().unwrap(),
+    };
+    (ix::find_evidence_link_address(program, &link.claim, OPENING_ROLE, &link.evidence_hash)
+        == *address
+        && ix::find_oracle_opening_claim_address(program, &link.month, &link.source) == link.claim)
+        .then_some(link)
+}
+
+/// The roles of a source's evidence links: its locator's and its definition's.
+const LOCATOR_ROLE: u8 = 0;
 const DEFINITION_ROLE: u8 = 1;
-/// Evidence object kind 2: a source definition.
+/// Evidence object kinds 1 and 2: a source URL and a source definition.
+const LOCATOR_KIND: u8 = 1;
 const DEFINITION_KIND: u8 = 2;
+/// Evidence object kinds 3 and 4: a Wayback archive URL and an authenticated
+/// evidence record, both committed with `ix::archive_url_hash`.
+pub(super) const ARCHIVE_KINDS: [u8; 2] = [3, 4];
 /// An evidence link's exact length.
 const LINK_LEN: usize = 251;
+/// Where an update claim keeps its claimant and its marker, and an update
+/// challenge its challenger and its marker (their Borsh layouts).
+const UPDATE_CLAIMANT: usize = 130;
+const UPDATE_CLAIM_MARKER: usize = 260;
+const UPDATE_CHALLENGER: usize = 130;
+const UPDATE_CHALLENGE_MARKER: usize = 268;
+/// Where an opening challenge keeps its marker.
+const OPENING_CHALLENGE_MARKER: usize = 368;
 
-/// The evidence object a source's definition link points to, when the link is
-/// the canonical role-1 link of exactly this source and definition commitment.
-fn definition_object(
+/// The evidence object a source's link of `role` points to, when the link is
+/// the canonical link of exactly this source, role and commitment `hash`.
+fn linked_object(
     program: &Pubkey,
     source: &SourceRef,
+    role: u8,
+    hash: &[u8; 32],
     link: &Pubkey,
     account: Option<&Account>,
 ) -> Option<Pubkey> {
@@ -170,29 +276,26 @@ fn definition_object(
         && !account.executable
         && d.len() == LINK_LEN
         && d[..5] == *b"OEL\x01\x01"
-        && *link
-            == ix::find_evidence_link_address(
-                program,
-                &source.address,
-                DEFINITION_ROLE,
-                &s.source_definition_hash,
-            )
+        && *link == ix::find_evidence_link_address(program, &source.address, role, hash)
         && d[6..38] == s.month.to_bytes()
         && d[38..70] == source.address.to_bytes()
         && d[70..102] == source.address.to_bytes()
-        && d[166] == DEFINITION_ROLE
-        && d[187..219] == s.source_definition_hash
+        && d[166] == role
+        && d[187..219] == *hash
         && d[219..251] == s.source_id;
     ok.then(|| Pubkey::new_from_array(d[102..134].try_into().unwrap()))
 }
 
-/// The definition text of a sealed definition object committed to `hash`.
-fn definition_in(
+/// The bytes of a sealed evidence object of `kind` committed to `hash`: at
+/// its canonical address, every byte written, and `commit` of them `hash`.
+fn sealed_body<'a>(
     program: &Pubkey,
     key: &Pubkey,
-    account: &Account,
+    account: &'a Account,
+    kind: u8,
     hash: &[u8; 32],
-) -> Option<String> {
+    commit: impl Fn(&[u8]) -> [u8; 32],
+) -> Option<&'a [u8]> {
     let d = &account.data;
     if account.owner != *program
         || account.executable
@@ -205,18 +308,93 @@ fn definition_in(
     let total = usize::from(u16::from_le_bytes([d[71], d[72]]));
     let written = usize::from(u16::from_le_bytes([d[73], d[74]]));
     let body = &d[OBJECT_HEADER..];
-    let ok = *key == ix::find_evidence_object_address(program, &payer, DEFINITION_KIND, hash)
-        && d[38] == DEFINITION_KIND
+    let ok = *key == ix::find_evidence_object_address(program, &payer, kind, hash)
+        && d[38] == kind
         && d[39..71] == *hash
         && d[75] == 1
         && total > 0
         && written == total
         && body.len() == total
-        && hashv(&[body]).to_bytes() == *hash;
-    if !ok {
+        && commit(body) == *hash;
+    ok.then_some(body)
+}
+
+/// The definition text of a sealed definition object committed to `hash`.
+pub(super) fn definition_in(
+    program: &Pubkey,
+    key: &Pubkey,
+    account: &Account,
+    hash: &[u8; 32],
+) -> Option<String> {
+    sealed_body(program, key, account, DEFINITION_KIND, hash, |b| {
+        hashv(&[b]).to_bytes()
+    })
+    .and_then(definition_text)
+}
+
+/// The URL of a sealed locator object committed to `hash`.
+fn locator_in(
+    program: &Pubkey,
+    key: &Pubkey,
+    account: &Account,
+    hash: &[u8; 32],
+) -> Option<String> {
+    sealed_body(program, key, account, LOCATOR_KIND, hash, |b| {
+        hashv(&[b"locator", b]).to_bytes()
+    })
+    .and_then(|b| String::from_utf8(b.to_vec()).ok())
+}
+
+/// The payer and text of a sealed archive object (kind 3 or 4) committed to
+/// `hash`: a Wayback archive URL or an evidence record, as a print cites it.
+pub(super) fn archive_in(
+    program: &Pubkey,
+    key: &Pubkey,
+    account: &Account,
+    hash: &[u8; 32],
+) -> Option<(Pubkey, String)> {
+    let kind = *account.data.get(38)?;
+    if !ARCHIVE_KINDS.contains(&kind) {
         return None;
     }
-    definition_text(body)
+    let body = sealed_body(program, key, account, kind, hash, |b| {
+        std::str::from_utf8(b).map_or([0; 32], ix::archive_url_hash)
+    })?;
+    let payer = Pubkey::new_from_array(account.data[6..38].try_into().unwrap());
+    Some((payer, String::from_utf8(body.to_vec()).ok()?))
+}
+
+/// The two addresses a payer's archive object committed to `hash` can have
+/// (kind 3 or 4).
+pub(super) fn archive_objects(program: &Pubkey, payer: &Pubkey, hash: &[u8; 32]) -> [Pubkey; 2] {
+    ARCHIVE_KINDS.map(|kind| ix::find_evidence_object_address(program, payer, kind, hash))
+}
+
+/// The commodity product of a month on `symbol` whose coverage commits to
+/// `root`; `sources` (the month's) are read only for a month formed from its
+/// own source buckets. See [`Oracle::chip_product`].
+pub fn chip_of(
+    symbol: &str,
+    root: &[u8; 32],
+    sources: impl FnOnce() -> Result<Vec<SourceRef>>,
+) -> Result<Option<Product>> {
+    let Some(product) = Product::from_symbol(symbol) else {
+        return Ok(None);
+    };
+    Ok(
+        match skus::for_root(symbol, root).and_then(|set| set.kind) {
+            Some(SetKind::Chips) => Some(product),
+            Some(SetKind::PartNumbers) => None,
+            None => {
+                let sources = sources()?;
+                (!sources.is_empty()
+                    && sources.iter().all(|s| {
+                        skus::chip_bucket(&s.state.bucket_id).is_some_and(|b| b.product == product)
+                    }))
+                .then_some(product)
+            }
+        },
+    )
 }
 
 fn squash(text: &str) -> String {
@@ -379,10 +557,13 @@ impl<'a> Oracle<'a> {
         select(self.periods()?, market, expiry)
     }
 
+    fn month_address(&self, period: &PeriodRef) -> Pubkey {
+        ix::find_oracle_month_address(&self.program, &period.address, period.period.expiry_ts)
+    }
+
     /// The month of a period: canonical address, current layout, bound to the period.
     pub fn month_of(&self, period: PeriodRef) -> Result<MonthRef> {
-        let address =
-            ix::find_oracle_month_address(&self.program, &period.address, period.period.expiry_ts);
+        let address = self.month_address(&period);
         let account = self.ctx.rpc.account(&address)?;
         if account.is_none() {
             bail(format!(
@@ -390,10 +571,32 @@ impl<'a> Oracle<'a> {
                 period.expiry_id()
             ))?;
         }
+        self.month_from(period, address, account.as_ref())
+    }
+
+    /// The months of `periods` that have one, in order (batched reads).
+    pub fn months_in(&self, periods: &[PeriodRef]) -> Result<Vec<MonthRef>> {
+        let addresses: Vec<Pubkey> = periods.iter().map(|p| self.month_address(p)).collect();
+        let accounts = self.ctx.rpc.accounts(&addresses)?;
+        let mut out = Vec::new();
+        for ((period, address), account) in periods.iter().zip(addresses).zip(accounts) {
+            if account.is_some() {
+                out.push(self.month_from(period.clone(), address, account.as_ref())?);
+            }
+        }
+        Ok(out)
+    }
+
+    fn month_from(
+        &self,
+        period: PeriodRef,
+        address: Pubkey,
+        account: Option<&Account>,
+    ) -> Result<MonthRef> {
         let state: OracleMonthState = decode(
             &self.program,
             &address,
-            account.as_ref(),
+            account,
             OracleMonthState::LEN,
             "oracle month",
         )?;
@@ -554,25 +757,213 @@ impl<'a> Oracle<'a> {
     /// of them. None for a month on part numbers or other categories, or a
     /// product without chip buckets.
     pub fn chip_product(&self, month: &MonthRef) -> Result<Option<Product>> {
-        let Some(product) = Product::from_symbol(&month.period.symbol) else {
+        if Product::from_symbol(&month.period.symbol).is_none() {
             return Ok(None);
-        };
+        }
         let root = self.coverage(month)?.required_sku_root;
-        Ok(
-            match skus::for_root(&month.period.symbol, &root).and_then(|set| set.kind) {
-                Some(SetKind::Chips) => Some(product),
-                Some(SetKind::PartNumbers) => None,
-                None => {
-                    let sources = self.sources(month)?;
-                    (!sources.is_empty()
-                        && sources.iter().all(|s| {
-                            skus::chip_bucket(&s.state.bucket_id)
-                                .is_some_and(|b| b.product == product)
-                        }))
-                    .then_some(product)
-                }
+        chip_of(&month.period.symbol, &root, || self.sources(month))
+    }
+
+    /// The SKU coverage manifest of each month, in order (one batched read):
+    /// None where a month has none, or not its own.
+    pub fn coverages(
+        &self,
+        months: &[&MonthRef],
+    ) -> Result<Vec<Option<OracleSkuCoverageManifest>>> {
+        let keys: Vec<Pubkey> = months
+            .iter()
+            .map(|m| derive_oracle_sku_coverage_manifest_pda(&self.program, &m.address).0)
+            .collect();
+        let accounts = self.ctx.rpc.accounts(&keys)?;
+        Ok(months
+            .iter()
+            .zip(keys)
+            .zip(accounts)
+            .map(|((month, key), account)| {
+                let coverage: OracleSkuCoverageManifest = decode(
+                    &self.program,
+                    &key,
+                    account.as_ref(),
+                    OracleSkuCoverageManifest::LEN,
+                    "SKU coverage manifest",
+                )
+                .ok()?;
+                (coverage.is_initialized
+                    && coverage.has_canonical_layout()
+                    && coverage.month == month.address)
+                    .then_some(coverage)
+            })
+            .collect())
+    }
+
+    /// The opening claim of `source`, if it has one.
+    pub fn opening_claim(&self, source: &SourceRef) -> Result<Option<ClaimRef>> {
+        let key = ix::find_oracle_opening_claim_address(
+            &self.program,
+            &source.state.month,
+            &source.address,
+        );
+        let account = self.ctx.rpc.account(&key)?;
+        if account.is_none() {
+            return Ok(None);
+        }
+        let state: OracleOpeningClaim = decode(
+            &self.program,
+            &key,
+            account.as_ref(),
+            OracleOpeningClaim::LEN,
+            "opening claim",
+        )?;
+        ClaimRef::bound(&self.program, key, source, state)
+            .map(Some)
+            .ok_or_else(|| {
+                Error::msg(format!(
+                    "{key} is not the opening claim of source {}",
+                    source.address
+                ))
+            })
+    }
+
+    /// The opening claims of `sources`, in source order (sources without one
+    /// are left out), read at their addresses in batches of a hundred: a
+    /// claim stores neither its month nor its source, so it is found by the
+    /// address derived from them (cheaper than a program scan, which would
+    /// match each claim back to its source the same way).
+    pub fn opening_claims(&self, sources: &[SourceRef]) -> Result<Vec<ClaimRef>> {
+        let keys: Vec<Pubkey> = sources
+            .iter()
+            .map(|s| {
+                ix::find_oracle_opening_claim_address(&self.program, &s.state.month, &s.address)
+            })
+            .collect();
+        let accounts = self.ctx.rpc.accounts(&keys)?;
+        Ok(sources
+            .iter()
+            .zip(keys)
+            .zip(accounts)
+            .filter_map(|((source, key), account)| {
+                let state: OracleOpeningClaim = decode(
+                    &self.program,
+                    &key,
+                    account.as_ref(),
+                    OracleOpeningClaim::LEN,
+                    "opening claim",
+                )
+                .ok()?;
+                ClaimRef::bound(&self.program, key, source, state)
+            })
+            .collect())
+    }
+
+    /// Every opening challenge of `month`, or of every month (a program scan
+    /// by the month at offset 2), each at its canonical address, by the slot
+    /// it was made (or last sent to review).
+    pub fn opening_challenges(
+        &self,
+        month: Option<&Pubkey>,
+    ) -> Result<Vec<(Pubkey, OracleOpeningClaimChallenge)>> {
+        // Other accounts share its size (update claims): its marker and
+        // version narrow the scan to opening challenges.
+        let mut marker = OracleOpeningClaimChallenge::ACCOUNT_DISCRIMINATOR.to_vec();
+        marker.push(OracleOpeningClaimChallenge::ACCOUNT_VERSION);
+        let mut filters = vec![
+            Filter::DataSize(OracleOpeningClaimChallenge::LEN as u64),
+            Filter::Memcmp {
+                offset: OPENING_CHALLENGE_MARKER,
+                bytes: marker,
             },
-        )
+        ];
+        if let Some(month) = month {
+            filters.push(Filter::Memcmp {
+                offset: 2,
+                bytes: month.to_bytes().to_vec(),
+            });
+        }
+        let mut out = Vec::new();
+        for (key, account) in self.ctx.rpc.program_accounts(&self.program, &filters)? {
+            let Ok(c) = decode::<OracleOpeningClaimChallenge>(
+                &self.program,
+                &key,
+                Some(&account),
+                OracleOpeningClaimChallenge::LEN,
+                "opening challenge",
+            ) else {
+                continue;
+            };
+            if c.is_initialized
+                && c.has_valid_account_layout()
+                && month.is_none_or(|m| c.month == *m)
+                && ix::find_oracle_opening_challenge_address(
+                    &self.program,
+                    &c.month,
+                    &c.claim,
+                    &c.challenge_id,
+                ) == key
+            {
+                out.push((key, c));
+            }
+        }
+        out.sort_by_key(|(key, c)| (c.rule_review_slot, *key));
+        Ok(out)
+    }
+
+    /// The evidence links of every submitted opening print of `month`, or of
+    /// every month (a program scan by the role byte, and the month at offset
+    /// 6): the record of prints a claim no longer holds.
+    pub fn print_links(&self, month: Option<&Pubkey>) -> Result<Vec<PrintLink>> {
+        let mut filters = vec![
+            Filter::DataSize(LINK_LEN as u64),
+            Filter::Memcmp {
+                offset: 166,
+                bytes: vec![OPENING_ROLE],
+            },
+        ];
+        if let Some(month) = month {
+            filters.push(Filter::Memcmp {
+                offset: 6,
+                bytes: month.to_bytes().to_vec(),
+            });
+        }
+        Ok(self
+            .ctx
+            .rpc
+            .program_accounts(&self.program, &filters)?
+            .iter()
+            .filter_map(|(key, account)| print_link(&self.program, key, account))
+            .collect())
+    }
+
+    /// The SKU pool of each (month, bucket), in order (one batched read):
+    /// None where there is none.
+    pub fn sku_pools(
+        &self,
+        wanted: &[(Pubkey, [u8; 32])],
+    ) -> Result<Vec<Option<OracleUsdcSkuPool>>> {
+        let keys: Vec<Pubkey> = wanted
+            .iter()
+            .map(|(month, bucket)| {
+                let schedule = derive_oracle_usdc_reward_schedule_pda(&self.program, month).0;
+                derive_oracle_usdc_sku_pool_pda(&self.program, &schedule, bucket).0
+            })
+            .collect();
+        let accounts = self.ctx.rpc.accounts(&keys)?;
+        Ok(wanted
+            .iter()
+            .zip(keys)
+            .zip(accounts)
+            .map(|(((month, bucket), key), account)| {
+                let pool: OracleUsdcSkuPool = decode(
+                    &self.program,
+                    &key,
+                    account.as_ref(),
+                    OracleUsdcSkuPool::LEN,
+                    "SKU reward pool",
+                )
+                .ok()?;
+                (pool.is_initialized && pool.month == *month && pool.bucket_id == *bucket)
+                    .then_some(pool)
+            })
+            .collect())
     }
 
     /// The definition text of the sources at `addresses`, in order (three
@@ -617,15 +1008,38 @@ impl<'a> Oracle<'a> {
     /// for any number of sources), and held to the source's definition
     /// commitment. None where either is missing or does not match.
     pub fn definitions(&self, sources: &[SourceRef]) -> Result<Vec<Option<String>>> {
+        self.linked(
+            sources,
+            DEFINITION_ROLE,
+            |s| s.source_definition_hash,
+            definition_in,
+        )
+    }
+
+    /// Each source's URL, in order, read and checked as [`Self::definitions`]
+    /// reads definitions, from its locator link and object.
+    pub fn locators(&self, sources: &[SourceRef]) -> Result<Vec<Option<String>>> {
+        self.linked(
+            sources,
+            LOCATOR_ROLE,
+            |s| s.canonical_locator_hash,
+            locator_in,
+        )
+    }
+
+    /// What `read` makes of each source's sealed object linked with `role`
+    /// and committed to `hash_of` its state.
+    fn linked(
+        &self,
+        sources: &[SourceRef],
+        role: u8,
+        hash_of: impl Fn(&OracleSourceState) -> [u8; 32],
+        read: impl Fn(&Pubkey, &Pubkey, &Account, &[u8; 32]) -> Option<String>,
+    ) -> Result<Vec<Option<String>>> {
         let links: Vec<Pubkey> = sources
             .iter()
             .map(|s| {
-                ix::find_evidence_link_address(
-                    &self.program,
-                    &s.address,
-                    DEFINITION_ROLE,
-                    &s.state.source_definition_hash,
-                )
+                ix::find_evidence_link_address(&self.program, &s.address, role, &hash_of(&s.state))
             })
             .collect();
         let link_accounts = self.ctx.rpc.accounts(&links)?;
@@ -634,7 +1048,8 @@ impl<'a> Oracle<'a> {
             .zip(&links)
             .zip(&link_accounts)
             .map(|((source, link), account)| {
-                definition_object(&self.program, source, link, account.as_ref())
+                let hash = hash_of(&source.state);
+                linked_object(&self.program, source, role, &hash, link, account.as_ref())
             })
             .collect();
         let keys: Vec<Pubkey> = objects.iter().flatten().copied().collect();
@@ -649,14 +1064,125 @@ impl<'a> Oracle<'a> {
             .zip(objects)
             .map(|(source, object)| {
                 let key = object?;
-                definition_in(
+                read(
                     &self.program,
                     &key,
                     found.get(&key)?,
-                    &source.state.source_definition_hash,
+                    &hash_of(&source.state),
                 )
             })
             .collect())
+    }
+
+    /// Every source challenge of `month`, or of every month (a program scan
+    /// by the month at offset 2), each at its canonical address.
+    pub fn source_challenges(
+        &self,
+        month: Option<&Pubkey>,
+    ) -> Result<Vec<(Pubkey, OracleSourceChallenge)>> {
+        let mut filters = vec![Filter::DataSize(OracleSourceChallenge::LEN as u64)];
+        if let Some(month) = month {
+            filters.push(Filter::Memcmp {
+                offset: 2,
+                bytes: month.to_bytes().to_vec(),
+            });
+        }
+        let accounts = self.ctx.rpc.program_accounts(&self.program, &filters)?;
+        let mut out = Vec::new();
+        for (key, account) in accounts {
+            let Ok(c) = decode::<OracleSourceChallenge>(
+                &self.program,
+                &key,
+                Some(&account),
+                OracleSourceChallenge::LEN,
+                "source challenge",
+            ) else {
+                continue;
+            };
+            if c.is_initialized
+                && month.is_none_or(|m| c.month == *m)
+                && ix::find_oracle_source_challenge_address(
+                    &self.program,
+                    &c.month,
+                    &c.source,
+                    &c.challenge_id,
+                ) == key
+            {
+                out.push((key, c));
+            }
+        }
+        out.sort_by_key(|(key, c)| (c.rule_review_slot, *key));
+        Ok(out)
+    }
+
+    /// The challenge guard of each source, in order (one batched read): None
+    /// where a source has none yet (it was never challenged).
+    pub fn source_guards(
+        &self,
+        sources: &[SourceRef],
+    ) -> Result<Vec<Option<OracleSourceChallengeGuard>>> {
+        let keys: Vec<Pubkey> = sources
+            .iter()
+            .map(|s| {
+                derive_oracle_source_challenge_guard_pda(&self.program, &s.state.month, &s.address)
+                    .0
+            })
+            .collect();
+        let accounts = self.ctx.rpc.accounts(&keys)?;
+        sources
+            .iter()
+            .zip(keys)
+            .zip(accounts)
+            .map(|((source, key), account)| {
+                if account.is_none() {
+                    return Ok(None);
+                }
+                let guard: OracleSourceChallengeGuard = decode(
+                    &self.program,
+                    &key,
+                    account.as_ref(),
+                    OracleSourceChallengeGuard::LEN,
+                    "challenge guard",
+                )?;
+                if !guard.is_initialized
+                    || guard.account_discriminator
+                        != OracleSourceChallengeGuard::ACCOUNT_DISCRIMINATOR
+                    || guard.account_version != OracleSourceChallengeGuard::ACCOUNT_VERSION
+                    || guard.month != source.state.month
+                    || guard.source != source.address
+                    || guard.source_id != source.state.source_id
+                {
+                    bail(format!(
+                        "challenge guard {key} is not the guard of source {}",
+                        source.address
+                    ))?;
+                }
+                Ok(Some(guard))
+            })
+            .collect()
+    }
+
+    /// The month's reward schedule, if it has one.
+    pub fn reward_schedule(&self, month: &MonthRef) -> Result<Option<OracleUsdcRewardSchedule>> {
+        let key = derive_oracle_usdc_reward_schedule_pda(&self.program, &month.address).0;
+        let account = self.ctx.rpc.account(&key)?;
+        if account.is_none() {
+            return Ok(None);
+        }
+        let schedule: OracleUsdcRewardSchedule = decode(
+            &self.program,
+            &key,
+            account.as_ref(),
+            OracleUsdcRewardSchedule::LEN,
+            "reward schedule",
+        )?;
+        if !schedule.is_initialized || schedule.month != month.address {
+            bail(format!(
+                "reward schedule {key} is not the schedule of {}",
+                month.period.expiry_id()
+            ))?;
+        }
+        Ok(Some(schedule))
     }
 
     /// A month by its address (a sponsorship records only that).
@@ -787,6 +1313,237 @@ impl<'a> Oracle<'a> {
             out.push((key, agreement));
         }
         Ok(out)
+    }
+
+    /// The support position of `supporter` on each source, in order (batched
+    /// reads at their addresses): None where they never supported it.
+    pub fn support_positions(
+        &self,
+        sources: &[SourceRef],
+        supporter: &Pubkey,
+    ) -> Result<Vec<Option<OracleSupportPosition>>> {
+        let keys: Vec<Pubkey> = sources
+            .iter()
+            .map(|s| {
+                ix::find_oracle_support_address(
+                    &self.program,
+                    &s.state.month,
+                    &s.address,
+                    supporter,
+                )
+            })
+            .collect();
+        let accounts = self.ctx.rpc.accounts(&keys)?;
+        Ok(sources
+            .iter()
+            .zip(keys)
+            .zip(accounts)
+            .map(|((source, key), account)| {
+                account.as_ref()?;
+                let position: OracleSupportPosition = decode(
+                    &self.program,
+                    &key,
+                    account.as_ref(),
+                    OracleSupportPosition::LEN,
+                    "support position",
+                )
+                .ok()?;
+                (position.is_initialized
+                    && position.month == source.state.month
+                    && position.source == source.address
+                    && position.supporter == *supporter)
+                    .then_some(position)
+            })
+            .collect())
+    }
+
+    /// Every update claim of `claimant` (of `month`, or of every month): one
+    /// program scan by the claim's marker and its claimant, each at its
+    /// canonical address.
+    pub fn update_claims_of(
+        &self,
+        claimant: &Pubkey,
+        month: Option<&Pubkey>,
+    ) -> Result<Vec<(Pubkey, OracleUpdateClaimV2)>> {
+        let mut marker = OracleUpdateClaimV2::ACCOUNT_DISCRIMINATOR.to_vec();
+        marker.push(OracleUpdateClaimV2::ACCOUNT_VERSION);
+        let mut filters = vec![
+            Filter::DataSize(OracleUpdateClaimV2::LEN as u64),
+            Filter::Memcmp {
+                offset: UPDATE_CLAIM_MARKER,
+                bytes: marker,
+            },
+            Filter::Memcmp {
+                offset: UPDATE_CLAIMANT,
+                bytes: claimant.to_bytes().to_vec(),
+            },
+        ];
+        if let Some(month) = month {
+            filters.push(Filter::Memcmp {
+                offset: 2,
+                bytes: month.to_bytes().to_vec(),
+            });
+        }
+        let mut out: Vec<(Pubkey, OracleUpdateClaimV2)> = self
+            .ctx
+            .rpc
+            .program_accounts(&self.program, &filters)?
+            .into_iter()
+            .filter_map(|(key, account)| {
+                let claim = self.update_claim_in(&key, &account)?;
+                (claim.claim.claimant == *claimant).then_some((key, claim))
+            })
+            .collect();
+        out.sort_by_key(|(key, c)| (c.commit_slot, *key));
+        Ok(out)
+    }
+
+    /// The update claims at `keys`, in order (one batched read): None where
+    /// there is no canonical claim.
+    pub fn update_claims_at(&self, keys: &[Pubkey]) -> Result<Vec<Option<OracleUpdateClaimV2>>> {
+        Ok(keys
+            .iter()
+            .zip(self.ctx.rpc.accounts(keys)?)
+            .map(|(key, account)| self.update_claim_in(key, account.as_ref()?))
+            .collect())
+    }
+
+    fn update_claim_in(&self, key: &Pubkey, account: &Account) -> Option<OracleUpdateClaimV2> {
+        let claim: OracleUpdateClaimV2 = decode(
+            &self.program,
+            key,
+            Some(account),
+            OracleUpdateClaimV2::LEN,
+            "update claim",
+        )
+        .ok()?;
+        let c = &claim.claim;
+        (c.is_initialized
+            && c.account_discriminator == OracleUpdateClaimV2::ACCOUNT_DISCRIMINATOR
+            && c.account_version == OracleUpdateClaimV2::ACCOUNT_VERSION
+            && ix::find_oracle_update_claim_address(
+                &self.program,
+                &c.month,
+                &c.source,
+                &c.claimant,
+                &c.claim_id,
+            ) == *key)
+            .then_some(claim)
+    }
+
+    /// Every update challenge `challenger` made (of `month`, or of every
+    /// month): one program scan by the challenge's marker and challenger.
+    pub fn update_challenges_of(
+        &self,
+        challenger: &Pubkey,
+        month: Option<&Pubkey>,
+    ) -> Result<Vec<(Pubkey, OracleUpdateChallenge)>> {
+        let mut marker = OracleUpdateChallenge::ACCOUNT_DISCRIMINATOR.to_vec();
+        marker.push(OracleUpdateChallenge::ACCOUNT_VERSION);
+        let mut filters = vec![
+            Filter::DataSize(OracleUpdateChallenge::LEN as u64),
+            Filter::Memcmp {
+                offset: UPDATE_CHALLENGE_MARKER,
+                bytes: marker,
+            },
+            Filter::Memcmp {
+                offset: UPDATE_CHALLENGER,
+                bytes: challenger.to_bytes().to_vec(),
+            },
+        ];
+        if let Some(month) = month {
+            filters.push(Filter::Memcmp {
+                offset: 2,
+                bytes: month.to_bytes().to_vec(),
+            });
+        }
+        let mut out: Vec<(Pubkey, OracleUpdateChallenge)> = self
+            .ctx
+            .rpc
+            .program_accounts(&self.program, &filters)?
+            .into_iter()
+            .filter_map(|(key, account)| {
+                let c = self.update_challenge_in(&key, &account)?;
+                (c.challenger == *challenger).then_some((key, c))
+            })
+            .collect();
+        out.sort_by_key(|(key, c)| (c.rule_review_slot, *key));
+        Ok(out)
+    }
+
+    fn update_challenge_in(
+        &self,
+        key: &Pubkey,
+        account: &Account,
+    ) -> Option<OracleUpdateChallenge> {
+        let c: OracleUpdateChallenge = decode(
+            &self.program,
+            key,
+            Some(account),
+            OracleUpdateChallenge::LEN,
+            "update challenge",
+        )
+        .ok()?;
+        (c.is_initialized
+            && c.has_valid_account_layout()
+            && ix::find_oracle_update_challenge_address(
+                &self.program,
+                &c.month,
+                &c.claim,
+                &c.challenge_id,
+            ) == *key)
+            .then_some(c)
+    }
+
+    /// The challenge of each update claim, found through its guard (a claim
+    /// takes one): two batched reads, None where a claim was never
+    /// challenged.
+    pub fn update_challenges_on(
+        &self,
+        claims: &[(Pubkey, &OracleUpdateClaimV2)],
+    ) -> Result<Vec<Option<(Pubkey, OracleUpdateChallenge)>>> {
+        let guards: Vec<Pubkey> = claims
+            .iter()
+            .map(|(key, c)| {
+                derive_oracle_update_challenge_guard_pda(&self.program, &c.claim.month, key).0
+            })
+            .collect();
+        let challenges: Vec<Option<Pubkey>> = guards
+            .iter()
+            .zip(self.ctx.rpc.accounts(&guards)?)
+            .zip(claims)
+            .map(|((key, account), (claim, _))| {
+                account.as_ref()?;
+                let guard: OracleUpdateChallengeGuard = decode(
+                    &self.program,
+                    key,
+                    account.as_ref(),
+                    OracleUpdateChallengeGuard::LEN,
+                    "update challenge guard",
+                )
+                .ok()?;
+                (guard.is_initialized && guard.claim == *claim).then_some(guard.challenge)
+            })
+            .collect();
+        let keys: Vec<Pubkey> = challenges.iter().flatten().copied().collect();
+        let found: std::collections::HashMap<Pubkey, OracleUpdateChallenge> = keys
+            .iter()
+            .zip(self.ctx.rpc.accounts(&keys)?)
+            .filter_map(|(key, account)| {
+                Some((*key, self.update_challenge_in(key, account.as_ref()?)?))
+            })
+            .collect();
+        Ok(challenges
+            .into_iter()
+            .zip(claims)
+            .map(|(challenge, (claim, _))| {
+                let key = challenge?;
+                found
+                    .get(&key)
+                    .filter(|c| c.claim == *claim)
+                    .map(|c| (key, c.clone()))
+            })
+            .collect())
     }
 
     pub fn collateral_address(&self, owner: &Pubkey) -> Pubkey {
@@ -950,6 +1707,17 @@ mod tests {
         (source, link, link_account, object, object_account)
     }
 
+    /// The evidence object a source's definition link points to.
+    fn definition_object(
+        program: &Pubkey,
+        source: &SourceRef,
+        link: &Pubkey,
+        account: Option<&Account>,
+    ) -> Option<Pubkey> {
+        let hash = source.state.source_definition_hash;
+        linked_object(program, source, DEFINITION_ROLE, &hash, link, account)
+    }
+
     #[test]
     fn a_sources_definition_reads_from_its_link_and_sealed_object() {
         let program = Pubkey::new_unique();
@@ -987,6 +1755,193 @@ mod tests {
         let last = tampered.data.len() - 2;
         tampered.data[last] ^= 1;
         assert_eq!(definition_in(&program, &object, &tampered, &hash), None);
+    }
+
+    #[test]
+    fn a_sources_url_reads_from_its_sealed_locator_object() {
+        let (program, payer) = (Pubkey::new_unique(), Pubkey::new_unique());
+        let url = "https://example.com/ram?id=1";
+        let hash = hashv(&[b"locator", url.as_bytes()]).to_bytes();
+        let object = |kind: u8| {
+            let mut data = b"OEB\x01\x01".to_vec();
+            data.push(0);
+            data.extend_from_slice(payer.as_ref());
+            data.push(kind);
+            data.extend_from_slice(&hash);
+            data.extend_from_slice(&(url.len() as u16).to_le_bytes());
+            data.extend_from_slice(&(url.len() as u16).to_le_bytes());
+            data.push(1);
+            data.extend_from_slice(url.as_bytes());
+            Account {
+                lamports: 1,
+                owner: program,
+                data,
+                executable: false,
+            }
+        };
+        let key = ix::find_evidence_object_address(&program, &payer, 1, &hash);
+        assert_eq!(
+            locator_in(&program, &key, &object(1), &hash).as_deref(),
+            Some(url)
+        );
+        // Another kind, another address, another commitment: nothing.
+        assert_eq!(locator_in(&program, &key, &object(2), &hash), None);
+        assert_eq!(
+            locator_in(&program, &Pubkey::new_unique(), &object(1), &hash),
+            None
+        );
+        assert_eq!(locator_in(&program, &key, &object(1), &[1; 32]), None);
+    }
+
+    #[test]
+    fn a_prints_link_and_archive_read_back_as_the_program_writes_them() {
+        let (program, payer) = (Pubkey::new_unique(), Pubkey::new_unique());
+        let (month, source) = (Pubkey::new_unique(), Pubkey::new_unique());
+        let claim = ix::find_oracle_opening_claim_address(&program, &month, &source);
+        let url = "https://web.archive.org/web/20261025010000/https://example.com/ram";
+        let hash = ix::archive_url_hash(url);
+        let object = ix::find_evidence_object_address(&program, &payer, 3, &hash);
+        let mut data = b"OEB\x01\x01".to_vec();
+        data.push(0);
+        data.extend_from_slice(payer.as_ref());
+        data.push(3);
+        data.extend_from_slice(&hash);
+        data.extend_from_slice(&(url.len() as u16).to_le_bytes());
+        data.extend_from_slice(&(url.len() as u16).to_le_bytes());
+        data.push(1);
+        data.extend_from_slice(url.as_bytes());
+        let archive = Account {
+            lamports: 1,
+            owner: program,
+            data,
+            executable: false,
+        };
+        assert_eq!(
+            archive_in(&program, &object, &archive, &hash),
+            Some((payer, url.to_string()))
+        );
+        assert!(archive_objects(&program, &payer, &hash).contains(&object));
+        // Another commitment, or a locator object: nothing.
+        assert_eq!(archive_in(&program, &object, &archive, &[1; 32]), None);
+        let mut locator = archive.clone();
+        locator.data[38] = 1;
+        assert_eq!(archive_in(&program, &object, &locator, &hash), None);
+
+        // The link 162 leaves: month, source, event (the claim), object,
+        // parent (the claim), role 2, attempt, value, time, evidence hash,
+        // source id.
+        let evidence = [7; 32];
+        let link = ix::find_evidence_link_address(&program, &claim, 2, &evidence);
+        let mut data = b"OEL\x01\x01".to_vec();
+        data.push(0);
+        for key in [month, source, claim, object, claim] {
+            data.extend_from_slice(key.as_ref());
+        }
+        data.push(2);
+        data.extend_from_slice(&3u32.to_le_bytes());
+        data.extend_from_slice(&75_500_000u64.to_le_bytes());
+        data.extend_from_slice(&1_792_890_000u64.to_le_bytes());
+        data.extend_from_slice(&evidence);
+        data.extend_from_slice(&[9; 32]);
+        let account = Account {
+            lamports: 1,
+            owner: program,
+            data,
+            executable: false,
+        };
+        assert_eq!(
+            print_link(&program, &link, &account),
+            Some(PrintLink {
+                address: link,
+                month,
+                source,
+                claim,
+                object,
+                attempt: 3,
+                value: 75_500_000,
+                time: 1_792_890_000,
+                evidence_hash: evidence,
+            })
+        );
+        // Another address, another role, another program: nothing.
+        assert_eq!(print_link(&program, &Pubkey::new_unique(), &account), None);
+        let mut challenge = account.clone();
+        challenge.data[166] = 3;
+        assert_eq!(print_link(&program, &link, &challenge), None);
+        assert_eq!(print_link(&Pubkey::new_unique(), &link, &account), None);
+    }
+
+    #[test]
+    fn a_claim_takes_its_identity_from_the_source_it_belongs_to() {
+        let program = Pubkey::new_unique();
+        let source = SourceRef {
+            address: Pubkey::new_unique(),
+            state: OracleSourceState {
+                is_initialized: true,
+                month: Pubkey::new_unique(),
+                source_id: [4; 32],
+                canonical_locator_hash: [5; 32],
+                source_definition_hash: [6; 32],
+                ..Default::default()
+            },
+        };
+        let key =
+            ix::find_oracle_opening_claim_address(&program, &source.state.month, &source.address);
+        let state = OracleOpeningClaim {
+            is_initialized: true,
+            ..Default::default()
+        };
+        let claim = ClaimRef::bound(&program, key, &source, state.clone()).unwrap();
+        assert_eq!(
+            (claim.state.month, claim.state.source, claim.state.source_id),
+            (source.state.month, source.address, [4; 32])
+        );
+        assert_eq!(claim.state.canonical_locator_hash, [5; 32]);
+        // Another source's address, or an uninitialized claim: none.
+        assert!(ClaimRef::bound(&program, Pubkey::new_unique(), &source, state).is_none());
+        assert!(ClaimRef::bound(&program, key, &source, OracleOpeningClaim::default()).is_none());
+    }
+
+    #[test]
+    fn scan_offsets_are_where_the_layouts_keep_them() {
+        let who = Pubkey::new_from_array([7; 32]);
+        let claim = OracleUpdateClaimV2 {
+            claim: ameba_oracle::state::OracleUpdateClaimData {
+                claimant: who,
+                account_discriminator: OracleUpdateClaimV2::ACCOUNT_DISCRIMINATOR,
+                account_version: OracleUpdateClaimV2::ACCOUNT_VERSION,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let bytes = borsh::to_vec(&claim).unwrap();
+        assert_eq!(bytes[UPDATE_CLAIMANT..UPDATE_CLAIMANT + 32], who.to_bytes());
+        assert_eq!(
+            bytes[UPDATE_CLAIM_MARKER..UPDATE_CLAIM_MARKER + 4],
+            *b"UC2\x04"
+        );
+        let challenge = OracleUpdateChallenge {
+            challenger: who,
+            account_discriminator: OracleUpdateChallenge::ACCOUNT_DISCRIMINATOR,
+            account_version: OracleUpdateChallenge::ACCOUNT_VERSION,
+            ..Default::default()
+        };
+        let bytes = borsh::to_vec(&challenge).unwrap();
+        assert_eq!(
+            bytes[UPDATE_CHALLENGER..UPDATE_CHALLENGER + 32],
+            who.to_bytes()
+        );
+        assert_eq!(
+            bytes[UPDATE_CHALLENGE_MARKER..UPDATE_CHALLENGE_MARKER + 4],
+            *b"UCH\x05"
+        );
+        let mut opening = OracleOpeningClaimChallenge::default();
+        opening.stamp_current_account_layout();
+        let bytes = borsh::to_vec(&opening).unwrap();
+        assert_eq!(
+            bytes[OPENING_CHALLENGE_MARKER..OPENING_CHALLENGE_MARKER + 4],
+            *b"OCH\x04"
+        );
     }
 
     #[test]

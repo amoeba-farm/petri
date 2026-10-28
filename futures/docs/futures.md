@@ -645,8 +645,27 @@ out, and what it earns or nets pays the debt first. Two rules bound the debt
 (`state::credit_risk`):
 
 - **Exposure**, what borrowing exposes the stakers to: the debt less the
-  vault's free cash and the least its claims and inventory pay at any
-  settlement, with its escrow counted as spent. At most `credit_limit`.
+  vault's free cash and the least it holds at any settlement from 80 to 120
+  (below): what its claims and inventory pay there and its reserved cash,
+  less what fills could take there (an escrowed bid at or above the
+  settlement, an escrowed ask below it, each at its step's best price; an
+  order's contribution beyond what its claim pays). At most
+  `credit_limit`.
+
+  **Band funding (the user, 2026-10-27: "80-120").** The settlements counted
+  are the reference ± `CREDIT_BAND_BPS` = 20% of it (`state::credit_band`;
+  80 to 120 on the 100 reference). Until then the escrow counted as spent
+  at every settlement at once, so a two-sided whole-grid ladder was funded
+  for the index ending at 0 and at 200 together; on production's 2026-10-27
+  books that rule took $1,167 a market where the worst settlement in 0-200
+  needed $587 and the worst in 80-120 $231. Now the vault's cash and credit
+  cover the band, and the maker quotes as much as that admits: about 5x on
+  those books (the measurement is in the design note of 2026-10-27).
+  Beyond the band nothing reserves the loss. A settlement there that costs
+  more than the vault's cash and credit is a shortfall like any other
+  (below): the buffer, then the staked AMBA at the average price (at most
+  all of it, whichever markets it lends to), then the winners' payouts cut
+  pro rata (`b1`, `b2`).
 - **Carry**, what pays the debt back: the vault's own free and reserved cash
   there plus the backing its own claims and inventory hold, `k` times the
   larger of its long and short lots at each step. Long and short coverage

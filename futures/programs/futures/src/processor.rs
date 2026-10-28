@@ -1899,8 +1899,12 @@ fn submit(
         &rested.to_le_bytes(),
     ]);
     check_credit(&b, &h, t)?;
+    // The credit owner's own package was just admitted at its worst fill,
+    // which bounds where it stands now: asserted only for someone else's.
     if let (Some(c), true) = (credit_slot, credit_filled) {
-        assert_credit(&b, &h, c)?;
+        if c != t {
+            assert_credit(&b, &h, c)?;
+        }
     }
     let mut ret = Vec::with_capacity(42);
     ret.extend_from_slice(&filled.to_le_bytes());

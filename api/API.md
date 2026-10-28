@@ -794,7 +794,7 @@ MarketView = {
   lotUsdPerPoint ("0.01" on dev), referenceValue (the listing reference; never a settlement),
   index: null | { value, ts },
   lastEntryValue | null, lastTradeTs | null, settlementValue | null,
-  trades, volumeLots, volumePremium, backing, custody, claimsOpen,
+  trades, volumeLots, volumePremium, backing, reserved, custody, claimsOpen,
   volume24hLots, change24hValue | null,
   suggestion: { sigmaValue, lowValue, highValue, lo, hi, centerValue, vol,
                 source ("book"|"oracle-index"|"dev-fixture") },
@@ -818,6 +818,10 @@ MarketView = {
   range contains the index), else the account's last trade; `lastTradeTs` is
   the account's (both `null` before the first trade). `settlementValue` is the settlement once the market is
   settled or failed (failed: the value the council set).
+* `reserved` is the escrow of every resting order and maker ladder (atoms):
+  the book's depth in USDC, what the web shows as Liquidity. The Earn
+  vault's part is borrowed beyond its cash where its credit covers it
+  (settlements from 80 to 120, `docs/futures.md` "Band funding").
 * `change24hValue` is the last entry minus the entry of the last price-line
   trade before 24 hours ago (else the first one in the window); `null`
   without trades. `volume24hLots` sums the lots filled in the last 24 hours.
