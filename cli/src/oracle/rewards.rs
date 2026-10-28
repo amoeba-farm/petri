@@ -678,7 +678,9 @@ fn scan<T: BorshDeserialize>(
 ) -> Result<Vec<(Pubkey, T)>> {
     filters.insert(0, Filter::DataSize(len as u64));
     Ok(oracle
-        .program_accounts(&filters)?
+        .ctx
+        .rpc
+        .program_accounts(&oracle.program, &filters)?
         .into_iter()
         .filter_map(|(key, account)| {
             decode(&oracle.program, &key, Some(&account), len, what)
@@ -784,14 +786,10 @@ pub fn read(oracle: &Oracle, wallet: &Pubkey, periods: &[PeriodRef]) -> Result<V
     let in_scope: HashSet<Pubkey> = periods.iter().map(month_of).collect();
     let scope: Vec<Filter> = single.iter().map(|m| memcmp(MONTH_OFFSET, m)).collect();
     // Each scan reads the whole program: they run side by side.
-    let (settings, scans_from_api) = (&oracle.ctx.s, oracle.scans_from_api);
+    let settings = &oracle.ctx.s;
     let on = |read: &Scan| {
         let ctx = Ctx::new(settings.clone());
-        read(&Oracle {
-            ctx: &ctx,
-            program,
-            scans_from_api,
-        })
+        read(&Oracle { ctx: &ctx, program })
     };
     let scans: [&Scan; 4] = [
         &|o| Ok(Scanned::Sources(o.sources_in(single.as_ref())?)),
@@ -1092,7 +1090,7 @@ pub fn show(
     expiry: Option<&str>,
     owner: Option<&str>,
 ) -> Result<Report> {
-    let oracle = Oracle::reads(ctx)?;
+    let oracle = Oracle::new(ctx)?;
     let wallet = ctx.owner(owner)?;
     let periods = oracle.periods_of(market, expiry)?;
     let months = read(&oracle, &wallet, &periods)?;

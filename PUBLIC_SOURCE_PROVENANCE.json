@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "b24a4ed2e058d2feb6122d38c445f4abe379d8d2",
+  "sourceCommit": "efc87f6a279caec6b4bfef8084fd1745d7a808ea",
   "component": "cli",
-  "cliVersion": "0.1.20",
-  "publicationType": "Petri v0.1.20 preview source and prepared ameba-sdk 0.4.1 package",
+  "cliVersion": "0.1.21",
+  "publicationType": "Petri v0.1.21 preview source and prepared ameba-sdk 0.4.1 package",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
   "deployedContractSourceCommit": "c723db776e9d0c639565d89ac761703731b37fb4",
-  "qualification": "CLI/SDK source accepts operator-assessed market accounts. Mainnet contract installation is pending; installed Futures and Oracle provenance remains separately recorded. Preview binaries are unsigned; npm publication is not claimed.",
+  "qualification": "CLI source matches the released Petri 0.1.19 implementation; only its shared market account decoder and package metadata change. Concurrent client API-cache changes are excluded. Mainnet contract installation is pending. Preview binaries are unsigned; npm publication is not claimed.",
   "retainedPublicLegalFiles": [
     ".gitattributes",
     ".gitignore",
@@ -35,7 +35,7 @@
     },
     {
       "path": "api/API.md",
-      "sha256": "59d0189d75bf9f43c08cd5a9e27e5ce47a34003d5a4f6591c0e7903915a19a37",
+      "sha256": "be240c79c6a0b0f2a38a3775d000698a3644cb6679d8cc036b70ad814d51c15b",
       "executable": false
     },
     {
@@ -60,12 +60,12 @@
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "2ddd434b97bb24ce18048b9b5811e051b48c9bbb0a0529cddc8e23ef899a2c21",
+      "sha256": "88fd6bcbcce2d7a6cefbdd0462e7e15e8fe44949d59731edfbe8c42b19683d9e",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "bbcbccad8f9fcbdec6ea4ac191774699d48b0bec40cb0fff5ef2e48440b06a78",
+      "sha256": "efba50ae3cddfc406f4131044539d3147ef5870fba46079111c0adc2a8fc7ef3",
       "executable": false
     },
     {
@@ -110,7 +110,7 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "eaf921a31f8ef9ecec5113a15437ff1e05f70d8d81644dd6b353ff27a0e7ddff",
+      "sha256": "7d81c31f3e4596532369f9433fe5551c162b71cf5abc15f6b09ea4afa1cc851f",
       "executable": false
     },
     {
@@ -250,7 +250,7 @@
     },
     {
       "path": "cli/docs/amoeba-cli-command-guide.md",
-      "sha256": "c925c5f74bc68e4822069bbe2de0621bb41f615e7c22b51f2c0b617623f2de30",
+      "sha256": "271aa5e8c73f8131b71e516b31bb4961ce0cf1d755b4fb5b8599298010a9ef52",
       "executable": false
     },
     {
@@ -310,7 +310,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "3bdef94fb4d92ce91d06e5866eb265ab3e6618cb9af06ac3694ff293e0e92a39",
+      "sha256": "29483b5130c2a845961aa71a9e6e532503762e9a16c5086b6c925b354ef3b0d4",
       "executable": false
     },
     {
@@ -530,7 +530,7 @@
     },
     {
       "path": "cli/src/endpoints.rs",
-      "sha256": "545cb7dce8738ff78b8c9ddd6ac47820bca1b99a49fa42eaf8c9495564b3cc81",
+      "sha256": "a5b6f776c6db6b539917153ea6085e6cb9233b640967f6746352c6af7ea769e5",
       "executable": false
     },
     {
@@ -630,12 +630,12 @@
     },
     {
       "path": "cli/src/futures/rpc.rs",
-      "sha256": "a60f069ac72ed69e373edb5c8fcb51316d9d1613aa35c47b3ab10033d180a6db",
+      "sha256": "bac86588e7aeaf7ef4d573f2ffc353ffa7f28060d0171078faeaca2dab54ac50",
       "executable": false
     },
     {
       "path": "cli/src/futures/settings.rs",
-      "sha256": "1e4bf5c0a394d7e77a024b96df93fd82fa72587f745c4eadd25bde8f6a205a0a",
+      "sha256": "3121794ba72c710243f5109d74f0af6fbdcce8b99f6804348bcdad91b60f8956",
       "executable": false
     },
     {
@@ -690,12 +690,12 @@
     },
     {
       "path": "cli/src/oracle/chain.rs",
-      "sha256": "f7b34e05a77beff4353aa4476c211266072c6c3cb0985be33d68a80a8a89229a",
+      "sha256": "48439d72f20a328df6408b58db8ff8dff49e9e0ed412f486d5e14d3af3799a47",
       "executable": false
     },
     {
       "path": "cli/src/oracle/challenges.rs",
-      "sha256": "14e721caa0eb258ed5fed0bacf60e27985d42dd2f373e6992ec4330a05d5f987",
+      "sha256": "aa7c3ed2837126c7965896362b10a00dd49a57aecd7db28cca564cd9f59f64ac",
       "executable": false
     },
     {
@@ -725,7 +725,7 @@
     },
     {
       "path": "cli/src/oracle/prints.rs",
-      "sha256": "177bea82101398acfb743f7539e1300e22441ca5028551cffeb356892707caa6",
+      "sha256": "1836a00d68ff19d71f91026d479729c5a3b3e2158991944a0d1bcbbd01c87c60",
       "executable": false
     },
     {
@@ -735,7 +735,7 @@
     },
     {
       "path": "cli/src/oracle/rewards.rs",
-      "sha256": "3455651bbaf1418f509d82107737d31000aef0a72006f723636c02e215a8ba74",
+      "sha256": "dd10c179e2d8c4cc9cb403c288289c6e11f9c0b17f9e3910fed61bfb0bf38343",
       "executable": false
     },
     {
@@ -755,17 +755,17 @@
     },
     {
       "path": "cli/src/oracle/sponsor.rs",
-      "sha256": "4355c63d7a38ccc59c6428304896a37f2984fea0d4d9af486069ac9828a1d7d1",
+      "sha256": "fcbb830cbc80809901ffc72d8794fd168f33b59c24cb8b75b9f7a3466341ac50",
       "executable": false
     },
     {
       "path": "cli/src/oracle/stakes.rs",
-      "sha256": "348c30fdacd28191e5834143b6ba52dad8d2822bbc834a36111c3a76766c0a2b",
+      "sha256": "a9b7ef7d09182501cb9726888a090dd9f2876939c288781463ecaca88afa4ecb",
       "executable": false
     },
     {
       "path": "cli/src/oracle/updates.rs",
-      "sha256": "103ec070d96371549a3eb0d20e721becaaef7e496c70fa986eff9cad9a03adb4",
+      "sha256": "6717d1871d51b7d3d99c36135f1f93aa306163928f69fec39e526f11c6f5ab44",
       "executable": false
     },
     {
@@ -905,7 +905,7 @@
     },
     {
       "path": "cli/src/research/rewards.rs",
-      "sha256": "05e87af81a7f5b9b7019c365471a6f1c9179942cd76daa7318d528f5f193621e",
+      "sha256": "35e8df6a03e3e9ec7274b9398e5153315e720078754b672721f324fc1d0e18b0",
       "executable": false
     },
     {
@@ -3790,8 +3790,8 @@
   ],
   "lineEndingQualification": "2 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.1",
-  "sourceRelease": "b24a4ed2e058d2feb6122d38c445f4abe379d8d2",
+  "sourceRelease": "efc87f6a279caec6b4bfef8084fd1745d7a808ea",
   "deployedOracleSourceCommit": "da0e9143f44635dcbce7288ea6510ddf042de215",
   "candidateContractSourceCommit": "bcf0601606617fda7e00a818e7663d031339858f",
-  "candidateContractPublicSource": "https://github.com/amoeba-farm/amoeba-program/commit/059bd72"
+  "candidateContractPublicSource": "https://github.com/amoeba-farm/amoeba-program/commit/059bd727fb61b68adf7d5ee3067ed5158674cbbc"
 }

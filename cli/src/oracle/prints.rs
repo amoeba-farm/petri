@@ -618,7 +618,7 @@ pub fn list(
     expiry: Option<&str>,
     owner: Option<&str>,
 ) -> Result<Report> {
-    let oracle = Oracle::reads(ctx)?;
+    let oracle = Oracle::new(ctx)?;
     let program = oracle.program;
     let owner = match owner {
         Some(text) => Some(ctx.owner(Some(text))?),

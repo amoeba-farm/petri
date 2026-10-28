@@ -1457,7 +1457,7 @@ pub fn list(
     owner: Option<&str>,
     all_settled: bool,
 ) -> Result<Report> {
-    let oracle = Oracle::reads(ctx)?;
+    let oracle = Oracle::new(ctx)?;
     let owner = ctx.owner(owner)?;
     let (months, sources, now) = scope(&oracle, market, expiry)?;
     let (stakes, earlier) = read(&oracle, &owner, &months, &sources, &now, all_settled)?;

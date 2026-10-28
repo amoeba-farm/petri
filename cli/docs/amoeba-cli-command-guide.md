@@ -492,15 +492,7 @@ and settles at expiry.
 for every month's phase, source count and settlement status and each month's
 verified source inventory, `/v1/oracle/catalog` for periods and settlement
 times, and `/oracle/source-candidates` for research candidates. They need no
-wallet. The commands that read state from the oracle program itself
-(`challenges`, `prints`, `updates`, `stakes`, `rewards`, `sponsorships`)
-take their program scans (`getProgramAccounts`) from the futures API's
-`/v1/oracle/accounts` while no RPC is set (`--rpc`, `PETRI_RPC_URL` or the
-`rpc` setting): it scans each account layout once for every caller, so
-Solana's public RPC, the production default, does not turn the reads away.
-Their other reads, and every write, go to the RPC; with an RPC set, so do
-the scans, and so does a scan the API can't answer. The JSON is the same
-either way.
+wallet.
 
 **Writes** are built with the oracle program's own instruction builders (the
 `ameba_oracle` crate, from the monorepo's `oracle/`, the source the deployment runs)
@@ -1481,7 +1473,7 @@ list complete):
 | --- | --- | --- |
 | `getAccountInfo` | accounts: markets, the oracle, gates, the Clock sysvar | yes |
 | `getMultipleAccounts` | accounts, up to 100 at a time | yes |
-| `getProgramAccounts` | the oracle's periods, sources, challenges, opening prints' links, sponsorships and a wallet's reward claims (oracle writes; the oracle reads only with an RPC set, else the API's `/v1/oracle/accounts`) | no |
+| `getProgramAccounts` | the oracle's periods, sources, challenges, opening prints' links, sponsorships and a wallet's reward claims | no |
 | `getBalance` | a wallet's SOL | yes |
 | `getSlot` | `petri status` | yes |
 | `getGenesisHash` | the deployment identity gate | yes |
@@ -1496,13 +1488,10 @@ list complete):
 
 The oracle commands, and the TUI's Fund and Rewards views, read with
 `getProgramAccounts`, which Solana's public RPC rate-limits per caller
-(`rewards` sends several at once; the views read every few seconds). The
-oracle reads (`challenges`, `prints`, `updates`, `stakes`, `rewards`,
-`sponsorships`, the Rewards view) take theirs from the futures API while no
-RPC is set ("Oracle"); the writes, and the Fund view, still scan the RPC.
-For those, pass `--rpc <provider URL>` or set `PETRI_RPC_URL` to an RPC
-provider's node. When an RPC turns a call away for its rate, Petri says so
-and names `--rpc`; it doesn't retry.
+(`rewards` sends several at once; the views read every few seconds). Pass
+`--rpc <provider URL>` or set `PETRI_RPC_URL` to an RPC provider's node. When
+an RPC turns a call away for its rate, Petri says so and names `--rpc`; it
+doesn't retry.
 
 The signing wallet is `--keypair` (a keypair file or hardware-wallet URL), else the saved
 `keypair` setting, else the Solana CLI config's keypair. `petri wallet new`

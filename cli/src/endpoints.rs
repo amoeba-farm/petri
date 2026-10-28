@@ -5,9 +5,6 @@
 pub const ORACLE_SNAPSHOT: &str = "/v1/oracle/public-snapshot";
 /// Each product's periods and settlement times.
 pub const ORACLE_CATALOG: &str = "/v1/oracle/catalog";
-/// The oracle program's accounts of one layout, from the API's kept scans
-/// (`oracle::chain::Oracle::reads`).
-pub const ORACLE_ACCOUNTS: &str = "/v1/oracle/accounts";
 /// The source-candidate store (at the API root, not under `/v1`).
 pub const ORACLE_CANDIDATES: &str = "/oracle/source-candidates";
 

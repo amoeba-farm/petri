@@ -1,1 +1,1 @@
-Petri v0.1.20 reads markets with operator-approved credit assessments. This keeps direct market reads and trading compatible with the upcoming Futures program upgrade. Existing market accounts remain supported.
+Petri v0.1.21 reads markets with operator-approved credit assessments. This keeps direct market reads and trading compatible with the upcoming Futures program upgrade. Existing market accounts remain supported.

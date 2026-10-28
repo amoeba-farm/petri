@@ -539,7 +539,7 @@ impl Oracle<'_> {
             });
         }
         let mut out = Vec::new();
-        for (key, account) in self.program_accounts(&filters)? {
+        for (key, account) in self.ctx.rpc.program_accounts(&self.program, &filters)? {
             let Ok(state) = decode::<OracleUpdateClaimV2>(
                 &self.program,
                 &key,
@@ -588,7 +588,7 @@ impl Oracle<'_> {
             });
         }
         let mut out = Vec::new();
-        for (key, account) in self.program_accounts(&filters)? {
+        for (key, account) in self.ctx.rpc.program_accounts(&self.program, &filters)? {
             let Ok(c) = decode::<OracleUpdateChallenge>(
                 &self.program,
                 &key,
@@ -1778,7 +1778,7 @@ pub fn list(
     expiry: Option<&str>,
     owner: Option<&str>,
 ) -> Result<Report> {
-    let oracle = Oracle::reads(ctx)?;
+    let oracle = Oracle::new(ctx)?;
     let seconds = challenge_seconds(ctx.deployment()?);
     let owner = match owner {
         Some(text) => Some(ctx.owner(Some(text))?),

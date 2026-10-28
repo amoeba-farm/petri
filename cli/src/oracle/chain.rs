@@ -19,77 +19,19 @@ use ameba_oracle::{
         derive_user_collateral_pda, find_config_address,
     },
 };
-use base64::{Engine, engine::general_purpose::STANDARD as B64};
 use borsh::BorshDeserialize;
 use chrono::{DateTime, Datelike, Utc};
-use serde_json::Value;
 use solana_program::{hash::hashv, pubkey::Pubkey};
-use std::str::FromStr;
 
 use super::{
     skus::{self, SetKind, hex},
     writes::{OBJECT_HEADER, definition_text},
 };
-use crate::{
-    endpoints,
-    futures::{
-        api::Api,
-        ctx::Ctx,
-        error::{Error, Result, bail},
-        rpc::{Account, Filter},
-    },
+use crate::futures::{
+    ctx::Ctx,
+    error::{Error, Result, bail},
+    rpc::{Account, Filter},
 };
-
-/// `filters` as the futures API's oracle accounts route takes them, or None
-/// without a size.
-pub fn accounts_route(filters: &[Filter]) -> Option<String> {
-    let mut size = None;
-    let mut memcmps = Vec::new();
-    for f in filters {
-        match f {
-            Filter::DataSize(n) => size = Some(*n),
-            Filter::Memcmp { offset, bytes } => {
-                memcmps.push(format!("&memcmp={offset}:{}", hex(bytes)))
-            }
-        }
-    }
-    Some(format!(
-        "{}?size={}{}",
-        endpoints::ORACLE_ACCOUNTS,
-        size?,
-        memcmps.concat()
-    ))
-}
-
-/// The futures API's accounts of `program` that pass `filters`, or None when
-/// it can't answer them (no such route or layout, another program).
-fn api_scan(api: &Api, program: &Pubkey, filters: &[Filter]) -> Option<Vec<(Pubkey, Account)>> {
-    let reply = api.get(&accounts_route(filters)?).ok()?;
-    scanned(program, reply.get("data")?)
-}
-
-/// A `/v1/oracle/accounts` document's accounts, each owned by `program`
-/// (the API scans it by owner); None when it names another program.
-pub fn scanned(program: &Pubkey, data: &Value) -> Option<Vec<(Pubkey, Account)>> {
-    if data.get("programId")?.as_str()? != program.to_string() {
-        return None;
-    }
-    data.get("accounts")?
-        .as_array()?
-        .iter()
-        .map(|a| {
-            Some((
-                Pubkey::from_str(a.get("address")?.as_str()?).ok()?,
-                Account {
-                    lamports: a.get("lamports")?.as_u64()?,
-                    owner: *program,
-                    data: B64.decode(a.get("data")?.as_str()?).ok()?,
-                    executable: false,
-                },
-            ))
-        })
-        .collect()
-}
 
 /// Decodes a fixed-size oracle account: owner, exact length, then the layout
 /// with every byte after it zero.
@@ -538,42 +480,12 @@ fn select(
 pub struct Oracle<'a> {
     pub ctx: &'a Ctx,
     pub program: Pubkey,
-    /// Program scans from the futures API ([`Self::reads`]).
-    pub scans_from_api: bool,
 }
 
 impl<'a> Oracle<'a> {
     pub fn new(ctx: &'a Ctx) -> Result<Self> {
         let program = ctx.deployment()?.oracle;
-        Ok(Self {
-            ctx,
-            program,
-            scans_from_api: false,
-        })
-    }
-
-    /// For a read: as [`Self::new`], but while no RPC is set (`--rpc`,
-    /// `PETRI_RPC_URL` or the Petri config) its program scans come from the
-    /// futures API, which scans each layout once for every caller (Solana's
-    /// public RPC, the production default, turns a caller away after a few
-    /// scans in a row). Writes keep [`Self::new`]: they read the chain.
-    pub fn reads(ctx: &'a Ctx) -> Result<Self> {
-        Ok(Self {
-            scans_from_api: ctx.s.default_rpc(),
-            ..Self::new(ctx)?
-        })
-    }
-
-    /// The program's accounts that pass `filters` (a `DataSize` among them):
-    /// the futures API's (`/v1/oracle/accounts`) for a read, or a program
-    /// scan on the RPC (also when the API can't answer).
-    pub fn program_accounts(&self, filters: &[Filter]) -> Result<Vec<(Pubkey, Account)>> {
-        if self.scans_from_api
-            && let Some(found) = api_scan(&self.ctx.api, &self.program, filters)
-        {
-            return Ok(found);
-        }
-        self.ctx.rpc.program_accounts(&self.program, filters)
+        Ok(Self { ctx, program })
     }
 
     pub fn config_address(&self) -> Pubkey {
@@ -602,13 +514,16 @@ impl<'a> Oracle<'a> {
 
     /// Every period of the program, by expiry then product.
     pub fn periods(&self) -> Result<Vec<PeriodRef>> {
-        let accounts = self.program_accounts(&[
-            Filter::DataSize(Period::LEN as u64),
-            Filter::Memcmp {
-                offset: 0,
-                bytes: Period::DISCRIMINATOR.to_vec(),
-            },
-        ])?;
+        let accounts = self.ctx.rpc.program_accounts(
+            &self.program,
+            &[
+                Filter::DataSize(Period::LEN as u64),
+                Filter::Memcmp {
+                    offset: 0,
+                    bytes: Period::DISCRIMINATOR.to_vec(),
+                },
+            ],
+        )?;
         let mut out: Vec<PeriodRef> = accounts
             .into_iter()
             .filter_map(|(address, account)| {
@@ -769,7 +684,7 @@ impl<'a> Oracle<'a> {
                 bytes: month.to_bytes().to_vec(),
             });
         }
-        let accounts = self.program_accounts(&filters)?;
+        let accounts = self.ctx.rpc.program_accounts(&self.program, &filters)?;
         let mut out = Vec::new();
         for (address, account) in accounts {
             let state: OracleSourceState = match decode(
@@ -965,7 +880,7 @@ impl<'a> Oracle<'a> {
             });
         }
         let mut out = Vec::new();
-        for (key, account) in self.program_accounts(&filters)? {
+        for (key, account) in self.ctx.rpc.program_accounts(&self.program, &filters)? {
             let Ok(c) = decode::<OracleOpeningClaimChallenge>(
                 &self.program,
                 &key,
@@ -1010,7 +925,9 @@ impl<'a> Oracle<'a> {
             });
         }
         Ok(self
-            .program_accounts(&filters)?
+            .ctx
+            .rpc
+            .program_accounts(&self.program, &filters)?
             .iter()
             .filter_map(|(key, account)| print_link(&self.program, key, account))
             .collect())
@@ -1170,7 +1087,7 @@ impl<'a> Oracle<'a> {
                 bytes: month.to_bytes().to_vec(),
             });
         }
-        let accounts = self.program_accounts(&filters)?;
+        let accounts = self.ctx.rpc.program_accounts(&self.program, &filters)?;
         let mut out = Vec::new();
         for (key, account) in accounts {
             let Ok(c) = decode::<OracleSourceChallenge>(
@@ -1380,7 +1297,7 @@ impl<'a> Oracle<'a> {
             },
         ];
         filters.extend(filter);
-        let accounts = self.program_accounts(&filters)?;
+        let accounts = self.ctx.rpc.program_accounts(&self.program, &filters)?;
         let mut out = Vec::new();
         for (key, account) in accounts {
             let agreement: SourceSponsorship = decode(
@@ -1468,7 +1385,9 @@ impl<'a> Oracle<'a> {
             });
         }
         let mut out: Vec<(Pubkey, OracleUpdateClaimV2)> = self
-            .program_accounts(&filters)?
+            .ctx
+            .rpc
+            .program_accounts(&self.program, &filters)?
             .into_iter()
             .filter_map(|(key, account)| {
                 let claim = self.update_claim_in(&key, &account)?;
@@ -1539,7 +1458,9 @@ impl<'a> Oracle<'a> {
             });
         }
         let mut out: Vec<(Pubkey, OracleUpdateChallenge)> = self
-            .program_accounts(&filters)?
+            .ctx
+            .rpc
+            .program_accounts(&self.program, &filters)?
             .into_iter()
             .filter_map(|(key, account)| {
                 let c = self.update_challenge_in(&key, &account)?;
@@ -1681,71 +1602,6 @@ impl<'a> Oracle<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::json;
-
-    #[test]
-    fn scans_ask_the_api_for_their_size_and_filters() {
-        let month = Pubkey::new_unique();
-        let route = accounts_route(&[
-            Filter::DataSize(352),
-            Filter::Memcmp {
-                offset: 2,
-                bytes: month.to_bytes().to_vec(),
-            },
-            Filter::Memcmp {
-                offset: 166,
-                bytes: vec![2, 0xab],
-            },
-        ]);
-        assert_eq!(
-            route.as_deref(),
-            Some(&*format!(
-                "/v1/oracle/accounts?size=352&memcmp=2:{}&memcmp=166:02ab",
-                hex(&month.to_bytes())
-            ))
-        );
-        assert_eq!(
-            accounts_route(&[Filter::Memcmp {
-                offset: 0,
-                bytes: vec![1]
-            }]),
-            None
-        );
-    }
-
-    #[test]
-    fn api_scans_are_the_programs_accounts() {
-        let (program, a, b) = (
-            Pubkey::new_unique(),
-            Pubkey::new_unique(),
-            Pubkey::new_unique(),
-        );
-        let data = json!({
-            "programId": program.to_string(), "size": 3, "slot": 9,
-            "accounts": [
-                { "address": a.to_string(), "lamports": 5, "data": B64.encode([1, 2, 3]) },
-                { "address": b.to_string(), "lamports": 6, "data": B64.encode([4, 5, 6]) },
-            ],
-        });
-        let found = scanned(&program, &data).unwrap();
-        let summary: Vec<_> = found
-            .iter()
-            .map(|(k, x)| (*k, x.lamports, x.owner, x.data.clone(), x.executable))
-            .collect();
-        assert_eq!(
-            summary,
-            vec![
-                (a, 5, program, vec![1, 2, 3], false),
-                (b, 6, program, vec![4, 5, 6], false),
-            ]
-        );
-        // Another program's, or a malformed reply: the chain is read instead.
-        assert!(scanned(&Pubkey::new_unique(), &data).is_none());
-        let mut bad = data.clone();
-        bad["accounts"][1]["data"] = json!("not base64!");
-        assert!(scanned(&program, &bad).is_none());
-        assert!(scanned(&program, &json!({ "programId": program.to_string() })).is_none());
-    }
 
     fn period(symbol: &str, expiry_ts: u64) -> PeriodRef {
         let product = product_id(symbol).unwrap();
