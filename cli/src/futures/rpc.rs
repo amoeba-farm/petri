@@ -45,7 +45,7 @@ pub const METHODS: &[(&str, &str, Served)] = &[
     ),
     (
         "getProgramAccounts",
-        "the oracle's periods, sources, challenges, opening prints' links, sponsorships and a wallet's reward claims",
+        "the oracle's periods, sources, challenges, opening prints' links, sponsorships and a wallet's reward claims (oracle writes; the oracle reads only with an RPC set, else the API's `/v1/oracle/accounts`)",
         Served::FullRpc,
     ),
     ("getBalance", "a wallet's SOL", Served::FullRpcAndGateway),

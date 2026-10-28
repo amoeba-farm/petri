@@ -1913,6 +1913,47 @@ served the same way.
 Each product's periods, from the same read as the snapshot (same protocol
 and freshness), for the research service.
 
+### `GET /v1/oracle/accounts` [added 2026-10-28]
+
+```text
+GET /v1/oracle/accounts?size=<bytes>[&memcmp=<offset>:<hex>]...
+200 { ok: true, data: { programId, size, slot, observedAt (unix ms),
+                        accounts: [{ address, lamports, data (base64) }] } }
+```
+
+The oracle program's accounts of one layout, for reads that would otherwise
+scan the program themselves: petri's `oracle challenges`, `prints`,
+`updates`, `stakes`, `rewards` and `sponsorships` (and its TUI's Rewards
+view) take their `getProgramAccounts` from here while no RPC is set, since
+Solana's public RPC turns a caller away after a few scans in a row.
+
+* `size` is a layout's exact data size; the served layouts are the ones
+  those reads scan: period (`Period::LEN`), source (352), source challenge,
+  opening challenge (the size of an update claim too), evidence link (251),
+  update claim, update challenge, support position and sponsorship (their
+  `LEN`s in the `ameba_oracle` crate). Another size is 404
+  `ORACLE_ACCOUNTS_LAYOUT_UNKNOWN` (the message lists the served sizes).
+* Each `memcmp` keeps the accounts whose bytes at `offset` are the hex bytes
+  (as an RPC's `memcmp` filter: an account too short does not match);
+  any number of them, all must match. A missing or repeated `size`, a
+  malformed `memcmp` or any other parameter is 400
+  `ORACLE_ACCOUNTS_QUERY_INVALID`.
+* One `getProgramAccounts` (by size, at `confirmed`, from the API's own RPC)
+  serves every caller and every filter: it is kept until an oracle
+  transaction lands after it (the oracle program's `logsSubscribe` at
+  `processed`; a read whose `slot` is behind that transaction is read again)
+  or it is 2 minutes old (the age at which the snapshot is stale: a
+  reconnecting subscription can miss one), so at most one read per layout
+  per 2 minutes while nothing changes. Callers at the same moment share one
+  read. `slot` is the read's
+  slot, `observedAt` when it was made.
+* Accounts are by address. Every one is owned by `programId` (the
+  configured oracle program, `programs.oracle`) and has exactly `size`
+  bytes; nothing else is checked here: readers decode and check them as
+  they would an RPC's (petri: layout, canonical address).
+* Without an oracle program configured it is 404 `ORACLE_ACCOUNTS_NO_PROGRAM`;
+  a failed read is 503 `ORACLE_ACCOUNTS_UNAVAILABLE` (nothing kept).
+
 ### Manifest
 
 `futures-ops bootstrap` writes the oracle into the deployment manifest:

@@ -66,8 +66,9 @@ jobs:
             oracle
             evidence
             scripts
-      - name: Rust 1.93.1 (the default toolchain; folders with rust-toolchain.toml use theirs)
+      - name: Rust 1.95.0 (cli/rust-toolchain.toml, with clippy) and 1.93.1 (the default; folders with rust-toolchain.toml use theirs)
         run: |
+          rustup toolchain install 1.95.0 --profile minimal --component rustfmt,clippy
           rustup toolchain install 1.93.1 --profile minimal --component rustfmt,clippy
           rustup default 1.93.1
       - name: Native build dependencies

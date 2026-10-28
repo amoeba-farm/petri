@@ -1,11 +1,1216 @@
 {
   "source": {
-    "futuresCommit": "unknown",
+    "futuresCommit": "bcf0601606617fda7e00a818e7663d031339858f",
     "generator": "tools/futures-vectors"
   },
   "vectors": {
     "accounts": {
       "address": "9m5Cn5ycBeNDdy5qf8Ddz94BGAiVfwKgpFYuRGzRfrr",
+      "approved": {
+        "arcs": [
+          {
+            "cap": "4",
+            "hi": 7,
+            "id": {
+              "kind": "order",
+              "slot": 0
+            },
+            "lo": 3,
+            "price": "25000",
+            "rank": "21474836480",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 5,
+            "id": {
+              "kind": "order",
+              "slot": 2
+            },
+            "lo": 2,
+            "price": "22000",
+            "rank": "38654705664",
+            "side": 1
+          },
+          {
+            "cap": "5",
+            "hi": 3,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 2,
+              "tier": 0
+            },
+            "lo": 2,
+            "price": "7300",
+            "rank": "12884901920",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 3,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 2,
+              "tier": 1
+            },
+            "lo": 2,
+            "price": "6800",
+            "rank": "12884901921",
+            "side": 0
+          },
+          {
+            "cap": "3",
+            "hi": 3,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 2,
+              "tier": 2
+            },
+            "lo": 2,
+            "price": "6300",
+            "rank": "12884901922",
+            "side": 0
+          },
+          {
+            "cap": "4",
+            "hi": 3,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 2,
+              "tier": 0
+            },
+            "lo": 2,
+            "price": "8000",
+            "rank": "12884901928",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 3,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 2,
+              "tier": 1
+            },
+            "lo": 2,
+            "price": "8500",
+            "rank": "12884901929",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 3,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 2,
+              "tier": 2
+            },
+            "lo": 2,
+            "price": "9000",
+            "rank": "12884901930",
+            "side": 1
+          },
+          {
+            "cap": "1",
+            "hi": 4,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 3,
+              "tier": 0
+            },
+            "lo": 3,
+            "price": "6600",
+            "rank": "12884901936",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 4,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 3,
+              "tier": 1
+            },
+            "lo": 3,
+            "price": "6100",
+            "rank": "12884901937",
+            "side": 0
+          },
+          {
+            "cap": "3",
+            "hi": 4,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 3,
+              "tier": 2
+            },
+            "lo": 3,
+            "price": "5600",
+            "rank": "12884901938",
+            "side": 0
+          },
+          {
+            "cap": "4",
+            "hi": 4,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 3,
+              "tier": 0
+            },
+            "lo": 3,
+            "price": "7300",
+            "rank": "12884901944",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 4,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 3,
+              "tier": 1
+            },
+            "lo": 3,
+            "price": "7800",
+            "rank": "12884901945",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 4,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 3,
+              "tier": 2
+            },
+            "lo": 3,
+            "price": "8300",
+            "rank": "12884901946",
+            "side": 1
+          },
+          {
+            "cap": "5",
+            "hi": 5,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 4,
+              "tier": 0
+            },
+            "lo": 4,
+            "price": "5900",
+            "rank": "12884901952",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 5,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 4,
+              "tier": 1
+            },
+            "lo": 4,
+            "price": "5400",
+            "rank": "12884901953",
+            "side": 0
+          },
+          {
+            "cap": "3",
+            "hi": 5,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 4,
+              "tier": 2
+            },
+            "lo": 4,
+            "price": "4900",
+            "rank": "12884901954",
+            "side": 0
+          },
+          {
+            "cap": "1",
+            "hi": 5,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 4,
+              "tier": 1
+            },
+            "lo": 4,
+            "price": "7100",
+            "rank": "12884901961",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 5,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 4,
+              "tier": 2
+            },
+            "lo": 4,
+            "price": "7600",
+            "rank": "12884901962",
+            "side": 1
+          },
+          {
+            "cap": "4",
+            "hi": 6,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 5,
+              "tier": 0
+            },
+            "lo": 5,
+            "price": "5900",
+            "rank": "12884901976",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 6,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 5,
+              "tier": 1
+            },
+            "lo": 5,
+            "price": "6400",
+            "rank": "12884901977",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 6,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 5,
+              "tier": 2
+            },
+            "lo": 5,
+            "price": "6900",
+            "rank": "12884901978",
+            "side": 1
+          },
+          {
+            "cap": "5",
+            "hi": 7,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 6,
+              "tier": 0
+            },
+            "lo": 6,
+            "price": "4500",
+            "rank": "12884901984",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 7,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 6,
+              "tier": 1
+            },
+            "lo": 6,
+            "price": "4000",
+            "rank": "12884901985",
+            "side": 0
+          },
+          {
+            "cap": "3",
+            "hi": 7,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 6,
+              "tier": 2
+            },
+            "lo": 6,
+            "price": "3500",
+            "rank": "12884901986",
+            "side": 0
+          },
+          {
+            "cap": "4",
+            "hi": 7,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 6,
+              "tier": 0
+            },
+            "lo": 6,
+            "price": "5200",
+            "rank": "12884901992",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 7,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 6,
+              "tier": 1
+            },
+            "lo": 6,
+            "price": "5700",
+            "rank": "12884901993",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 7,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 6,
+              "tier": 2
+            },
+            "lo": 6,
+            "price": "6200",
+            "rank": "12884901994",
+            "side": 1
+          },
+          {
+            "cap": "5",
+            "hi": 8,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 7,
+              "tier": 0
+            },
+            "lo": 7,
+            "price": "3800",
+            "rank": "12884902000",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 8,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 7,
+              "tier": 1
+            },
+            "lo": 7,
+            "price": "3300",
+            "rank": "12884902001",
+            "side": 0
+          },
+          {
+            "cap": "3",
+            "hi": 8,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 7,
+              "tier": 2
+            },
+            "lo": 7,
+            "price": "2800",
+            "rank": "12884902002",
+            "side": 0
+          },
+          {
+            "cap": "4",
+            "hi": 8,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 7,
+              "tier": 0
+            },
+            "lo": 7,
+            "price": "4500",
+            "rank": "12884902008",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 8,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 7,
+              "tier": 1
+            },
+            "lo": 7,
+            "price": "5000",
+            "rank": "12884902009",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 8,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 7,
+              "tier": 2
+            },
+            "lo": 7,
+            "price": "5500",
+            "rank": "12884902010",
+            "side": 1
+          },
+          {
+            "cap": "5",
+            "hi": 9,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 8,
+              "tier": 0
+            },
+            "lo": 8,
+            "price": "3100",
+            "rank": "12884902016",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 9,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 8,
+              "tier": 1
+            },
+            "lo": 8,
+            "price": "2600",
+            "rank": "12884902017",
+            "side": 0
+          },
+          {
+            "cap": "3",
+            "hi": 9,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 8,
+              "tier": 2
+            },
+            "lo": 8,
+            "price": "2100",
+            "rank": "12884902018",
+            "side": 0
+          },
+          {
+            "cap": "5",
+            "hi": 10,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 9,
+              "tier": 0
+            },
+            "lo": 9,
+            "price": "2400",
+            "rank": "12884902032",
+            "side": 0
+          },
+          {
+            "cap": "2",
+            "hi": 10,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 9,
+              "tier": 1
+            },
+            "lo": 9,
+            "price": "1900",
+            "rank": "12884902033",
+            "side": 0
+          },
+          {
+            "cap": "3",
+            "hi": 10,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 0,
+              "step": 9,
+              "tier": 2
+            },
+            "lo": 9,
+            "price": "1400",
+            "rank": "12884902034",
+            "side": 0
+          },
+          {
+            "cap": "4",
+            "hi": 10,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 9,
+              "tier": 0
+            },
+            "lo": 9,
+            "price": "3100",
+            "rank": "12884902040",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 10,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 9,
+              "tier": 1
+            },
+            "lo": 9,
+            "price": "3600",
+            "rank": "12884902041",
+            "side": 1
+          },
+          {
+            "cap": "2",
+            "hi": 10,
+            "id": {
+              "kind": "maker",
+              "maker": 0,
+              "side": 1,
+              "step": 9,
+              "tier": 2
+            },
+            "lo": 9,
+            "price": "4100",
+            "rank": "12884902042",
+            "side": 1
+          }
+        ],
+        "book": {
+          "claims": [
+            0,
+            1,
+            3,
+            4
+          ],
+          "claimsOf0": [
+            0,
+            4
+          ],
+          "makers": [
+            {
+              "slot": 0,
+              "steps": [
+                0,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                11
+              ]
+            },
+            {
+              "slot": 1,
+              "steps": [
+                4,
+                5
+              ]
+            }
+          ],
+          "orders": [
+            0,
+            2,
+            3
+          ],
+          "owners": [
+            {
+              "owner": "A18nxBUCAuqPCPBm3Aiae5WuHAoQ7WkD81DSgv3Uyyed",
+              "trader": 0,
+              "value": [
+                "6240000",
+                "6440000"
+              ]
+            },
+            {
+              "owner": "98CqPT6D4ZxCfbRs9gAi3YPosSxpf5RW7Ai6BMVvUDEZ",
+              "trader": 1,
+              "value": [
+                "100100",
+                "940100"
+              ]
+            },
+            {
+              "owner": "8KAQNepLneXBRMxZPay2Tyezhs4oWw3kKjkPZ2P54cPW",
+              "trader": 3,
+              "value": [
+                "1125899906872624",
+                "1125899906952624"
+              ]
+            },
+            {
+              "owner": "33WEhyEUMsvdTVTzCKcbguVUFDWcT2ggaTUJeDAC42Xy",
+              "trader": null,
+              "value": [
+                "0",
+                "0"
+              ]
+            }
+          ],
+          "traders": [
+            0,
+            1,
+            3
+          ]
+        },
+        "claims": [
+          {
+            "cost": "45000",
+            "hi": 9,
+            "lo": 4,
+            "lots": "3",
+            "openedTs": "1791900000",
+            "reserved": "0",
+            "seq": "12",
+            "side": 0,
+            "slot": 0,
+            "trader": 0
+          },
+          {
+            "cost": "30000",
+            "hi": 5,
+            "lo": 2,
+            "lots": "2",
+            "openedTs": "1791900100",
+            "reserved": "2",
+            "seq": "13",
+            "side": 0,
+            "slot": 1,
+            "trader": 3
+          },
+          {
+            "cost": "0",
+            "hi": 0,
+            "lo": 0,
+            "lots": "0",
+            "openedTs": "0",
+            "reserved": "0",
+            "seq": "0",
+            "side": 0,
+            "slot": 2,
+            "trader": 0
+          },
+          {
+            "cost": "500000",
+            "hi": 12,
+            "lo": 0,
+            "lots": "7",
+            "openedTs": "1791900200",
+            "reserved": "0",
+            "seq": "20",
+            "side": 1,
+            "slot": 3,
+            "trader": 1
+          },
+          {
+            "cost": "4000",
+            "hi": 7,
+            "lo": 6,
+            "lots": "1",
+            "openedTs": "1791900300",
+            "reserved": "0",
+            "seq": "21",
+            "side": 1,
+            "slot": 4,
+            "trader": 0
+          },
+          {
+            "cost": "0",
+            "hi": 0,
+            "lo": 0,
+            "lots": "0",
+            "openedTs": "0",
+            "reserved": "0",
+            "seq": "0",
+            "side": 0,
+            "slot": 5,
+            "trader": 0
+          }
+        ],
+        "data": "QUZSQU5HRTEBAP4GDAAEAAQAAv0GAAAAAwAAAAAAAABSQU1YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACB5moAAAAA6CVhntoWU4/MCEWBvfo2c6/sKGSh3RpWk88LSITB/TraFlOPywhEgb36NnKv6yhkod0ZVpLPC0iEwP05drLvK9wYVZHNCkaDv/w4dLHtKmaj3xtYlNENSobC/zt4tPEt9TFuqucjX5zYFVGOygZDf7z4NXGt6iZjn9wYVJHNCkbPC0iEwf06drLvK2ik4R1ZltIPS4jEAD15tvIva6jkIBAnAAAAAAAAQEIPAAAAAABg6gAAAAAAAAAAAAAAAAAAKAAAAAAAAACH1hIAAAAAAM7KIwAAAAAAFb80AAAAAABqYGsAAAAAABEAAAAAAAAAAAAAAAABAAA5MAAAAAAAAEAAAAAAAAAAMu8AAAAAAAAEAAAAAAAAAE0AAAAAAAAAAAAAAAAAAAAHedBqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACFwf46d7PwLGil4R5al9MPTIjFAT56tvMvbKjlIV2a1kBLTAAAAAAAgE8SAAAAAAACAAAAAAABAAAAAAAAAAAAeLXxLmqn4x9cmNURTorGAz98uPUxbarmI1+c2BRRjcpkAAAAAAAAAKCGAQAAAAAAAQAAAAIAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsqOUhXZrWE0+MyARBfbr2M2+r6CRhndoWUo/LCESBvQAAAAAAAAQAAAAAAAAAAAABAAAAAQACAAAAAAAAAAAABQAAAAAAAAABAAAAAwAHAAQAAAAAAAAAqGEAAAAAAACoYQAAAAAAAP////8AAAAABgAAAAAAAAAAwM9qAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAMAAQECAAUAAgAAAAAAAADwVQAAAAAAAAAAAAAAAAAAAQAAAAAAAAACAAAAAAAAAGTAz2oAAAAACwAAAAAAAAABAAEACAAMAAAAAAAAAAAAMHUAAAAAAAAQJwAAAAAAAP////8AAAAABQAAAAAAAADIwM9qAAAAAAMAAAAAAAAAAAABAAIACgA/Qg8AAAAAACwBAACQAQAALMHPagAAAAADADIA9AEAAAoAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQB8AAIQcAAAIAAAAAAAAAAoAAAAAAAAAAAAAAAAAAACEHAAAyBkAAAgAAAAAAAAABgAAAAAAAAADAAAAAAAAAMgZAAAMFwAAAwAAAAAAAAAKAAAAAAAAAAAAAAAAAAAADBcAAFAUAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQFAAAlBEAAAgAAAAAAAAACgAAAAAAAAD+/////////5QRAADYDgAACAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAA2A4AABwMAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAcDAAAYAkAAAgAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAAAAAAAMAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP3/////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAMAAAAAAAAAAAAAAAEAAkAyK8AAAAAAAAAAAAAAAAAAGA5zmoAAAAAAAAAAAAAAAACAAAAAAAAAA0AAAAAAAAAAwAAAAIABQAwdQAAAAAAAAIAAAAAAAAAxDnOagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAUAAAAAAAAAAEAAQAAAAwAIKEHAAAAAAAAAAAAAAAAACg6zmoAAAAAAAAAAAAAAAABAAAAAAAAABUAAAAAAAAAAAABAAYABwCgDwAAAAAAAAAAAAAAAAAAjDrOagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUZDUklTSzFA4gEAAAAAAA==",
+        "header": {
+          "authorityBump": 254,
+          "backing": "3456789",
+          "claimCap": 6,
+          "claimHint": 3,
+          "claimsOpen": "4",
+          "creator": "EwDNbqARxjATe9EFAqXPv4T1XT4MoxddtRikU5jDYEJT",
+          "custody": "7037034",
+          "expiryTs": "1793491200",
+          "grid": 12,
+          "k": "10000",
+          "lastEntryFine": "61234",
+          "lastTradeTs": "1792047367",
+          "makerCap": 2,
+          "nextSeq": "40",
+          "oracleProgram": "FgKdB9GMGRRt836brDYSRuEyxYBzZyX5bLh4pKPNSmJi",
+          "orderCap": 4,
+          "period": "GdCeUYUEb6o3JwdLzRA1wV3VCpBcXYhQT7s9Tvuo6eWD",
+          "productId": "52414d5800000000000000000000000000000000000000000000000000000000",
+          "quoteMint": "FpADTkCNT22LQDbcipCH1enWSrcPv6tiiA2Nw5UZwRx8",
+          "refFine": "60000",
+          "registryBump": 253,
+          "settledTs": "0",
+          "settlementFine": "0",
+          "status": 0,
+          "stepValue": "1000000",
+          "totalFree": "1234567",
+          "totalPaidOut": "77",
+          "totalReserved": "2345678",
+          "traderCap": 4,
+          "trades": "17",
+          "valueDecimals": 6,
+          "vault": "HW8c3GrDqFZXZY5pwJxRWVyHAEGLV4qGbuKGanj8ybL1",
+          "volumeLots": "1099511627776",
+          "volumePremium": "1180591620717411315769"
+        },
+        "ladderArcs": 41,
+        "makers": [
+          {
+            "askSpread": 400,
+            "askTotal": "8",
+            "bidSpread": 300,
+            "bidTotal": "10",
+            "escrow": "999999",
+            "hi": 10,
+            "lo": 2,
+            "quotedTs": "1792000300",
+            "seq": "3",
+            "slot": 0,
+            "steps": [
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "5",
+                "pos": 0
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 1
+              },
+              {
+                "ask": 8000,
+                "askLots": "8",
+                "bid": 7300,
+                "bidLots": "10",
+                "inv": "0",
+                "pos": 2
+              },
+              {
+                "ask": 7300,
+                "askLots": "8",
+                "bid": 6600,
+                "bidLots": "6",
+                "inv": "3",
+                "pos": 3
+              },
+              {
+                "ask": 6600,
+                "askLots": "3",
+                "bid": 5900,
+                "bidLots": "10",
+                "inv": "0",
+                "pos": 4
+              },
+              {
+                "ask": 5900,
+                "askLots": "8",
+                "bid": 5200,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 5
+              },
+              {
+                "ask": 5200,
+                "askLots": "8",
+                "bid": 4500,
+                "bidLots": "10",
+                "inv": "-2",
+                "pos": 6
+              },
+              {
+                "ask": 4500,
+                "askLots": "8",
+                "bid": 3800,
+                "bidLots": "10",
+                "inv": "0",
+                "pos": 7
+              },
+              {
+                "ask": 3800,
+                "askLots": "0",
+                "bid": 3100,
+                "bidLots": "10",
+                "inv": "0",
+                "pos": 8
+              },
+              {
+                "ask": 3100,
+                "askLots": "8",
+                "bid": 2400,
+                "bidLots": "10",
+                "inv": "0",
+                "pos": 9
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 10
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "-1",
+                "pos": 11
+              }
+            ],
+            "tiers": {
+              "count": 3,
+              "ratio": 50,
+              "spread": 500
+            },
+            "trader": 0,
+            "used": true
+          },
+          {
+            "askSpread": 0,
+            "askTotal": "0",
+            "bidSpread": 0,
+            "bidTotal": "0",
+            "escrow": "0",
+            "hi": 0,
+            "lo": 0,
+            "quotedTs": "0",
+            "seq": "0",
+            "slot": 1,
+            "steps": [
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 0
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 1
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 2
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 3
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "2",
+                "pos": 4
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "-3",
+                "pos": 5
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 6
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 7
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 8
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 9
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 10
+              },
+              {
+                "ask": 0,
+                "askLots": "0",
+                "bid": 0,
+                "bidLots": "0",
+                "inv": "0",
+                "pos": 11
+              }
+            ],
+            "tiers": {
+              "count": 0,
+              "ratio": 0,
+              "spread": 0
+            },
+            "trader": 3,
+            "used": true
+          }
+        ],
+        "orders": [
+          {
+            "claim": 4294967295,
+            "escrowPerLot": "25000",
+            "flags": 0,
+            "hi": 7,
+            "lo": 3,
+            "lots": "4",
+            "placedLots": "6",
+            "placedTs": "1792000000",
+            "price": "25000",
+            "seq": "5",
+            "side": 0,
+            "slot": 0,
+            "trader": 1
+          },
+          {
+            "claim": 0,
+            "escrowPerLot": "0",
+            "flags": 0,
+            "hi": 0,
+            "lo": 0,
+            "lots": "0",
+            "placedLots": "0",
+            "placedTs": "0",
+            "price": "0",
+            "seq": "0",
+            "side": 0,
+            "slot": 1,
+            "trader": 0
+          },
+          {
+            "claim": 1,
+            "escrowPerLot": "0",
+            "flags": 1,
+            "hi": 5,
+            "lo": 2,
+            "lots": "2",
+            "placedLots": "2",
+            "placedTs": "1792000100",
+            "price": "22000",
+            "seq": "9",
+            "side": 1,
+            "slot": 2,
+            "trader": 3
+          },
+          {
+            "claim": 4294967295,
+            "escrowPerLot": "10000",
+            "flags": 0,
+            "hi": 12,
+            "lo": 8,
+            "lots": "0",
+            "placedLots": "5",
+            "placedTs": "1792000200",
+            "price": "30000",
+            "seq": "11",
+            "side": 1,
+            "slot": 3,
+            "trader": 1
+          }
+        ],
+        "traderValues": [
+          {
+            "slot": 0,
+            "value": [
+              "6240000",
+              "6440000"
+            ]
+          },
+          {
+            "slot": 1,
+            "value": [
+              "100100",
+              "940100"
+            ]
+          },
+          {
+            "slot": 2,
+            "value": [
+              "0",
+              "0"
+            ]
+          },
+          {
+            "slot": 3,
+            "value": [
+              "1125899906872624",
+              "1125899906952624"
+            ]
+          }
+        ],
+        "traders": [
+          {
+            "claims": 2,
+            "free": "5000000",
+            "maker": 1,
+            "orders": 0,
+            "owner": "A18nxBUCAuqPCPBm3Aiae5WuHAoQ7WkD81DSgv3Uyyed",
+            "paidOut": "0",
+            "reserved": "1200000",
+            "slot": 0
+          },
+          {
+            "claims": 1,
+            "free": "100",
+            "maker": 0,
+            "orders": 2,
+            "owner": "98CqPT6D4ZxCfbRs9gAi3YPosSxpf5RW7Ai6BMVvUDEZ",
+            "paidOut": "9",
+            "reserved": "100000",
+            "slot": 1
+          },
+          {
+            "claims": 0,
+            "free": "0",
+            "maker": 0,
+            "orders": 0,
+            "owner": "11111111111111111111111111111111",
+            "paidOut": "0",
+            "reserved": "0",
+            "slot": 2
+          },
+          {
+            "claims": 1,
+            "free": "1125899906842624",
+            "maker": 2,
+            "orders": 1,
+            "owner": "8KAQNepLneXBRMxZPay2Tyezhs4oWw3kKjkPZ2P54cPW",
+            "paidOut": "0",
+            "reserved": "0",
+            "slot": 3
+          }
+        ]
+      },
       "failed": {
         "data": "QUZSQU5HRTEBAv4GDAAEAAQAAv0GAAAAAwAAAAAAAABSQU1YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACB5moAAAAA6CVhntoWU4/MCEWBvfo2c6/sKGSh3RpWk88LSITB/TraFlOPywhEgb36NnKv6yhkod0ZVpLPC0iEwP05drLvK9wYVZHNCkaDv/w4dLHtKmaj3xtYlNENSobC/zt4tPEt9TFuqucjX5zYFVGOygZDf7z4NXGt6iZjn9wYVJHNCkbPC0iEwf06drLvK2ik4R1ZltIPS4jEAD15tvIva6jkIBAnAAAAAAAAQEIPAAAAAABg6gAAAAAAAGDqAAAAAAAAKAAAAAAAAACH1hIAAAAAAM7KIwAAAAAAFb80AAAAAABqYGsAAAAAABEAAAAAAAAAAAAAAAABAAA5MAAAAAAAAEAAAAAAAAAAMu8AAAAAAAAEAAAAAAAAAE0AAAAAAAAAYKPmagAAAAAHedBqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACFwf46d7PwLGil4R5al9MPTIjFAT56tvMvbKjlIV2a1kBLTAAAAAAAgE8SAAAAAAACAAAAAAABAAAAAAAAAAAAeLXxLmqn4x9cmNURTorGAz98uPUxbarmI1+c2BRRjcpkAAAAAAAAAKCGAQAAAAAAAQAAAAIAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsqOUhXZrWE0+MyARBfbr2M2+r6CRhndoWUo/LCESBvQAAAAAAAAQAAAAAAAAAAAABAAAAAQACAAAAAAAAAAAABQAAAAAAAAABAAAAAwAHAAQAAAAAAAAAqGEAAAAAAACoYQAAAAAAAP////8AAAAABgAAAAAAAAAAwM9qAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAMAAQECAAUAAgAAAAAAAADwVQAAAAAAAAAAAAAAAAAAAQAAAAAAAAACAAAAAAAAAGTAz2oAAAAACwAAAAAAAAABAAEACAAMAAAAAAAAAAAAMHUAAAAAAAAQJwAAAAAAAP////8AAAAABQAAAAAAAADIwM9qAAAAAAMAAAAAAAAAAAABAAIACgA/Qg8AAAAAACwBAACQAQAALMHPagAAAAADADIA9AEAAAoAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQB8AAIQcAAAIAAAAAAAAAAoAAAAAAAAAAAAAAAAAAACEHAAAyBkAAAgAAAAAAAAABgAAAAAAAAADAAAAAAAAAMgZAAAMFwAAAwAAAAAAAAAKAAAAAAAAAAAAAAAAAAAADBcAAFAUAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQFAAAlBEAAAgAAAAAAAAACgAAAAAAAAD+/////////5QRAADYDgAACAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAA2A4AABwMAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAcDAAAYAkAAAgAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAAAAAAAMAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP3/////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAMAAAAAAAAAAAAAAAEAAkAyK8AAAAAAAAAAAAAAAAAAGA5zmoAAAAAAAAAAAAAAAACAAAAAAAAAA0AAAAAAAAAAwAAAAIABQAwdQAAAAAAAAIAAAAAAAAAxDnOagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAUAAAAAAAAAAEAAQAAAAwAIKEHAAAAAAAAAAAAAAAAACg6zmoAAAAAAAAAAAAAAAABAAAAAAAAABUAAAAAAAAAAAABAAYABwCgDwAAAAAAAAAAAAAAAAAAjDrOagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         "header": {

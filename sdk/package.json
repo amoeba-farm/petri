@@ -1,6 +1,6 @@
 {
   "name": "ameba-sdk",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "TypeScript and Rust SDK for Ameba futures: API client, instruction builders, market decoder, proposal codec and governance gate binding",
   "repository": {
     "type": "git",

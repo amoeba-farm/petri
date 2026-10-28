@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+
+- Decode markets carrying the operator credit assessment extension while
+  preserving every existing header and record offset.
+
 ## 0.4.0 - 2026-10-16
 
 The first release published to npm. It is the client for the futures program

@@ -79,7 +79,10 @@ export function decodeHeader(data) {
         settledTs: r.u64(360),
         lastTradeTs: r.u64(368),
     };
-    if (r.length !== marketLen(h.grid, h.traderCap, h.orderCap, h.makerCap, h.claimCap)) {
+    const base = marketLen(h.grid, h.traderCap, h.orderCap, h.makerCap, h.claimCap);
+    const approval = r.length === base + 16 &&
+        Buffer.from(r.slice(base, 8)).equals(Buffer.from("AFCRISK1"));
+    if (r.length !== base && !approval) {
         throw new FuturesAccountError("market: bad length");
     }
     return h;

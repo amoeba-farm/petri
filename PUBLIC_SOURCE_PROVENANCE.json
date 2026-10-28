@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "28b77480d5ec6c3cdc714cd94878fa6eb3b020c0",
+  "sourceCommit": "b24a4ed2e058d2feb6122d38c445f4abe379d8d2",
   "component": "cli",
-  "cliVersion": "0.1.19",
-  "publicationType": "source of the signed petri v0.1.19 release and of ameba-sdk 0.4.0 on npm",
+  "cliVersion": "0.1.20",
+  "publicationType": "Petri v0.1.20 preview source and prepared ameba-sdk 0.4.1 package",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
-  "deployedContractSourceCommit": "c723db77",
-  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from c723db77, the oracle from da0e9143); this source mirror makes no reproducible ELF claim. Signed release packages are built from sourceCommit.",
+  "deployedContractSourceCommit": "c723db776e9d0c639565d89ac761703731b37fb4",
+  "qualification": "CLI/SDK source accepts operator-assessed market accounts. Mainnet contract installation is pending; installed Futures and Oracle provenance remains separately recorded. Preview binaries are unsigned; npm publication is not claimed.",
   "retainedPublicLegalFiles": [
     ".gitattributes",
     ".gitignore",
@@ -30,12 +30,12 @@
     },
     {
       "path": ".github/workflows/cli.yml",
-      "sha256": "82ff953bcf655bdae0a71de7000bdc188363f024916ef9dcc016023f9f70cd47",
+      "sha256": "e2d9b98479ee696d3fc166e0c2e81fa57a9dc3d441c145193bab917df2036424",
       "executable": false
     },
     {
       "path": "api/API.md",
-      "sha256": "be240c79c6a0b0f2a38a3775d000698a3644cb6679d8cc036b70ad814d51c15b",
+      "sha256": "59d0189d75bf9f43c08cd5a9e27e5ce47a34003d5a4f6591c0e7903915a19a37",
       "executable": false
     },
     {
@@ -60,12 +60,12 @@
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "3fd42b8a34cdecce6527682c7d4a239e91e3608c9a79ef099910a1f4705c1206",
+      "sha256": "2ddd434b97bb24ce18048b9b5811e051b48c9bbb0a0529cddc8e23ef899a2c21",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "38656df5ce14bc137f934ea0a4ce5df2ad75e2a4328160f3706955bdeb3fc48f",
+      "sha256": "bbcbccad8f9fcbdec6ea4ac191774699d48b0bec40cb0fff5ef2e48440b06a78",
       "executable": false
     },
     {
@@ -110,12 +110,12 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "a0b6f6dffddc86f8847f911dfbc9c07917ac29f6b65dfb2b4205eef398a379f8",
+      "sha256": "eaf921a31f8ef9ecec5113a15437ff1e05f70d8d81644dd6b353ff27a0e7ddff",
       "executable": false
     },
     {
       "path": "cli/THIRD_PARTY_NOTICES.md",
-      "sha256": "c0438821e1155de455b950f8456500a5fb8e3cbc83f95c921a39e81a751e4692",
+      "sha256": "b36873988bb7d689145637c57fb872c8cb901d6977f33436d6fe9d9f49266cd8",
       "executable": false
     },
     {
@@ -250,7 +250,7 @@
     },
     {
       "path": "cli/docs/amoeba-cli-command-guide.md",
-      "sha256": "271aa5e8c73f8131b71e516b31bb4961ce0cf1d755b4fb5b8599298010a9ef52",
+      "sha256": "c925c5f74bc68e4822069bbe2de0621bb41f615e7c22b51f2c0b617623f2de30",
       "executable": false
     },
     {
@@ -310,7 +310,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "4ca92e81fa1ea4d5bc7bc926c5aa7bb89ca96407b9cdea2fbdb9813ba07fa35e",
+      "sha256": "3bdef94fb4d92ce91d06e5866eb265ab3e6618cb9af06ac3694ff293e0e92a39",
       "executable": false
     },
     {
@@ -530,7 +530,7 @@
     },
     {
       "path": "cli/src/endpoints.rs",
-      "sha256": "a5b6f776c6db6b539917153ea6085e6cb9233b640967f6746352c6af7ea769e5",
+      "sha256": "545cb7dce8738ff78b8c9ddd6ac47820bca1b99a49fa42eaf8c9495564b3cc81",
       "executable": false
     },
     {
@@ -630,12 +630,12 @@
     },
     {
       "path": "cli/src/futures/rpc.rs",
-      "sha256": "bac86588e7aeaf7ef4d573f2ffc353ffa7f28060d0171078faeaca2dab54ac50",
+      "sha256": "a60f069ac72ed69e373edb5c8fcb51316d9d1613aa35c47b3ab10033d180a6db",
       "executable": false
     },
     {
       "path": "cli/src/futures/settings.rs",
-      "sha256": "3121794ba72c710243f5109d74f0af6fbdcce8b99f6804348bcdad91b60f8956",
+      "sha256": "1e4bf5c0a394d7e77a024b96df93fd82fa72587f745c4eadd25bde8f6a205a0a",
       "executable": false
     },
     {
@@ -690,12 +690,12 @@
     },
     {
       "path": "cli/src/oracle/chain.rs",
-      "sha256": "48439d72f20a328df6408b58db8ff8dff49e9e0ed412f486d5e14d3af3799a47",
+      "sha256": "f7b34e05a77beff4353aa4476c211266072c6c3cb0985be33d68a80a8a89229a",
       "executable": false
     },
     {
       "path": "cli/src/oracle/challenges.rs",
-      "sha256": "aa7c3ed2837126c7965896362b10a00dd49a57aecd7db28cca564cd9f59f64ac",
+      "sha256": "14e721caa0eb258ed5fed0bacf60e27985d42dd2f373e6992ec4330a05d5f987",
       "executable": false
     },
     {
@@ -725,7 +725,7 @@
     },
     {
       "path": "cli/src/oracle/prints.rs",
-      "sha256": "1836a00d68ff19d71f91026d479729c5a3b3e2158991944a0d1bcbbd01c87c60",
+      "sha256": "177bea82101398acfb743f7539e1300e22441ca5028551cffeb356892707caa6",
       "executable": false
     },
     {
@@ -735,7 +735,7 @@
     },
     {
       "path": "cli/src/oracle/rewards.rs",
-      "sha256": "dd10c179e2d8c4cc9cb403c288289c6e11f9c0b17f9e3910fed61bfb0bf38343",
+      "sha256": "3455651bbaf1418f509d82107737d31000aef0a72006f723636c02e215a8ba74",
       "executable": false
     },
     {
@@ -755,17 +755,17 @@
     },
     {
       "path": "cli/src/oracle/sponsor.rs",
-      "sha256": "fcbb830cbc80809901ffc72d8794fd168f33b59c24cb8b75b9f7a3466341ac50",
+      "sha256": "4355c63d7a38ccc59c6428304896a37f2984fea0d4d9af486069ac9828a1d7d1",
       "executable": false
     },
     {
       "path": "cli/src/oracle/stakes.rs",
-      "sha256": "a9b7ef7d09182501cb9726888a090dd9f2876939c288781463ecaca88afa4ecb",
+      "sha256": "348c30fdacd28191e5834143b6ba52dad8d2822bbc834a36111c3a76766c0a2b",
       "executable": false
     },
     {
       "path": "cli/src/oracle/updates.rs",
-      "sha256": "6717d1871d51b7d3d99c36135f1f93aa306163928f69fec39e526f11c6f5ab44",
+      "sha256": "103ec070d96371549a3eb0d20e721becaaef7e496c70fa986eff9cad9a03adb4",
       "executable": false
     },
     {
@@ -905,7 +905,7 @@
     },
     {
       "path": "cli/src/research/rewards.rs",
-      "sha256": "35e8df6a03e3e9ec7274b9398e5153315e720078754b672721f324fc1d0e18b0",
+      "sha256": "05e87af81a7f5b9b7019c365471a6f1c9179942cd76daa7318d528f5f193621e",
       "executable": false
     },
     {
@@ -1379,7 +1379,7 @@
     },
     {
       "path": "futures/crates/futures-client/src/lib.rs",
-      "sha256": "eb6cfdd5cd8f26d619fe463642fae0a4b636228ccd65571999ff9bd2650defe6",
+      "sha256": "32d542b4c9ea90f7f3bd8256b48d6ebef19aa6bbc55f730b5a3e08c04b165649",
       "executable": false
     },
     {
@@ -1474,12 +1474,12 @@
     },
     {
       "path": "futures/docs/futures.md",
-      "sha256": "78159b3f9b269e01de67f94abc39407ec8625fcd9e2bd845669b2ae037c0d4fe",
+      "sha256": "5c22fa7c9d5442e54c98733e798c5a551e1dfa85cda3d9a6f9b5f8f92d0a6e41",
       "executable": false
     },
     {
       "path": "futures/docs/interfaces.md",
-      "sha256": "65b4c930176be62a16d1bd0c2fd8a031bb7550a092443e471638d06a265d79e9",
+      "sha256": "23358a4bcb6e2406af7c695a32870e331c9f883a05eb37e0614a6ae17c1befa2",
       "executable": false
     },
     {
@@ -1494,7 +1494,7 @@
     },
     {
       "path": "futures/programs/futures/src/lib.rs",
-      "sha256": "0f3fcb4ec9d1cf3aeae6a6ab26972ffc293e6cd425e438d4809060db4da79809",
+      "sha256": "7e66836e7a22c0669e7c7e4df77e7ab566249ce7ab4f307a33279f9103652c76",
       "executable": false
     },
     {
@@ -1504,12 +1504,12 @@
     },
     {
       "path": "futures/programs/futures/src/processor.rs",
-      "sha256": "da13fc13bc8d988aa0af1869d1c255633b1c85d10faf56a9e35cc81ddce2c200",
+      "sha256": "2ada1c6587fc3e80e1ad04dc0fd929ad2c5042741c6c8b6f2cd7dfc4bc95a3f6",
       "executable": false
     },
     {
       "path": "futures/programs/futures/src/state.rs",
-      "sha256": "b77a684139d3066fe826930dd7681825e03f704b90c67657f99330668e7526b2",
+      "sha256": "48edecca8411cfb8e3798b9a451b9c91850cce226e84fd0b82883a5d05b33d92",
       "executable": false
     },
     {
@@ -3349,7 +3349,7 @@
     },
     {
       "path": "sdk/CHANGELOG.md",
-      "sha256": "5b28b27a068156cf76dfa5672d01e5f9e70a1ee6e68890a13abdc2cb5379609d",
+      "sha256": "fb3ceed54e55f0adb9bbb0da2034cab57c747aae03ecda7e475cd78ac02c0973",
       "executable": false
     },
     {
@@ -3414,17 +3414,17 @@
     },
     {
       "path": "sdk/dist/futures/accounts.d.ts.map",
-      "sha256": "b53106ae902205f43524addbb09535f92639167039be3938a9283a383061ff4e",
+      "sha256": "c96b413b688c8345f69f7d8c2cdb072dbdd9423f06827da75eb3da04817118bc",
       "executable": false
     },
     {
       "path": "sdk/dist/futures/accounts.js",
-      "sha256": "af288cf3cb33b80a365ae1dfe31715ce64152cdcb9b0734c4db035e704b2c086",
+      "sha256": "ef28c44756e443561b2d00df820af6b56cb2f6d0e2450c26748e1516f5b2584c",
       "executable": false
     },
     {
       "path": "sdk/dist/futures/accounts.js.map",
-      "sha256": "82b10eda085c0fb23e0f73190b0cf8be61a417afd390c6f23b31e01bdceaf425",
+      "sha256": "f0bfe9cb1fe6756137c2c0ade2ed73279ef9991168ef86b620df3c3c26c4a966",
       "executable": false
     },
     {
@@ -3654,12 +3654,12 @@
     },
     {
       "path": "sdk/package-lock.json",
-      "sha256": "a235af4f6b33d865c0a2fe3acc20f2d9422a7c5954b34478a165f62624883f20",
+      "sha256": "c36faeef442c22a3daf030f4a9868cf5ad13f9bf3d2ff8b2a29a04aa044c83d9",
       "executable": false
     },
     {
       "path": "sdk/package.json",
-      "sha256": "793f68bda526a26c32c72d61d0f5b5d395b14e1aab27bbcdf0c790cb7287464b",
+      "sha256": "5c716200846ecd08afbeee5b2da723baaf9e9969b95430e22e66a5b0005787ec",
       "executable": false
     },
     {
@@ -3679,7 +3679,7 @@
     },
     {
       "path": "sdk/src/futures/accounts.ts",
-      "sha256": "e14a7ff12da6ac62642fb9e5df02ed9280b9f413b6e4d89f86165836d5e6b329",
+      "sha256": "930bbde20578f582b6e7fb711b5e7f0b2029692bb7476956100f490a81437d78",
       "executable": false
     },
     {
@@ -3744,7 +3744,7 @@
     },
     {
       "path": "sdk/test/fixtures/futures/futures.json",
-      "sha256": "dee0d6e1e362960c50cf10182bda8bb189a020c5bbb327e45bf71d55ddd1a79e",
+      "sha256": "61fc0d52fbf3b492bb966ddf514b91b81d8e6e419e9e0468a982de3512a0e435",
       "executable": false
     },
     {
@@ -3764,7 +3764,7 @@
     },
     {
       "path": "sdk/test/futures-vectors.test.mjs",
-      "sha256": "3cbd7b1eea7f339c59007fbe5712936e01928e90eedf65af8e8d334d2cc4dd33",
+      "sha256": "acf9d1968f9c1fde3aec374a0336f143ed024a284ed9b00d9b07827e6dff62e8",
       "executable": false
     },
     {
@@ -3779,7 +3779,7 @@
     },
     {
       "path": "sdk/tools/futures-vectors/src/main.rs",
-      "sha256": "9c0ae17a99486632ebae5fa3e953af9cedf30c0c36639aad3ef1a4a46fa57d33",
+      "sha256": "ad41338d5b7677fdbd264deb5079d18b8f860003d284f23d24cd9942f61d613f",
       "executable": false
     },
     {
@@ -3789,7 +3789,9 @@
     }
   ],
   "lineEndingQualification": "2 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
-  "sdkVersion": "0.4.0",
-  "sourceRelease": "release/2026-10-28-oracle-stages",
-  "deployedOracleSourceCommit": "da0e9143"
+  "sdkVersion": "0.4.1",
+  "sourceRelease": "b24a4ed2e058d2feb6122d38c445f4abe379d8d2",
+  "deployedOracleSourceCommit": "da0e9143f44635dcbce7288ea6510ddf042de215",
+  "candidateContractSourceCommit": "bcf0601606617fda7e00a818e7663d031339858f",
+  "candidateContractPublicSource": "https://github.com/amoeba-farm/amoeba-program/commit/059bd72"
 }

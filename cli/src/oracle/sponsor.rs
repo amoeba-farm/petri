@@ -393,7 +393,7 @@ pub fn outcome(a: &SourceSponsorship) -> &'static str {
 
 /// `petri oracle sponsorships`: the sponsorships the wallet paid for.
 pub fn sponsorships(ctx: &Ctx, p: Paint) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
+    let oracle = Oracle::reads(ctx)?;
     let sponsor = ctx.wallet_pubkey()?;
     let list = oracle.sponsorships(&sponsor)?;
     let mut table = Table::new(&["Source", "Product", "Bond", "Outcome", "Reward paid"]);

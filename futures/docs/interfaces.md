@@ -363,3 +363,26 @@ frozen or invalid fails preparation.
 Oracle Period version 2 permits a genuine settled value of zero. Readers still
 accept exact version 1 accounts under their original nonzero-settlement rule.
 The layout and addresses are unchanged, and new writes use version 2.
+
+
+## 7. Operator credit assessments
+
+`CreditAuthorize` is appended to the Borsh instruction enum (tag 43):
+`snapshot [u8;32]`, `exposure u64`, `action Vec<u8>`. The action is an
+unwrapped Quote or Submit, or empty to refresh. Its usual accounts start
+with the writable market and the Earn vault, followed by its operator
+(signer, writable) and the system program. The governance envelope wraps
+only the outer instruction. The operator must be the registered vault's
+operator, and the vault must be this market's credit owner.
+
+The snapshot is SHA-256 of `ameba-credit-approval-v1`, program address,
+market address, and the exact pre-action account bytes. There is no range
+parameter. The exposure is a trusted assessment of every possible later fill;
+carry, custody, and accounting remain independently enforced.
+
+Existing market offsets stay unchanged. First approval appends a 16-byte
+tail: `AFCRISK1` (8 bytes), exposure (little-endian u64). The operator pays
+rent. Readers accept the legacy exact length or that length plus this tail.
+New Quote/Submit actions replace the assessment; ordinary fills preserve its
+upper bound. Cash draws increase it; settled markets use actual settlement
+accounting. An account without the tail uses full-grid exposure.

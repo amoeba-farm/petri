@@ -781,6 +781,7 @@ fn account(status: u8, settlement_fine: u64) -> (Header, Vec<u8>) {
             cost: 45_000,
             reserved: 0,
             opened_ts: 1_791_900_000,
+            held: false,
         }),
         Some(Claim {
             lots: 2,
@@ -792,6 +793,7 @@ fn account(status: u8, settlement_fine: u64) -> (Header, Vec<u8>) {
             cost: 30_000,
             reserved: 2,
             opened_ts: 1_791_900_100,
+            held: false,
         }),
         None,
         Some(Claim {
@@ -804,6 +806,7 @@ fn account(status: u8, settlement_fine: u64) -> (Header, Vec<u8>) {
             cost: 500_000,
             reserved: 0,
             opened_ts: 1_791_900_200,
+            held: false,
         }),
         Some(Claim {
             lots: 1,
@@ -815,6 +818,7 @@ fn account(status: u8, settlement_fine: u64) -> (Header, Vec<u8>) {
             cost: 4_000,
             reserved: 0,
             opened_ts: 1_791_900_300,
+            held: false,
         }),
         None,
     ];
@@ -1343,6 +1347,11 @@ fn vault_accounts() -> Value {
 /// Every vector, as `futures.json` holds them.
 fn vectors() -> Value {
     let (open_h, open_b) = account(state::STATUS_OPEN, 0);
+    let mut approved_b = open_b.clone();
+    approved_b.extend_from_slice(&state::CREDIT_APPROVAL_MAGIC);
+    approved_b.extend_from_slice(&0u64.to_le_bytes());
+    state::set_credit_approval(&mut approved_b, &open_h, 123_456);
+    assert_eq!(Header::read(&approved_b).unwrap(), open_h);
     let (settled_h, settled_b) = account(state::STATUS_SETTLED, 61_234);
     let (failed_h, failed_b) = account(state::STATUS_FAILED, 60_000);
     json!({
@@ -1352,6 +1361,7 @@ fn vectors() -> Value {
             "address": key(81).to_string(),
             "program": program().to_string(),
             "open": book_json(&open_h, &open_b),
+            "approved": book_json(&open_h, &approved_b),
             "settled": final_json(&settled_h, &settled_b),
             "failed": final_json(&failed_h, &failed_b),
             "registry": registry(),

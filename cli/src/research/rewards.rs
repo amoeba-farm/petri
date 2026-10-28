@@ -114,7 +114,7 @@ fn fetch(
     agents: &[Key],
     months: &mut HashMap<Pubkey, (String, String)>,
 ) -> Result<ByAgent, String> {
-    let oracle = Oracle::new(ctx).map_err(|e| e.message)?;
+    let oracle = Oracle::reads(ctx).map_err(|e| e.message)?;
     let mut out = HashMap::new();
     for (id, wallet) in agents {
         let (Ok(agent), Ok(wallet)) = (skus::parse_hex32(id, "agent"), wallet.parse::<Pubkey>())

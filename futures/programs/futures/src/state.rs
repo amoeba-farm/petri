@@ -21,6 +21,10 @@ pub const AUTHORITY_SEED: &[u8] = b"authority";
 pub const MAGIC: [u8; 8] = *b"AFRANGE1";
 pub const VERSION: u8 = 1;
 pub const HEADER_LEN: usize = 512;
+/// Optional signed credit assessment, appended after the existing arenas.
+/// Existing accounts and every record offset remain unchanged.
+pub const CREDIT_APPROVAL_LEN: usize = 16;
+pub const CREDIT_APPROVAL_MAGIC: [u8; 8] = *b"AFCRISK1";
 pub const TRADER_LEN: usize = 64;
 pub const ORDER_LEN: usize = 64;
 pub const CLAIM_LEN: usize = 56;
@@ -394,7 +398,10 @@ impl Header {
             credit_flags: b[28],
             profit_bps: u16_at(b, 30),
         };
-        if b.len() != market_len(h.grid, h.trader_cap, h.order_cap, h.maker_cap, h.claim_cap) {
+        let base = market_len(h.grid, h.trader_cap, h.order_cap, h.maker_cap, h.claim_cap);
+        if b.len() != base
+            && (b.len() != base + CREDIT_APPROVAL_LEN || b[base..base + 8] != CREDIT_APPROVAL_MAGIC)
+        {
             return Err(FuturesError::InvalidAccount.into());
         }
         Ok(h)
@@ -2135,26 +2142,35 @@ impl StakePosition {
     }
 }
 
-/// How far either side of the reference value the credit owner's cash and
-/// credit must cover a settlement, in basis points of the reference (the
-/// user, 2026-10-27: "80-120", around a reference of 100). Beyond it a loss
-/// past the vault's cash and credit is a shortfall like any other: the
-/// buffer, then the staked AMBA, then the winners' payouts pro rata
-/// (`CreditSettle`, `SettleRecovery`).
-pub const CREDIT_BAND_BPS: u64 = 2_000;
+/// An operator-approved bound on exposure over all later fills of the
+/// current resting liquidity. The policy used to calculate it is not
+/// stored in the account. An account without an approval uses the full
+/// settlement grid. Only `CreditAuthorize` may replace this bound with a
+/// privately calculated one; permissionless cash draws increase it.
+pub fn credit_approval(b: &[u8], h: &Header) -> Option<u64> {
+    let base = market_len(h.grid, h.trader_cap, h.order_cap, h.maker_cap, h.claim_cap);
+    (b.len() == base + CREDIT_APPROVAL_LEN && b[base..base + 8] == CREDIT_APPROVAL_MAGIC)
+        .then(|| u64_at(b, base + 8))
+}
 
-/// The grid positions whose settlement [`credit_risk`] covers: the
-/// reference ± [`CREDIT_BAND_BPS`] of it, rounded outward, within the grid.
-/// A market without a reference covers the whole grid.
-pub fn credit_band(h: &Header) -> (u16, u16) {
-    if h.ref_fine == 0 || h.k == 0 {
-        return (0, h.grid);
+pub fn set_credit_approval(b: &mut [u8], h: &Header, exposure: u64) {
+    if credit_approval(b, h).is_some() {
+        let base = b.len() - CREDIT_APPROVAL_LEN;
+        put64(b, base + 8, exposure);
     }
-    let (r, k) = (u128::from(h.ref_fine), u128::from(h.k));
-    let lo = r * u128::from(10_000 - CREDIT_BAND_BPS) / (10_000 * k);
-    let hi = (r * u128::from(10_000 + CREDIT_BAND_BPS)).div_ceil(10_000 * k);
-    let grid = u128::from(h.grid);
-    (lo.min(grid) as u16, hi.min(grid) as u16)
+}
+
+/// Binds an approval to the exact program, market, and account bytes. A
+/// changed book, withdrawal, credit allocation, or prior approval makes
+/// an outstanding assessment unusable. No policy parameter is transmitted.
+pub fn credit_snapshot(program: &Pubkey, market: &Pubkey, data: &[u8]) -> [u8; 32] {
+    solana_program::hash::hashv(&[
+        b"ameba-credit-approval-v1",
+        program.as_ref(),
+        market.as_ref(),
+        data,
+    ])
+    .to_bytes()
 }
 
 /// What the credit owner's position in this market could cost its stakers,
@@ -2162,7 +2178,7 @@ pub fn credit_band(h: &Header) -> (u16, u16) {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct CreditRisk {
     /// Its debt less its free cash and the least it holds at any settlement
-    /// in [`credit_band`]: what its claims and inventory pay there and its
+    /// in the assessed range: what its claims and inventory pay there and its
     /// reserved cash, less what its fills could give up there (0 at best).
     pub exposure: u64,
     /// Its own free and reserved cash plus the backing its claims and
@@ -2201,7 +2217,7 @@ pub struct CreditRisk {
 ///   pairs with that fill, a whole set: it costs `c - k <= 0`). The bound
 ///   holds for every partial fill. Between grid positions payoffs are
 ///   linear and these terms convex, so the least is at a grid position.
-///   Only the settlements in [`credit_band`] count; with no fill to come
+///   Only the assessed settlements count; with no fill to come
 ///   (`resting` false) nothing is given up.
 /// * **Carry.** Per step, with net position `D` (long minus short lots), a
 ///   fill adds `k` per lot to the backing held except on the side that
@@ -2229,12 +2245,49 @@ pub fn credit_risk_with(
     resting: bool,
     work: &mut Vec<i128>,
 ) -> Option<CreditRisk> {
+    let mut r = credit_risk_in_range_with(b, h, t, resting, (0, h.grid), work)?;
+    if h.status == STATUS_OPEN && Trader::read(b, h.trader_off(t)).owner == h.credit_owner {
+        if let Some(approved) = credit_approval(b, h) {
+            // Both are upper bounds. An independently calculated full-grid
+            // bound can release headroom after cancellation or a cash deposit
+            // without waiting for the backend to issue another assessment.
+            r.exposure = r.exposure.min(approved);
+        }
+    }
+    Some(r)
+}
+
+/// Calculates exposure for a caller-selected settlement interval. This is
+/// the backend's calculation; it ignores any cached assessment. Neither
+/// the selected interval nor a default private policy is stored on chain.
+/// Carry is always checked over every grid step, independent of the range.
+pub fn credit_risk_in_range(
+    b: &[u8],
+    h: &Header,
+    t: u16,
+    resting: bool,
+    range: (u16, u16),
+) -> Option<CreditRisk> {
+    credit_risk_in_range_with(b, h, t, resting, range, &mut Vec::new())
+}
+
+fn credit_risk_in_range_with(
+    b: &[u8],
+    h: &Header,
+    t: u16,
+    resting: bool,
+    range: (u16, u16),
+    work: &mut Vec<i128>,
+) -> Option<CreditRisk> {
+    if range.0 > range.1 || range.1 > h.grid {
+        return None;
+    }
     if h.status == STATUS_OPEN {
-        if let Some(r) = credit_risk_fast(b, h, t, resting, work) {
+        if let Some(r) = credit_risk_fast(b, h, t, resting, range, work) {
             return Some(r);
         }
     }
-    credit_risk_exact(b, h, t, resting, work)
+    credit_risk_exact(b, h, t, resting, range, work)
 }
 
 /// Below this, a product of two values fits an `i64` with room: lots,
@@ -2279,6 +2332,7 @@ fn credit_risk_fast(
     h: &Header,
     t: u16,
     resting: bool,
+    range: (u16, u16),
     work: &mut Vec<i128>,
 ) -> Option<CreditRisk> {
     let tr = Trader::read(b, h.trader_off(t));
@@ -2371,7 +2425,7 @@ fn credit_risk_fast(
     // ask's there and a bid's at or above it (`bid_escrow` in all, at the
     // end), at the step's best price for every lot, a bound.
     let (mut bid_escrow, mut ask_escrow) = (0i64, 0i64);
-    let (band_lo, band_hi) = credit_band(h);
+    let (band_lo, band_hi) = range;
     let mut least = i64::MAX;
     let mut floor = 0i64;
     let mut x_k = 0u64;
@@ -2697,6 +2751,7 @@ fn credit_risk_exact(
     h: &Header,
     t: u16,
     resting: bool,
+    range: (u16, u16),
     work: &mut Vec<i128>,
 ) -> Option<CreditRisk> {
     let tr = Trader::read(b, h.trader_off(t));
@@ -2843,7 +2898,7 @@ fn credit_risk_exact(
     let mut bid_backed = bid_backed_total;
     // Its ladder lots' escrow below the position (`escrow`).
     let (mut bid_escrow, mut ask_escrow) = (0i128, 0i128);
-    let (band_lo, band_hi) = credit_band(h);
+    let (band_lo, band_hi) = range;
     let mut long: Vec<(i128, i128)> = Vec::with_capacity(n + orders.len());
     let mut short: Vec<(i128, i128)> = Vec::with_capacity(n + orders.len());
     for x in 0..=h.grid {
@@ -3542,9 +3597,16 @@ mod tests {
                 }
             }
             for resting in [false, true] {
-                let want = credit_risk_exact(&b, &h, t, resting, &mut Vec::new());
-                assert_eq!(credit_risk(&b, &h, t, resting), want);
-                match credit_risk_fast(&b, &h, t, resting, &mut Vec::new()) {
+                let lo = next(u64::from(h.grid) + 1) as u16;
+                let hi = lo + next(u64::from(h.grid - lo) + 1) as u16;
+                let range = if round % 2 == 0 {
+                    (lo, hi)
+                } else {
+                    (0, h.grid)
+                };
+                let want = credit_risk_exact(&b, &h, t, resting, range, &mut Vec::new());
+                assert_eq!(credit_risk_in_range(&b, &h, t, resting, range), want);
+                match credit_risk_fast(&b, &h, t, resting, range, &mut Vec::new()) {
                     Some(got) => {
                         assert_eq!(Some(got), want, "round {round} resting {resting}");
                         counted += usize::from(got.exposure > 0 && got.carry > 0);

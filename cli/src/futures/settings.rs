@@ -204,6 +204,13 @@ impl Settings {
             color: !cli.no_color,
         }
     }
+
+    /// Whether the RPC is the profile's own (no flag, environment or config
+    /// set one): oracle reads then take their program scans from the futures
+    /// API (`oracle::chain::Oracle::reads`).
+    pub fn default_rpc(&self) -> bool {
+        self.rpc_url.1 == Source::Default
+    }
 }
 
 #[cfg(test)]
@@ -232,6 +239,23 @@ mod tests {
             ameba_sdk_futures::futures::governance::PRODUCTION_CONTROLLER_PROGRAM_ID.to_string(),
             "8fhNi6QHU5TYNhoPDM4vs89ZBztnpxp3LnBXRgkBVKtx"
         );
+    }
+
+    #[test]
+    fn only_the_profiles_own_rpc_is_the_default() {
+        assert!(settings(&["petri"], Default::default()).default_rpc());
+        assert!(
+            !settings(
+                &["petri", "--rpc", "https://rpc.example"],
+                Default::default()
+            )
+            .default_rpc()
+        );
+        let file = petri_config::FuturesConfig {
+            rpc_url: Some("https://rpc.example".into()),
+            ..Default::default()
+        };
+        assert!(!settings(&["petri"], file).default_rpc());
     }
 
     /// A release build (no `dev-chain`) with no config talks to production.

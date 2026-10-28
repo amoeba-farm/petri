@@ -233,6 +233,21 @@ function header(h) {
   return Object.fromEntries(HEADER_KEYS.map((k) => [k, plain(h[k])]));
 }
 
+test("an operator-assessed market preserves all existing record offsets", () => {
+  const data = bytes(v.accounts.approved.data);
+  const book = FuturesBook.decode(data);
+  const legacy = FuturesBook.decode(bytes(v.accounts.open.data));
+  assert.deepEqual(plain(book.header), plain(legacy.header));
+  assert.deepEqual(plain(book.traders()), plain(legacy.traders()));
+  assert.deepEqual(plain(book.orders()), plain(legacy.orders()));
+  assert.deepEqual(plain(book.claims()), plain(legacy.claims()));
+  assert.deepEqual(plain(book.makers()), plain(legacy.makers()));
+  const bad = Uint8Array.from(data);
+  bad[data.length - 16] ^= 1;
+  assert.throws(() => FuturesBook.decode(bad), FuturesAccountError);
+  assert.throws(() => FuturesBook.decode(data.subarray(0, data.length - 1)), FuturesAccountError);
+});
+
 test("the market account decodes every record as the program stores it", () => {
   const a = v.accounts.open;
   const data = bytes(a.data);
