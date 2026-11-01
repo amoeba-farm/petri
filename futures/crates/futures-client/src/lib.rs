@@ -1585,11 +1585,31 @@ impl Book {
         now: u64,
         range: (u16, u16),
     ) -> bool {
+        let limit = self.header.credit_limit;
+        self.quote_admits_within(owner, l, core, knots, now, range, limit)
+    }
+
+    /// As [`Book::quote_admits_in_range`], the credit owner's exposure
+    /// within `limit` (never more than its market's credit limit):
+    /// futures-maker quotes within the credit it keeps in a market, so that
+    /// what it hands back can leave (`CreditDefund` never goes below the
+    /// exposure its quotes hold).
+    #[allow(clippy::too_many_arguments)]
+    pub fn quote_admits_within(
+        &self,
+        owner: &Pubkey,
+        l: &Ladder,
+        core: Core,
+        knots: &[Knot],
+        now: u64,
+        range: (u16, u16),
+        limit: u64,
+    ) -> bool {
         self.quote_risk_in_range(owner, l, core, knots, now, range)
             .is_some_and(|r| {
                 !self.header.has_credit()
                     || self.header.credit_owner != *owner
-                    || r.exposure <= self.header.credit_limit
+                    || r.exposure <= limit.min(self.header.credit_limit)
             })
     }
 

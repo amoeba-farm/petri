@@ -145,6 +145,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "ameba-oracle-heads"
+version = "0.1.0"
+
+[[package]]
 name = "ameba-oracle-interface"
 version = "0.2.0"
 dependencies = [
@@ -164,6 +168,7 @@ name = "ameba_oracle"
 version = "0.1.0"
 dependencies = [
  "ameba-governance-interface",
+ "ameba-oracle-heads",
  "ameba-oracle-interface",
  "borsh 0.10.4",
  "solana-program",
@@ -173,10 +178,11 @@ dependencies = [
 
 [[package]]
 name = "amoeba"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "aes-gcm",
  "ameba-commodity-spec",
+ "ameba-oracle-heads",
  "ameba-sdk",
  "ameba_oracle",
  "amoeba-evidence",

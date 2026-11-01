@@ -103,7 +103,7 @@ error codes (base `0x46520000`).
   "computeUnitLimit": 1400000,
   "preparedTtlSecs": 90,
   "sponsorship": { "researcherBps": 2000, "retentionBps": 2000,
-                   "lookupTables": { "RAMX-1796083200": "<address lookup table>" } },
+                   "lookupTables": { "RAMX-1798761600": "<address lookup table>" } },
   "evidence": { "webProof": {
     "notary": "/oracle/notary",
     "policy": "amoeba-webproof-verifier-policy-v1/dev",
@@ -1913,6 +1913,50 @@ served the same way.
 Each product's periods, from the same read as the snapshot (same protocol
 and freshness), for the research service.
 
+### `GET /v1/oracle/accounts` [added 2026-10-28]
+
+```text
+GET /v1/oracle/accounts?size=<bytes>[&memcmp=<offset>:<hex>]...
+200 { ok: true, data: { programId, size, slot, observedAt (unix ms),
+                        accounts: [{ address, lamports, data (base64) }] } }
+```
+
+The oracle program's accounts of one layout, for reads that would otherwise
+scan the program themselves: petri's `oracle challenges`, `prints`,
+`updates`, `stakes`, `rewards` and `sponsorships` (and its TUI's Rewards
+view) take their `getProgramAccounts` from here while no RPC is set, since
+Solana's public RPC turns a caller away after a few scans in a row.
+
+* `size` is a layout's exact data size; the served layouts are the ones
+  those reads scan: period (`Period::LEN`), source (352), source challenge,
+  opening challenge (the size of an update claim too), evidence link (251),
+  update claim, update challenge, support position and sponsorship (their
+  `LEN`s in the `ameba_oracle` crate), and **[added 2026-10-29]** oracle
+  v2's heads layouts (`state::heads`, their `LEN`s): heads config, board,
+  stake, head, delegation, claim, challenge, contract and epoch. A contract's weights accounts have no fixed size:
+  read them by address. Another size is 404
+  `ORACLE_ACCOUNTS_LAYOUT_UNKNOWN` (the message lists the served sizes).
+* Each `memcmp` keeps the accounts whose bytes at `offset` are the hex bytes
+  (as an RPC's `memcmp` filter: an account too short does not match);
+  any number of them, all must match. A missing or repeated `size`, a
+  malformed `memcmp` or any other parameter is 400
+  `ORACLE_ACCOUNTS_QUERY_INVALID`.
+* One `getProgramAccounts` (by size, at `confirmed`, from the API's own RPC)
+  serves every caller and every filter: it is kept until an oracle
+  transaction lands after it (the oracle program's `logsSubscribe` at
+  `processed`; a read whose `slot` is behind that transaction is read again)
+  or it is 2 minutes old (the age at which the snapshot is stale: a
+  reconnecting subscription can miss one), so at most one read per layout
+  per 2 minutes while nothing changes. Callers at the same moment share one
+  read. `slot` is the read's
+  slot, `observedAt` when it was made.
+* Accounts are by address. Every one is owned by `programId` (the
+  configured oracle program, `programs.oracle`) and has exactly `size`
+  bytes; nothing else is checked here: readers decode and check them as
+  they would an RPC's (petri: layout, canonical address).
+* Without an oracle program configured it is 404 `ORACLE_ACCOUNTS_NO_PROGRAM`;
+  a failed read is 503 `ORACLE_ACCOUNTS_UNAVAILABLE` (nothing kept).
+
 ### Manifest
 
 `futures-ops bootstrap` writes the oracle into the deployment manifest:
@@ -1924,7 +1968,7 @@ and freshness), for the research service.
   "releaseCommit": "<oracle source commit>",
   "periods": { "RAMX-1793491200": "<Period>", "NANDX-1793491200": "<Period>" },
   "months":  { "RAMX-1793491200": "<OracleMonth>", "NANDX-1793491200": "<OracleMonth>" },
-  "sponsorLookupTables": { "RAMX-1796083200": "<address lookup table>" }
+  "sponsorLookupTables": { "RAMX-1798761600": "<address lookup table>" }
 }
 ```
 
@@ -1945,6 +1989,340 @@ address is left out (logged). The section drives
 `programs.oracle`, the index months and the `/v1/oracle/*` reads.
 `FUTURES_ORACLE_PROGRAM` names the oracle program for the reads only (not the
 index) while the manifest has no `oracle` section.
+
+## Oracle heads [added 2026-10-29]
+
+Oracle v2, "heads on pikes" (`oracle/docs/heads.md`), with the long-term
+agreement channel layer (`oracle/docs/lta.md`), on dev: stakers stake AMBA
+into the oracle and delegate it to sources ("heads"), each source's
+delegation is its weight (no caps: a source weighs its time-weighted raw
+delegation), and a contract settles on the weighted median of its sources'
+changes per component.
+Every board's items (its basket members) are observed in three channels,
+Spot, Contract and LTA: a **component** is one `(item, channel)` pair, at
+index `item * 3 + channel` (spot 0, contract 1, LTA 2), with its own target
+sentence, heads and median. Contracts are quarterly ("RAMX Q1 2027", expiring
+at the quarter's end) and settle on the **fixed-mix blend**: each item at its
+fixed-mix reference, the quarter's `[spot, contract, LTA]` mix (the molds'
+schedule, frozen on the contract at listing, an assumed scenario) over its
+three channels' changes, the items by their basket weights.
+
+The boards are read by address, never by a scan of the oracle's accounts
+(**[changed 2026-10-29]**: on the one-core dev validator each
+`getProgramAccounts` of the oracle takes seconds), and served from memory:
+no RPC per request. A read is a few `getMultipleAccounts`: the heads config
+and the RAMX, NANDX and BATX boards (their PDAs), each board's heads
+(`0..head_count`) and the contracts of its contract ring, then the weights of
+contracts past their freeze, new heads' sealed spec objects and the heads'
+open claims (from where the last read found the lowest one open: a final
+claim stays final). It runs at most every 30 s: within 30 s of the last read
+once an oracle transaction landed since it (the oracle program's
+`logsSubscribe`), and every 2 minutes while none does. Without the heads
+config account (an oracle built or deployed without heads) a read is that
+one account and the boards are `[]`. What has no address to read by is read
+on request only and kept 30 s: a wallet's claims and challenges
+(`GET /v1/accounts/:owner/heads`), a head's challenges and delegations
+(`GET /v1/oracle/heads/:product/:headId`), each one `getProgramAccounts` by
+the account's exact size and a `memcmp` on the wallet or head at its field;
+a wallet's stake and delegations, and a head's claims, are read by address
+with them. Every account is checked as the program loads it
+(owner, exact length, discriminator, version, field domains, zero tail,
+invariants, canonical PDA); one that fails is left out (logged). The numbers
+the reads add (shares, thresholds, the channels' changes, the
+references, the index, positions) are `ameba_oracle::heads_view`'s, the code
+ops and the chain read a board with, on `ameba-oracle-heads`' arithmetic.
+They are the board **now**: settlement uses the time-weighted settlement
+weights the program collects at freeze.
+
+These routes answer bare JSON (no `{ ok, data }` envelope); errors are the
+API's `{ "error": "<sentence>" }`: 404 for an unknown product, head or
+period, 400 for a malformed one, 503 before the first read since start or
+when a wallet's or head's accounts can't be read.
+Amounts are decimal strings of atoms (AMBA nine decimals, USDC six; values
+in the oracle's six-decimal scale), times unix seconds of the chain clock
+(`null` for one that has not happened), statuses lower-case, products
+upper-case. The contract fixture is `api/api/fixtures/oracle-heads.json`:
+its `heads`, `account`, `emptyAccount`, `prepareRequests`, `prepared` and
+`refusal` are the site's documents (every field they hold is served, in
+kind); its `channels` section is exactly what the API serves over the
+test chain of `oracle/heads/tests.rs` (`GET /v1/oracle/heads`, one head,
+one wallet, a contract and its terms), regenerated with
+`HEADS_FIXTURE_WRITE=1 cargo test --release channels_fixture`.
+
+### `GET /v1/oracle/heads` → `{ boards: [Board], updatedAt }`
+
+`updatedAt` is the chain clock at the read. Boards: RAMX, NANDX, BATX, in
+that order (those with a board). A board's contracts are those of its
+contract ring.
+
+```text
+Board = { product, address, params: Params, components: [Component],
+          totals: { delegation, liveDelegation, reserve, prizePool },
+          thresholds: { minPost, activation },
+          heads: [Head], contracts: [ContractSummary],
+          settlementTarget ("fixed-mix"|"contract-channel"), quarter ("Q4 2026"),
+          disclosure (the listing's sentence|null), items: [Item], index: Index }
+Params = every board parameter (spec §7) in camelCase: slashRateBps, maxStrikes, proposerSlashBps,
+         prizeCutBps, baseFillPrize, fillPrizeSlopePpb,
+         baseUpdatePrize, updatePrizeSlopePpb, claimBond, challengeBond, challengeWindowSecs,
+         challengeExtensionSecs, headTtlSecs, cooldownSecs, minDelegators, minLiveSources,
+         minSettleWeight, alphaBps, floorPost, betaBps, floorActivate, settlementBusinessDays,
+         maxLiabilityBps (1 - (1 - slashRate)^maxStrikes); atom amounts and ppb slopes are strings,
+         bps, counts and seconds numbers
+Component = { index (item * 3 + channel), bucketId (hex), label ("DDR5 16Gb Contract"),
+              basketWeightBps, liveSources, item, channel ("spot"|"contract"|"lta"), liveOrigins,
+              settles, sentenceHash (hex|null) }
+Head = { id, address, product, component, name, spec, specHash, accessClass
+         ("public-page"|"login-zktls"|"offline-quote"|"physical"), proposer,
+         status ("open"|"active"|"live"|"retired"|"expired"), delegation, delegators,
+         postedAt, expiresAt, activeAt, liveAt, retiredAt, strikes, value, sourceTs,
+         shareBps, openClaims, openChallenges,
+         weights: [{ period, rawWeight, effectiveWeight }],
+         channel, componentLabel, originId (hex|null), duplicate }
+ContractSummary = { period, expiry, status ("live"|"frozen"|"settled"), listingTs, freezeTs,
+                    address, quarter ("Q1 2027"), label ("RAMX Q1 2027"), settlementTarget, disclosure,
+                    indexChangePpm (number|null), value (string|null) }
+Item = { index, bucketId, name ("DDR5 16Gb"), basketWeightBps, mixBps: { spot, contract, lta },
+         mixBasis ("none"|"assumed"|"matched"), mixReason (the mold's, or null),
+         components: [ItemComponent] (Spot, Contract, LTA), reference: Reference }
+ItemComponent = { index, channel, label, settles, indexWeightBps, sentence (the mold's text|null),
+                  sentenceHash (on chain), sentenceMatches (the mold's hash is the on-chain one|null),
+                  liveSources, liveOrigins, origins: [hex],
+                  sources: [{ head, shareBps, duplicate, origin, delegation, weight,
+                              level, opening, changePpm }],
+                  changePpm (number|null), reading: Reading }
+Reading = { status: "no-contract" } | { status: "live", changePpm, eligibleSources, duplicateSources,
+            weight } | { status: "degraded", reason
+            ("too-few-origins"|"too-little-weight"|"freeze-check-failed") } | { status: "settled",
+            changePpm, live, reason }
+Reference = ({ available: true, changePpm, assumed, flagged, recorded }
+          | { available: false, code ("no-contract"|"mix-basis-none"|"invalid-mix"), channel: null,
+              reason (a sentence) })
+            & { channels: [{ channel, mixBps, changePpm, status, degraded, reason }] }
+Index = { contract (period|null), status ("indicative"|"settled"|"unavailable"), changePpm, value,
+          degradedComponents: [index], reason (a sentence|null) }
+```
+
+* `components` lists every component of the board (three per item). A
+  component's `basketWeightBps` is its weight in the index its target settles:
+  under the fixed mix the item's basket weight times its mix share of the
+  channel (they add up to 10,000 for every mold), and `settles` is true where
+  that share is above zero; under the Contract-channel target (the brief's
+  Stage 1, kept for a contract listed so) the item's basket weight on its
+  Contract component and 0 on Spot and LTA.
+* `quarter` is the quarter the board's mixes are for: the front contract's,
+  else the quarter a listing now covers (the one holding now). Each item's
+  `mixBps`/`mixBasis` are the front contract's, frozen for its quarter at
+  listing; without a contract, the molds' schedule for that quarter
+  (`MoldItem::mix_for`), labelled `assumed`.
+* `heads`: live sources first by delegation, then active, open, retired and
+  expired heads. `spec` is the head's sealed kind-2 spec object's text (`""`
+  while it can't be read); `specHash` its commitment. `value`/`sourceTs` are
+  the last standing print (`null` before a fill). `shareBps` is a live
+  source's share of its component's weight, in basis points: against the
+  front contract its raw weight in it so far (its time-weighted live
+  delegation over the window, what settlement weighs; no caps), without one
+  its delegation now; a component's shares add up to 10,000 by largest
+  remainder; `0` for a live duplicate, `null` for a head that is not live.
+  `duplicate`: an earlier live source of the component declares its origin
+  (no weight, no origin count, no delegator share). `openChallenges` counts
+  the head's unruled claim and source challenges. `weights` has one entry
+  per open contract the head weighs in: `rawWeight` its time-weighted live
+  delegation over the window so far (from the listing capture or its
+  accrual), `effectiveWeight` the settlement weight the contract recorded for
+  it (`null` until its component settles). There are no fetcher seats or
+  votes: a claim (fill or update) is open to anyone, bonded.
+* `disclosure` is the sentence the listing discloses ("This contract measures
+  periodic wholesale procurement outside LTAs."), from the listing terms
+  document of the front contract (a contract summary's: its own), else the
+  one the next listing would carry.
+* `thresholds`: `minPost = max(floorPost, alpha * D / n)` and `activation =
+  max(floorActivate, beta * median)` over the live sources that carry weight
+  (spec §6), as the board stands.
+* `items` and `index` are read against the **front contract**: the open
+  contract with the nearest expiry that still accumulates, else the nearest
+  collecting weights; `null`/`"no-contract"`/`"unavailable"` without one. A
+  component's change is the settlement rule (`settle::settle_component`) on
+  its sources now: each live source's level now (its latest accepted print;
+  on the LTA channel the latest still in effect, a print past its own reset
+  being no level) over its opening in that contract (its listed value, or
+  its fill value when it went live inside the window), weighted by its raw
+  weight. `"degraded"` says why it would fall to its last valid value. The
+  reference is `channels::reference` on the three channels with the item's
+  mix: under the fixed mix it is what the item settles at, flagged when the
+  mix is an assumed scenario; each of `reference.channels` says whether that
+  channel would settle on its degraded path, held at its last valid value
+  (before it settles, its listing value, 0). Recorded values replace the
+  indicative ones once the contract recorded them. `index` is the front
+  contract's target on its items (the fixed mix: `Σ basketWeight ×
+  reference`; `degradedComponents` the components the mix weighs that would
+  settle degraded), `value` the settlement value on its base; a settled
+  contract's are the published ones. The maker's reference index for a
+  heads contract (`sampler`) is this value.
+
+### `GET /v1/oracle/heads/:product` → `Board`
+
+One board (`RAMX`, any case), as above.
+
+### `GET /v1/oracle/heads/:product/:headId` → `HeadDetail`
+
+`Head` with (no `fetchers`: the program has no fetcher seats):
+
+```text
+claims: [{ address, seq, kind ("fill"|"update"), fetcher, value, sourceTs, originId,
+           lta: { effectiveFrom, nextReset, floor, ceiling } | null, evidence: { kind, commitment,
+           object } | null, bond, committedAt, revealedAt, windowEndsAt, challenges,
+           status ("committed"|"open"|"challenged"|"accepted"|"rejected"|"expired"), prize }]
+challenges: [{ address, target ("claim"|"source"), seq (the claim's|null), claim (address|null),
+               challenger, reason ("value-or-other"|"off-channel"|"duplicate-origin"|
+               "expired-observation"), bond, alternativeValue, alternativeSourceTs, evidence,
+               openedAt, ruledAt, status ("open"|"upheld"|"dismissed"|"settled"), payout, payoutAmba }]
+delegations: [{ address, owner, amount, cooling, escrow, proposer }]
+prints: [{ sourceTs, value (, effectiveFrom, nextReset on the LTA channel) }]  // newest first
+```
+
+Claims newest first; a claim's `prize` is what it was paid once claimed,
+its prize points once it stood, the prize it would earn while open
+(`rewards::fill_prize`/`update_prize` on the head's delegation), `"0"` once
+it fell or expired. The claims (by address), challenges and delegations (a
+scan each, by the head) are read at the first request and kept 30 s; the
+head itself is the board's.
+
+### `GET /v1/accounts/:owner/heads`
+
+```text
+200 { stake: { free },
+      delegations: [{ head, product, amount, cooling, escrow, cooldownEndsAt, rewards }],
+      claims: [{ address, head, product, seq, kind, value, sourceTs, bond, windowEndsAt, status, prize }],
+      challenges: [{ address, target, head, product, claim, bond, status, payout }],
+      rewards }
+```
+
+An owner with nothing gets this document empty (`free: "0"`, `[]`,
+`rewards: "0"`), never 404. The stake and the delegations (by address, on
+the boards' heads) and the claims and challenges (a scan each, by the
+wallet) are read at the first request and kept 30 s. A delegation's position is
+`heads_view::position`, what the next `SyncDelegation` would see: `amount`
+its active and fresh delegation; of what it undelegated, `escrow` what the
+head's remaining strikes can still take (the proposer's: what a lost source
+challenge takes) while it is exposed (an open contract overlapped its active
+time, or a case on its head opened while it was active), the rest
+`cooling`, back after `cooldownEndsAt`; `rewards` its accrued USDC plus what
+the board's reward index added since while its head is a live source that
+carries weight. `rewards` at the top is their sum.
+
+### `GET /v1/oracle/heads/contracts/:period` → `Contract`
+
+`ContractSummary` with `product`, `base`, `termsHash`, `digest` (the
+settlement record's, `null` before), `settledAt`, `items` (as a board's,
+against this contract: its frozen items, mixes, sentences and caps, its
+params), `index` and `listed: [{ head, component, duplicate, opening }]`
+(the sources live at its listing).
+
+### `GET /v1/oracle/heads/contracts/:period/terms`
+
+```text
+200 { period, product, expiry, settlementTarget, molds, moldsSha256,
+      document (the listing terms document), documentSha256, termsHash (the contract's), matches,
+      sentences: [{ index, item, bucketId, channel, sentence, sentenceSha256, onChain, matches }] }
+```
+
+`document` is `ameba_commodity_spec::molds::listing_terms_document(product,
+expiry)`: `amoeba-oracle-listing-terms-v1\n` and compact JSON naming each
+component's sentence by its hash; `matches` says whether its SHA-256 is the
+commitment the contract listed with. `sentences` are the mold's texts of the
+contract's components beside the hashes it froze.
+
+### `POST /v1/oracle/heads/prepare`
+
+An unsigned transaction for one heads action, built with
+`ameba_oracle::instruction::heads` (tag 210), bound to the oracle's
+governance gate when the deployment has one (as every API-built oracle
+transaction: the gate account and the epoch tail appended), simulated
+before it is returned (no signature check, the latest blockhash). The
+request is the site's, byte for byte (the fixture's `prepareRequests`);
+`payer` is optional, and petri's `sync` takes the same shape. There is no
+`vote-fetcher` (the program has no fetcher seats or votes; claims are open
+to anyone) and no claim, challenge or prize action here: petri builds those.
+
+```text
+{ action: "stake",         owner, amount }
+{ action: "unstake",       owner, amount }                       // free stake to the wallet
+{ action: "delegate",      owner, product, head, amount }
+{ action: "undelegate",    owner, product, head, amount }
+{ action: "post",          owner, product, component, name, spec, accessClass, amount }
+{ action: "claim-rewards", owner [, product, head] }             // every delegation with rewards, or that one
+{ action: "sync",          owner, product, head }                // the owner's own delegation
+  [, payer: "owner"|"sponsor"]
+200 { transaction (base64, legacy), summary (one sentence), action, owner, version: "legacy",
+      payer ("owner"|"sponsor"), feePayer, blockhash, lastValidBlockHeight, instructions: [label],
+      simulated, unitsConsumed, rentLamports, sponsorRentLamports,
+      id, expiresAt (sponsored only), before: [{ transaction, summary, version, id? }] (post only, when needed),
+      head, specHash, specObject (post), rewards (claim-rewards) }
+400|422 { error: "<one plain sentence>", logs? }
+```
+
+* Amounts are canonical decimal strings of atoms, positive. Any other field,
+  a missing one, a product other than RAMX/NANDX/BATX, a malformed wallet
+  is 400 (`"That request isn't one oracle staking takes."` or a sentence
+  naming the field).
+* 422 when the oracle (or the wallet) would refuse, in plain words, for
+  example `"You have 2,500 AMBA staked and free. Stake more AMBA to delegate
+  3,000."`, `"Your wallet holds 9,000 AMBA."`, `"You can unstake up to 2,500
+  AMBA."`, `"You can undelegate up to 5,000 AMBA."`, `"Posting takes at least
+  4,480 AMBA."` (`minPost` of the board as it is), `"Nothing to claim yet."`,
+  `"Oracle staking isn't open on this network yet."`; a failed simulation is
+  422 with its error worded (`InsufficientHeadsStake`: "You don't have
+  enough free AMBA staked in the oracle for that.", a missing fee: "You need
+  a little SOL (about 0.003) in this wallet to pay the network fee.", a tag
+  210 the deployed oracle does not route: "The oracle on this network doesn't
+  take this yet.") and its `logs`. 503 when the chain can't be read or
+  simulated.
+* Every transaction asks for 1,400,000 compute units and a 256 KiB heap frame
+  (the board, a contract and heads decode onto the heap). Owner-paid, it
+  calls only the compute budget program, the oracle and, for `unstake` to a
+  wallet without an AMBA account, the associated token program
+  (`createAmbaAta`, paid by the fee payer).
+* **Who pays** (the site's rule since 2026-10-19). `payer: "owner"`: the
+  owner is the fee payer and only signer, pays every rent, may let its
+  wallet change the transaction, and sends it through `/rpc/sendTransaction`;
+  nothing is stored. `payer: "sponsor"` (a Google/Magic wallet): the API's
+  sponsor is the fee payer, the owner signs, and `/v1/tx/submit` co-signs it
+  with the returned `id` (90 s), as it does a futures action. Without
+  `payer`, the owner pays when its SOL covers a fee allowance of 100,000
+  lamports per transaction plus every rent the transaction creates (and stays
+  rent-exempt), else the sponsor does. The fee payer is also the heads
+  instructions' `payer` (account 0, ahead of the owner): it pays the rent of
+  the stake account, a delegation, a head and the spec object, and the
+  accounts that close (delegations) record it as
+  `rent_payer` and give the rent back to it, never to the owner, so a
+  sponsored wallet's rent can't be farmed; `sync` names the delegation's
+  recorded `rent_payer`. The oracle balance (`InitUserCollateral`, opened by
+  a first `claim-rewards`) takes its rent from the owner and never closes, so
+  a sponsored transaction first moves the owner's shortfall for it from the
+  sponsor (`sponsorRent`, a plain transfer: the only System instruction a
+  sponsored transaction carries; `sponsorRentLamports`). Owner-paid parts
+  have no System instruction and no `id`; every sponsored part, `before`
+  ones included, is legacy and has its own `id`.
+* `post`: the spec is sealed as a kind-2 evidence object of `"<name>. <spec>"`
+  (at most 4,096 bytes; the head's `spec`), committed by its SHA-256
+  (`specHash`), and the post names it (`specObject`). Its writes (192 bytes
+  each) go in the post's own transaction while they fit (about 380 bytes of
+  spec), written (and paid) by the payer and sealed with the post. A longer
+  spec's leading writes come as `before` transactions (three writes each) to
+  land in order first, and only the first of all the transactions is
+  simulated (`simulated: false` on the main one); those uploads are the
+  owner's, at its own rent, even when sponsored (they need the owner's
+  signature to be co-signed, and a draft the owner could close is never
+  sponsor-funded): a sponsored wallet without that SOL is 422 "Add about …
+  SOL to this wallet for the spec upload this opens, or shorten the spec."
+  An object already sealed is not written again; an unfinished draft of the
+  same text is continued, one of another text refuses ("close evidence draft
+  … first"). `amount` is at least the board's `minPost` and at most the free
+  stake; `head` is the id the post takes (the board's head count).
+* `claim-rewards` claims into the owner's oracle balance (`UserCollateral`,
+  opened first when it has none), as many delegations as fit one transaction
+  (the summary says when some are left).
 
 ## Oracle source candidates [added]
 
@@ -2619,6 +2997,8 @@ enable` registers it for both.
 | `earn`, `stake`, `news`, `oracle_catalog` | `GET /v1/earn`, `/v1/stake`, `/v1/news`, `/v1/oracle/catalog` |
 | `oracle_months`, `oracle_sources` (`market`, `expiry`) | `GET /v1/oracle/public-snapshot`: `state.months` or `sourceLinks` of that market or month, with `protocol` and `freshness` |
 | `oracle_candidates` (`marketId, expiryId, agentId, after, limit`) | `GET /oracle/source-candidates` |
+| `oracle_heads` (`product`, `head`) **[added 2026-10-29]** | `GET /v1/oracle/heads`, `.../:product`, `.../:product/:headId` |
+| `account_heads` (`owner`) **[added 2026-10-29]** | `GET /v1/accounts/:owner/heads` |
 | `prepare_order` (`owner`, the order, `withdraw`, `payer`) | `POST /v1/tx/quote-prepare` |
 | `prepare_transaction` (`owner, action, params, payer`) | `POST /v1/tx/prepare` |
 | `submit_transaction` (`id, transaction`) | `POST /v1/tx/submit` |

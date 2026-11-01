@@ -1,6 +1,6 @@
 [package]
 name = "amoeba"
-version = "0.1.21"
+version = "0.1.22"
 edition = "2024"
 description = "Petri, the open-source Rust CLI and terminal interface for Amoeba markets"
 license = "Apache-2.0"
@@ -31,6 +31,9 @@ ameba_sdk_futures = { package = "ameba-sdk", path = "../sdk" }
 # localnet dev profile, so its compiled-in program id is never used; every
 # builder takes the trusted deployment's oracle id.
 ameba_oracle = { path = "../oracle/programs/ameba_oracle", features = ["no-entrypoint"] }
+# Oracle v2's shared arithmetic (oracle/crates/heads): thresholds, prizes, escrow, months, the
+# channels' LTA terms, as the program and `ameba_oracle::heads_view` compute them.
+ameba-oracle-heads = { path = "../oracle/crates/heads" }
 # Authenticated evidence (evidence/): the shared verifier and the web-proof
 # prover (TLSNotary). The prover needs Rust 1.95 (rust-toolchain.toml).
 amoeba-evidence = { path = "../evidence/crates/evidence" }

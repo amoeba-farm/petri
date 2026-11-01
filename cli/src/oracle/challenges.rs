@@ -705,7 +705,7 @@ pub fn list(
     expiry: Option<&str>,
     owner: Option<&str>,
 ) -> Result<Report> {
-    let oracle = Oracle::new(ctx)?;
+    let oracle = Oracle::reads(ctx)?;
     let owner = match owner {
         Some(text) => Some(ctx.owner(Some(text))?),
         None => ctx.wallet_pubkey().ok(),

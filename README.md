@@ -6,13 +6,14 @@ source dependencies they build against. Start with [Petri's guide](cli/README.md
 or [the SDK](sdk/README.md).
 
 The source is mirrored from Amoeba monorepo commit
-`efc87f6a279caec6b4bfef8084fd1745d7a808ea`.
-Petri `0.1.21` uses the released 0.1.19 client implementation with the shared
-market-account decoder updated for operator-approved credit. Concurrent client
-API-cache changes are excluded. Existing market accounts remain supported.
-The Preview binaries workflow builds unsigned Windows and macOS packages.
-The SDK `0.4.1` package is prepared; npm publication is not claimed.
-The selected backend policy is not included in this repository.
+`d892799c605001955d2f760eb128a0174c180671` (release `2026-11-01-petri-heads`);
+its CLI version is `0.1.22` and its SDK version `0.4.1`. Petri 0.1.22 adds
+oracle v2's heads boards, which the Mainnet oracle runs since 2026-10-31.
+Unsigned v0.1.22 preview packages for Windows and macOS are built from this
+commit by the Preview binaries workflow and published on this repository's
+Releases page. The v0.1.9 and earlier previews contain older code for a
+retired deployment. The selected backend credit policy is not included in
+this repository.
 
 Build from `cli/` with Rust 1.95.0: `cargo build --release --locked`.
 The `sdk/`, `futures/`, `oracle/`, and `governance/` directories preserve upstream

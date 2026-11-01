@@ -1,6 +1,6 @@
 # Welcome to Amoeba Farm
 
-Amoeba Farm is a futures market on hardware component prices. Two indexes trade: **RAMX** tracks DRAM memory chip prices, and **NANDX** tracks NAND flash chip prices. A third index, **BATX**, tracks lithium-ion battery cell prices in China. BATX is a prototype, and its first month is BATX Nov 26. You trade **capped futures**: a long or a short on a range of one index, paid for up front and settled in USDC at the market's expiry. Nothing physical is delivered.
+Amoeba Farm is a futures market on hardware component prices. Two indexes trade: **RAMX** tracks DRAM memory chip prices, and **NANDX** tracks NAND flash chip prices. A third index, **BATX**, tracks lithium-ion battery cell prices in China. BATX is a prototype and has no market yet. You trade **capped futures**: a long or a short on a range of one index, paid for up front and settled in USDC at the market's expiry. Nothing physical is delivered.
 
 > **Caution:**
 > Capped futures run on Solana mainnet and settle in real USDC. You trade them in the web app at [amoeba.farm](https://amoeba.farm); Petri's mainnet release is coming. The programs have not been audited.

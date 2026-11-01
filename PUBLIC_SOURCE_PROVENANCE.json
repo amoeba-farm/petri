@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "efc87f6a279caec6b4bfef8084fd1745d7a808ea",
+  "sourceCommit": "d892799c605001955d2f760eb128a0174c180671",
   "component": "cli",
-  "cliVersion": "0.1.21",
-  "publicationType": "Petri v0.1.21 preview source and prepared ameba-sdk 0.4.1 package",
+  "cliVersion": "0.1.22",
+  "publicationType": "source of the unsigned petri v0.1.22 preview release and of ameba-sdk 0.4.1",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
-  "deployedContractSourceCommit": "c723db776e9d0c639565d89ac761703731b37fb4",
-  "qualification": "CLI source matches the released Petri 0.1.19 implementation; only its shared market account decoder and package metadata change. Concurrent client API-cache changes are excluded. Mainnet contract installation is pending. Preview binaries are unsigned; npm publication is not claimed.",
+  "deployedContractSourceCommit": "bcf0601606617fda7e00a818e7663d031339858f",
+  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from bcf06016, the oracle from 2af39bf9); this source mirror makes no reproducible ELF claim. The unsigned preview packages are built from sourceCommit; npm publication of the SDK is not claimed.",
   "retainedPublicLegalFiles": [
     ".gitattributes",
     ".gitignore",
@@ -30,12 +30,12 @@
     },
     {
       "path": ".github/workflows/cli.yml",
-      "sha256": "e2d9b98479ee696d3fc166e0c2e81fa57a9dc3d441c145193bab917df2036424",
+      "sha256": "fddc4185d18ffe76a382b472df0615abde28dce078bfaf54e6094dce0ec1bc78",
       "executable": false
     },
     {
       "path": "api/API.md",
-      "sha256": "be240c79c6a0b0f2a38a3775d000698a3644cb6679d8cc036b70ad814d51c15b",
+      "sha256": "6c0ecad4db1d0f10b4b145789832bd5e82150e18adbc8b9b3ab5f15616736580",
       "executable": false
     },
     {
@@ -55,17 +55,17 @@
     },
     {
       "path": "cli/AGENTS.md",
-      "sha256": "957b0632606dea1a02ca4cc3283dcea3b9d40f684b2231aff8d5e4dffd0ac876",
+      "sha256": "3c79c8ad0598d9093312e1ce99a52c4fd8bc526073d8683e0c985171c9b05106",
       "executable": false
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "88fd6bcbcce2d7a6cefbdd0462e7e15e8fe44949d59731edfbe8c42b19683d9e",
+      "sha256": "8d48fcd94c6ec508483bab3a4746bcedcd166a0bc657403bdd44e6e065cfebd6",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "efba50ae3cddfc406f4131044539d3147ef5870fba46079111c0adc2a8fc7ef3",
+      "sha256": "030b895ac025bc89e1b49bfee452a98ea16bb44e1a0907fe8d45f95f66344a99",
       "executable": false
     },
     {
@@ -110,7 +110,7 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "7d81c31f3e4596532369f9433fe5551c162b71cf5abc15f6b09ea4afa1cc851f",
+      "sha256": "424765e4c28107a27af7f19e78cad0ba9433dcdcb92aaa93c533efda476ffd73",
       "executable": false
     },
     {
@@ -135,7 +135,7 @@
     },
     {
       "path": "cli/assets/gitbook/README.md",
-      "sha256": "cfc71c2bd7470781f79f03505283bf1dfce3cf8eceb4bfad4589e4bee3355426",
+      "sha256": "d365667c13c4ea4f17f50fc58107df05fa5da88ebb58fb5f8a88d08068bc94b3",
       "executable": false
     },
     {
@@ -145,7 +145,7 @@
     },
     {
       "path": "cli/assets/gitbook/docs/04-products-indexes-buckets.md",
-      "sha256": "48a26d483b96056cf548dd7bc7f7d0b0b0137a825c85adf962351efcdd62d910",
+      "sha256": "aaec50bea5e65e42dfb3ce82490e6963da274d2c53cbd8f4dae8cdae6f2e11b8",
       "executable": false
     },
     {
@@ -190,7 +190,7 @@
     },
     {
       "path": "cli/assets/gitbook/docs/oracle/01-how-it-is-structured.md",
-      "sha256": "68e3fb7d52cdcd2415c9b415d1d3414e8b93975d53e4ac9a5f09882899feada9",
+      "sha256": "f2dbeecef192535435b5584eb647299a63096f8c9f441a59cedb6fd75e3624ab",
       "executable": false
     },
     {
@@ -210,7 +210,7 @@
     },
     {
       "path": "cli/assets/gitbook/docs/overview/02-markets-ramx-nandx-future.md",
-      "sha256": "03b0e8c4db3260276b636ef227dcfa584bb68757ee5db0ed6df5ad85492df17c",
+      "sha256": "4d20fa7384301f33852d9b1d37851a8d4534142da386c82aac312790ac1cac18",
       "executable": false
     },
     {
@@ -250,7 +250,7 @@
     },
     {
       "path": "cli/docs/amoeba-cli-command-guide.md",
-      "sha256": "271aa5e8c73f8131b71e516b31bb4961ce0cf1d755b4fb5b8599298010a9ef52",
+      "sha256": "eab80d907fd7d97eccb1132ae5431d2e580d541527ce8d632ed738fc22ddd4ad",
       "executable": false
     },
     {
@@ -275,7 +275,7 @@
     },
     {
       "path": "cli/docs/html/source-map.html",
-      "sha256": "22631abc746038dd740f2e7cf14116b9d287ef50bfb46a148c10e31a3586cac1",
+      "sha256": "a9a88bd3eaa74d8c78a0e268b3b81f7b05d58148f397d19fb73b38a145d6739e",
       "executable": false
     },
     {
@@ -310,7 +310,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "29483b5130c2a845961aa71a9e6e532503762e9a16c5086b6c925b354ef3b0d4",
+      "sha256": "d745b60d0af1f67b3578dea2a8a51dccfcc9bd3bd7914fa1451a03b06ba23d0b",
       "executable": false
     },
     {
@@ -425,7 +425,7 @@
     },
     {
       "path": "cli/src/agent_protocol.rs",
-      "sha256": "5420bedcccfb38272bcd04aadb34da130f7cdd692f64d1841508d04c7846f65e",
+      "sha256": "39f3bd3ca15df4c835b5d792702f892d66be70ce49ae549b86a3b426a6f65a09",
       "executable": false
     },
     {
@@ -530,7 +530,7 @@
     },
     {
       "path": "cli/src/endpoints.rs",
-      "sha256": "a5b6f776c6db6b539917153ea6085e6cb9233b640967f6746352c6af7ea769e5",
+      "sha256": "545cb7dce8738ff78b8c9ddd6ac47820bca1b99a49fa42eaf8c9495564b3cc81",
       "executable": false
     },
     {
@@ -630,12 +630,12 @@
     },
     {
       "path": "cli/src/futures/rpc.rs",
-      "sha256": "bac86588e7aeaf7ef4d573f2ffc353ffa7f28060d0171078faeaca2dab54ac50",
+      "sha256": "a60f069ac72ed69e373edb5c8fcb51316d9d1613aa35c47b3ab10033d180a6db",
       "executable": false
     },
     {
       "path": "cli/src/futures/settings.rs",
-      "sha256": "3121794ba72c710243f5109d74f0af6fbdcce8b99f6804348bcdad91b60f8956",
+      "sha256": "1e4bf5c0a394d7e77a024b96df93fd82fa72587f745c4eadd25bde8f6a205a0a",
       "executable": false
     },
     {
@@ -685,17 +685,17 @@
     },
     {
       "path": "cli/src/oracle/args.rs",
-      "sha256": "c68891978bde5fe576ba1f229762f6e242a65ee89e0569fe3c37c841ba6710f6",
+      "sha256": "7987f519f255b736b20fdc0f26d767ea0a12239047955b1ddc96cc0cc5dbc30e",
       "executable": false
     },
     {
       "path": "cli/src/oracle/chain.rs",
-      "sha256": "48439d72f20a328df6408b58db8ff8dff49e9e0ed412f486d5e14d3af3799a47",
+      "sha256": "f7b34e05a77beff4353aa4476c211266072c6c3cb0985be33d68a80a8a89229a",
       "executable": false
     },
     {
       "path": "cli/src/oracle/challenges.rs",
-      "sha256": "aa7c3ed2837126c7965896362b10a00dd49a57aecd7db28cca564cd9f59f64ac",
+      "sha256": "14e721caa0eb258ed5fed0bacf60e27985d42dd2f373e6992ec4330a05d5f987",
       "executable": false
     },
     {
@@ -710,12 +710,52 @@
     },
     {
       "path": "cli/src/oracle/errors.rs",
-      "sha256": "74c25c98228449dc30b9e067a5c8e26b7884e8bf50caf7aa8a5fa389e5efa0cc",
+      "sha256": "ccd9646c814b12136d3e448c1d3937187cee37431b728be967fefdc0f10a613e",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/accounts.rs",
+      "sha256": "618d1386e8ece0df25f4de55d324b5e71820a974b84730404119318270c241f2",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/args.rs",
+      "sha256": "a9af605589adaa4290907b189ad88252e9d452e2e853e493b2ca7e792fc8eb07",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/claims.rs",
+      "sha256": "108f24ae58dba86cd87eb323bf039b07b60b15f30ec7688f1e89a932b979ff67",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/docs.rs",
+      "sha256": "8da53473a54e7857d16e3a28bc675b18e2f68cbb07cf664c66690c90c88ed734",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/material.rs",
+      "sha256": "73d684bdda1627e6484159582657f1dead6dbdf316b58641e85c4fcf3b9b8705",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/mod.rs",
+      "sha256": "cdac696576daa7ee042295462bc8cd21da8f0bb87c7b81a1914f31754ecaca3d",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/reads.rs",
+      "sha256": "24454864cece198a3622d6c8b259e229ca79882d65e1575a77e541ff9470213f",
+      "executable": false
+    },
+    {
+      "path": "cli/src/oracle/heads/writes.rs",
+      "sha256": "5d6ec5295f1aaaa3928e7902d7c6fd8bc153a0ba26353f7dc9bee89149930d55",
       "executable": false
     },
     {
       "path": "cli/src/oracle/mod.rs",
-      "sha256": "a5330d71f5c1fb217e4f2ebda3c3a19cac8c2937fd9c134e1c4db44038644b77",
+      "sha256": "28135d9e2128a87c940f14fbeb0cad0ee37911ef24fbe4fe715912340709e20d",
       "executable": false
     },
     {
@@ -725,7 +765,7 @@
     },
     {
       "path": "cli/src/oracle/prints.rs",
-      "sha256": "1836a00d68ff19d71f91026d479729c5a3b3e2158991944a0d1bcbbd01c87c60",
+      "sha256": "177bea82101398acfb743f7539e1300e22441ca5028551cffeb356892707caa6",
       "executable": false
     },
     {
@@ -735,12 +775,12 @@
     },
     {
       "path": "cli/src/oracle/rewards.rs",
-      "sha256": "dd10c179e2d8c4cc9cb403c288289c6e11f9c0b17f9e3910fed61bfb0bf38343",
+      "sha256": "3455651bbaf1418f509d82107737d31000aef0a72006f723636c02e215a8ba74",
       "executable": false
     },
     {
       "path": "cli/src/oracle/send.rs",
-      "sha256": "416c4d4335b06babce4ad0c7ac64818bf336f525f362b091a862770cc23928c2",
+      "sha256": "785ab6aa4f2b58848f4055ee3f7e08c0ed70dfae0c166a585168ac7aaa00e609",
       "executable": false
     },
     {
@@ -755,17 +795,17 @@
     },
     {
       "path": "cli/src/oracle/sponsor.rs",
-      "sha256": "fcbb830cbc80809901ffc72d8794fd168f33b59c24cb8b75b9f7a3466341ac50",
+      "sha256": "4355c63d7a38ccc59c6428304896a37f2984fea0d4d9af486069ac9828a1d7d1",
       "executable": false
     },
     {
       "path": "cli/src/oracle/stakes.rs",
-      "sha256": "a9b7ef7d09182501cb9726888a090dd9f2876939c288781463ecaca88afa4ecb",
+      "sha256": "348c30fdacd28191e5834143b6ba52dad8d2822bbc834a36111c3a76766c0a2b",
       "executable": false
     },
     {
       "path": "cli/src/oracle/updates.rs",
-      "sha256": "6717d1871d51b7d3d99c36135f1f93aa306163928f69fec39e526f11c6f5ab44",
+      "sha256": "103ec070d96371549a3eb0d20e721becaaef7e496c70fa986eff9cad9a03adb4",
       "executable": false
     },
     {
@@ -905,7 +945,7 @@
     },
     {
       "path": "cli/src/research/rewards.rs",
-      "sha256": "35e8df6a03e3e9ec7274b9398e5153315e720078754b672721f324fc1d0e18b0",
+      "sha256": "05e87af81a7f5b9b7019c365471a6f1c9179942cd76daa7318d528f5f193621e",
       "executable": false
     },
     {
@@ -1379,7 +1419,7 @@
     },
     {
       "path": "futures/crates/futures-client/src/lib.rs",
-      "sha256": "32d542b4c9ea90f7f3bd8256b48d6ebef19aa6bbc55f730b5a3e08c04b165649",
+      "sha256": "093e95ce61ac28e37ba69b646c0062e48fd4344372adf6b6a7c9fd59149f17b8",
       "executable": false
     },
     {
@@ -1474,7 +1514,7 @@
     },
     {
       "path": "futures/docs/futures.md",
-      "sha256": "5c22fa7c9d5442e54c98733e798c5a551e1dfa85cda3d9a6f9b5f8f92d0a6e41",
+      "sha256": "37ee082a8cbfc15bd7514adb850a8a542bc1cbf4e020902052bcc4fc6ec784ad",
       "executable": false
     },
     {
@@ -2284,17 +2324,17 @@
     },
     {
       "path": "oracle/Cargo.lock",
-      "sha256": "2d61b381b3a111cf098e3937a8c9d77b6ec4626e517a89da000492c87b0141ac",
+      "sha256": "b80dcc6b8d5fba9dfcc3db07104f876108f86b9087257614ff532267d6d1c1d9",
       "executable": false
     },
     {
       "path": "oracle/Cargo.toml",
-      "sha256": "97585cbaa2146e03df6fb63ee6332f8d25a66be5ab652f573ed78f86de9b9131",
+      "sha256": "bb0444374e2ed86ee6d92ce169d14b6e47e92c78941ea6e649b2cb59d54a4f8c",
       "executable": false
     },
     {
       "path": "oracle/crates/commodity-spec/Cargo.toml",
-      "sha256": "7acb1ae81f8893d059dfe8a2ce10f4ff98a7b2eb5c0747c7fd515dae84804646",
+      "sha256": "667f6211eb7eff15287df8c3a50af0a99e4d283649c24b13db645d861f5517ee",
       "executable": false
     },
     {
@@ -2309,7 +2349,12 @@
     },
     {
       "path": "oracle/crates/commodity-spec/src/lib.rs",
-      "sha256": "a0a6711a0ead06286b1f673aad13fc8368b67e0bb4482bcfdea91ee9f57c5e03",
+      "sha256": "14b6df864d369ca1cb05e39398450e708d928eeedb4350460d8e85aeb5a0408b",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/commodity-spec/src/molds.rs",
+      "sha256": "628fd0023a24dc6512669724763d0aa7c5b638ab77ea1a359995aafab1fcc6bf",
       "executable": false
     },
     {
@@ -2333,8 +2378,83 @@
       "executable": false
     },
     {
+      "path": "oracle/crates/commodity-spec/src/tests_molds.rs",
+      "sha256": "2a5f0927cb146974bbb4d4ab40d11ced9974771205d1a967cd7e87a75a61f5b8",
+      "executable": false
+    },
+    {
       "path": "oracle/crates/commodity-spec/src/time.rs",
-      "sha256": "e82efed36421a2497b509242ef0d5dcde584960864c28163394a2c0d0de878df",
+      "sha256": "6552b616f809354d80831313b73a28d3937636e08ff0cdeadae614ce7e9ac9fe",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/commodity-spec/tests/channel_migration.rs",
+      "sha256": "68de0621c73161f5ff87d1da05c451168ea102d6467e4509afa7002453c1cfcd",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/Cargo.toml",
+      "sha256": "177118a9708297f3c1915359e9982a78bb98d980393571acd770d977753487a7",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/channels.rs",
+      "sha256": "02628b3cd9c0319b2ef044a1d8f45ed79fbadbe28a35730a6e1f114e7bbc9a70",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/liability.rs",
+      "sha256": "ec0eb5aea2f9fc7f5e102afe9fc502047dd6ddc4f0c747713f8d245338487f6a",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/lib.rs",
+      "sha256": "71e1dfa29de2a4915009cf9e37612914982371725e427f946af32e45f08f1e44",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/median.rs",
+      "sha256": "0015414c04674f5e57d61655413f6a17e56e4b3650cf9495e10ae57a428f2a46",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/outcome.rs",
+      "sha256": "03a3ca395940d0eac254ef3e09e80fad03f3483c71a00501dba637ae7caf5064",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/params.rs",
+      "sha256": "07b0e809d507ca249a468d4dda7506fad431d17399d0d52b72782d9482ce0852",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/rewards.rs",
+      "sha256": "f39e53a42baa1e7411819d47337557a825c4d224fcfae87197b9f2a873ebdf25",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/settle.rs",
+      "sha256": "8f06757d74984e179081df966ed2301256d8693523be8a3f834625953fe726fb",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/tests.rs",
+      "sha256": "b02195ccf41eabe3e3ac7db52c848592010e23579a5d4547a03a7118ca67eb87",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/tests_channels.rs",
+      "sha256": "c2b8f3511872624140f430bb4a762e1836cabe92fd4b3c802759ff0acc7822c6",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/thresholds.rs",
+      "sha256": "5bb9f0597ab4fba693f62838e41b60b11784f9dbf7a657c0d0d8848811b7f408",
+      "executable": false
+    },
+    {
+      "path": "oracle/crates/heads/src/time.rs",
+      "sha256": "57e4733c9d1bfd8d550e8d34c0651d26256d32c65076cdd47593cbcaf70eab32",
       "executable": false
     },
     {
@@ -2345,6 +2465,11 @@
     {
       "path": "oracle/crates/oracle-interface/src/lib.rs",
       "sha256": "a8c990aa959990427cfe9f3327a6212587d23edb535aaa0e510d361ea6230332",
+      "executable": false
+    },
+    {
+      "path": "oracle/docs/lta-spec.md",
+      "sha256": "be7eaa1998466ae6fd0faeb273cc1d09972b03ff77045bfa2e949a411ec7e1ba",
       "executable": false
     },
     {
@@ -2360,6 +2485,11 @@
     {
       "path": "oracle/governance/cfm_parent_proxy_registry.v1.json",
       "sha256": "a9ccce1a990fc93024a9ed989dec9638614928dea716add5df3bcbc31964ac4a",
+      "executable": false
+    },
+    {
+      "path": "oracle/governance/channel_molds.v1.json",
+      "sha256": "d8311ecaf0678196ede01d3cc10d9e7bbacaeafdcacd62b4a6bfe6625c694d8c",
       "executable": false
     },
     {
@@ -2404,7 +2534,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/Cargo.toml",
-      "sha256": "d4b0d425cbdbce3b80e4e2bab546ecbd0ee5b690a3233f67c25ce5dde85ad6e3",
+      "sha256": "ef159f6140e8e87e45622783889c0c447a07dca3e7b9e1acd9917d60f757b40c",
       "executable": false
     },
     {
@@ -2424,7 +2554,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/compact_error.rs",
-      "sha256": "aac47975f327aae0170fc592746443af29ea16f098d50df326c92d7e45e0b029",
+      "sha256": "1a50627dee3ef7f3b3ee0a65c49862e0f5b5d0ce0b9fc6af9356a60ebd9be691",
       "executable": false
     },
     {
@@ -2444,12 +2574,12 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/error.rs",
-      "sha256": "a3105b0ce4c4aefa4245ad67eaa4e871d92ded12f06a3605ead1b95a4badad65",
+      "sha256": "8ea5a69cf718be589d253f5dcb3d160cfe6bf168b9db2ded2611cf3b058660cf",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/fixed_codec.rs",
-      "sha256": "4c5a80d10d58c64b17a0bbff623c45d2a06b58f87e5bedd5e935119f9da877b5",
+      "sha256": "07164082074643cdb381d5a8881aca6fb2eca1655957ba6816e7851dfd312e75",
       "executable": false
     },
     {
@@ -2479,12 +2609,12 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/fixed_codec/fields.rs",
-      "sha256": "ec4275ca4015c7f1d263a9281a00fa8a34a75b08368bc84648c0adba3ddba33a",
+      "sha256": "7b255cdb5aa0fc6aa550200b5aa93950723ee6a76059ec43065d2037332c98a8",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/fixed_codec/flat.rs",
-      "sha256": "5d5ac41c6fc3f9a39e8f023c1697eb387053b248db56cb2aea0739ab60e22cfd",
+      "sha256": "bf37d8d3ba7cf007f3f9e903ef76991d8fa34dad89cfe70f7680b832865bed8e",
       "executable": false
     },
     {
@@ -2539,17 +2669,27 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/governance_manifest.rs",
-      "sha256": "1105656ff1bc2e0288b85ea3cb7481fa4266fbd0ab7baa9ce3cafe2acd30a680",
+      "sha256": "9b2ee2c0ab71d7e77a80e9afa7a3cb77b9cc79a15aeedf0ba31a8fa727800081",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/heads_view.rs",
+      "sha256": "8b501f33bd0f73a83cce1827475680634f80f7e3965257a2ce9e03e51dad2079",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/heads_view/tests.rs",
+      "sha256": "1cf775c74fa7a8abb6c6c4975b8c64706cf3696da263a11463d3e6e88e3bf637",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/instruction/builders.rs",
-      "sha256": "343314bb792a7cfd1eeda71ac4ff965e593342c9dc0d7b39bcfb9a08c7b8b427",
+      "sha256": "b53109dcd6b46a53423973aae4bbaddff6b913c9adcc7c1d56ee496dac23fea2",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/instruction/carry.rs",
-      "sha256": "b0095b5758d5678a2a766883960e86b1b2c6f4713bca8e69b68597451ab1c01f",
+      "sha256": "066c0dde515e196070adb555d287c3ca23b6276dff0a2edb5017c828a484fb27",
       "executable": false
     },
     {
@@ -2578,8 +2718,23 @@
       "executable": false
     },
     {
+      "path": "oracle/programs/ameba_oracle/src/instruction/heads/builders.rs",
+      "sha256": "f50b2a8d91a66f0f9d50ebddfdbbc392e263c4b4737e9af013ae7dce8a2a75d8",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/heads/mod.rs",
+      "sha256": "139ae963dc29a71871be7b9a13d0e6ec935b4208ed5bc6d0239d55ff7501e45b",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/instruction/heads/tests.rs",
+      "sha256": "0f85b3bbe8049e7381b350b68e413362f91cdfab9ecfafcb6f6e0dcb0d3f6fd5",
+      "executable": false
+    },
+    {
       "path": "oracle/programs/ameba_oracle/src/instruction/mod.rs",
-      "sha256": "c49344e382b7d5fb5410528af1338e486633b87437e898b422a866dd8bb0e1ad",
+      "sha256": "c47d8f9bb717c9ddaf593d2bddc88d99d0daabd5819d21f07d576d68ed77c9e5",
       "executable": false
     },
     {
@@ -2594,7 +2749,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/instruction/payloads.rs",
-      "sha256": "70ec442ff097e5e90c9618da5c02e33805132119ac922cf151e01fc193d9c4bc",
+      "sha256": "db7cf8997b9b77c709afeb872466af35559f96cb3d3ae8066434e613cc80d909",
       "executable": false
     },
     {
@@ -2609,7 +2764,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/instruction/tags.rs",
-      "sha256": "dcdfe190bb8373fc6145de55afbf8dd082071f9d5f049db377d23f5ff41866ec",
+      "sha256": "b95fc7313f7bd5caf79deac7430afcbea6be54dcc5bc2d17acbd6f8747b425dd",
       "executable": false
     },
     {
@@ -2619,7 +2774,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/lib.rs",
-      "sha256": "9a16403d03f4b83383c05e84e437a18b9227815986fee683b82d7d9e668a88e3",
+      "sha256": "8a23328071aebc62c6d959650b65a445f14db8509781e7fbbd8eb0644f38e7be",
       "executable": false
     },
     {
@@ -2629,7 +2784,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/oracle_rank.rs",
-      "sha256": "513b3e145c8f01d6e33326c5f9399939de71a7203b1eff5952fe9c1a1b83bdbe",
+      "sha256": "b597aa7922dc2b0debb61bdd3eb6e5016ae953d0912fbb4a78c90821a2e565fd",
       "executable": false
     },
     {
@@ -2649,12 +2804,12 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/active_weights.rs",
-      "sha256": "bf9194bb2b62999fad5b8089cd5404dfa2aa8b68a38e90198cf2c12d2a94d89b",
+      "sha256": "533600e28f38bd4a26632566bb9a99aae306c796af29b954aa132e57dde0cdc2",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/adapters.rs",
-      "sha256": "16dab6f465cabf3f5fe0c2d4a0ebb9d3341d319328960073f458761c7a50b9f5",
+      "sha256": "8170ded2d416b058e39cfff65703003d9e459942538a391f3d5b0aa47060888b",
       "executable": false
     },
     {
@@ -2684,7 +2839,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/carry/mod.rs",
-      "sha256": "2bdd573de46da726c6b1f4b52c165551ad3e3599c9fed57ca53b88f52881a3d0",
+      "sha256": "8bf03edac0f69b125f87a88f7580446f5d84c290f7e0526983f41e5e2a52b6c0",
       "executable": false
     },
     {
@@ -2694,7 +2849,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/carry/periods.rs",
-      "sha256": "adf49891f362c495b8ae3b3ec60104785b04fb57034eda382d29f156db54b228",
+      "sha256": "3802f314fb7ce9534083cf9359dc7055c3e3e39de8a6f07517fc2c913d531a9c",
       "executable": false
     },
     {
@@ -2714,7 +2869,12 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/cfm_launch.rs",
-      "sha256": "af33c622af19b7da75d5170b5a2f3d293faab30e43c01e94984e8316275e2538",
+      "sha256": "922e483d32766628a9e38c2dbcd83041d9d61f395099b518c4eb51b2b5377cda",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/cfm_receipt.rs",
+      "sha256": "a39bac7ee0a823e22418b4d4668d5eb7a9076c9482dc4af884934b8d8a8c50e3",
       "executable": false
     },
     {
@@ -2749,7 +2909,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/council/mod.rs",
-      "sha256": "def941fe861155bd7c06349816b032e188be92a14be45bb2124b56be91e7ec8a",
+      "sha256": "7fd7bdd68a7252d8a46627448fdd29775e9c6f467cdb2d33cc9f48efb01d18fa",
       "executable": false
     },
     {
@@ -2784,7 +2944,82 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/dispatch.rs",
-      "sha256": "712f3d06dbb103ae3f23edc327346ab404ba615df1aa2e9c71b5a052ec59da14",
+      "sha256": "0c4baf2ec819ca7d07f3f4f0ebd260de4c84489a8edfd97e6cc2b4d696617e3a",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/failed_month.rs",
+      "sha256": "b1d666dfcb6a2f5de41e198f191558dea5af864a9c0577e4892fd9438e1351c8",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/accounts.rs",
+      "sha256": "b428bd5026f6c48d2bcae95976fef0879b862d3f63a45eeca5beb29ddbde14e2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/claims.rs",
+      "sha256": "8e3ad8b8a6c2c7574e6c1a7b476717df4393e0bc754ed9424caa7a4d4485d5bd",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/config.rs",
+      "sha256": "94587256da59d4c43fa2870aea322a38bbd30e0ea21f835fbc287f381e52d315",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/contracts.rs",
+      "sha256": "81624632a7482d8bf65a7314876cade9db9895704f0343a6793e7460ea358884",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/delegation.rs",
+      "sha256": "04a0c8ec55888f961486476ebc3c106715646fc618ec37d54db0b4af45acf3c8",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/migrate.rs",
+      "sha256": "a6dc3b1048c20185d25e21960a8019d2c9573278f1067f019d8388209e3bdd63",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/mod.rs",
+      "sha256": "46595dd14feec7809fed336917bcf7fb9c4e4b1b1aaf0b0f3ebb127ada87729c",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/rewards.rs",
+      "sha256": "7714cfd52e3afcdd53d8323ff3114f0eff3a5579ca6b051f3b8becc8bfc597fc",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/samples.rs",
+      "sha256": "1b09323bc95631f0f75c419673cc85aa99c00c1a87a81fc4f312069836249172",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/sources.rs",
+      "sha256": "827e5c037d691154a7cc024425da3744ddffb521a0a9dda0b699358c27d9bfa2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/tests.rs",
+      "sha256": "c494496af7996e2329d9c6671c8c38dc3b9c9d2fd52f49896e8e6c6cff937762",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/token.rs",
+      "sha256": "4290ec7d9e4041df4d536f428dc396d9c0d970d62fc39d42dd086dad7beb38d3",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/transitions.rs",
+      "sha256": "0425621a65ceb244dcbae712f58e7b8ea9bc3f7312c9a29348911e73b4061179",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/processor/heads/transitions_tests.rs",
+      "sha256": "a9c7fdf515d9ff3e2d4370a21bcbed2029dfb06bd86cc8b459b2a0a02e2abdf0",
       "executable": false
     },
     {
@@ -2794,7 +3029,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/mod.rs",
-      "sha256": "f04a2ee8171c7d38e68d83ebb6ba8b7b92df7eac05567b2a7201f737823c934a",
+      "sha256": "e103c7f5a362c99611e2ad40a2ff506c86067bc126aaac722443375d60f4dc39",
       "executable": false
     },
     {
@@ -2814,7 +3049,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/oracle_evidence.rs",
-      "sha256": "cbba6e35cc76883eef1134daab1730f7a70c9d2ab0993b04bbb4434e13ede810",
+      "sha256": "267ecff7f84044348138a2ddb2c7f64d14325daf07b1ed878f7f3d4be5760174",
       "executable": false
     },
     {
@@ -2824,7 +3059,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/oracle_rules.rs",
-      "sha256": "5128b0a037a3e13595ed6155cf6d0789fb81107413a61309c0f256fa50339b67",
+      "sha256": "67d34b135a9def564d9bb34a3a39021a6b0afe64ce0c98ef56d46cc00a9b88bc",
       "executable": false
     },
     {
@@ -2839,17 +3074,17 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/oracle_validation.rs",
-      "sha256": "a1a1a5a73636f62004b376209028cff99cb6865fec10e213bd923d3d5816c04d",
+      "sha256": "38439da04f07afefefda84e9bb081f182caba8f35a2c356631d16d06556f779e",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/period.rs",
-      "sha256": "5a5062cee295ac99fda29a2f883a0d04dd83cd035ad3e33e24e791a68ea27131",
+      "sha256": "1cab84f550208ca3350f14f43e77bbaa078e6d1fd0d020aa0e81f35532629f43",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/recipe_weights.rs",
-      "sha256": "80ca3260ea418b8423d80d14f18981b0bb841d7cef8833d4e62fb955b6813551",
+      "sha256": "9c7a7ea7a22884ca05a2ba393707439087b8b2e0adc7e00c1ba74fc8b02923a0",
       "executable": false
     },
     {
@@ -2864,17 +3099,17 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/rewards/escrow.rs",
-      "sha256": "4bce4bc6b0f639e124a989b42671e42a7310f8b5924529696c5bfca5d7519cd8",
+      "sha256": "e9c7bcbace0f61e13f711c1d3ebae06481ed3be049c3c22269249cd8620b09ab",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/rewards/registration.rs",
-      "sha256": "c521e13b0658199f873854da672239129e4e131a0e71d24f33cb798b34adf289",
+      "sha256": "b00a1800aff1d037878b0e186545a050f4725ae901e397bacaf5cfb9f939944d",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/rewards/tests.rs",
-      "sha256": "70ef3365e63b1874cdb3aff482021a8e852b9c798ebec5c160d9386580f707e4",
+      "sha256": "57ca6f318d7f800e7c1c00980714c588d45119446a3081bc95a7f2153347c901",
       "executable": false
     },
     {
@@ -2904,7 +3139,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/sku_coverage.rs",
-      "sha256": "2a3c76d9b84b46042b3a5685bb943d4108ee23f97237d78589fc983e9e966e14",
+      "sha256": "d026210e6d47e6630852b70d39edd3596be7328cb52b56e8cfb2cdc14d168eeb",
       "executable": false
     },
     {
@@ -2924,7 +3159,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/sponsorship/mod.rs",
-      "sha256": "0f5614d0c33415842375f5b162b7179318edcf1d5b7a7c6bac47b820a8c0032b",
+      "sha256": "59b0dd505127a1ae7bc3b3e15b7e2332a86fdb63f8d13b1f60e930494a1e8e05",
       "executable": false
     },
     {
@@ -2954,7 +3189,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/tests/mod.rs",
-      "sha256": "4f116f4bceb99d43bfcf6fea6f555ff4cd665f2cad1a78bcddf2694a0d8309e8",
+      "sha256": "d30436b7abbac74dee0a90586b1201e784b56ecffece1d6d6e9f89c9af6cfb46",
       "executable": false
     },
     {
@@ -2984,7 +3219,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/tests/source_weights.rs",
-      "sha256": "09d63b170d035edd3da097028890a9585d7dd166d960605bad0eba3d1c9b873f",
+      "sha256": "31e1c2b2c6468b79376bb991bdacd1ce42dff9d3532b2d2321d2812e4f1926b7",
       "executable": false
     },
     {
@@ -2994,7 +3229,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/usdc.rs",
-      "sha256": "120267956e76d45f719f05f45652f436abb7be5ed0a36a2cbc99a102ebd9c489",
+      "sha256": "f7f7dcb0e9bea4af08de5fae0d52ebccaf252ed25e9522ba5833ac12d3034bd7",
       "executable": false
     },
     {
@@ -3004,22 +3239,22 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/usdc/opening.rs",
-      "sha256": "fceaf1b005e33b3b3776accb3905dd7783aeaa66a08b04c4be1b02d35202a4b6",
+      "sha256": "dccc90d6b4f71e01aa32f0e8ec17806f13957428e8538e4fb6ed73ae171a80ae",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/usdc/schedule.rs",
-      "sha256": "c3d947ef803c0cc51cd4585bc2d3fe689fb256da6ac8925b65a8e9555c133cf2",
+      "sha256": "2b2709a73e8f1c87fd7b8e1814cae45137a94a25ba962435e5384a8325db938c",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/usdc/sources.rs",
-      "sha256": "dba2b819893221bccd0853e984d28150f0bfe1906bf9511d92e45f28bdf110fd",
+      "sha256": "80b73a7e4f0fc1d96e13c93b24d411f656f339eff3ee51d9b698bfec50fec64d",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/usdc/tests.rs",
-      "sha256": "5fbfa168c334f181df643bc5fe57e510345bc46b918d86e52ba2893b53e46302",
+      "sha256": "ee629fde843325c9666b809774845b19307ba13ce2444e4537ac360ce95eaed3",
       "executable": false
     },
     {
@@ -3048,6 +3283,31 @@
       "executable": false
     },
     {
+      "path": "oracle/programs/ameba_oracle/src/state/heads/gen_layouts.py",
+      "sha256": "2ed3ba0bb2c13b5a38c956754388f49f2f0b078a3a7d4515c79d71a48fb07049",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/heads/layouts.rs",
+      "sha256": "5b4800741046d9b5eb23dde190e64dbb2d10beeaddb8caa930e2dd16056c8b97",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/heads/mod.rs",
+      "sha256": "b2f9fff80a3b20351992ba9a125c18749941326354030755a6e870e4bdb06395",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/heads/settlement.rs",
+      "sha256": "93fd51a66f84f166b3fec5969b79034ac6457ae3ee8a11f8916ad8922221cd9d",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/src/state/heads/tests.rs",
+      "sha256": "00c626d6eeb180cb1d488b93d01f584d496665efd28005da4495eb25356be801",
+      "executable": false
+    },
+    {
       "path": "oracle/programs/ameba_oracle/src/state/manifests.rs",
       "sha256": "bf64a584adcb54af710011b531206da6a816ebfebc475c38e1b01ba595e368d5",
       "executable": false
@@ -3059,7 +3319,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/state/mod.rs",
-      "sha256": "04ea594124ea603c48b0c799fecffce8df2d32e3168b74f4f87f7ead1bb0bfd0",
+      "sha256": "a0099c849f638ddd248f7ecb28fbfcea327c35dda7105870c4c2854f31af38a0",
       "executable": false
     },
     {
@@ -3104,12 +3364,12 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/token_instruction.rs",
-      "sha256": "e64bc377caef59df1211c4d3d65282c032a99b34e8417c1d2ae8d119385a49fa",
+      "sha256": "4268a4a921ed26f51608db3058245b9c330fe04a420b74f5258b56be994549b1",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/src/token_state.rs",
-      "sha256": "ea4a5f748417cf492612027729d542efdd2d377fc174a4f74fb7fa4602148313",
+      "sha256": "998908b85b6a44bd83a9d2ba405375786f1059eab0e6442da0b080aa301cda56",
       "executable": false
     },
     {
@@ -3144,12 +3404,17 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/common/cohort.rs",
-      "sha256": "fb037a369641e08f2c21c8347278448e57665e22d254f6628ce6b5e34c93e0b8",
+      "sha256": "7a75180c1a288b4ea9b9bdc38bc08ca9ff1ce25502cd7940e712224aa9c673f9",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/common/mod.rs",
-      "sha256": "89565fa956da7fe46550080542a0323fd3a90fad41a2618700a0a2e490a947a3",
+      "sha256": "ca07147719710640445d516b1626b8d41cf9ec2e6bdb49d887ec14a9c4572a6f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/common/production.rs",
+      "sha256": "e18e2ebf9faea7c2a3ee13d19596b34efa9ffe00c2dc9275ea375e9745617441",
       "executable": false
     },
     {
@@ -3188,6 +3453,11 @@
       "executable": false
     },
     {
+      "path": "oracle/programs/ameba_oracle/tests/failed_month.rs",
+      "sha256": "37b8f9d0c8ca5c7fd42de3bc16630837c38be6cf63ee3a17b243c3678e3d3032",
+      "executable": false
+    },
+    {
       "path": "oracle/programs/ameba_oracle/tests/fixtures/dev-oracle-chip-sources.json",
       "sha256": "2b93befe361777ac45122d0a9223f803a7b9845ca073768f6573e0706a4ceb6c",
       "executable": false
@@ -3205,6 +3475,21 @@
     {
       "path": "oracle/programs/ameba_oracle/tests/governance.rs",
       "sha256": "5da09500734c7bbff114b0985fe1eec56c676daefedfdb3e712aa7ad539549e2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/heads.rs",
+      "sha256": "4d22798a065482626b6ed68333efce512c2d15013d756fe426d260c8a18cb58f",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/heads_claims.rs",
+      "sha256": "460aa1461b079e9e0542ddda87bd7760128c39de9c7b6996d01282be6b72c849",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/heads_governed.rs",
+      "sha256": "5af122003023d9cf23d8ef08c8acd317a810bf12dafbef6f652438d6387fd9d4",
       "executable": false
     },
     {
@@ -3263,6 +3548,16 @@
       "executable": false
     },
     {
+      "path": "oracle/programs/ameba_oracle/tests/production_artifact.rs",
+      "sha256": "6ab4757375182b43e67a18f31a4340e90cc3f1bc7d49d3c27c2f309955110bb2",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/production_failed_month.rs",
+      "sha256": "b42a36032f62399d0b6d13d76d521369d7c09bd03acc1862e49aeadb2c4be5f0",
+      "executable": false
+    },
+    {
       "path": "oracle/programs/ameba_oracle/tests/program.rs",
       "sha256": "6aa8e8a49ef9d54dc98a22630928a6ab5e653d7945fe3923ffac51e41762d010",
       "executable": false
@@ -3314,22 +3609,27 @@
     },
     {
       "path": "scripts/check.sh",
-      "sha256": "a0ceae737ccbe5764a52ae4cfaae781850018e4426c41ff71db769cdb661fc4f",
+      "sha256": "3a055c2792ee5e4bfda8e722b277cb2651c93f0ba5dc75078c43f387d32e25ae",
       "executable": true
     },
     {
       "path": "scripts/shared-cargo.sh",
-      "sha256": "3949758f0d2fd0db10c8e1142609866a73cfee346588993754d69eba6f411f0e",
+      "sha256": "3973778fb0de6b64e0379c3eca2c3029f6b7df8d9e5b786c27ce3e469b55b535",
       "executable": true
     },
     {
       "path": "scripts/shared-cargo/clippy-driver",
-      "sha256": "e185fb6898358e245b81d383802d2ecd1b835e6f1def656b4147d7144c55ca78",
+      "sha256": "892888461e7fd45ff52bb3af5e384a89c04e5f4d971c091f459dfde6ec565d7d",
       "executable": true
     },
     {
+      "path": "scripts/shared-cargo/owner",
+      "sha256": "2cd2c10eec33a786224d297dfaa8c58172599955f4bd14313c6bccf0006f2d17",
+      "executable": false
+    },
+    {
       "path": "scripts/shared-cargo/rustc",
-      "sha256": "87acbec66404d960c22e63aadf5249d8ec6b16a02b795dfc1f7d701b47bec227",
+      "sha256": "889e021e7c4e8536248792e55a53b479f2986c9d693e80d462a845a4ac2d771e",
       "executable": true
     },
     {
@@ -3790,8 +4090,8 @@
   ],
   "lineEndingQualification": "2 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.1",
-  "sourceRelease": "efc87f6a279caec6b4bfef8084fd1745d7a808ea",
-  "deployedOracleSourceCommit": "da0e9143f44635dcbce7288ea6510ddf042de215",
+  "sourceRelease": "release/2026-11-01-petri-heads",
+  "deployedOracleSourceCommit": "2af39bf9f69f783bacf929daf9b1baa103ade351",
   "candidateContractSourceCommit": "bcf0601606617fda7e00a818e7663d031339858f",
   "candidateContractPublicSource": "https://github.com/amoeba-farm/amoeba-program/commit/059bd727fb61b68adf7d5ee3067ed5158674cbbc"
 }

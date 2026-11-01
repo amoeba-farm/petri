@@ -188,6 +188,15 @@ sbf_build() (
     || echo "; ${#dead[@]} function(s) of SBF_DEAD_CODE reported, linked into none")"
 )
 in_list() { local x="$1" y; shift; for y in "$@"; do [ "$x" = "$y" ] && return 0; done; return 1; }
+# max_size <artifact> <bytes>: the artifact fits the program account it deploys to.
+max_size() {
+  local size
+  step "size of $1 (limit $2 bytes)"
+  [ -f "$1" ] || { echo "  missing $1" >&2; return 1; }
+  size="$(stat -c %s "$1")"
+  echo "  $size bytes"
+  [ "$size" -le "$2" ] || { echo "  $1 is $size bytes, over $2" >&2; return 1; }
+}
 # release_markers <artifact>...: production artifacts carry no DEV_MARKERS.
 release_markers() {
   local so m bad=0
@@ -247,26 +256,53 @@ check_governance() {
 check_oracle() {
   cd "$root/oracle"
   run cargo fmt --all -- --check
-  run cargo test --workspace --locked -j "$JOBS"
+  # The integration tests form v1 months; the production artifact routes none of that
+  # (`v1-formation`), and the synthetic-controller unit tests below run without it.
+  run cargo test --workspace --locked -j "$JOBS" --features ameba_oracle/v1-formation
   run cargo test -p ameba_oracle --lib --locked -j "$JOBS" --features synthetic-governance-controller
   AMEBA_ORACLE_PROGRAM_ID=9MBnqUCLEgkCxZHDPPrJGdwEJAiGU8K5tD3R5SD5MUkm \
     run cargo test -p ameba_oracle --lib --locked -j "$JOBS" --features localnet-governance
   AMEBA_ORACLE_PROGRAM_ID=9MBnqUCLEgkCxZHDPPrJGdwEJAiGU8K5tD3R5SD5MUkm \
     run cargo test -p ameba_oracle --locked -j "$JOBS" --features localnet-dev-authority
+  # Oracle v2 heads (tag 210) under the governance envelope: the dev chain's profile. The
+  # production profile's `heads` (a default feature) with `v1-formation`, the profile the chain
+  # links, runs it in the workspace tests above.
+  AMEBA_ORACLE_PROGRAM_ID=9MBnqUCLEgkCxZHDPPrJGdwEJAiGU8K5tD3R5SD5MUkm \
+    run cargo test -p ameba_oracle --locked -j "$JOBS" --features localnet-governance --test heads_governed
+  # The production profile's own unit tests (default features: heads; no v1-formation, no dev
+  # migration, no dev authority).
+  run cargo test -p ameba_oracle --lib --locked -j "$JOBS"
   sbf || return 0
   # The intermediates' directory: the shared cache in a worktree.
   local sbf_target="${CARGO_BUILD_BUILD_DIR:-${CARGO_TARGET_DIR:-$PWD/target}}"
-  # Production artifact (no features, SBPF v1): target/deploy.
+  # Production artifact (no explicit features: the default `heads`; SBPF v1): target/deploy.
   sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
     "${SBPF_ARCH[@]}" --sbf-out-dir target/deploy -- --locked -j "$JOBS"
   release_markers target/deploy/ameba_oracle.so
   sbpf_v1 target/deploy/ameba_oracle.so
   ls -l target/deploy/ameba_oracle.so
   # Test-only artifact on the shortened test calendar, on the production arch
-  # so the SBF tests run what ships; never deployed.
+  # so the SBF tests run what ships, with the v1 formation the tests form months
+  # with; never deployed. tests/production_artifact.rs upgrades it to the
+  # production artifact above (which must route everything a Live month needs).
   sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
     "${SBPF_ARCH[@]}" --features test-sbf --sbf-out-dir target/deploy-test -- --locked -j "$JOBS"
-  SBF_OUT_DIR="$PWD/target/deploy-test" run cargo test -p ameba_oracle --locked -j "$JOBS" --features test-sbf
+  SBF_OUT_DIR="$PWD/target/deploy-test" AMEBA_ORACLE_PRODUCTION_SO="$PWD/target/deploy/ameba_oracle.so" \
+    run cargo test -p ameba_oracle --locked -j "$JOBS" --features test-sbf
+  # The dev artifacts (heads too) get the same stack check. The governed localnet one is
+  # the profile dev runs (futures/scripts/build-governed-localnet.sh: its arch, the dev oracle and
+  # controller ids): it must fit the dev oracle's ProgramData, 1 MiB, which only the controller
+  # could extend and has no action to.
+  sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" \
+    AMEBA_ORACLE_PROGRAM_ID=AbtsvZcYjFD2rHK4ATw4rjm9o3CLcqRvRwy8FT38YsrW \
+    AMEBA_GOVERNANCE_CONTROLLER_ID=9CNKzWmKXKs9vkE3uXs63QZi3AxN3B2hdZCqkN8xf3om \
+    cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml --features localnet-governance \
+    --sbf-out-dir target/deploy-governed-localnet -- --locked -j "$JOBS"
+  max_size target/deploy-governed-localnet/ameba_oracle.so 1048576
+  sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" \
+    AMEBA_ORACLE_PROGRAM_ID=9MBnqUCLEgkCxZHDPPrJGdwEJAiGU8K5tD3R5SD5MUkm \
+    cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml --features localnet-dev-authority \
+    --sbf-out-dir target/deploy-dev-authority -- --locked -j "$JOBS"
 }
 
 check_evidence() {

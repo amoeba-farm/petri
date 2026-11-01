@@ -32,6 +32,9 @@
 #     workspace already hash by their absolute path, and crates.io crates by
 #     name and version, so those stay shared. `cargo clippy` puts its own
 #     wrapper there, so shared_clippy runs clippy through shared-cargo/clippy-driver.
+#     Both note the worktree as the owner of what they build
+#     (shared-cargo/owner), so scripts/agent.sh rm and gc can delete it
+#     with the worktree (scripts/cargo-cache-prune.py).
 #   - With Cargo 1.91+ (build.build-dir), only intermediates go to the cache:
 #     binaries land in the worktree's <component>/target.
 # Never for SBF builds: the hashes are in the programs' symbols (check.sh's

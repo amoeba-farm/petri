@@ -17,6 +17,7 @@ on:
       - 'oracle/governance/**'
       - 'oracle/Cargo.toml'
       - 'evidence/**'
+      - 'api/api/fixtures/oracle-heads.json'
       - 'scripts/check.sh'
       - 'scripts/shared-cargo.sh'
       - '.github/workflows/cli.yml'
@@ -35,6 +36,7 @@ on:
       - 'oracle/governance/**'
       - 'oracle/Cargo.toml'
       - 'evidence/**'
+      - 'api/api/fixtures/oracle-heads.json'
       - 'scripts/check.sh'
       - 'scripts/shared-cargo.sh'
       - '.github/workflows/cli.yml'
@@ -65,6 +67,7 @@ jobs:
             futures
             oracle
             evidence
+            api/api/fixtures
             scripts
       - name: Rust 1.95.0 (cli/rust-toolchain.toml, with clippy) and 1.93.1 (the default; folders with rust-toolchain.toml use theirs)
         run: |

@@ -9,6 +9,7 @@
 //! 81) and how they end in `prints.rs`, Game updates (166-169, 198, 199,
 //! 201) and how they end in `updates.rs`, a wallet's bonds and stakes and
 //! their settlement (tag 169) in `stakes.rs`. Cleanup (30/24) has no command.
+//! Oracle v2's heads board (tag 210, `oracle/docs/heads.md`) is `heads/`.
 
 pub mod args;
 pub mod chain;
@@ -16,6 +17,7 @@ pub mod challenges;
 pub mod claims;
 pub mod council;
 pub mod errors;
+pub mod heads;
 pub mod observe;
 pub mod prints;
 pub mod reads;
@@ -504,5 +506,6 @@ fn dispatch(ctx: &Ctx, p: Paint, command: Option<&OracleCommand>) -> Result<Repo
             )
         }
         O::Emergency { command } => council::run(ctx, p, command),
+        O::Heads(heads) => heads::run(ctx, p, heads),
     }
 }

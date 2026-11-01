@@ -36,6 +36,9 @@ use crate::{
 pub struct Tx {
     pub steps: Vec<(String, Instruction)>,
     pub lookup_table: Option<Pubkey>,
+    /// Also ask for the 256 KiB heap frame (oracle v2's heads instructions decode the board, a
+    /// contract and heads onto the heap).
+    pub heap_frame: bool,
 }
 
 impl Tx {
@@ -64,12 +67,24 @@ impl Tx {
         self.steps.iter().map(|(n, _)| n.clone()).collect()
     }
 
+    /// The same transaction with the 256 KiB heap frame.
+    pub fn with_heap(mut self) -> Self {
+        self.heap_frame = true;
+        self
+    }
+
     fn instructions(&self) -> Vec<Instruction> {
         let mut out = vec![compute_unit_limit(COMPUTE_UNIT_LIMIT)];
+        if self.heap_frame {
+            out.push(ameba_sdk_futures::futures::heap_frame(HEAP_FRAME_BYTES));
+        }
         out.extend(self.steps.iter().map(|(_, ix)| ix.clone()));
         out
     }
 }
+
+/// The heap frame a heads transaction asks for: the bump allocator's 256 KiB.
+pub const HEAP_FRAME_BYTES: u32 = 256 * 1024;
 
 /// An oracle write ready to review and send.
 pub struct Write {

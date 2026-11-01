@@ -1,0 +1,26 @@
+# Sourced by ./rustc and ./clippy-driver, with rustc's arguments: notes this
+# worktree as the owner of the crate rustc builds, in ameba-worktree in its
+# Cargo fingerprint directory (<profile>/.fingerprint/<package>-<hash>), and
+# in the build script run's whose OUT_DIR the crate reads. Workspace members
+# have no other trace of it (their dep-info lists sources relative to the
+# workspace), and scripts/agent.sh rm and gc delete a worktree's crates from
+# the shared cache by it (scripts/cargo-cache-prune.py).
+ameba_out= ameba_hash= ameba_prev=
+for ameba_arg in "$@"; do
+  case "$ameba_prev" in
+    --out-dir) ameba_out=$ameba_arg ;;
+    -C) case "$ameba_arg" in extra-filename=-*) ameba_hash=${ameba_arg#extra-filename=-} ;; esac ;;
+  esac
+  ameba_prev=$ameba_arg
+done
+# ameba_note <fingerprint dir>: this worktree's root, if Cargo made the directory.
+ameba_note() { if [ -d "$1" ]; then printf '%s\n' "${0%/scripts/shared-cargo/*}" > "$1/ameba-worktree" 2>/dev/null || :; fi; }
+# --out-dir is <profile>/deps or <profile>/examples, or
+# <profile>/build/<package>-<hash> for a build script.
+case "$ameba_out" in
+  */deps|*/examples) ameba_note "${ameba_out%/*}/.fingerprint/${CARGO_PKG_NAME:-}-$ameba_hash" ;;
+  */build/*) ameba_note "${ameba_out%/build/*}/.fingerprint/${ameba_out##*/}" ;;
+esac
+case "${OUT_DIR:-}" in
+  */build/*/out) ameba_out=${OUT_DIR%/out}; ameba_note "${ameba_out%/build/*}/.fingerprint/${ameba_out##*/}" ;;
+esac

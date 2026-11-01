@@ -35,7 +35,7 @@ The program works in basis points and rounds the final value half up. A 3% weigh
 
 ## Who set the launch month's sources
 
-The first RAMX and NANDX months on Solana mainnet, the launch month, did not use open, bonded source formation. The governance council approved a launch document instead: a fixed registry of public price pages with each one's bucket, weight and printed opening value, recorded on chain in one launch per index. RAMX and NANDX each launched this way once; every later month forms through the ordinary process below. BATX has no launch month: its first month, BATX Nov 26, forms through the ordinary process too.
+The first RAMX and NANDX months on Solana mainnet, the launch month, did not use open, bonded source formation. The governance council approved a launch document instead: a fixed registry of public price pages with each one's bucket, weight and printed opening value, recorded on chain in one launch per index. RAMX and NANDX each launched this way once; every later month forms through the ordinary process below. BATX has no launch month: its first month forms through the ordinary process too.
 
 | Market | Sources | Buckets | Source pages |
 |---|---|---|---|

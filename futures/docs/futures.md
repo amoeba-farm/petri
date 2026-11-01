@@ -940,8 +940,19 @@ the ladder's worst fill (`Book::quote_admits`): holding inventory bought on
 credit, with asks that could sell it at a loss beyond its own cash, it quotes
 thinner until they fit, so its quotes keep landing. It lends the whole
 capacity, with no unlent reserve (the user, 2026-10-18): unstaking shares
-leave the capacity, so it hands their credit back as it can, and the rest
-comes back at settlement. It does not yet steer the credit toward close-outs and
+leave the capacity, so it hands their credit back. `CreditDefund` never goes
+below the exposure its quotes hold, and its quotes filled the whole limit,
+so until 2026-10-29 nothing came back and a finished timer waited for
+settlement (mainnet's first unstake). Now, where a market still lends and it
+wants credit back, it quotes within the share it keeps
+(`Book::quote_admits_within`): the market's depth drops, its exposure falls
+under the share and the next pass hands back the rest. Only what its
+positions themselves could cost stays until settlement. While stakers wait
+to leave it lends within what the stake backs at the lower of the average
+and the last posted price (`ops::stake::capacity_floor`), which the average
+can't go below before the next post, and hands back any amount over it, the
+1% band aside: `Unstake` needs what stays to back all of the credit lent at
+whatever second it is sent. It does not yet steer the credit toward close-outs and
 buybacks, as the user's notes recommend; the credit simply deepens its whole
 ladder.
 
@@ -975,7 +986,7 @@ covered, shortfall, AMBA], `ARRCVR01` [market, owner, payout, USDC, AMBA].
 - `e1`: a near-total wipe-out, then a stake whose shares used to overflow
   starts a new epoch; the old staker unstakes its residual (on a pool of
   either size: the legacy one grows).
-- `u1` to `u6`, the unstake timer: `Unstake` waits the week and the
+- `u1` to `u7`, the unstake timer: `Unstake` waits the week and the
   unstaking shares back no new credit (`u1`); a shortfall during the timer
   cuts them like every share, and they keep earning the stream (`u2`);
   cancelling, restarting the timer, only the owner starting or cancelling
@@ -984,7 +995,9 @@ covered, shortfall, AMBA], `ARRCVR01` [market, owner, payout, USDC, AMBA].
   finished timer, only into the owner's account and only all of it (`u5`);
   an unstake that would take AMBA backing lent credit waits, then goes
   through once the credit is back (`u6`); an unstake paying no AMBA is
-  refused (`u2`).
+  refused (`u2`); the maker's quotes holding the whole limit keep a
+  finished timer's credit out, and quoting within its share brings it back
+  and the keeper pays (`u7`).
 - `w1`, `w2`, the markets an unstake waits for: a finished timer can't
   leave in a lending market's last day nor after its expiry before its
   `CreditSettle`, then can, the keeper waiting as well; missing, repeated,

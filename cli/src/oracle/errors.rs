@@ -364,7 +364,59 @@ const ERRORS: &[(OracleError, &str)] = &[
         "InvalidPeriodTransition",
     ),
     (OracleError::PeriodNotFailable, "PeriodNotFailable"),
+    (OracleError::InvalidCfmLaunchPlan, "InvalidCfmLaunchPlan"),
+    (
+        OracleError::InvalidCfmLaunchReceipt,
+        "InvalidCfmLaunchReceipt",
+    ),
+    (
+        OracleError::CfmLaunchCouncilRequired,
+        "CfmLaunchCouncilRequired",
+    ),
+    // Oracle v2, heads on pikes (tag 210).
+    (OracleError::HeadsNotImplemented, "HeadsNotImplemented"),
+    (OracleError::InvalidHeadsAccount, "InvalidHeadsAccount"),
+    (
+        OracleError::InvalidHeadsTokenAccount,
+        "InvalidHeadsTokenAccount",
+    ),
+    (OracleError::InvalidHeadsState, "InvalidHeadsState"),
+    (
+        OracleError::HeadsCapacityExhausted,
+        "HeadsCapacityExhausted",
+    ),
+    (OracleError::HeadsCouncilRequired, "HeadsCouncilRequired"),
+    (OracleError::InvalidHeadsEvidence, "InvalidHeadsEvidence"),
+    (
+        OracleError::InsufficientHeadsStake,
+        "InsufficientHeadsStake",
+    ),
 ];
+
+/// What a heads refusal means, in plain words (petri checks first and says why itself; these
+/// cover what changed on chain between its read and the send).
+pub fn heads_words(code: u32) -> Option<&'static str> {
+    let error = ERRORS.iter().find(|(e, _)| *e as u32 == code)?.0;
+    Some(match error {
+        OracleError::InsufficientHeadsStake => {
+            "You don't have enough free AMBA staked in the oracle for that."
+        }
+        OracleError::InvalidHeadsState => {
+            "The head or claim is not in the state this needs any more (someone acted on it first, or a window opened or closed): read it again and retry."
+        }
+        OracleError::InvalidHeadsEvidence => {
+            "The oracle refused the evidence: its capture time must be the claim's time, and it must be sealed."
+        }
+        OracleError::HeadsCapacityExhausted => {
+            "The board is at its capacity for that (live sources, open contracts or a head's strikes)."
+        }
+        OracleError::HeadsNotImplemented => "The oracle on this network doesn't take this yet.",
+        OracleError::InsufficientAvailableCollateral => {
+            "Your oracle collateral doesn't cover the bond: deposit with petri oracle collateral deposit <USDC>."
+        }
+        _ => return None,
+    })
+}
 
 /// `Name: message (oracle error 6xxx)` for an oracle custom error code.
 pub fn name(code: u32) -> Option<String> {
@@ -391,5 +443,8 @@ mod tests {
         codes.sort_unstable();
         codes.dedup();
         assert_eq!(codes.len(), ERRORS.len(), "every code appears once");
+        assert!(name(6316).unwrap().starts_with("InsufficientHeadsStake"));
+        assert!(heads_words(6316).unwrap().contains("free AMBA"));
+        assert_eq!(heads_words(6000), None);
     }
 }

@@ -20,14 +20,25 @@
 //! 2026-10-22, when the user made them packaged NAND chips like RAMX's (spec v2; same bucket
 //! labels, so the same on-chain SKU list). BATX starts with the months
 //! expiring 2026-12-01 ([`BATX_FIRST_EXPIRY`]); [`index`] is its brief's fixed-base index.
+//!
+//! Oracle v2's long-term agreement layer observes every bucket in three channels, Spot,
+//! Contract and LTA: [`molds`] compiles `governance/channel_molds.v1.json`, each product's
+//! components with their frozen sentences and hashes, mixes, evidence tables and listing terms
+//! document (`oracle/docs/lta.md`).
 
 mod buckets;
 pub mod index;
+pub mod molds;
 mod routing;
 mod series;
 pub mod time;
 
 pub use buckets::*;
+pub use molds::{
+    listing_mix_commitment, listing_mixes, listing_terms_document, listing_terms_sha256, molds,
+    origin_id, Channel, ChannelMold, Component, MixBasis, Mold, MoldItem, Molds, Quarter,
+    SettlementTarget,
+};
 pub use routing::*;
 pub use series::*;
 
@@ -44,3 +55,5 @@ pub fn uses_chip_buckets(expiry_ts: i64) -> bool {
 mod tests;
 #[cfg(test)]
 mod tests_batx;
+#[cfg(test)]
+mod tests_molds;

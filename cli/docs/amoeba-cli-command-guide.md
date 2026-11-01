@@ -492,7 +492,15 @@ and settles at expiry.
 for every month's phase, source count and settlement status and each month's
 verified source inventory, `/v1/oracle/catalog` for periods and settlement
 times, and `/oracle/source-candidates` for research candidates. They need no
-wallet.
+wallet. The commands that read state from the oracle program itself
+(`challenges`, `prints`, `updates`, `stakes`, `rewards`, `sponsorships`)
+take their program scans (`getProgramAccounts`) from the futures API's
+`/v1/oracle/accounts` while no RPC is set (`--rpc`, `PETRI_RPC_URL` or the
+`rpc` setting): it scans each account layout once for every caller, so
+Solana's public RPC, the production default, does not turn the reads away.
+Their other reads, and every write, go to the RPC; with an RPC set, so do
+the scans, and so does a scan the API can't answer. The JSON is the same
+either way.
 
 **Writes** are built with the oracle program's own instruction builders (the
 `ameba_oracle` crate, from the monorepo's `oracle/`, the source the deployment runs)
@@ -563,9 +571,55 @@ oracle sponsorships [settle|claim <SOURCE>]
 oracle reserve withdraw --agent ID <USDC> a researcher's held-back bounty share, to collateral
 oracle emergency propose|apply|recover MARKET --kind K --target ADDRESS --target-id HEX [--account A …]
 oracle emergency vote MARKET --kind K --target ADDRESS --target-id HEX --choice N [--account A …]
+oracle heads [--product P]                the heads boards (oracle v2): components, live sources and shares, heads gathering backing
+oracle heads show <HEAD> --product P      one head: spec, claims, challenges, delegations
+oracle heads mine [--owner PUBKEY]        your stake, delegations, claims, challenges, rewards, with what to run next
+oracle heads terms <PERIOD|QUARTER|PRODUCT>   a quarterly contract's listing terms: sentences and its quarter's mix
+oracle heads stake|unstake <AMBA>         AMBA into the oracle, or free stake back (`all`)
+oracle heads post --product P --component C --name N [--spec TEXT] --access public-page|login-zktls|offline-quote|physical [--amount AMBA]
+oracle heads delegate|undelegate <HEAD> <AMBA> --product P
+oracle heads sync <HEAD> --product P [--owner PUBKEY]
+oracle heads fill|update <HEAD> --product P --value V --time T --origin PUBLISHER/REPORT [--evidence FILE|URL]
+                         [--effective-from T --next-reset T --floor V --ceiling V]   (LTA heads only)
+oracle heads reveal <HEAD> <SEQ> --product P
+oracle heads challenge <HEAD> <SEQ> --product P --reason R [--code value|off-channel|duplicate-origin|expired-observation]
+                         [--value V] [--time T] [--evidence FILE|URL] [--bond USDC]
+oracle heads challenge-source <HEAD> --product P --reason R [--code …] [--evidence FILE|URL] [--bond USDC]
+oracle heads settle <HEAD> [<SEQ>] --product P   finalize a claim whose window ended, pay its challenges (or the head's own case)
+oracle heads rewards [--claim]            delegator rewards, or claim them into collateral
+oracle heads prize <HEAD> <SEQ> --product P   an accepted claim's prize once its month ended
 ```
 
 Every write accepts `--simulate`, and `--yes` skips the confirmation prompt.
+
+### Heads (oracle v2)
+
+Oracle v2, "heads on pikes" (`oracle/docs/heads.md`, with the channel layer of
+`oracle/docs/lta.md`), on dev only: stakers stake AMBA into the oracle and
+delegate it to sources ("heads") posted by name and spec, not URL. Each
+product's items are observed in three channels (Spot, Contract, LTA); a
+component is one item in one channel. Contracts are quarterly (RAMX Q4 2026
+expires on 2027-01-01, then Q1 2027, …), and each settles on its items'
+fixed-mix blends of their channels, by the quarter's mix frozen at listing
+(assumed placeholders for now; a channel that would settle degraded keeps its
+weight at its last valid value), weighted by the basket. `petri oracle heads`
+shows per item its mix, each channel's change and the blend; `heads terms` a
+contract's quarter mix and sentences. A head turns active once its delegation
+reaches the board's activation threshold with enough delegators, the first fill
+that survives its challenge window makes it live, anyone keeps it current with
+updates (a claim and its bond), and anyone challenges a claim (bonds only) or
+the source itself (a fallen source slashes its delegators).
+Reads print the futures API's documents (`/v1/oracle/heads*`) verbatim, or the
+same documents built from chain through `ameba_oracle::heads_view` when the API
+can't answer; `heads mine` is read from chain and lists the follow-ups
+(`syncCommand`, `prizeCommand`, the rewards' `claimCommand`). Writes default every bond and stake to the exact amount the
+program needs, refuse in plain words, ask for the 256 KiB heap frame, and print
+`{ action: "heads.<name>", signature, product, head, … }`. A fill or update
+commits and reveals in one call; if the reveal fails, the result says so with
+`heads reveal`. Evidence: a Wayback capture (kind 3), a web proof (kind 4) or
+a file (kind 2); a challenge without evidence seals its reason as a kind-2
+object. Reveal material stays in `oracle-heads-claims.json` beside the config
+(mode 0600).
 
 ### Collateral and bonds
 
@@ -1473,7 +1527,7 @@ list complete):
 | --- | --- | --- |
 | `getAccountInfo` | accounts: markets, the oracle, gates, the Clock sysvar | yes |
 | `getMultipleAccounts` | accounts, up to 100 at a time | yes |
-| `getProgramAccounts` | the oracle's periods, sources, challenges, opening prints' links, sponsorships and a wallet's reward claims | no |
+| `getProgramAccounts` | the oracle's periods, sources, challenges, opening prints' links, sponsorships and a wallet's reward claims (oracle writes; the oracle reads only with an RPC set, else the API's `/v1/oracle/accounts`) | no |
 | `getBalance` | a wallet's SOL | yes |
 | `getSlot` | `petri status` | yes |
 | `getGenesisHash` | the deployment identity gate | yes |
@@ -1488,10 +1542,13 @@ list complete):
 
 The oracle commands, and the TUI's Fund and Rewards views, read with
 `getProgramAccounts`, which Solana's public RPC rate-limits per caller
-(`rewards` sends several at once; the views read every few seconds). Pass
-`--rpc <provider URL>` or set `PETRI_RPC_URL` to an RPC provider's node. When
-an RPC turns a call away for its rate, Petri says so and names `--rpc`; it
-doesn't retry.
+(`rewards` sends several at once; the views read every few seconds). The
+oracle reads (`challenges`, `prints`, `updates`, `stakes`, `rewards`,
+`sponsorships`, the Rewards view) take theirs from the futures API while no
+RPC is set ("Oracle"); the writes, and the Fund view, still scan the RPC.
+For those, pass `--rpc <provider URL>` or set `PETRI_RPC_URL` to an RPC
+provider's node. When an RPC turns a call away for its rate, Petri says so
+and names `--rpc`; it doesn't retry.
 
 The signing wallet is `--keypair` (a keypair file or hardware-wallet URL), else the saved
 `keypair` setting, else the Solana CLI config's keypair. `petri wallet new`

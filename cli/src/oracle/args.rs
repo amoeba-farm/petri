@@ -207,6 +207,10 @@ pub enum OracleCommand {
         #[command(subcommand)]
         command: CouncilCommand,
     },
+    #[command(
+        about = "Oracle v2's heads board: sources backed by staked AMBA; stake, post, delegate, fetch, fill, challenge, claim"
+    )]
+    Heads(super::heads::args::HeadsArgs),
 }
 
 #[derive(Debug, Args, Clone)]

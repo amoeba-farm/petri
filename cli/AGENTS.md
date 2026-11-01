@@ -124,8 +124,12 @@ contracts:
   settlement, tag 169: what each waits for or where it went, `oracle
   stakes`, `stakes settle --all`, and the one settle builder `stakes settle`
   shares), `rewards.rs` (a wallet's rewards read from chain and their
-  claims, tag 174), `claims.rs` (private update-claim reveal material) and
-  `errors.rs` (oracle error names).
+  claims, tag 174), `claims.rs` (private update-claim reveal material),
+  `errors.rs` (oracle error names) and `heads/` (oracle v2's heads board,
+  tag 210: the API's `/v1/oracle/heads*` documents with a chain fallback
+  through `ameba_oracle::heads_view`, `heads mine` with its follow-ups, and
+  every user write; the DeepSeek plugin's `HEADS` tools run exactly this
+  grammar).
 - `src/chain_identity.rs` owns the deployment identity gate: the RPC's genesis
   must be the trusted deployment's and the oracle and futures programs must be
   deployed there (oracle writes also check the oracle config's bond

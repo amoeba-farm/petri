@@ -40,7 +40,7 @@ The density is the single die's: a package holding four 1Tb dies is not a 1Tb ch
 
 These definitions are new. The comparison series in each bucket come from open submissions and are still being filled in, and published contract-price coverage is thin for some buckets, especially DDR5 24Gb and the NANDX chips.
 
-**BATX** prices new manufactured lithium-ion battery cells. It uses China domestic industrial prices in Chinese yuan (CNY), per Wh where possible. Its first month is BATX Nov 26, expiring 2026-12-01 00:00 UTC. It has no launch month: its sources form through the [ordinary monthly process](https://docs.amoeba.farm/oracle/01-how-it-is-structured/#the-ordinary-monthly-process) from its first month.
+**BATX** prices new manufactured lithium-ion battery cells. It uses China domestic industrial prices in Chinese yuan (CNY), per Wh where possible. It has no market yet, and no launch month: its sources form through the [ordinary monthly process](https://docs.amoeba.farm/oracle/01-how-it-is-structured/#the-ordinary-monthly-process) from its first month.
 
 | Bucket | What it prices | Weight |
 |---|---|---|

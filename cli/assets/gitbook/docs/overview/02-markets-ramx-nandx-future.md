@@ -1,6 +1,6 @@
 # RAMX, NANDX, and BATX markets
 
-Amoeba Farm has three indexes. **RAMX** tracks DRAM memory chip prices. **NANDX** tracks NAND flash chip prices. **BATX** tracks lithium-ion battery cell prices in China. Each index has one capped futures market per monthly expiry, paid in USDC on Solana mainnet. BATX is a prototype, and its first month is BATX Nov 26.
+Amoeba Farm has three indexes. **RAMX** tracks DRAM memory chip prices. **NANDX** tracks NAND flash chip prices. **BATX** tracks lithium-ion battery cell prices in China. Each index has one capped futures market per monthly expiry, paid in USDC on Solana mainnet. BATX is a prototype and has no market yet.
 
 ## What each index tracks
 
@@ -24,7 +24,7 @@ BATX measures China domestic industrial prices of new manufactured lithium-ion b
 
 Its buckets are LFP cells for energy storage, LFP cells for electric vehicles, and nickel-based ternary prismatic and pouch cells for electric vehicles. Their weights are design allocations, not market shares. Raw materials, assembled packs, complete storage systems, used cells and retail prices are outside BATX. [Products, buckets, and weights](https://docs.amoeba.farm/reference/04-products-indexes-buckets/) has the full definition.
 
-BATX's first month is BATX Nov 26, expiring 2026-12-01 00:00 UTC. It has no launch month: its sources form through the [ordinary monthly process](https://docs.amoeba.farm/oracle/01-how-it-is-structured/#the-ordinary-monthly-process) from its first month.
+BATX has no market yet. It has no launch month: its sources form through the [ordinary monthly process](https://docs.amoeba.farm/oracle/01-how-it-is-structured/#the-ordinary-monthly-process) from its first month.
 
 BATX is a prototype. No publisher's prices are licensed for its settlement yet.
 
