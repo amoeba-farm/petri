@@ -1,0 +1,4527 @@
+{
+  "nowMs": 1793250000000,
+  "config": {
+    "programs": {
+      "oracle": "AbtsvZcYjFD2rHK4ATw4rjm9o3CLcqRvRwy8FT38YsrW"
+    }
+  },
+  "heads": {
+    "boards": [
+      {
+        "product": "RAMX",
+        "address": "HZkfzKFjFPmh9RM5rcUmKXkSScZnCb1q6rYTWWh1kmza",
+        "params": {
+          "slashRateBps": 1000,
+          "maxStrikes": 2,
+          "proposerSlashBps": 10000,
+          "prizeCutBps": 2000,
+          "baseFillPrize": "5000000",
+          "fillPrizeSlopePpb": "0",
+          "baseUpdatePrize": "1000000",
+          "updatePrizeSlopePpb": "0",
+          "claimBond": "1000000",
+          "challengeBond": "1000000",
+          "challengeWindowSecs": 86400,
+          "challengeExtensionSecs": 21600,
+          "headTtlSecs": 1209600,
+          "cooldownSecs": 1209600,
+          "minDelegators": 2,
+          "minLiveSources": 3,
+          "minSettleWeight": "1000000000000",
+          "alphaBps": 2500,
+          "floorPost": "1000000000000",
+          "betaBps": 5000,
+          "floorActivate": "2000000000000",
+          "settlementBusinessDays": 5,
+          "maxLiabilityBps": 1900
+        },
+        "components": [
+          {
+            "index": 0,
+            "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+            "label": "DDR5 16Gb",
+            "basketWeightBps": 4000,
+            "liveSources": 4
+          },
+          {
+            "index": 1,
+            "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+            "label": "DDR5 24Gb",
+            "basketWeightBps": 2000,
+            "liveSources": 3
+          },
+          {
+            "index": 2,
+            "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+            "label": "DDR4 16Gb",
+            "basketWeightBps": 2500,
+            "liveSources": 3
+          },
+          {
+            "index": 3,
+            "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+            "label": "DDR4 8Gb",
+            "basketWeightBps": 1500,
+            "liveSources": 3
+          }
+        ],
+        "totals": {
+          "delegation": "233000000000000",
+          "liveDelegation": "219000000000000",
+          "reserve": "1250000000",
+          "prizePool": "312500000"
+        },
+        "thresholds": {
+          "minPost": "4480000000000",
+          "activation": "7000000000000"
+        },
+        "heads": [
+          {
+            "id": 1,
+            "address": "HPBPbbWFhNDrsukuPFLCWPyU3R8ojYYhZMkWf4TEPW2j",
+            "product": "RAMX",
+            "component": 0,
+            "name": "Mouser DDR5-4800 16Gb spot",
+            "spec": "Mouser DDR5-4800 16Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "ba1f9249fe290cb727c5e622611ef8e79bc54cb3944ab97960eeae82c40f4e97",
+            "accessClass": "public-page",
+            "proposer": "rBiLf2y5bTSo9EpEAQsZisF3pwbrq4b1KJsY8FZrFhT",
+            "status": "live",
+            "delegation": "42000000000000",
+            "delegators": 6,
+            "postedAt": 1789794000,
+            "expiresAt": 1791003600,
+            "activeAt": 1789966800,
+            "liveAt": 1790056800,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "7940000",
+            "sourceTs": 1793178000,
+            "shareBps": 3333,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "41160000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "address": "3rX3SCo2rwjhdnvBe6YLo1LP6qQKTWjz4ijt9nRCQMrH",
+            "product": "RAMX",
+            "component": 0,
+            "name": "Digi-Key DDR5 16Gb unit price",
+            "spec": "Digi-Key DDR5 16Gb unit price. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "4b26289eee65018788819f0b20f0b34e56ca75c94a543a29c307d5db9bb0e3f7",
+            "accessClass": "public-page",
+            "proposer": "2EM7YqcVb9d76CN93RUwKoY5R5atLMYP47TeZK4GdenA",
+            "status": "live",
+            "delegation": "31500000000000",
+            "delegators": 4,
+            "postedAt": 1789966800,
+            "expiresAt": 1791176400,
+            "activeAt": 1790139600,
+            "liveAt": 1790229600,
+            "retiredAt": null,
+            "strikes": 1,
+            "value": "8120000",
+            "sourceTs": 1793178000,
+            "shareBps": 3333,
+            "openClaims": 1,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "30870000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "address": "GJgEefuMh8JhgZXMTQdqXvSFHyxzJUh51ExwwtLEDgew",
+            "product": "RAMX",
+            "component": 1,
+            "name": "Mouser DDR5 24Gb spot",
+            "spec": "Mouser DDR5 24Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "7c61e06f7b00d1904eb1a06a076c92f8bf423152d6d371a51ea412f9fa60d5ba",
+            "accessClass": "public-page",
+            "proposer": "8doPMedp2XpV3ZJBV3wtzzk4xVXG1pK9jY5qDbmvSibY",
+            "status": "live",
+            "delegation": "22000000000000",
+            "delegators": 4,
+            "postedAt": 1790226000,
+            "expiresAt": 1791435600,
+            "activeAt": 1790398800,
+            "liveAt": 1790488800,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "11600000",
+            "sourceTs": 1793178000,
+            "shareBps": 3334,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "21560000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "address": "Gt5kqth2xP47PwdmkiVdmHC2VW83rkMjWXAFFR8Xnmnt",
+            "product": "RAMX",
+            "component": 2,
+            "name": "Mouser DDR4 16Gb spot",
+            "spec": "Mouser DDR4 16Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "f52d6aa63d296d912c15c9b82687576d345f3c38a316c7bc37ff6a573e2de230",
+            "accessClass": "public-page",
+            "proposer": "dq1D1RKBozyFzWjrsBT4uF1ra6spcqfJKjUxSuJ7Q43",
+            "status": "live",
+            "delegation": "20000000000000",
+            "delegators": 3,
+            "postedAt": 1790398800,
+            "expiresAt": 1791608400,
+            "activeAt": 1790571600,
+            "liveAt": 1790661600,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "6200000",
+            "sourceTs": 1793178000,
+            "shareBps": 3334,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "19600000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "address": "6epKyrcpAL4iKVs11dgakTrDBV657NLRtBbb1ichp4Xu",
+            "product": "RAMX",
+            "component": 0,
+            "name": "Memory Market DDR5 16Gb spot",
+            "spec": "Memory Market DDR5 16Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "b8378d3d6be6e14cee7260cb21249d27bf688170987eeadebfb77928c6e672a3",
+            "accessClass": "public-page",
+            "proposer": "4wutnTgbD9wG23cdFf6zHhyRyAbk8aBdFUDWkVuv5aLQ",
+            "status": "live",
+            "delegation": "18000000000000",
+            "delegators": 3,
+            "postedAt": 1790139600,
+            "expiresAt": 1791349200,
+            "activeAt": 1790312400,
+            "liveAt": 1790402400,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "7650000",
+            "sourceTs": 1793178000,
+            "shareBps": 2182,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "17640000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "address": "HTM2TZLD9jCxWiTqtTqzrgaJ8JfTm62Mfm9zzuoYzaUu",
+            "product": "RAMX",
+            "component": 1,
+            "name": "Memory Market DDR5 24Gb spot",
+            "spec": "Memory Market DDR5 24Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "bbea72aec7ef54df4570c74d92fb12fe49651b8e2a40be62510d5c76137203f3",
+            "accessClass": "public-page",
+            "proposer": "Q6acoDTZbaCVyuo3q272Wvo7BscxdoVjMWvBBoRnvPT",
+            "status": "live",
+            "delegation": "15000000000000",
+            "delegators": 3,
+            "postedAt": 1790312400,
+            "expiresAt": 1791522000,
+            "activeAt": 1790485200,
+            "liveAt": 1790575200,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "11250000",
+            "sourceTs": 1793178000,
+            "shareBps": 3333,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "14700000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "address": "Dj2GnHhER5CaZhohymiKSg5ZhsKr6pexDfngCAXEPFWA",
+            "product": "RAMX",
+            "component": 2,
+            "name": "Memory Market DDR4 16Gb spot",
+            "spec": "Memory Market DDR4 16Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "9409d716e7ff75ed979626215a2c46b65b70efa7adb8eb4d19775f3221a18d62",
+            "accessClass": "public-page",
+            "proposer": "8JzhcSTAWeg9upPiNsZkY2YpVzS9wPbubCMjSx2egxoh",
+            "status": "live",
+            "delegation": "14000000000000",
+            "delegators": 3,
+            "postedAt": 1790485200,
+            "expiresAt": 1791694800,
+            "activeAt": 1790658000,
+            "liveAt": 1790748000,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "6050000",
+            "sourceTs": 1793178000,
+            "shareBps": 3333,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "13720000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "address": "EDiTcKxX9t6M9CWTre6szvz4g5BZxsrRbe2gF5hP8gWi",
+            "product": "RAMX",
+            "component": 3,
+            "name": "Mouser DDR4 8Gb spot",
+            "spec": "Mouser DDR4 8Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "463d486ee0212989ca8c6634f11385cd3f87201cc34930188af028af1e608de5",
+            "accessClass": "public-page",
+            "proposer": "FKScnLcSoByfZk1ckvbjwL8kwEcJ6LWJHvkS5QLFh28Q",
+            "status": "live",
+            "delegation": "12000000000000",
+            "delegators": 3,
+            "postedAt": 1790571600,
+            "expiresAt": 1791781200,
+            "activeAt": 1790744400,
+            "liveAt": 1790834400,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "2910000",
+            "sourceTs": 1793178000,
+            "shareBps": 3334,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "11760000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "address": "NbNnKfkzy6TVKr1edCtQ2NxKWAmiQfdr6isV9cgRruE",
+            "product": "RAMX",
+            "component": 2,
+            "name": "Distributor portal DDR4 16Gb contract price",
+            "spec": "Distributor portal DDR4 16Gb contract price. Unit: USD per chip; the signed-in contract price page, proven with a web proof; one print per business day.",
+            "specHash": "9fc1d4b539b3a5230e87473f566dae46f3dce4df1adf7279503169bd1488d1e1",
+            "accessClass": "login-zktls",
+            "proposer": "8z81MW3ZWPbSHdj3Tvw23HhfcdxnzN6j7qhkqoYeYG1E",
+            "status": "live",
+            "delegation": "11000000000000",
+            "delegators": 2,
+            "postedAt": 1790571600,
+            "expiresAt": 1791781200,
+            "activeAt": 1790744400,
+            "liveAt": 1790834400,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "6350000",
+            "sourceTs": 1793178000,
+            "shareBps": 3333,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "10780000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "address": "9UZVrXqJjixGkVUjxDCj9Y1QiSKqTeWn74fJ2dnyCKfG",
+            "product": "RAMX",
+            "component": 0,
+            "name": "Shenzhen broker DDR5 16Gb weekly quote",
+            "spec": "Shenzhen broker DDR5 16Gb weekly quote. Unit: USD per chip; a written quote for 1,000+ units, dated, with the seller named; one print per week.",
+            "specHash": "1cdfeb4881b8e1848237217decb6bebc7474cc26e5c20ca960be2c97bec31dc9",
+            "accessClass": "offline-quote",
+            "proposer": "JBQ3SeLqgsoxvGstw3Z3VALQZKttK4k7Yu7tscHRFA5H",
+            "status": "live",
+            "delegation": "9500000000000",
+            "delegators": 2,
+            "postedAt": 1790658000,
+            "expiresAt": 1791867600,
+            "activeAt": 1790830800,
+            "liveAt": 1790920800,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "7400000",
+            "sourceTs": 1792998000,
+            "shareBps": 1152,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "9310000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "address": "4uGGJXuaujFf3KRLXjDZ3q4UD12yYFNn5EqDjMbYmf2T",
+            "product": "RAMX",
+            "component": 3,
+            "name": "Memory Market DDR4 8Gb spot",
+            "spec": "Memory Market DDR4 8Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "038c6201c1c30ffb2ede88588dbbd9e9696143265f62359e3bb1d5f6b04b0841",
+            "accessClass": "public-page",
+            "proposer": "GxQPNuiqWMML2rKFisGC5MF285djfYyd7xGANW5BC4bZ",
+            "status": "live",
+            "delegation": "9000000000000",
+            "delegators": 2,
+            "postedAt": 1790658000,
+            "expiresAt": 1791867600,
+            "activeAt": 1790830800,
+            "liveAt": 1790920800,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "2840000",
+            "sourceTs": 1793178000,
+            "shareBps": 3333,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "8820000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "address": "4qJHdrKJz1uSFFmZ62mkbSHmFUXixj8grfnsuyWS7L6V",
+            "product": "RAMX",
+            "component": 1,
+            "name": "Broker DDR5 24Gb weekly quote",
+            "spec": "Broker DDR5 24Gb weekly quote. Unit: USD per chip; a written quote for 1,000+ units, dated, with the seller named; one print per week.",
+            "specHash": "c12a57f214d54bbc995468d7852d481e6100d205b3dc3c2689edc671ae2a068c",
+            "accessClass": "offline-quote",
+            "proposer": "64wxAB5iw4BsHomr42qZxYBXDTi8iMnXm2Dk7tJMnV37",
+            "status": "live",
+            "delegation": "8000000000000",
+            "delegators": 2,
+            "postedAt": 1790398800,
+            "expiresAt": 1791608400,
+            "activeAt": 1790571600,
+            "liveAt": 1790661600,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "11900000",
+            "sourceTs": 1793178000,
+            "shareBps": 3333,
+            "openClaims": 0,
+            "openChallenges": 1,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "7840000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 16,
+            "address": "72aB5Yabev9NMocdQyfJUf1xavcghz5s5SbxgDVWHaYj",
+            "product": "RAMX",
+            "component": 3,
+            "name": "Broker DDR4 8Gb weekly quote",
+            "spec": "Broker DDR4 8Gb weekly quote. Unit: USD per chip; a written quote for 1,000+ units, dated, with the seller named; one print per week.",
+            "specHash": "ac905d2199c617fae405cf00b66345dc382880c26c7cd66f08185cb2135c56b0",
+            "accessClass": "offline-quote",
+            "proposer": "DtSecA3d7b61axQqcARi34561fZ3CwVQoqsudRB6Va3e",
+            "status": "live",
+            "delegation": "7000000000000",
+            "delegators": 2,
+            "postedAt": 1790744400,
+            "expiresAt": 1791954000,
+            "activeAt": 1790917200,
+            "liveAt": 1791007200,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "2970000",
+            "sourceTs": 1793070000,
+            "shareBps": 3333,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": [
+              {
+                "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+                "rawWeight": "6860000000000",
+                "effectiveWeight": null
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "address": "3jk63ZAiLhkw9ExmRSMgZnPaS1Z2XCaXxt2KKvdW8x7S",
+            "product": "RAMX",
+            "component": 0,
+            "name": "Arrow DDR5 16Gb distributor price",
+            "spec": "Arrow DDR5 16Gb distributor price. Unit: USD per chip; the signed-in distributor price page, proven with a web proof; one print per business day.",
+            "specHash": "ca9deb5b3c99f878cd9d67b3636647813d953fc3891f468d90ffdb12a2a0649f",
+            "accessClass": "login-zktls",
+            "proposer": "n8JQgSRG1JeF3XfxGPBZ9k7JbArP6My8JxScWhMxHzx",
+            "status": "active",
+            "delegation": "6800000000000",
+            "delegators": 3,
+            "postedAt": 1792990800,
+            "expiresAt": 1794200400,
+            "activeAt": 1793163600,
+            "liveAt": null,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": null,
+            "sourceTs": null,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 17,
+            "address": "Hmrya3awGpERiD4eoRkkBssojf6yW9TqVTDbKCLnHEP8",
+            "product": "RAMX",
+            "component": 3,
+            "name": "Auction-site DDR4 8Gb lots",
+            "spec": "Auction-site DDR4 8Gb lots. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "b894f54b740244319ffcc32046dd0f103e8c08bea58d854b187ba683fbac4e97",
+            "accessClass": "public-page",
+            "proposer": "8CFhAZXfNSDCAzEPyWfDpCzux84Jjoa5uhSgLfji1uhu",
+            "status": "retired",
+            "delegation": "3200000000000",
+            "delegators": 2,
+            "postedAt": 1790830800,
+            "expiresAt": 1792040400,
+            "activeAt": 1791003600,
+            "liveAt": 1791093600,
+            "retiredAt": 1793077200,
+            "strikes": 2,
+            "value": "3400000",
+            "sourceTs": 1793178000,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 14,
+            "address": "2qM8i1a4XsJgrh5NHHiVgpcqL7VvMZ3rhM3y6PtNmMko",
+            "product": "RAMX",
+            "component": 1,
+            "name": "Digi-Key DDR5 24Gb unit price",
+            "spec": "Digi-Key DDR5 24Gb unit price. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "097cc7e8c3b3b50a4a6b6c12cde42d7efc1209060a8c9c1f105d444c8a9a88b2",
+            "accessClass": "public-page",
+            "proposer": "YV8YqyWHWueqo3147kHjbVLKYPYnuBYvUP1g7D2tYFz",
+            "status": "open",
+            "delegation": "2500000000000",
+            "delegators": 1,
+            "postedAt": 1793077200,
+            "expiresAt": 1794286800,
+            "activeAt": null,
+            "liveAt": null,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": null,
+            "sourceTs": null,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 15,
+            "address": "Bjg4TCR4hA3EosRBR5P8JLyrivn5ZLDF5tFZX1EBSgFo",
+            "product": "RAMX",
+            "component": 0,
+            "name": "Huaqiangbei DDR5 16Gb street price",
+            "spec": "Huaqiangbei DDR5 16Gb street price. Unit: USD per chip; a dated photo of the posted price at three stalls in the SEG market, the median; one print per week.",
+            "specHash": "09f759c42c62a3d94ed546c1243e088b0dd9e122034950d2d43f3dbdda8cc083",
+            "accessClass": "physical",
+            "proposer": "3jDM1anoWJebYN3X41kG2m83ZC4VV74ywNxYkaW1mVGr",
+            "status": "open",
+            "delegation": "1500000000000",
+            "delegators": 1,
+            "postedAt": 1793163600,
+            "expiresAt": 1794373200,
+            "activeAt": null,
+            "liveAt": null,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": null,
+            "sourceTs": null,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          }
+        ],
+        "contracts": [
+          {
+            "period": "9Vm7MUsEjrvHsKsE3h7AHCQPWQdYpuJosBgxbLmnrc6o",
+            "expiry": 1803859200,
+            "status": "live",
+            "listingTs": 1793145600,
+            "freezeTs": 1803254400
+          }
+        ]
+      },
+      {
+        "product": "NANDX",
+        "address": "6jQTrsFxB8hy8iYmuV4J5GvHD6Dus3WwwR7avZD4ysa8",
+        "params": {
+          "slashRateBps": 1000,
+          "maxStrikes": 2,
+          "proposerSlashBps": 10000,
+          "prizeCutBps": 2000,
+          "baseFillPrize": "5000000",
+          "fillPrizeSlopePpb": "0",
+          "baseUpdatePrize": "1000000",
+          "updatePrizeSlopePpb": "0",
+          "claimBond": "1000000",
+          "challengeBond": "1000000",
+          "challengeWindowSecs": 86400,
+          "challengeExtensionSecs": 21600,
+          "headTtlSecs": 1209600,
+          "cooldownSecs": 1209600,
+          "minDelegators": 2,
+          "minLiveSources": 3,
+          "minSettleWeight": "1000000000000",
+          "alphaBps": 2500,
+          "floorPost": "1000000000000",
+          "betaBps": 5000,
+          "floorActivate": "2000000000000",
+          "settlementBusinessDays": 5,
+          "maxLiabilityBps": 1900
+        },
+        "components": [
+          {
+            "index": 0,
+            "bucketId": "746c635f31746200000000000000000000000000000000000000000000000000",
+            "label": "1Tb TLC",
+            "basketWeightBps": 4000,
+            "liveSources": 2
+          },
+          {
+            "index": 1,
+            "bucketId": "716c635f31746200000000000000000000000000000000000000000000000000",
+            "label": "1Tb QLC",
+            "basketWeightBps": 3000,
+            "liveSources": 1
+          },
+          {
+            "index": 2,
+            "bucketId": "746c635f35313267620000000000000000000000000000000000000000000000",
+            "label": "512Gb TLC",
+            "basketWeightBps": 2000,
+            "liveSources": 0
+          },
+          {
+            "index": 3,
+            "bucketId": "746c635f32353667620000000000000000000000000000000000000000000000",
+            "label": "256Gb TLC",
+            "basketWeightBps": 1000,
+            "liveSources": 0
+          }
+        ],
+        "totals": {
+          "delegation": "32200000000000",
+          "liveDelegation": "26000000000000",
+          "reserve": "180000000",
+          "prizePool": "45000000"
+        },
+        "thresholds": {
+          "minPost": "2683000000000",
+          "activation": "4000000000000"
+        },
+        "heads": [
+          {
+            "id": 1,
+            "address": "FWUmAciwDEunB2Y1hwAawCv2yCaHt9RdGKz7x2fzd1tG",
+            "product": "NANDX",
+            "component": 0,
+            "name": "Memory Market 1Tb TLC chip spot",
+            "spec": "Memory Market 1Tb TLC chip spot. Unit: USD per packaged single-die chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "6ecaae7a1c94e5002609523b82e6128ada849eec2fa932cd4811405c0c3fc091",
+            "accessClass": "public-page",
+            "proposer": "CDxnALt9ZwhEaHpq6c4raeCtbsVbCCr5gtKuLwKPeh2x",
+            "status": "live",
+            "delegation": "12000000000000",
+            "delegators": 3,
+            "postedAt": 1791522000,
+            "expiresAt": 1792731600,
+            "activeAt": 1791694800,
+            "liveAt": 1791784800,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "5200000",
+            "sourceTs": 1793178000,
+            "shareBps": 5000,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 2,
+            "address": "9GePFiFtMf7NtmoCDWyhoupjg5BAVnxN2QkQcF3u9hrw",
+            "product": "NANDX",
+            "component": 0,
+            "name": "Mouser 1Tb TLC NAND unit price",
+            "spec": "Mouser 1Tb TLC NAND unit price. Unit: USD per packaged single-die chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "48c2f12b476800f8135105e0f20b6f2fb8987e95e66bfdce1e21b5c707993041",
+            "accessClass": "public-page",
+            "proposer": "A6G2vAZQHmjerR2NYTC4HasJugf4nSauzEkmW2CFTs35",
+            "status": "live",
+            "delegation": "8000000000000",
+            "delegators": 2,
+            "postedAt": 1791694800,
+            "expiresAt": 1792904400,
+            "activeAt": 1791867600,
+            "liveAt": 1791957600,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "5350000",
+            "sourceTs": 1793178000,
+            "shareBps": 5000,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 4,
+            "address": "2npDqbjECWbzp1UWZde5JyyMejBNDvzUpxRagpm9iUak",
+            "product": "NANDX",
+            "component": 1,
+            "name": "Memory Market 1Tb QLC chip spot",
+            "spec": "Memory Market 1Tb QLC chip spot. Unit: USD per packaged single-die chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "7930b55a1b0ec98728cd82fefaf3de030d94ce40c6e9eac9ae478a70afd8189f",
+            "accessClass": "public-page",
+            "proposer": "AaMqP231F5s8PCjksZgUGqKCwDVMpas7iQXzvFLcmimo",
+            "status": "live",
+            "delegation": "6000000000000",
+            "delegators": 2,
+            "postedAt": 1791781200,
+            "expiresAt": 1792990800,
+            "activeAt": 1791954000,
+            "liveAt": 1792044000,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": "4100000",
+            "sourceTs": 1793178000,
+            "shareBps": 10000,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 3,
+            "address": "G5Hj4Y3T3PSNfUFQ54BmeD7kUrZ7ecnRky9Q5Lgy6u84",
+            "product": "NANDX",
+            "component": 0,
+            "name": "Broker 1Tb TLC weekly quote",
+            "spec": "Broker 1Tb TLC weekly quote. Unit: USD per chip; a written quote for 1,000+ units, dated, with the seller named; one print per week.",
+            "specHash": "0f456833745bc6b4af59d26f4da20f2ab4478cdbde1feaa537a2db78c95bae63",
+            "accessClass": "offline-quote",
+            "proposer": "ccEYRBAjXVfzzJ2poPU4wwP9LsbGtx5otKf3RUiSiqP",
+            "status": "active",
+            "delegation": "4000000000000",
+            "delegators": 3,
+            "postedAt": 1792904400,
+            "expiresAt": 1794114000,
+            "activeAt": 1793077200,
+            "liveAt": null,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": null,
+            "sourceTs": null,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 5,
+            "address": "EzUBavt1e5wsN2aPRazahxicwfZJe34e4iymMgopsFXe",
+            "product": "NANDX",
+            "component": 2,
+            "name": "Digi-Key 512Gb TLC unit price",
+            "spec": "Digi-Key 512Gb TLC unit price. Unit: USD per packaged single-die chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "3b60b78e722705752d560b8e196b35772365f673fefc1cd19edbd877a83cd3ed",
+            "accessClass": "public-page",
+            "proposer": "C8JrSfnf2hPVD6AHFzWBXd6Lz7SGrX5fp1WYQru2XXe1",
+            "status": "open",
+            "delegation": "1200000000000",
+            "delegators": 1,
+            "postedAt": 1792731600,
+            "expiresAt": 1793941200,
+            "activeAt": null,
+            "liveAt": null,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": null,
+            "sourceTs": null,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 6,
+            "address": "HD8YwJefkez66U9rTUbkDM1twbtgsS3pDM5Q8YwpQGnL",
+            "product": "NANDX",
+            "component": 3,
+            "name": "Mouser 256Gb TLC NAND unit price",
+            "spec": "Mouser 256Gb TLC NAND unit price. Unit: USD per packaged single-die chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "a77a44a016ee199cfc4e2a20946b3e5920f93165d634b23bffc12c17600463f4",
+            "accessClass": "public-page",
+            "proposer": "ANu55wibazz6dukYCFax4RE8XEbPLhMVGVALhcs4NwGm",
+            "status": "open",
+            "delegation": "1000000000000",
+            "delegators": 1,
+            "postedAt": 1792213200,
+            "expiresAt": 1793422800,
+            "activeAt": null,
+            "liveAt": null,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": null,
+            "sourceTs": null,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          },
+          {
+            "id": 7,
+            "address": "HcrWFbNwjZevVoVxuJhYkMW3gDAvyeSBNc3CUYxnFYSp",
+            "product": "NANDX",
+            "component": 2,
+            "name": "Forum post 512Gb TLC prices",
+            "spec": "Forum post 512Gb TLC prices. Unit: USD per packaged single-die chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+            "specHash": "0fab04347a0b21cc8096d92d467e72b62ddfb9a81652a07ee7c4596dee7c8c8e",
+            "accessClass": "public-page",
+            "proposer": "DfpXvZPigTTX1AeDEhHy4ZzbWdDt1T2VX1DMBPXobGQy",
+            "status": "expired",
+            "delegation": "0",
+            "delegators": 0,
+            "postedAt": 1791867600,
+            "expiresAt": 1793077200,
+            "activeAt": null,
+            "liveAt": null,
+            "retiredAt": null,
+            "strikes": 0,
+            "value": null,
+            "sourceTs": null,
+            "shareBps": null,
+            "openClaims": 0,
+            "openChallenges": 0,
+            "weights": []
+          }
+        ],
+        "contracts": []
+      }
+    ],
+    "updatedAt": 1793249996
+  },
+  "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+  "account": {
+    "stake": {
+      "free": "2500000000000"
+    },
+    "delegations": [
+      {
+        "head": 1,
+        "product": "RAMX",
+        "amount": "5000000000000",
+        "cooling": "0",
+        "escrow": "0",
+        "cooldownEndsAt": null,
+        "rewards": "1840000"
+      },
+      {
+        "head": 13,
+        "product": "RAMX",
+        "amount": "1500000000000",
+        "cooling": "0",
+        "escrow": "0",
+        "cooldownEndsAt": null,
+        "rewards": "0"
+      },
+      {
+        "head": 2,
+        "product": "NANDX",
+        "amount": "0",
+        "cooling": "810000000000",
+        "escrow": "190000000000",
+        "cooldownEndsAt": 1794286800,
+        "rewards": "420000"
+      }
+    ],
+    "claims": [
+      {
+        "address": "FwjoGVk1yrzV7Ee8FMYkdo2P9xQakJNki3Ydr3nPncE5",
+        "head": 1,
+        "product": "RAMX",
+        "seq": 41,
+        "kind": "update",
+        "value": "7940000",
+        "sourceTs": 1793178000,
+        "bond": "1000000",
+        "windowEndsAt": 1793264400,
+        "status": "open",
+        "prize": "1000000"
+      }
+    ],
+    "challenges": [
+      {
+        "address": "Ay8HGvvoB7RLZgMXrKusoPZZUo2coyAFm2kuBMRwDC7P",
+        "target": "claim",
+        "head": 7,
+        "product": "RAMX",
+        "claim": "9iS2i9yrj5y3TMsAbbz55mmD55MqpMAgatiKs5QzBfmX",
+        "bond": "1000000",
+        "status": "open",
+        "payout": "0"
+      }
+    ],
+    "rewards": "2260000"
+  },
+  "emptyAccount": {
+    "stake": {
+      "free": "0"
+    },
+    "delegations": [],
+    "claims": [],
+    "challenges": [],
+    "rewards": "0"
+  },
+  "prepareRequests": {
+    "stake": {
+      "action": "stake",
+      "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+      "amount": "500000000000"
+    },
+    "unstake": {
+      "action": "unstake",
+      "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+      "amount": "2500000000000"
+    },
+    "delegate": {
+      "action": "delegate",
+      "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+      "product": "RAMX",
+      "head": 13,
+      "amount": "500000000000"
+    },
+    "undelegate": {
+      "action": "undelegate",
+      "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+      "product": "RAMX",
+      "head": 1,
+      "amount": "5000000000000"
+    },
+    "post": {
+      "action": "post",
+      "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+      "product": "NANDX",
+      "component": 2,
+      "name": "Mouser 512Gb TLC NAND unit price",
+      "spec": "Unit: USD per packaged single-die chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+      "accessClass": "public-page",
+      "amount": "2683000000000"
+    },
+    "claim-rewards": {
+      "action": "claim-rewards",
+      "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf"
+    }
+  },
+  "prepared": {
+    "request": {
+      "action": "delegate",
+      "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+      "product": "RAMX",
+      "head": 13,
+      "amount": "500000000000"
+    },
+    "response": {
+      "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAMIqv/CFK/FEnt4CO2/6tSstxK01Vw23ksBjfOu4gFnge72HvUAZ1KqGjZYHS0SlCD4ifTy98rYAcCB+balN1GmsyiqfIYmUqhjvs50jopD7J9Cp30vmXiDFB9Q10u+ygjZWZ/uVKbb9hobHaWkRNAafy8pJuizTrNcjgEwQ0uzisTel7VzTw3a1pp54M4dkq+/+tjuyOr6/DKJX7jkTEb4RQMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAAjqmWpnOCP/0nSs6F5tbcMY4KNI3qcwEKAJUD919ygkcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADlb9yf5qsXoCRFZEHP8+cgm9CiAQTHKCJvro4aUIXSaAgUABQJADQMABgYAAQIDBAcK0gcAiFJqdAAAAA==",
+      "summary": "Delegate 500 AMBA to Arrow DDR5 16Gb distributor price (RAMX DDR5 16Gb)."
+    }
+  },
+  "refusal": {
+    "status": 422,
+    "body": {
+      "error": "You have 2,500 AMBA staked and free. Stake more AMBA to delegate 3,000."
+    }
+  },
+  "channels": {
+    "account": {
+      "challenges": [
+        {
+          "address": "Fpg7wZCK2t7c44d8kPaNV7hrBJ2JBVmychn5yHPcwceh",
+          "bond": "1000000",
+          "claim": "9dzTvLCCozbBbuwPTTWSnFQiGuY9uJNkSisYwZTuEky1",
+          "head": 7,
+          "payout": "0",
+          "product": "RAMX",
+          "status": "open",
+          "target": "claim"
+        }
+      ],
+      "claims": [
+        {
+          "address": "EtjmWFGVPEoNvz3RopynT2VsmLpvXuvNBL42AnwqZied",
+          "bond": "1000000",
+          "head": 1,
+          "kind": "update",
+          "prize": "1000000",
+          "product": "RAMX",
+          "seq": 41,
+          "sourceTs": 1793178000,
+          "status": "open",
+          "value": "7960000",
+          "windowEndsAt": 1793264400
+        }
+      ],
+      "delegations": [
+        {
+          "amount": "5000000000000",
+          "cooldownEndsAt": null,
+          "cooling": "0",
+          "escrow": "0",
+          "head": 1,
+          "product": "RAMX",
+          "rewards": "1840000"
+        },
+        {
+          "amount": "1500000000000",
+          "cooldownEndsAt": null,
+          "cooling": "0",
+          "escrow": "0",
+          "head": 17,
+          "product": "RAMX",
+          "rewards": "0"
+        },
+        {
+          "amount": "0",
+          "cooldownEndsAt": 1794286800,
+          "cooling": "1000000000000",
+          "escrow": "0",
+          "head": 2,
+          "product": "NANDX",
+          "rewards": "420000"
+        }
+      ],
+      "rewards": "2260000",
+      "stake": {
+        "free": "2500000000000"
+      }
+    },
+    "contract": {
+      "address": "5RAPX4guUUffhic6zRgFqqeG8xXzoTn95hWCet3gSVca",
+      "base": "100000000",
+      "digest": null,
+      "disclosure": "This contract settles on a fixed-mix procurement reference: each item's spot, periodic-contract and long-term-agreement prices, weighted by the mix published with this listing (an assumed scenario until matched evidence backs it).",
+      "expiry": 1798761600,
+      "freezeTs": 1798156800,
+      "index": {
+        "changePpm": 7321,
+        "contract": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+        "degradedComponents": [
+          2,
+          3,
+          5,
+          6,
+          8,
+          9,
+          11
+        ],
+        "reason": null,
+        "status": "indicative",
+        "value": "100732100"
+      },
+      "indexChangePpm": 7321,
+      "items": [
+        {
+          "basketWeightBps": 4000,
+          "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+          "components": [
+            {
+              "changePpm": 18072,
+              "channel": "spot",
+              "index": 0,
+              "indexWeightBps": 400,
+              "label": "DDR5 16Gb Spot",
+              "liveOrigins": 2,
+              "liveSources": 3,
+              "origins": [
+                "1735d34a2963bf8f9b50c367e3a7e58d382a6af63bff52ec737cc8e947ad691b",
+                "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d"
+              ],
+              "reading": {
+                "changePpm": 18072,
+                "duplicateSources": 1,
+                "eligibleSources": 2,
+                "status": "live",
+                "weight": "20000000000000"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+              "sentenceHash": "ab895236be2044df7df7149689c5f16ac00b6354f6585061011c666fe4298ff7",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": [
+                {
+                  "changePpm": 18072,
+                  "delegation": "12000000000000",
+                  "duplicate": false,
+                  "head": 14,
+                  "level": "8450000",
+                  "opening": "8300000",
+                  "origin": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+                  "shareBps": 6000,
+                  "weight": "12000000000000"
+                },
+                {
+                  "changePpm": 14285,
+                  "delegation": "8000000000000",
+                  "duplicate": false,
+                  "head": 15,
+                  "level": "8520000",
+                  "opening": "8400000",
+                  "origin": "1735d34a2963bf8f9b50c367e3a7e58d382a6af63bff52ec737cc8e947ad691b",
+                  "shareBps": 4000,
+                  "weight": "8000000000000"
+                },
+                {
+                  "changePpm": 18072,
+                  "delegation": "3000000000000",
+                  "duplicate": true,
+                  "head": 16,
+                  "level": "8450000",
+                  "opening": "8300000",
+                  "origin": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+                  "shareBps": 0,
+                  "weight": "0"
+                }
+              ]
+            },
+            {
+              "changePpm": 17948,
+              "channel": "contract",
+              "index": 1,
+              "indexWeightBps": 2000,
+              "label": "DDR5 16Gb Contract",
+              "liveOrigins": 4,
+              "liveSources": 4,
+              "origins": [
+                "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2"
+              ],
+              "reading": {
+                "changePpm": 17948,
+                "duplicateSources": 0,
+                "eligibleSources": 4,
+                "status": "live",
+                "weight": "101000000000000"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+              "sentenceHash": "e4b04c941ee4f943172691cee8fa53947e9dff2e6dd16a13bff608a6dacd0864",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": [
+                {
+                  "changePpm": 17948,
+                  "delegation": "42000000000000",
+                  "duplicate": false,
+                  "head": 1,
+                  "level": "7940000",
+                  "opening": "7800000",
+                  "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                  "shareBps": 4158,
+                  "weight": "42000000000000"
+                },
+                {
+                  "changePpm": 27848,
+                  "delegation": "31500000000000",
+                  "duplicate": false,
+                  "head": 2,
+                  "level": "8120000",
+                  "opening": "7900000",
+                  "origin": "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                  "shareBps": 3119,
+                  "weight": "31500000000000"
+                },
+                {
+                  "changePpm": -6493,
+                  "delegation": "18000000000000",
+                  "duplicate": false,
+                  "head": 3,
+                  "level": "7650000",
+                  "opening": "7700000",
+                  "origin": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+                  "shareBps": 1782,
+                  "weight": "18000000000000"
+                },
+                {
+                  "changePpm": -13333,
+                  "delegation": "9500000000000",
+                  "duplicate": false,
+                  "head": 4,
+                  "level": "7400000",
+                  "opening": "7500000",
+                  "origin": "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                  "shareBps": 941,
+                  "weight": "9500000000000"
+                }
+              ]
+            },
+            {
+              "changePpm": null,
+              "channel": "lta",
+              "index": 2,
+              "indexWeightBps": 1600,
+              "label": "DDR5 16Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "origins": [],
+              "reading": {
+                "changePpm": null,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+              "sentenceHash": "37ebaf0d25c93bd22da0b0c7e2b9a16de6e23954bec7d431f6b52c68b94c5660",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": []
+            }
+          ],
+          "index": 0,
+          "mixBasis": "assumed",
+          "mixBps": {
+            "contract": 5000,
+            "lta": 4000,
+            "spot": 1000
+          },
+          "mixReason": "The mainstream PC and server DDR5 die: large OEMs and ODMs buy it on monthly contracts while hyperscalers and top OEMs have moved much of their volume to LTAs; spot is a small channel market.",
+          "name": "DDR5 16Gb",
+          "reference": {
+            "assumed": true,
+            "available": true,
+            "changePpm": 10781,
+            "channels": [
+              {
+                "changePpm": 18072,
+                "channel": "spot",
+                "degraded": false,
+                "mixBps": 1000,
+                "reason": null,
+                "status": "live"
+              },
+              {
+                "changePpm": 17948,
+                "channel": "contract",
+                "degraded": false,
+                "mixBps": 5000,
+                "reason": null,
+                "status": "live"
+              },
+              {
+                "changePpm": null,
+                "channel": "lta",
+                "degraded": true,
+                "mixBps": 4000,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              }
+            ],
+            "flagged": true,
+            "recorded": false
+          }
+        },
+        {
+          "basketWeightBps": 2000,
+          "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+          "components": [
+            {
+              "changePpm": null,
+              "channel": "spot",
+              "index": 3,
+              "indexWeightBps": 100,
+              "label": "DDR5 24Gb Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "origins": [],
+              "reading": {
+                "changePpm": null,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+              "sentenceHash": "f97cfdbbaf1f069659e1e90c9c2ebbd469fb6f1819a1374c03e3f9091f717771",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": []
+            },
+            {
+              "changePpm": 17543,
+              "channel": "contract",
+              "index": 4,
+              "indexWeightBps": 900,
+              "label": "DDR5 24Gb Contract",
+              "liveOrigins": 3,
+              "liveSources": 3,
+              "origins": [
+                "420ed1db1f4ead809f61faccf6bd14d7dc97729945c76b0aa7698c1247774f46",
+                "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                "f93ab24cf12f3eb24fd82735239ab4d032eb55e0ea92616aa75a18ad7b69b037"
+              ],
+              "reading": {
+                "changePpm": 17543,
+                "duplicateSources": 0,
+                "eligibleSources": 3,
+                "status": "live",
+                "weight": "45000000000000"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation quarter, price fixed during this negotiation period.",
+              "sentenceHash": "372ea42ac9eb9e8b9f042704a70457cbaa09037b332ae9ef6e05f244ec892e33",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": [
+                {
+                  "changePpm": 17543,
+                  "delegation": "22000000000000",
+                  "duplicate": false,
+                  "head": 5,
+                  "level": "11600000",
+                  "opening": "11400000",
+                  "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                  "shareBps": 4889,
+                  "weight": "22000000000000"
+                },
+                {
+                  "changePpm": 13513,
+                  "delegation": "15000000000000",
+                  "duplicate": false,
+                  "head": 6,
+                  "level": "11250000",
+                  "opening": "11100000",
+                  "origin": "f93ab24cf12f3eb24fd82735239ab4d032eb55e0ea92616aa75a18ad7b69b037",
+                  "shareBps": 3333,
+                  "weight": "15000000000000"
+                },
+                {
+                  "changePpm": 34782,
+                  "delegation": "8000000000000",
+                  "duplicate": false,
+                  "head": 7,
+                  "level": "11900000",
+                  "opening": "11500000",
+                  "origin": "420ed1db1f4ead809f61faccf6bd14d7dc97729945c76b0aa7698c1247774f46",
+                  "shareBps": 1778,
+                  "weight": "8000000000000"
+                }
+              ]
+            },
+            {
+              "changePpm": null,
+              "channel": "lta",
+              "index": 5,
+              "indexWeightBps": 1000,
+              "label": "DDR5 24Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "origins": [],
+              "reading": {
+                "changePpm": null,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, price in effect for deliveries during the observation quarter under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+              "sentenceHash": "3822dac5786acdab7f5ae50b892d78f19b64d316653bfbf53201e6692d3ed01f",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": []
+            }
+          ],
+          "index": 1,
+          "mixBasis": "assumed",
+          "mixBps": {
+            "contract": 4500,
+            "lta": 5000,
+            "spot": 500
+          },
+          "mixReason": "Goes mostly into server RDIMMs bought by hyperscalers and server OEMs, the buyers most likely to hold LTAs; there is almost no spot market.",
+          "name": "DDR5 24Gb",
+          "reference": {
+            "assumed": true,
+            "available": true,
+            "changePpm": 7894,
+            "channels": [
+              {
+                "changePpm": null,
+                "channel": "spot",
+                "degraded": true,
+                "mixBps": 500,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              {
+                "changePpm": 17543,
+                "channel": "contract",
+                "degraded": false,
+                "mixBps": 4500,
+                "reason": null,
+                "status": "live"
+              },
+              {
+                "changePpm": null,
+                "channel": "lta",
+                "degraded": true,
+                "mixBps": 5000,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              }
+            ],
+            "flagged": true,
+            "recorded": false
+          }
+        },
+        {
+          "basketWeightBps": 2500,
+          "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+          "components": [
+            {
+              "changePpm": null,
+              "channel": "spot",
+              "index": 6,
+              "indexWeightBps": 375,
+              "label": "DDR4 16Gb Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "origins": [],
+              "reading": {
+                "changePpm": null,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+              "sentenceHash": "f5691918e7690b71770134730f40be1ebfe13e6df24ab3f6c6355327087fbe7c",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": []
+            },
+            {
+              "changePpm": 8333,
+              "channel": "contract",
+              "index": 7,
+              "indexWeightBps": 1375,
+              "label": "DDR4 16Gb Contract",
+              "liveOrigins": 3,
+              "liveSources": 3,
+              "origins": [
+                "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2"
+              ],
+              "reading": {
+                "changePpm": 8333,
+                "duplicateSources": 0,
+                "eligibleSources": 3,
+                "status": "live",
+                "weight": "45000000000000"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+              "sentenceHash": "5bf7a21ede8d0ebd11febe89607cbec3a6acdd31f73d4bb05fbb4175ad9941bc",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": [
+                {
+                  "changePpm": 16393,
+                  "delegation": "20000000000000",
+                  "duplicate": false,
+                  "head": 8,
+                  "level": "6200000",
+                  "opening": "6100000",
+                  "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                  "shareBps": 4445,
+                  "weight": "20000000000000"
+                },
+                {
+                  "changePpm": 8333,
+                  "delegation": "14000000000000",
+                  "duplicate": false,
+                  "head": 9,
+                  "level": "6050000",
+                  "opening": "6000000",
+                  "origin": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+                  "shareBps": 3111,
+                  "weight": "14000000000000"
+                },
+                {
+                  "changePpm": 7936,
+                  "delegation": "11000000000000",
+                  "duplicate": false,
+                  "head": 10,
+                  "level": "6350000",
+                  "opening": "6300000",
+                  "origin": "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                  "shareBps": 2444,
+                  "weight": "11000000000000"
+                }
+              ]
+            },
+            {
+              "changePpm": null,
+              "channel": "lta",
+              "index": 8,
+              "indexWeightBps": 750,
+              "label": "DDR4 16Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "origins": [],
+              "reading": {
+                "changePpm": null,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+              "sentenceHash": "2251710de3acbce14d9ba43251f964144c5c7e66c4bca32784858dd8c8d878ea",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": []
+            }
+          ],
+          "index": 2,
+          "mixBasis": "assumed",
+          "mixBps": {
+            "contract": 5500,
+            "lta": 3000,
+            "spot": 1500
+          },
+          "mixReason": "A legacy die the major suppliers are winding down: industrial and networking buyers fix prices on contract or last-time buys, and spot trade has grown as supply tightens.",
+          "name": "DDR4 16Gb",
+          "reference": {
+            "assumed": true,
+            "available": true,
+            "changePpm": 4583,
+            "channels": [
+              {
+                "changePpm": null,
+                "channel": "spot",
+                "degraded": true,
+                "mixBps": 1500,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              {
+                "changePpm": 8333,
+                "channel": "contract",
+                "degraded": false,
+                "mixBps": 5500,
+                "reason": null,
+                "status": "live"
+              },
+              {
+                "changePpm": null,
+                "channel": "lta",
+                "degraded": true,
+                "mixBps": 3000,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              }
+            ],
+            "flagged": true,
+            "recorded": false
+          }
+        },
+        {
+          "basketWeightBps": 1500,
+          "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+          "components": [
+            {
+              "changePpm": null,
+              "channel": "spot",
+              "index": 9,
+              "indexWeightBps": 300,
+              "label": "DDR4 8Gb Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "origins": [],
+              "reading": {
+                "changePpm": null,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+              "sentenceHash": "8a8b781ddf1949ac030d7f144dcd62561311a537915de58571237cb2e1eda805",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": []
+            },
+            {
+              "changePpm": 3448,
+              "channel": "contract",
+              "index": 10,
+              "indexWeightBps": 825,
+              "label": "DDR4 8Gb Contract",
+              "liveOrigins": 3,
+              "liveSources": 3,
+              "origins": [
+                "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2"
+              ],
+              "reading": {
+                "changePpm": 3448,
+                "duplicateSources": 0,
+                "eligibleSources": 3,
+                "status": "live",
+                "weight": "28000000000000"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+              "sentenceHash": "25bc0c9bc6290d329d93ab9a573e76720d9b0575def1bb6574483894ef51acfe",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": [
+                {
+                  "changePpm": 3448,
+                  "delegation": "12000000000000",
+                  "duplicate": false,
+                  "head": 11,
+                  "level": "2910000",
+                  "opening": "2900000",
+                  "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                  "shareBps": 4286,
+                  "weight": "12000000000000"
+                },
+                {
+                  "changePpm": 14285,
+                  "delegation": "9000000000000",
+                  "duplicate": false,
+                  "head": 12,
+                  "level": "2840000",
+                  "opening": "2800000",
+                  "origin": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+                  "shareBps": 3214,
+                  "weight": "9000000000000"
+                },
+                {
+                  "changePpm": -10000,
+                  "delegation": "7000000000000",
+                  "duplicate": false,
+                  "head": 13,
+                  "level": "2970000",
+                  "opening": "3000000",
+                  "origin": "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                  "shareBps": 2500,
+                  "weight": "7000000000000"
+                }
+              ]
+            },
+            {
+              "changePpm": null,
+              "channel": "lta",
+              "index": 11,
+              "indexWeightBps": 375,
+              "label": "DDR4 8Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "origins": [],
+              "reading": {
+                "changePpm": null,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+              "sentenceHash": "2db7db5beb0688a363c130ca1f6680d62980a98001e98a7516c99dd0fa8e9ef3",
+              "sentenceMatches": true,
+              "settles": true,
+              "sources": []
+            }
+          ],
+          "index": 3,
+          "mixBasis": "assumed",
+          "mixBps": {
+            "contract": 5500,
+            "lta": 2500,
+            "spot": 2000
+          },
+          "mixReason": "The most spot-traded DRAM chip (the usual spot benchmark), bought by consumer-electronics and module makers on short contracts with little multi-year commitment.",
+          "name": "DDR4 8Gb",
+          "reference": {
+            "assumed": true,
+            "available": true,
+            "changePpm": 1896,
+            "channels": [
+              {
+                "changePpm": null,
+                "channel": "spot",
+                "degraded": true,
+                "mixBps": 2000,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              },
+              {
+                "changePpm": 3448,
+                "channel": "contract",
+                "degraded": false,
+                "mixBps": 5500,
+                "reason": null,
+                "status": "live"
+              },
+              {
+                "changePpm": null,
+                "channel": "lta",
+                "degraded": true,
+                "mixBps": 2500,
+                "reason": "too-few-origins",
+                "status": "degraded"
+              }
+            ],
+            "flagged": true,
+            "recorded": false
+          }
+        }
+      ],
+      "label": "RAMX Q4 2026",
+      "listed": [
+        {
+          "component": 1,
+          "duplicate": false,
+          "head": 1,
+          "opening": "7800000"
+        },
+        {
+          "component": 1,
+          "duplicate": false,
+          "head": 2,
+          "opening": "7900000"
+        },
+        {
+          "component": 1,
+          "duplicate": false,
+          "head": 3,
+          "opening": "7700000"
+        },
+        {
+          "component": 1,
+          "duplicate": false,
+          "head": 4,
+          "opening": "7500000"
+        },
+        {
+          "component": 4,
+          "duplicate": false,
+          "head": 5,
+          "opening": "11400000"
+        },
+        {
+          "component": 4,
+          "duplicate": false,
+          "head": 6,
+          "opening": "11100000"
+        },
+        {
+          "component": 4,
+          "duplicate": false,
+          "head": 7,
+          "opening": "11500000"
+        },
+        {
+          "component": 7,
+          "duplicate": false,
+          "head": 8,
+          "opening": "6100000"
+        },
+        {
+          "component": 7,
+          "duplicate": false,
+          "head": 9,
+          "opening": "6000000"
+        },
+        {
+          "component": 7,
+          "duplicate": false,
+          "head": 10,
+          "opening": "6300000"
+        },
+        {
+          "component": 10,
+          "duplicate": false,
+          "head": 11,
+          "opening": "2900000"
+        },
+        {
+          "component": 10,
+          "duplicate": false,
+          "head": 12,
+          "opening": "2800000"
+        },
+        {
+          "component": 10,
+          "duplicate": false,
+          "head": 13,
+          "opening": "3000000"
+        },
+        {
+          "component": 0,
+          "duplicate": false,
+          "head": 14,
+          "opening": "8300000"
+        },
+        {
+          "component": 0,
+          "duplicate": false,
+          "head": 15,
+          "opening": "8400000"
+        },
+        {
+          "component": 0,
+          "duplicate": true,
+          "head": 16,
+          "opening": "8300000"
+        }
+      ],
+      "listingTs": 1793145600,
+      "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+      "product": "RAMX",
+      "quarter": "Q4 2026",
+      "settledAt": null,
+      "settlementTarget": "fixed-mix",
+      "status": "live",
+      "termsHash": "e5e7eefe598ba479e953ee4976d1fc8b805c2b47d42276449c9c8d08804b7eb5",
+      "value": "100732100"
+    },
+    "head": {
+      "accessClass": "public-page",
+      "activeAt": 1789966800,
+      "address": "6peUQGMq9c26dq3ZUBzFkm1z953VNos5LnG4BsrLTctr",
+      "challenges": [],
+      "channel": "contract",
+      "claims": [
+        {
+          "address": "EtjmWFGVPEoNvz3RopynT2VsmLpvXuvNBL42AnwqZied",
+          "bond": "1000000",
+          "challenges": 0,
+          "committedAt": 1793170000,
+          "evidence": null,
+          "fetcher": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+          "kind": "update",
+          "lta": null,
+          "originId": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+          "prize": "1000000",
+          "revealedAt": 1793178000,
+          "seq": 41,
+          "sourceTs": 1793178000,
+          "status": "open",
+          "value": "7960000",
+          "windowEndsAt": 1793264400
+        }
+      ],
+      "component": 1,
+      "componentLabel": "DDR5 16Gb Contract",
+      "delegation": "42000000000000",
+      "delegations": [
+        {
+          "address": "BuTdkFPDpyBYWFsv3ZpbFiERZrboy7NiqxdKsSV3zMGz",
+          "amount": "7400000000000",
+          "cooling": "0",
+          "escrow": "0",
+          "owner": "2BZ3o14DTvbmdsnPyMLuJnhjTeJN1AL18SCkhYEJ7PF1",
+          "proposer": false
+        },
+        {
+          "address": "Gqg98uJa8ScaykVE96xnCe9qhtqgcdeqo4QuHzjD5TZY",
+          "amount": "7400000000000",
+          "cooling": "0",
+          "escrow": "0",
+          "owner": "4rbfYTv7aAMcDRVMsyzz9XScF8oNwbFXog5Ah5QBdwWa",
+          "proposer": false
+        },
+        {
+          "address": "7FH5EsRdhPF36mv3sUdmLP1S9EiGRrR8rjVdj9GbrSaK",
+          "amount": "7400000000000",
+          "cooling": "0",
+          "escrow": "0",
+          "owner": "CUxVr68EWJEHVo6sg4X55fvW2CZ6ftjbJLn4iAGYDHr4",
+          "proposer": true
+        },
+        {
+          "address": "GAFntr5Et9KZmLPVJXtjHiAU2v68eEr7FrjoRXkGxNRh",
+          "amount": "7400000000000",
+          "cooling": "0",
+          "escrow": "0",
+          "owner": "Cu9Y82MEiFnBJY7NCSzq1SkRp6GqTNMdsorc433kUBrq",
+          "proposer": false
+        },
+        {
+          "address": "82jh3LSwwJgMjdtfKpFJhCwAymUbuXdmn6SXfoZD3SAA",
+          "amount": "7400000000000",
+          "cooling": "0",
+          "escrow": "0",
+          "owner": "FpP2bDw3mAubv6QSrYNeU2YrU9exzmbZspZCmPGmumU5",
+          "proposer": false
+        },
+        {
+          "address": "EMLS9vDqHTjJgoXaU5yiSMt62rfYwWCMk8nt8whvYrsQ",
+          "amount": "5000000000000",
+          "cooling": "0",
+          "escrow": "0",
+          "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+          "proposer": false
+        }
+      ],
+      "delegators": 6,
+      "duplicate": false,
+      "expiresAt": 1791003600,
+      "id": 1,
+      "liveAt": 1790056800,
+      "name": "Wholesale survey DDR5 16Gb contract price",
+      "openChallenges": 0,
+      "openClaims": 1,
+      "originId": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+      "postedAt": 1789794000,
+      "prints": [
+        {
+          "sourceTs": 1793178000,
+          "value": "7940000"
+        },
+        {
+          "sourceTs": 1790056800,
+          "value": "7800000"
+        }
+      ],
+      "product": "RAMX",
+      "proposer": "CUxVr68EWJEHVo6sg4X55fvW2CZ6ftjbJLn4iAGYDHr4",
+      "retiredAt": null,
+      "shareBps": 4158,
+      "sourceTs": 1793178000,
+      "spec": "Wholesale survey DDR5 16Gb contract price. Unit: USD per chip; the month's contract price for 1,000,000+ chips a quarter, as published.",
+      "specHash": "97af8e891b5bb83fba00dbd7c0a199004468951681d3b46d17a36bb7e7df17c1",
+      "status": "live",
+      "strikes": 0,
+      "value": "7940000",
+      "weights": [
+        {
+          "effectiveWeight": null,
+          "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+          "rawWeight": "42000000000000"
+        }
+      ]
+    },
+    "heads": {
+      "boards": [
+        {
+          "address": "EzoahrxZ6pwFaZaiDDbJPERQYJDRaEwrXipQYZiPS8eG",
+          "components": [
+            {
+              "basketWeightBps": 400,
+              "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 0,
+              "item": 0,
+              "label": "DDR5 16Gb Spot",
+              "liveOrigins": 2,
+              "liveSources": 3,
+              "sentenceHash": "ab895236be2044df7df7149689c5f16ac00b6354f6585061011c666fe4298ff7",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 2000,
+              "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 1,
+              "item": 0,
+              "label": "DDR5 16Gb Contract",
+              "liveOrigins": 4,
+              "liveSources": 4,
+              "sentenceHash": "e4b04c941ee4f943172691cee8fa53947e9dff2e6dd16a13bff608a6dacd0864",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 1600,
+              "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 2,
+              "item": 0,
+              "label": "DDR5 16Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "37ebaf0d25c93bd22da0b0c7e2b9a16de6e23954bec7d431f6b52c68b94c5660",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 100,
+              "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 3,
+              "item": 1,
+              "label": "DDR5 24Gb Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "f97cfdbbaf1f069659e1e90c9c2ebbd469fb6f1819a1374c03e3f9091f717771",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 900,
+              "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 4,
+              "item": 1,
+              "label": "DDR5 24Gb Contract",
+              "liveOrigins": 3,
+              "liveSources": 3,
+              "sentenceHash": "372ea42ac9eb9e8b9f042704a70457cbaa09037b332ae9ef6e05f244ec892e33",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 1000,
+              "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 5,
+              "item": 1,
+              "label": "DDR5 24Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "3822dac5786acdab7f5ae50b892d78f19b64d316653bfbf53201e6692d3ed01f",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 375,
+              "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 6,
+              "item": 2,
+              "label": "DDR4 16Gb Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "f5691918e7690b71770134730f40be1ebfe13e6df24ab3f6c6355327087fbe7c",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 1375,
+              "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 7,
+              "item": 2,
+              "label": "DDR4 16Gb Contract",
+              "liveOrigins": 3,
+              "liveSources": 3,
+              "sentenceHash": "5bf7a21ede8d0ebd11febe89607cbec3a6acdd31f73d4bb05fbb4175ad9941bc",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 750,
+              "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 8,
+              "item": 2,
+              "label": "DDR4 16Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "2251710de3acbce14d9ba43251f964144c5c7e66c4bca32784858dd8c8d878ea",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 300,
+              "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 9,
+              "item": 3,
+              "label": "DDR4 8Gb Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "8a8b781ddf1949ac030d7f144dcd62561311a537915de58571237cb2e1eda805",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 825,
+              "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 10,
+              "item": 3,
+              "label": "DDR4 8Gb Contract",
+              "liveOrigins": 3,
+              "liveSources": 3,
+              "sentenceHash": "25bc0c9bc6290d329d93ab9a573e76720d9b0575def1bb6574483894ef51acfe",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 375,
+              "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 11,
+              "item": 3,
+              "label": "DDR4 8Gb LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "2db7db5beb0688a363c130ca1f6680d62980a98001e98a7516c99dd0fa8e9ef3",
+              "settles": true
+            }
+          ],
+          "contracts": [
+            {
+              "address": "5RAPX4guUUffhic6zRgFqqeG8xXzoTn95hWCet3gSVca",
+              "disclosure": "This contract settles on a fixed-mix procurement reference: each item's spot, periodic-contract and long-term-agreement prices, weighted by the mix published with this listing (an assumed scenario until matched evidence backs it).",
+              "expiry": 1798761600,
+              "freezeTs": 1798156800,
+              "indexChangePpm": 7321,
+              "label": "RAMX Q4 2026",
+              "listingTs": 1793145600,
+              "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+              "quarter": "Q4 2026",
+              "settlementTarget": "fixed-mix",
+              "status": "live",
+              "value": "100732100"
+            }
+          ],
+          "disclosure": "This contract settles on a fixed-mix procurement reference: each item's spot, periodic-contract and long-term-agreement prices, weighted by the mix published with this listing (an assumed scenario until matched evidence backs it).",
+          "heads": [
+            {
+              "accessClass": "public-page",
+              "activeAt": 1789966800,
+              "address": "6peUQGMq9c26dq3ZUBzFkm1z953VNos5LnG4BsrLTctr",
+              "channel": "contract",
+              "component": 1,
+              "componentLabel": "DDR5 16Gb Contract",
+              "delegation": "42000000000000",
+              "delegators": 6,
+              "duplicate": false,
+              "expiresAt": 1791003600,
+              "id": 1,
+              "liveAt": 1790056800,
+              "name": "Wholesale survey DDR5 16Gb contract price",
+              "openChallenges": 0,
+              "openClaims": 1,
+              "originId": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+              "postedAt": 1789794000,
+              "product": "RAMX",
+              "proposer": "CUxVr68EWJEHVo6sg4X55fvW2CZ6ftjbJLn4iAGYDHr4",
+              "retiredAt": null,
+              "shareBps": 4158,
+              "sourceTs": 1793178000,
+              "spec": "Wholesale survey DDR5 16Gb contract price. Unit: USD per chip; the month's contract price for 1,000,000+ chips a quarter, as published.",
+              "specHash": "97af8e891b5bb83fba00dbd7c0a199004468951681d3b46d17a36bb7e7df17c1",
+              "status": "live",
+              "strikes": 0,
+              "value": "7940000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "42000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "login-zktls",
+              "activeAt": 1790139600,
+              "address": "CFYZ9UjrsYCYXV4or2aMQzq8bi1FVbeH67ERCwEH2Jjy",
+              "channel": "contract",
+              "component": 1,
+              "componentLabel": "DDR5 16Gb Contract",
+              "delegation": "31500000000000",
+              "delegators": 4,
+              "duplicate": false,
+              "expiresAt": 1791176400,
+              "id": 2,
+              "liveAt": 1790229600,
+              "name": "Distributor portal DDR5 16Gb contract price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+              "postedAt": 1789966800,
+              "product": "RAMX",
+              "proposer": "HUdQcLCZmSMP9bqYMG9rvQm2GnGQXHT5659VAshGaxz4",
+              "retiredAt": null,
+              "shareBps": 3119,
+              "sourceTs": 1793178000,
+              "spec": "Distributor portal DDR5 16Gb contract price. Unit: USD per chip; the portal's contract price for the quarter, signed in.",
+              "specHash": "69164d2fc5c44244a415644198e9f31578fa99f3b5a7d78a7622b4a95e7e1467",
+              "status": "live",
+              "strikes": 1,
+              "value": "8120000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "31500000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790398800,
+              "address": "crKtLB27C1DUFCGL3FdSGYsRgpoUKzYDUArRJ2n3MKt",
+              "channel": "contract",
+              "component": 4,
+              "componentLabel": "DDR5 24Gb Contract",
+              "delegation": "22000000000000",
+              "delegators": 4,
+              "duplicate": false,
+              "expiresAt": 1791435600,
+              "id": 5,
+              "liveAt": 1790488800,
+              "name": "Wholesale survey DDR5 24Gb contract price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+              "postedAt": 1790226000,
+              "product": "RAMX",
+              "proposer": "JAeG2AJN3rwuo54KqFp2Z8ssrRicFRkfb7djVsVSb5jk",
+              "retiredAt": null,
+              "shareBps": 4889,
+              "sourceTs": 1793178000,
+              "spec": "Wholesale survey DDR5 24Gb contract price. Unit: USD per chip; the month's contract price for 1,000,000+ chips a quarter, as published.",
+              "specHash": "9f33158b87675b2c800db57478b33dbd367474d30aa109cce5794806697ead65",
+              "status": "live",
+              "strikes": 0,
+              "value": "11600000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "22000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790571600,
+              "address": "G5TwnxKudoPdn19mhorvvtW6FAdf5jCyd77uoYdQA3uz",
+              "channel": "contract",
+              "component": 7,
+              "componentLabel": "DDR4 16Gb Contract",
+              "delegation": "20000000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1791608400,
+              "id": 8,
+              "liveAt": 1790661600,
+              "name": "Wholesale survey DDR4 16Gb contract price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+              "postedAt": 1790398800,
+              "product": "RAMX",
+              "proposer": "FaMAFi1duP6L2AyUqSv9Fg2BRfdH2FaHohezr5gurDuZ",
+              "retiredAt": null,
+              "shareBps": 4445,
+              "sourceTs": 1793178000,
+              "spec": "Wholesale survey DDR4 16Gb contract price. Unit: USD per chip; the month's contract price for 1,000,000+ chips a quarter, as published.",
+              "specHash": "90c231c83dd329e825984795e640d80b6c8da9068fdc8632c21e33274d43919a",
+              "status": "live",
+              "strikes": 0,
+              "value": "6200000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "20000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790312400,
+              "address": "Ac65hyy3AsBmRCFcty5t4XSR8Gm71L351QNbiHHnQH1S",
+              "channel": "contract",
+              "component": 1,
+              "componentLabel": "DDR5 16Gb Contract",
+              "delegation": "18000000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1791349200,
+              "id": 3,
+              "liveAt": 1790402400,
+              "name": "OEM tender DDR5 16Gb award",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+              "postedAt": 1790139600,
+              "product": "RAMX",
+              "proposer": "2cKaY8zi8SvxbYjFF4512CH7AkSkwWjkqCg6wFHxoLAK",
+              "retiredAt": null,
+              "shareBps": 1782,
+              "sourceTs": 1793178000,
+              "spec": "OEM tender DDR5 16Gb award. Unit: USD per chip; the awarded price of a published OEM tender delivered this month.",
+              "specHash": "01424b08a45f847e1e54f839a6c482eca8677cfcc6d5f38191575e6f301cb0ba",
+              "status": "live",
+              "strikes": 0,
+              "value": "7650000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "18000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "login-zktls",
+              "activeAt": 1790485200,
+              "address": "24eCu348i9QGgTRGwLj8rZ8gQWig4aWTTRfpzNY5otaq",
+              "channel": "contract",
+              "component": 4,
+              "componentLabel": "DDR5 24Gb Contract",
+              "delegation": "15000000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1791522000,
+              "id": 6,
+              "liveAt": 1790575200,
+              "name": "Server OEM DDR5 24Gb contract price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "f93ab24cf12f3eb24fd82735239ab4d032eb55e0ea92616aa75a18ad7b69b037",
+              "postedAt": 1790312400,
+              "product": "RAMX",
+              "proposer": "2fBEuT2Xi1y4ZHmB155mv6hehMmxigovetrGm7hBwQMF",
+              "retiredAt": null,
+              "shareBps": 3333,
+              "sourceTs": 1793178000,
+              "spec": "Server OEM DDR5 24Gb contract price. Unit: USD per chip; a server OEM's quarterly contract price, signed in.",
+              "specHash": "b537d5076429089ea40e1fa5f21753a02fe1dfe93ebf4c7511b7306dc779b704",
+              "status": "live",
+              "strikes": 0,
+              "value": "11250000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "15000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790658000,
+              "address": "8JdxbLo4A9enZ41J1eUv1ewwsAwGgt3orkjDgfWANQcW",
+              "channel": "contract",
+              "component": 7,
+              "componentLabel": "DDR4 16Gb Contract",
+              "delegation": "14000000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1791694800,
+              "id": 9,
+              "liveAt": 1790748000,
+              "name": "OEM tender DDR4 16Gb award",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+              "postedAt": 1790485200,
+              "product": "RAMX",
+              "proposer": "8PeT2CxNSHT1UkRzYjrhmSHHCaDX8y48UZZSKgM8t2ce",
+              "retiredAt": null,
+              "shareBps": 3111,
+              "sourceTs": 1793178000,
+              "spec": "OEM tender DDR4 16Gb award. Unit: USD per chip; the awarded price of a published OEM tender delivered this month.",
+              "specHash": "f48ca07f52d244f9a8c92fc2b3926e4b48b4d89e300cc1e360e2ab7fe88d7da2",
+              "status": "live",
+              "strikes": 0,
+              "value": "6050000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "14000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790744400,
+              "address": "Br2j8K2D4ThdqwpVYPqrURZFDuRLZimuviQcTYfG4gY1",
+              "channel": "contract",
+              "component": 10,
+              "componentLabel": "DDR4 8Gb Contract",
+              "delegation": "12000000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1791781200,
+              "id": 11,
+              "liveAt": 1790834400,
+              "name": "Wholesale survey DDR4 8Gb contract price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+              "postedAt": 1790571600,
+              "product": "RAMX",
+              "proposer": "6CK8u15zRGQb2zbgochQH8yRgufhND8FLV7M1Eui1RxW",
+              "retiredAt": null,
+              "shareBps": 4286,
+              "sourceTs": 1793178000,
+              "spec": "Wholesale survey DDR4 8Gb contract price. Unit: USD per chip; the month's contract price for 1,000,000+ chips a quarter, as published.",
+              "specHash": "e90f65a5715a1ac5c0c9249d3632333b3bd960eec56391b2289373e575586aa7",
+              "status": "live",
+              "strikes": 0,
+              "value": "2910000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "12000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1789966800,
+              "address": "2ebCtSCZRJT38r3GZ59RfC9gdnY7EP9HYvgvCEHWbTWL",
+              "channel": "spot",
+              "component": 0,
+              "componentLabel": "DDR5 16Gb Spot",
+              "delegation": "12000000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1791003600,
+              "id": 14,
+              "liveAt": 1790056800,
+              "name": "Mouser DDR5-4800 16Gb spot",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+              "postedAt": 1789794000,
+              "product": "RAMX",
+              "proposer": "CkczqoCFXDvGmxRjTPLjUsDb5y5B6mXjtZu9CSmdZUYi",
+              "retiredAt": null,
+              "shareBps": 6000,
+              "sourceTs": 1793178000,
+              "spec": "Mouser DDR5-4800 16Gb spot. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+              "specHash": "ba1f9249fe290cb727c5e622611ef8e79bc54cb3944ab97960eeae82c40f4e97",
+              "status": "live",
+              "strikes": 0,
+              "value": "8450000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "12000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "login-zktls",
+              "activeAt": 1790744400,
+              "address": "AhnFEA5azpuzLgKCr4qRLc5LyNSNDLRNbbAbcvWNGJYA",
+              "channel": "contract",
+              "component": 7,
+              "componentLabel": "DDR4 16Gb Contract",
+              "delegation": "11000000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1791781200,
+              "id": 10,
+              "liveAt": 1790834400,
+              "name": "Distributor portal DDR4 16Gb contract price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+              "postedAt": 1790571600,
+              "product": "RAMX",
+              "proposer": "7BSPLsebRbsUC8ArMJnzwSB4zyommBifAWz5f1U9zAuD",
+              "retiredAt": null,
+              "shareBps": 2444,
+              "sourceTs": 1793178000,
+              "spec": "Distributor portal DDR4 16Gb contract price. Unit: USD per chip; the portal's contract price for the quarter, signed in.",
+              "specHash": "b82ec06f3a9d13b2c4787158e2a8c62eab053fa06bd3f6bf18e4c04657d0f7c6",
+              "status": "live",
+              "strikes": 0,
+              "value": "6350000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "11000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "offline-quote",
+              "activeAt": 1790830800,
+              "address": "dnX3XS3GeJZf1cPkTboqbx5zJqPErf8oKut6M97HFVV",
+              "channel": "contract",
+              "component": 1,
+              "componentLabel": "DDR5 16Gb Contract",
+              "delegation": "9500000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1791867600,
+              "id": 4,
+              "liveAt": 1790920800,
+              "name": "Module maker DDR5 16Gb contract quote",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+              "postedAt": 1790658000,
+              "product": "RAMX",
+              "proposer": "CSZffSvPAhhkqkaLNH7d5Pi4NvU7tnmFKNBsMyiJsJsE",
+              "retiredAt": null,
+              "shareBps": 941,
+              "sourceTs": 1793178000,
+              "spec": "Module maker DDR5 16Gb contract quote. Unit: USD per chip; a written contract quote from a module maker, dated, buyer named.",
+              "specHash": "ac3d174d2ba744ea74043f3c8aca222b38b79386a7d8a6740c3441b3b181f42b",
+              "status": "live",
+              "strikes": 0,
+              "value": "7400000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "9500000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790830800,
+              "address": "5q8ZgBmRcGru1kB4o1T8XqFKUUikKdGVzerF3STK8bby",
+              "channel": "contract",
+              "component": 10,
+              "componentLabel": "DDR4 8Gb Contract",
+              "delegation": "9000000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1791867600,
+              "id": 12,
+              "liveAt": 1790920800,
+              "name": "OEM tender DDR4 8Gb award",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+              "postedAt": 1790658000,
+              "product": "RAMX",
+              "proposer": "68fCowthdTqTq2svZno7ymPDJ3eyYx2CdDCthVNuDoWp",
+              "retiredAt": null,
+              "shareBps": 3214,
+              "sourceTs": 1793178000,
+              "spec": "OEM tender DDR4 8Gb award. Unit: USD per chip; the awarded price of a published OEM tender delivered this month.",
+              "specHash": "b6bf8cf6e04b4b6612ce8e6e1832f3d213f2944345e05aa6afb7deb51f70adcc",
+              "status": "live",
+              "strikes": 0,
+              "value": "2840000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "9000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "offline-quote",
+              "activeAt": 1790571600,
+              "address": "2ZK512MJnwkG4U1RffozyeBfem5U24yk8KENw9Nnyo6q",
+              "channel": "contract",
+              "component": 4,
+              "componentLabel": "DDR5 24Gb Contract",
+              "delegation": "8000000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1791608400,
+              "id": 7,
+              "liveAt": 1790661600,
+              "name": "Broker DDR5 24Gb contract quote",
+              "openChallenges": 1,
+              "openClaims": 1,
+              "originId": "420ed1db1f4ead809f61faccf6bd14d7dc97729945c76b0aa7698c1247774f46",
+              "postedAt": 1790398800,
+              "product": "RAMX",
+              "proposer": "2Ly4dzVxJAJxcwMdgRNEQ8bNZfmS8qcpXhHxeo77AY1d",
+              "retiredAt": null,
+              "shareBps": 1778,
+              "sourceTs": 1793178000,
+              "spec": "Broker DDR5 24Gb contract quote. Unit: USD per chip; a written contract quote for 1,000,000+ chips, dated, seller named.",
+              "specHash": "c71ed4e54c60b70a303e31b0f0d9766663d274920aad2b1f457815506b95a7ae",
+              "status": "live",
+              "strikes": 0,
+              "value": "11900000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "8000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790139600,
+              "address": "6iLkJhf9TvnxNY4dTB33Nr5K77uLqy4c5ZPomJdypBEG",
+              "channel": "spot",
+              "component": 0,
+              "componentLabel": "DDR5 16Gb Spot",
+              "delegation": "8000000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1791176400,
+              "id": 15,
+              "liveAt": 1790229600,
+              "name": "Digi-Key DDR5 16Gb unit price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "1735d34a2963bf8f9b50c367e3a7e58d382a6af63bff52ec737cc8e947ad691b",
+              "postedAt": 1789966800,
+              "product": "RAMX",
+              "proposer": "918U1nigaCae19Y1Gqa7T1A3Cjzh2CHYQuAGxqMdnTZe",
+              "retiredAt": null,
+              "shareBps": 4000,
+              "sourceTs": 1793178000,
+              "spec": "Digi-Key DDR5 16Gb unit price. Unit: USD per chip, excluding tax; one print per business day; the listed price for the first quantity break.",
+              "specHash": "4b26289eee65018788819f0b20f0b34e56ca75c94a543a29c307d5db9bb0e3f7",
+              "status": "live",
+              "strikes": 0,
+              "value": "8520000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "8000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "offline-quote",
+              "activeAt": 1790917200,
+              "address": "BtrZP24dYuMFzz8MfTafEnpPez3UoGkgU2apZJPByEnC",
+              "channel": "contract",
+              "component": 10,
+              "componentLabel": "DDR4 8Gb Contract",
+              "delegation": "7000000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1791954000,
+              "id": 13,
+              "liveAt": 1791007200,
+              "name": "Module maker DDR4 8Gb contract quote",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+              "postedAt": 1790744400,
+              "product": "RAMX",
+              "proposer": "GaC7Yx3KxLhkzfTBCmM29neThD2SwyAG9Z5S5t6xsDB9",
+              "retiredAt": null,
+              "shareBps": 2500,
+              "sourceTs": 1793178000,
+              "spec": "Module maker DDR4 8Gb contract quote. Unit: USD per chip; a written contract quote from a module maker, dated, buyer named.",
+              "specHash": "5d0f7de6a0c76ded2c74a8a840a5ca55c53344498a2efe2b07744cc2ce66d98e",
+              "status": "live",
+              "strikes": 0,
+              "value": "2970000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "7000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1791003600,
+              "address": "Crqnh4BDzac33tz8GiZ9cyzXkiL6g3UUNeKWev7oP1Mg",
+              "channel": "spot",
+              "component": 0,
+              "componentLabel": "DDR5 16Gb Spot",
+              "delegation": "3000000000000",
+              "delegators": 2,
+              "duplicate": true,
+              "expiresAt": 1792040400,
+              "id": 16,
+              "liveAt": 1791093600,
+              "name": "Reseller mirror of Mouser DDR5 16Gb",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+              "postedAt": 1790830800,
+              "product": "RAMX",
+              "proposer": "xzXMem7DrFkPp9vGjouxk6eqnJwUueVEWTffpsWSnjA",
+              "retiredAt": null,
+              "shareBps": 0,
+              "sourceTs": 1793178000,
+              "spec": "Reseller mirror of Mouser DDR5 16Gb. Unit: USD per chip; a reseller page that republishes Mouser's DDR5 16Gb price.",
+              "specHash": "6ebf66700a78e23c68567c8831a521e3e499685975c9e8920c6dd18cc40b36e7",
+              "status": "live",
+              "strikes": 0,
+              "value": "8450000",
+              "weights": [
+                {
+                  "effectiveWeight": null,
+                  "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+                  "rawWeight": "3000000000000"
+                }
+              ]
+            },
+            {
+              "accessClass": "login-zktls",
+              "activeAt": 1793163600,
+              "address": "CNju9zujMspcGJetnedA7736eoGBTL1yMYDrsvbQ8vt",
+              "channel": "contract",
+              "component": 1,
+              "componentLabel": "DDR5 16Gb Contract",
+              "delegation": "6800000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1794200400,
+              "id": 17,
+              "liveAt": null,
+              "name": "Arrow DDR5 16Gb distributor price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": null,
+              "postedAt": 1792990800,
+              "product": "RAMX",
+              "proposer": "EkN99QRRTYcfuTwY4bt5ZhrHcaLhdKLvzJReJmKDcCjv",
+              "retiredAt": null,
+              "shareBps": null,
+              "sourceTs": null,
+              "spec": "Arrow DDR5 16Gb distributor price. Unit: USD per chip; Arrow's quoted contract price for the quarter, signed in.",
+              "specHash": "74df7b5238c663f83bec970dc277e3ac1af7ff053482323e52794b6ca9b071d7",
+              "status": "active",
+              "strikes": 0,
+              "value": null,
+              "weights": []
+            },
+            {
+              "accessClass": "physical",
+              "activeAt": null,
+              "address": "4QAiAiRqwjbiqJ83m3ZoL3zKQ116uSDAbsTfhzBD7YeB",
+              "channel": "spot",
+              "component": 3,
+              "componentLabel": "DDR5 24Gb Spot",
+              "delegation": "2500000000000",
+              "delegators": 1,
+              "duplicate": false,
+              "expiresAt": 1794286800,
+              "id": 20,
+              "liveAt": null,
+              "name": "Huaqiangbei DDR5 24Gb street price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": null,
+              "postedAt": 1793077200,
+              "product": "RAMX",
+              "proposer": "E5dtHmxFdiwKeWxWB9aZB4MuVruxbTnzzBMuMDw9wuxc",
+              "retiredAt": null,
+              "shareBps": null,
+              "sourceTs": null,
+              "spec": "Huaqiangbei DDR5 24Gb street price. Unit: USD per chip; the street price in Huaqiangbei, checked in person.",
+              "specHash": "a712083773fd03389298a24fd9e81824e78caeb21015afc61b93e0ab75ad9826",
+              "status": "open",
+              "strikes": 0,
+              "value": null,
+              "weights": []
+            },
+            {
+              "accessClass": "login-zktls",
+              "activeAt": null,
+              "address": "EBrN2mF7sHPN1pbRWdmRxkhQTeobN62Ng5WrqmwCeygS",
+              "channel": "lta",
+              "component": 2,
+              "componentLabel": "DDR5 16Gb LTA",
+              "delegation": "1500000000000",
+              "delegators": 1,
+              "duplicate": false,
+              "expiresAt": 1794373200,
+              "id": 18,
+              "liveAt": null,
+              "name": "Hyperscaler DDR5 16Gb LTA price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": null,
+              "postedAt": 1793163600,
+              "product": "RAMX",
+              "proposer": "VC4YTJDBRts4fewane7Fjc3TeGfZgzprhLwGu3e6TPo",
+              "retiredAt": null,
+              "shareBps": null,
+              "sourceTs": null,
+              "spec": "Hyperscaler DDR5 16Gb LTA price. Unit: USD per chip; the price in effect under a multi-year supply agreement, its next reset and band.",
+              "specHash": "f3ed641917f131d7260058e2f4db8d3b93248b74f75efc20021fa8f663c2311c",
+              "status": "open",
+              "strikes": 0,
+              "value": null,
+              "weights": []
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1791003600,
+              "address": "FGRhpbSjDJnjYHgyRmFt1Vo5MfrkgWKNDKiw9QQQ3zYZ",
+              "channel": "spot",
+              "component": 9,
+              "componentLabel": "DDR4 8Gb Spot",
+              "delegation": "3200000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1792040400,
+              "id": 19,
+              "liveAt": 1791093600,
+              "name": "Auction-site DDR4 8Gb lots",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "ae809e6b6e50d1fa72d9676e32fb31db8077747f133b9bd839f4ef37ce6a78de",
+              "postedAt": 1790830800,
+              "product": "RAMX",
+              "proposer": "7VJSQV8fb1kNapCaGjwsn9ZAbGj82cKiNBQEGKktTfx7",
+              "retiredAt": 1793077200,
+              "shareBps": null,
+              "sourceTs": 1793178000,
+              "spec": "Auction-site DDR4 8Gb lots. Unit: USD per chip; the hammer price of DDR4 8Gb lots.",
+              "specHash": "cda8766781c8109d8c6acfd7007d11912148af28fb906ce380733a9029302fa3",
+              "status": "retired",
+              "strikes": 2,
+              "value": "3400000",
+              "weights": []
+            }
+          ],
+          "index": {
+            "changePpm": 7321,
+            "contract": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+            "degradedComponents": [
+              2,
+              3,
+              5,
+              6,
+              8,
+              9,
+              11
+            ],
+            "reason": null,
+            "status": "indicative",
+            "value": "100732100"
+          },
+          "items": [
+            {
+              "basketWeightBps": 4000,
+              "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": 18072,
+                  "channel": "spot",
+                  "index": 0,
+                  "indexWeightBps": 400,
+                  "label": "DDR5 16Gb Spot",
+                  "liveOrigins": 2,
+                  "liveSources": 3,
+                  "origins": [
+                    "1735d34a2963bf8f9b50c367e3a7e58d382a6af63bff52ec737cc8e947ad691b",
+                    "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d"
+                  ],
+                  "reading": {
+                    "changePpm": 18072,
+                    "duplicateSources": 1,
+                    "eligibleSources": 2,
+                    "status": "live",
+                    "weight": "20000000000000"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "ab895236be2044df7df7149689c5f16ac00b6354f6585061011c666fe4298ff7",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": [
+                    {
+                      "changePpm": 18072,
+                      "delegation": "12000000000000",
+                      "duplicate": false,
+                      "head": 14,
+                      "level": "8450000",
+                      "opening": "8300000",
+                      "origin": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+                      "shareBps": 6000,
+                      "weight": "12000000000000"
+                    },
+                    {
+                      "changePpm": 14285,
+                      "delegation": "8000000000000",
+                      "duplicate": false,
+                      "head": 15,
+                      "level": "8520000",
+                      "opening": "8400000",
+                      "origin": "1735d34a2963bf8f9b50c367e3a7e58d382a6af63bff52ec737cc8e947ad691b",
+                      "shareBps": 4000,
+                      "weight": "8000000000000"
+                    },
+                    {
+                      "changePpm": 18072,
+                      "delegation": "3000000000000",
+                      "duplicate": true,
+                      "head": 16,
+                      "level": "8450000",
+                      "opening": "8300000",
+                      "origin": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+                      "shareBps": 0,
+                      "weight": "0"
+                    }
+                  ]
+                },
+                {
+                  "changePpm": 17948,
+                  "channel": "contract",
+                  "index": 1,
+                  "indexWeightBps": 2000,
+                  "label": "DDR5 16Gb Contract",
+                  "liveOrigins": 4,
+                  "liveSources": 4,
+                  "origins": [
+                    "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                    "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                    "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                    "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2"
+                  ],
+                  "reading": {
+                    "changePpm": 17948,
+                    "duplicateSources": 0,
+                    "eligibleSources": 4,
+                    "status": "live",
+                    "weight": "101000000000000"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+                  "sentenceHash": "e4b04c941ee4f943172691cee8fa53947e9dff2e6dd16a13bff608a6dacd0864",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": [
+                    {
+                      "changePpm": 17948,
+                      "delegation": "42000000000000",
+                      "duplicate": false,
+                      "head": 1,
+                      "level": "7940000",
+                      "opening": "7800000",
+                      "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                      "shareBps": 4158,
+                      "weight": "42000000000000"
+                    },
+                    {
+                      "changePpm": 27848,
+                      "delegation": "31500000000000",
+                      "duplicate": false,
+                      "head": 2,
+                      "level": "8120000",
+                      "opening": "7900000",
+                      "origin": "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                      "shareBps": 3119,
+                      "weight": "31500000000000"
+                    },
+                    {
+                      "changePpm": -6493,
+                      "delegation": "18000000000000",
+                      "duplicate": false,
+                      "head": 3,
+                      "level": "7650000",
+                      "opening": "7700000",
+                      "origin": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+                      "shareBps": 1782,
+                      "weight": "18000000000000"
+                    },
+                    {
+                      "changePpm": -13333,
+                      "delegation": "9500000000000",
+                      "duplicate": false,
+                      "head": 4,
+                      "level": "7400000",
+                      "opening": "7500000",
+                      "origin": "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                      "shareBps": 941,
+                      "weight": "9500000000000"
+                    }
+                  ]
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 2,
+                  "indexWeightBps": 1600,
+                  "label": "DDR5 16Gb LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "37ebaf0d25c93bd22da0b0c7e2b9a16de6e23954bec7d431f6b52c68b94c5660",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 0,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 5000,
+                "lta": 4000,
+                "spot": 1000
+              },
+              "mixReason": "The mainstream PC and server DDR5 die: large OEMs and ODMs buy it on monthly contracts while hyperscalers and top OEMs have moved much of their volume to LTAs; spot is a small channel market.",
+              "name": "DDR5 16Gb",
+              "reference": {
+                "assumed": true,
+                "available": true,
+                "changePpm": 10781,
+                "channels": [
+                  {
+                    "changePpm": 18072,
+                    "channel": "spot",
+                    "degraded": false,
+                    "mixBps": 1000,
+                    "reason": null,
+                    "status": "live"
+                  },
+                  {
+                    "changePpm": 17948,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 5000,
+                    "reason": null,
+                    "status": "live"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": true,
+                    "mixBps": 4000,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  }
+                ],
+                "flagged": true,
+                "recorded": false
+              }
+            },
+            {
+              "basketWeightBps": 2000,
+              "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": null,
+                  "channel": "spot",
+                  "index": 3,
+                  "indexWeightBps": 100,
+                  "label": "DDR5 24Gb Spot",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "f97cfdbbaf1f069659e1e90c9c2ebbd469fb6f1819a1374c03e3f9091f717771",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": 17543,
+                  "channel": "contract",
+                  "index": 4,
+                  "indexWeightBps": 900,
+                  "label": "DDR5 24Gb Contract",
+                  "liveOrigins": 3,
+                  "liveSources": 3,
+                  "origins": [
+                    "420ed1db1f4ead809f61faccf6bd14d7dc97729945c76b0aa7698c1247774f46",
+                    "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                    "f93ab24cf12f3eb24fd82735239ab4d032eb55e0ea92616aa75a18ad7b69b037"
+                  ],
+                  "reading": {
+                    "changePpm": 17543,
+                    "duplicateSources": 0,
+                    "eligibleSources": 3,
+                    "status": "live",
+                    "weight": "45000000000000"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation quarter, price fixed during this negotiation period.",
+                  "sentenceHash": "372ea42ac9eb9e8b9f042704a70457cbaa09037b332ae9ef6e05f244ec892e33",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": [
+                    {
+                      "changePpm": 17543,
+                      "delegation": "22000000000000",
+                      "duplicate": false,
+                      "head": 5,
+                      "level": "11600000",
+                      "opening": "11400000",
+                      "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                      "shareBps": 4889,
+                      "weight": "22000000000000"
+                    },
+                    {
+                      "changePpm": 13513,
+                      "delegation": "15000000000000",
+                      "duplicate": false,
+                      "head": 6,
+                      "level": "11250000",
+                      "opening": "11100000",
+                      "origin": "f93ab24cf12f3eb24fd82735239ab4d032eb55e0ea92616aa75a18ad7b69b037",
+                      "shareBps": 3333,
+                      "weight": "15000000000000"
+                    },
+                    {
+                      "changePpm": 34782,
+                      "delegation": "8000000000000",
+                      "duplicate": false,
+                      "head": 7,
+                      "level": "11900000",
+                      "opening": "11500000",
+                      "origin": "420ed1db1f4ead809f61faccf6bd14d7dc97729945c76b0aa7698c1247774f46",
+                      "shareBps": 1778,
+                      "weight": "8000000000000"
+                    }
+                  ]
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 5,
+                  "indexWeightBps": 1000,
+                  "label": "DDR5 24Gb LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, price in effect for deliveries during the observation quarter under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "3822dac5786acdab7f5ae50b892d78f19b64d316653bfbf53201e6692d3ed01f",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 1,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 4500,
+                "lta": 5000,
+                "spot": 500
+              },
+              "mixReason": "Goes mostly into server RDIMMs bought by hyperscalers and server OEMs, the buyers most likely to hold LTAs; there is almost no spot market.",
+              "name": "DDR5 24Gb",
+              "reference": {
+                "assumed": true,
+                "available": true,
+                "changePpm": 7894,
+                "channels": [
+                  {
+                    "changePpm": null,
+                    "channel": "spot",
+                    "degraded": true,
+                    "mixBps": 500,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  {
+                    "changePpm": 17543,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 4500,
+                    "reason": null,
+                    "status": "live"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": true,
+                    "mixBps": 5000,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  }
+                ],
+                "flagged": true,
+                "recorded": false
+              }
+            },
+            {
+              "basketWeightBps": 2500,
+              "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": null,
+                  "channel": "spot",
+                  "index": 6,
+                  "indexWeightBps": 375,
+                  "label": "DDR4 16Gb Spot",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "f5691918e7690b71770134730f40be1ebfe13e6df24ab3f6c6355327087fbe7c",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": 8333,
+                  "channel": "contract",
+                  "index": 7,
+                  "indexWeightBps": 1375,
+                  "label": "DDR4 16Gb Contract",
+                  "liveOrigins": 3,
+                  "liveSources": 3,
+                  "origins": [
+                    "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                    "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                    "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2"
+                  ],
+                  "reading": {
+                    "changePpm": 8333,
+                    "duplicateSources": 0,
+                    "eligibleSources": 3,
+                    "status": "live",
+                    "weight": "45000000000000"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+                  "sentenceHash": "5bf7a21ede8d0ebd11febe89607cbec3a6acdd31f73d4bb05fbb4175ad9941bc",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": [
+                    {
+                      "changePpm": 16393,
+                      "delegation": "20000000000000",
+                      "duplicate": false,
+                      "head": 8,
+                      "level": "6200000",
+                      "opening": "6100000",
+                      "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                      "shareBps": 4445,
+                      "weight": "20000000000000"
+                    },
+                    {
+                      "changePpm": 8333,
+                      "delegation": "14000000000000",
+                      "duplicate": false,
+                      "head": 9,
+                      "level": "6050000",
+                      "opening": "6000000",
+                      "origin": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+                      "shareBps": 3111,
+                      "weight": "14000000000000"
+                    },
+                    {
+                      "changePpm": 7936,
+                      "delegation": "11000000000000",
+                      "duplicate": false,
+                      "head": 10,
+                      "level": "6350000",
+                      "opening": "6300000",
+                      "origin": "a8988462468bc90159bc81caea9ae15513d05c589abce7b2cff9be45ba386701",
+                      "shareBps": 2444,
+                      "weight": "11000000000000"
+                    }
+                  ]
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 8,
+                  "indexWeightBps": 750,
+                  "label": "DDR4 16Gb LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "2251710de3acbce14d9ba43251f964144c5c7e66c4bca32784858dd8c8d878ea",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 2,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 5500,
+                "lta": 3000,
+                "spot": 1500
+              },
+              "mixReason": "A legacy die the major suppliers are winding down: industrial and networking buyers fix prices on contract or last-time buys, and spot trade has grown as supply tightens.",
+              "name": "DDR4 16Gb",
+              "reference": {
+                "assumed": true,
+                "available": true,
+                "changePpm": 4583,
+                "channels": [
+                  {
+                    "changePpm": null,
+                    "channel": "spot",
+                    "degraded": true,
+                    "mixBps": 1500,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  {
+                    "changePpm": 8333,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 5500,
+                    "reason": null,
+                    "status": "live"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": true,
+                    "mixBps": 3000,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  }
+                ],
+                "flagged": true,
+                "recorded": false
+              }
+            },
+            {
+              "basketWeightBps": 1500,
+              "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": null,
+                  "channel": "spot",
+                  "index": 9,
+                  "indexWeightBps": 300,
+                  "label": "DDR4 8Gb Spot",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "8a8b781ddf1949ac030d7f144dcd62561311a537915de58571237cb2e1eda805",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": 3448,
+                  "channel": "contract",
+                  "index": 10,
+                  "indexWeightBps": 825,
+                  "label": "DDR4 8Gb Contract",
+                  "liveOrigins": 3,
+                  "liveSources": 3,
+                  "origins": [
+                    "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                    "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                    "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2"
+                  ],
+                  "reading": {
+                    "changePpm": 3448,
+                    "duplicateSources": 0,
+                    "eligibleSources": 3,
+                    "status": "live",
+                    "weight": "28000000000000"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+                  "sentenceHash": "25bc0c9bc6290d329d93ab9a573e76720d9b0575def1bb6574483894ef51acfe",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": [
+                    {
+                      "changePpm": 3448,
+                      "delegation": "12000000000000",
+                      "duplicate": false,
+                      "head": 11,
+                      "level": "2910000",
+                      "opening": "2900000",
+                      "origin": "c246259a0b1fc6833373bcf5a97190e1b7acf09dca3b923267c8755127069f87",
+                      "shareBps": 4286,
+                      "weight": "12000000000000"
+                    },
+                    {
+                      "changePpm": 14285,
+                      "delegation": "9000000000000",
+                      "duplicate": false,
+                      "head": 12,
+                      "level": "2840000",
+                      "opening": "2800000",
+                      "origin": "d1436bc34b5893f499473067d08bcfc72405cb57cae1c1926769ce3863a4a7c2",
+                      "shareBps": 3214,
+                      "weight": "9000000000000"
+                    },
+                    {
+                      "changePpm": -10000,
+                      "delegation": "7000000000000",
+                      "duplicate": false,
+                      "head": 13,
+                      "level": "2970000",
+                      "opening": "3000000",
+                      "origin": "6676fc5c703c36a374643ce707e4992a5bb9fa7a945bae83a2b576e5b56a7e32",
+                      "shareBps": 2500,
+                      "weight": "7000000000000"
+                    }
+                  ]
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 11,
+                  "indexWeightBps": 375,
+                  "label": "DDR4 8Gb LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "2db7db5beb0688a363c130ca1f6680d62980a98001e98a7516c99dd0fa8e9ef3",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 3,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 5500,
+                "lta": 2500,
+                "spot": 2000
+              },
+              "mixReason": "The most spot-traded DRAM chip (the usual spot benchmark), bought by consumer-electronics and module makers on short contracts with little multi-year commitment.",
+              "name": "DDR4 8Gb",
+              "reference": {
+                "assumed": true,
+                "available": true,
+                "changePpm": 1896,
+                "channels": [
+                  {
+                    "changePpm": null,
+                    "channel": "spot",
+                    "degraded": true,
+                    "mixBps": 2000,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  },
+                  {
+                    "changePpm": 3448,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 5500,
+                    "reason": null,
+                    "status": "live"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": true,
+                    "mixBps": 2500,
+                    "reason": "too-few-origins",
+                    "status": "degraded"
+                  }
+                ],
+                "flagged": true,
+                "recorded": false
+              }
+            }
+          ],
+          "params": {
+            "alphaBps": 2500,
+            "baseFillPrize": "5000000",
+            "baseUpdatePrize": "1000000",
+            "betaBps": 5000,
+            "challengeBond": "1000000",
+            "challengeExtensionSecs": 21600,
+            "challengeWindowSecs": 86400,
+            "claimBond": "1000000",
+            "cooldownSecs": 1209600,
+            "fillPrizeSlopePpb": "0",
+            "floorActivate": "2000000000000",
+            "floorPost": "1000000000000",
+            "headTtlSecs": 1209600,
+            "maxLiabilityBps": 1900,
+            "maxStrikes": 2,
+            "minDelegators": 2,
+            "minLiveSources": 1,
+            "minSettleWeight": "1000000000000",
+            "prizeCutBps": 2000,
+            "proposerSlashBps": 10000,
+            "settlementBusinessDays": 5,
+            "slashRateBps": 1000,
+            "updatePrizeSlopePpb": "0"
+          },
+          "product": "RAMX",
+          "quarter": "Q4 2026",
+          "settlementTarget": "fixed-mix",
+          "thresholds": {
+            "activation": "6000000000000",
+            "minPost": "4213333333333"
+          },
+          "totals": {
+            "delegation": "252800000000000",
+            "liveDelegation": "239000000000000",
+            "prizePool": "312500000",
+            "reserve": "1250000000"
+          }
+        },
+        {
+          "address": "BH3URGU9H7VtCQwbjEdfrj3a57Qoa9BVU2eT4SePM1Pv",
+          "components": [
+            {
+              "basketWeightBps": 400,
+              "bucketId": "746c635f31746200000000000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 0,
+              "item": 0,
+              "label": "1Tb TLC Spot",
+              "liveOrigins": 2,
+              "liveSources": 2,
+              "sentenceHash": "82eae18382a2207f384e8d41a80ab9bc0da0d9a05c5713638e3d353a8924df61",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 2200,
+              "bucketId": "746c635f31746200000000000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 1,
+              "item": 0,
+              "label": "1Tb TLC Contract",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "971d947c1396911065d6c5bf0f2e6b2c0886d81d79a3e8a9b41de4ea5b455402",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 1400,
+              "bucketId": "746c635f31746200000000000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 2,
+              "item": 0,
+              "label": "1Tb TLC LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "ff7ffd7d8ed3be2d9045a9a97f21c7e4193637f91572e5e16d81fa5625a73c2b",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 300,
+              "bucketId": "716c635f31746200000000000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 3,
+              "item": 1,
+              "label": "1Tb QLC Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "d02dd094aab752f2be74ebcbbfcd0f3ba26801be7bec00e4d2c12eb48bb8ec9d",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 1350,
+              "bucketId": "716c635f31746200000000000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 4,
+              "item": 1,
+              "label": "1Tb QLC Contract",
+              "liveOrigins": 1,
+              "liveSources": 1,
+              "sentenceHash": "b9d577790966c6775ff54bce392603494a1381d02304f6ed5967e45faeb59906",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 1350,
+              "bucketId": "716c635f31746200000000000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 5,
+              "item": 1,
+              "label": "1Tb QLC LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "15bcf9d4a1bd0d3ec4951d1f330c82611f4b5e947a17f266210fde11203c822e",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 400,
+              "bucketId": "746c635f35313267620000000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 6,
+              "item": 2,
+              "label": "512Gb TLC Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "44df06cb804412bcc4e1e5129e0bb4512e0cd0ec75647d9f2f159f1fe54d585c",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 1200,
+              "bucketId": "746c635f35313267620000000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 7,
+              "item": 2,
+              "label": "512Gb TLC Contract",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "519f46f844d398a5533bf486318ddabf467332d09ae431538a91f3ff13eb3ae8",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 400,
+              "bucketId": "746c635f35313267620000000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 8,
+              "item": 2,
+              "label": "512Gb TLC LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "a774fa42be83c2f8c9cd0a9c28dcc2dd1b59ed9cee45ba0d10de0ad88f884ae6",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 300,
+              "bucketId": "746c635f32353667620000000000000000000000000000000000000000000000",
+              "channel": "spot",
+              "index": 9,
+              "item": 3,
+              "label": "256Gb TLC Spot",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "57732b3fa70f4ac43b7bd4f9fcbcb4f336fadc49ab27299557d721b6d297ab27",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 550,
+              "bucketId": "746c635f32353667620000000000000000000000000000000000000000000000",
+              "channel": "contract",
+              "index": 10,
+              "item": 3,
+              "label": "256Gb TLC Contract",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "5239f54c99a9b641005aca1d213f37679bb6b557c7b3ce99577ba8fe1001d52f",
+              "settles": true
+            },
+            {
+              "basketWeightBps": 150,
+              "bucketId": "746c635f32353667620000000000000000000000000000000000000000000000",
+              "channel": "lta",
+              "index": 11,
+              "item": 3,
+              "label": "256Gb TLC LTA",
+              "liveOrigins": 0,
+              "liveSources": 0,
+              "sentenceHash": "85122cc871f6f4b4898b2c73b68c5afcf1723bcab033d0298812211639bd5967",
+              "settles": true
+            }
+          ],
+          "contracts": [],
+          "disclosure": "This contract settles on a fixed-mix procurement reference: each item's spot, periodic-contract and long-term-agreement prices, weighted by the mix published with this listing (an assumed scenario until matched evidence backs it).",
+          "heads": [
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790744400,
+              "address": "8W1qqnKa2vQuF2GisjnQychwhxRcr2e9AwpGYrkFrXzJ",
+              "channel": "spot",
+              "component": 0,
+              "componentLabel": "1Tb TLC Spot",
+              "delegation": "16000000000000",
+              "delegators": 3,
+              "duplicate": false,
+              "expiresAt": 1791781200,
+              "id": 1,
+              "liveAt": 1790834400,
+              "name": "Memory Market 1Tb TLC chip spot",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "6df8f209eddf317311eadc592ae0d1b56c8fa619539b4c75b688e03ec2d4ae10",
+              "postedAt": 1790571600,
+              "product": "NANDX",
+              "proposer": "GegUtFQjJHsDAaMB747YiortHfRi33np8hj3orCk2uMC",
+              "retiredAt": null,
+              "shareBps": 6154,
+              "sourceTs": 1793178000,
+              "spec": "Memory Market 1Tb TLC chip spot. Unit: USD per packaged single-die chip, excluding tax; one print per business day.",
+              "specHash": "667faebc15cac9e295855048c1540c1499ee244ddaa5ef943a97fc5012e00bb6",
+              "status": "live",
+              "strikes": 0,
+              "value": "4520000",
+              "weights": []
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1790917200,
+              "address": "AkiDiyVqMuGauSeAJneWkf8AAaj1LKa9nRTM2x7iUv4z",
+              "channel": "spot",
+              "component": 0,
+              "componentLabel": "1Tb TLC Spot",
+              "delegation": "10000000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1791954000,
+              "id": 2,
+              "liveAt": 1791007200,
+              "name": "Mouser 1Tb TLC NAND unit price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+              "postedAt": 1790744400,
+              "product": "NANDX",
+              "proposer": "6Lm3Yu1ao3ghfeRfbS9buy3F62sNbjxK9FDkngzUQXRC",
+              "retiredAt": null,
+              "shareBps": 3846,
+              "sourceTs": 1793178000,
+              "spec": "Mouser 1Tb TLC NAND unit price. Unit: USD per packaged single-die chip, excluding tax; the listed price for the first quantity break.",
+              "specHash": "d42d8fea130f2f747856c16f52eaa32ada67adb71d6be083b0c644f2674857e6",
+              "status": "live",
+              "strikes": 0,
+              "value": "4610000",
+              "weights": []
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": 1791003600,
+              "address": "BsNuoxa74xgbDDJTeqFTR9ErJfxqxMjYKHaPkDuQUz6E",
+              "channel": "contract",
+              "component": 4,
+              "componentLabel": "1Tb QLC Contract",
+              "delegation": "9000000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1792040400,
+              "id": 4,
+              "liveAt": 1791093600,
+              "name": "Wholesale survey 1Tb QLC contract price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": "53dd86b9fce32b0fc58f9188ffa88bdd46b387cdace306c39a04bb309b03b021",
+              "postedAt": 1790830800,
+              "product": "NANDX",
+              "proposer": "2z7o5KTKd8fTKvS81HqbdzHFSZXgbmRaGzzBkfBLmtDW",
+              "retiredAt": null,
+              "shareBps": 10000,
+              "sourceTs": 1793178000,
+              "spec": "Wholesale survey 1Tb QLC contract price. Unit: USD per chip; the month's contract price for 1,000,000+ chips a quarter, as published.",
+              "specHash": "b8cfd1f7c440597d921585629bd77ed4af81e779a0590d378cc9ed6b1d6e6774",
+              "status": "live",
+              "strikes": 0,
+              "value": "3650000",
+              "weights": []
+            },
+            {
+              "accessClass": "offline-quote",
+              "activeAt": 1793077200,
+              "address": "A6h4dduKzeKdUpdT4onG5wEFjiy27dcoJ4tPJpYfD4dE",
+              "channel": "spot",
+              "component": 0,
+              "componentLabel": "1Tb TLC Spot",
+              "delegation": "4100000000000",
+              "delegators": 2,
+              "duplicate": false,
+              "expiresAt": 1794114000,
+              "id": 3,
+              "liveAt": null,
+              "name": "Broker 1Tb TLC weekly quote",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": null,
+              "postedAt": 1792904400,
+              "product": "NANDX",
+              "proposer": "42NRfYwTX7Z4VJehCTrjSAwvqYTEBMzuaRh7HEijtMqz",
+              "retiredAt": null,
+              "shareBps": null,
+              "sourceTs": null,
+              "spec": "Broker 1Tb TLC weekly quote. Unit: USD per chip; a written quote for 1,000+ units, dated, with the seller named; one print per week.",
+              "specHash": "0f456833745bc6b4af59d26f4da20f2ab4478cdbde1feaa537a2db78c95bae63",
+              "status": "active",
+              "strikes": 0,
+              "value": null,
+              "weights": []
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": null,
+              "address": "2Hzpcn85ngP1M4ARdvCtBEVKBcoVxceqhxAirLU7eggm",
+              "channel": "spot",
+              "component": 6,
+              "componentLabel": "512Gb TLC Spot",
+              "delegation": "1200000000000",
+              "delegators": 1,
+              "duplicate": false,
+              "expiresAt": 1794373200,
+              "id": 5,
+              "liveAt": null,
+              "name": "Digi-Key 512Gb TLC unit price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": null,
+              "postedAt": 1793163600,
+              "product": "NANDX",
+              "proposer": "4JVXsNpe9h19bLmfPyFn7TaAcj93FUjsMNKcrLbioZ1j",
+              "retiredAt": null,
+              "shareBps": null,
+              "sourceTs": null,
+              "spec": "Digi-Key 512Gb TLC unit price. Unit: USD per packaged single-die chip, excluding tax; the listed price for the first quantity break.",
+              "specHash": "d9d52658572b4a2e2645faaf459e442c2df13a756def356793f3cb80f1ed8b27",
+              "status": "open",
+              "strikes": 0,
+              "value": null,
+              "weights": []
+            },
+            {
+              "accessClass": "login-zktls",
+              "activeAt": null,
+              "address": "4JPzPc6QraaZT4e8kVJPQhVPZFngSTrdix3ZUHwC1ML6",
+              "channel": "lta",
+              "component": 5,
+              "componentLabel": "1Tb QLC LTA",
+              "delegation": "1000000000000",
+              "delegators": 1,
+              "duplicate": false,
+              "expiresAt": 1794286800,
+              "id": 6,
+              "liveAt": null,
+              "name": "Enterprise SSD 1Tb QLC LTA price",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": null,
+              "postedAt": 1793077200,
+              "product": "NANDX",
+              "proposer": "71h3tLL8xXEMPZY9NEd7JfWox97wG9dRssTqyGZbB7Xa",
+              "retiredAt": null,
+              "shareBps": null,
+              "sourceTs": null,
+              "spec": "Enterprise SSD 1Tb QLC LTA price. Unit: USD per chip; the price in effect under a multi-year enterprise SSD agreement, its next reset and band.",
+              "specHash": "9add62ee4d9fab0f87adce99dad2f1e9ef9270d57b7e48b6f5224c123b0d51c1",
+              "status": "open",
+              "strikes": 0,
+              "value": null,
+              "weights": []
+            },
+            {
+              "accessClass": "public-page",
+              "activeAt": null,
+              "address": "ACCcTNbj99fxsLn68NAACNot54R88LSUkpvG8bZEP721",
+              "channel": "spot",
+              "component": 6,
+              "componentLabel": "512Gb TLC Spot",
+              "delegation": "0",
+              "delegators": 0,
+              "duplicate": false,
+              "expiresAt": 1791209600,
+              "id": 7,
+              "liveAt": null,
+              "name": "Forum post 512Gb TLC prices",
+              "openChallenges": 0,
+              "openClaims": 0,
+              "originId": null,
+              "postedAt": 1790000000,
+              "product": "NANDX",
+              "proposer": "E5pgU3mCrdrf2Wun9nmX1CNn8svxza2vT8pjHZppFcby",
+              "retiredAt": 1791209600,
+              "shareBps": null,
+              "sourceTs": null,
+              "spec": "Forum post 512Gb TLC prices. Unit: USD per chip; prices people post in a forum thread.",
+              "specHash": "58791215990ce6633b068113e0a1f93003f60ac3c032d2a1c3489788c1a5622e",
+              "status": "expired",
+              "strikes": 0,
+              "value": null,
+              "weights": []
+            }
+          ],
+          "index": {
+            "changePpm": null,
+            "contract": null,
+            "degradedComponents": [],
+            "reason": "No contract is listed yet.",
+            "status": "unavailable",
+            "value": null
+          },
+          "items": [
+            {
+              "basketWeightBps": 4000,
+              "bucketId": "746c635f31746200000000000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": null,
+                  "channel": "spot",
+                  "index": 0,
+                  "indexWeightBps": 400,
+                  "label": "1Tb TLC Spot",
+                  "liveOrigins": 2,
+                  "liveSources": 2,
+                  "origins": [
+                    "6df8f209eddf317311eadc592ae0d1b56c8fa619539b4c75b688e03ec2d4ae10",
+                    "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d"
+                  ],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 1Tb TLC flash, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "82eae18382a2207f384e8d41a80ab9bc0da0d9a05c5713638e3d353a8924df61",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": [
+                    {
+                      "changePpm": null,
+                      "delegation": "16000000000000",
+                      "duplicate": false,
+                      "head": 1,
+                      "level": "4520000",
+                      "opening": null,
+                      "origin": "6df8f209eddf317311eadc592ae0d1b56c8fa619539b4c75b688e03ec2d4ae10",
+                      "shareBps": 6154,
+                      "weight": "16000000000000"
+                    },
+                    {
+                      "changePpm": null,
+                      "delegation": "10000000000000",
+                      "duplicate": false,
+                      "head": 2,
+                      "level": "4610000",
+                      "opening": null,
+                      "origin": "de95fd29b15a60b5b7e29d1092cdb435b233b4d7d4d6ae81ca8298fb1114186d",
+                      "shareBps": 3846,
+                      "weight": "10000000000000"
+                    }
+                  ]
+                },
+                {
+                  "changePpm": null,
+                  "channel": "contract",
+                  "index": 1,
+                  "indexWeightBps": 2200,
+                  "label": "1Tb TLC Contract",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 1Tb TLC flash, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+                  "sentenceHash": "971d947c1396911065d6c5bf0f2e6b2c0886d81d79a3e8a9b41de4ea5b455402",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 2,
+                  "indexWeightBps": 1400,
+                  "label": "1Tb TLC LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 1Tb TLC flash, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "ff7ffd7d8ed3be2d9045a9a97f21c7e4193637f91572e5e16d81fa5625a73c2b",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 0,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 5500,
+                "lta": 3500,
+                "spot": 1000
+              },
+              "mixReason": "The mainstream die for client and enterprise SSDs: mostly monthly or quarterly contracts with SSD and module makers, a growing LTA share at enterprise SSD buyers, and a little spot.",
+              "name": "1Tb TLC",
+              "reference": {
+                "available": false,
+                "channel": null,
+                "channels": [
+                  {
+                    "changePpm": null,
+                    "channel": "spot",
+                    "degraded": false,
+                    "mixBps": 1000,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 5500,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": false,
+                    "mixBps": 3500,
+                    "reason": null,
+                    "status": "no-contract"
+                  }
+                ],
+                "code": "no-contract",
+                "reason": "No contract is listed yet, so the channels have no change to mix."
+              }
+            },
+            {
+              "basketWeightBps": 3000,
+              "bucketId": "716c635f31746200000000000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": null,
+                  "channel": "spot",
+                  "index": 3,
+                  "indexWeightBps": 300,
+                  "label": "1Tb QLC Spot",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 1Tb QLC flash, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "d02dd094aab752f2be74ebcbbfcd0f3ba26801be7bec00e4d2c12eb48bb8ec9d",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": null,
+                  "channel": "contract",
+                  "index": 4,
+                  "indexWeightBps": 1350,
+                  "label": "1Tb QLC Contract",
+                  "liveOrigins": 1,
+                  "liveSources": 1,
+                  "origins": [
+                    "53dd86b9fce32b0fc58f9188ffa88bdd46b387cdace306c39a04bb309b03b021"
+                  ],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 1Tb QLC flash, supplier → OEM/ODM purchase not under an LTA, delivered during the observation quarter, price fixed during this negotiation period.",
+                  "sentenceHash": "b9d577790966c6775ff54bce392603494a1381d02304f6ed5967e45faeb59906",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": [
+                    {
+                      "changePpm": null,
+                      "delegation": "9000000000000",
+                      "duplicate": false,
+                      "head": 4,
+                      "level": "3650000",
+                      "opening": null,
+                      "origin": "53dd86b9fce32b0fc58f9188ffa88bdd46b387cdace306c39a04bb309b03b021",
+                      "shareBps": 10000,
+                      "weight": "9000000000000"
+                    }
+                  ]
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 5,
+                  "indexWeightBps": 1350,
+                  "label": "1Tb QLC LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 1Tb QLC flash, price in effect for deliveries during the observation quarter under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "15bcf9d4a1bd0d3ec4951d1f330c82611f4b5e947a17f266210fde11203c822e",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 1,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 4500,
+                "lta": 4500,
+                "spot": 1000
+              },
+              "mixReason": "Mostly in high-capacity enterprise SSDs for data centers, whose buyers have taken multi-year LTAs; spot is thin.",
+              "name": "1Tb QLC",
+              "reference": {
+                "available": false,
+                "channel": null,
+                "channels": [
+                  {
+                    "changePpm": null,
+                    "channel": "spot",
+                    "degraded": false,
+                    "mixBps": 1000,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 4500,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": false,
+                    "mixBps": 4500,
+                    "reason": null,
+                    "status": "no-contract"
+                  }
+                ],
+                "code": "no-contract",
+                "reason": "No contract is listed yet, so the channels have no change to mix."
+              }
+            },
+            {
+              "basketWeightBps": 2000,
+              "bucketId": "746c635f35313267620000000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": null,
+                  "channel": "spot",
+                  "index": 6,
+                  "indexWeightBps": 400,
+                  "label": "512Gb TLC Spot",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 512Gb TLC flash, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "44df06cb804412bcc4e1e5129e0bb4512e0cd0ec75647d9f2f159f1fe54d585c",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": null,
+                  "channel": "contract",
+                  "index": 7,
+                  "indexWeightBps": 1200,
+                  "label": "512Gb TLC Contract",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 512Gb TLC flash, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+                  "sentenceHash": "519f46f844d398a5533bf486318ddabf467332d09ae431538a91f3ff13eb3ae8",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 8,
+                  "indexWeightBps": 400,
+                  "label": "512Gb TLC LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 512Gb TLC flash, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "a774fa42be83c2f8c9cd0a9c28dcc2dd1b59ed9cee45ba0d10de0ad88f884ae6",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 2,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 6000,
+                "lta": 2000,
+                "spot": 2000
+              },
+              "mixReason": "Used in mobile and client storage that module makers buy on contract, with an active channel spot market and few LTAs.",
+              "name": "512Gb TLC",
+              "reference": {
+                "available": false,
+                "channel": null,
+                "channels": [
+                  {
+                    "changePpm": null,
+                    "channel": "spot",
+                    "degraded": false,
+                    "mixBps": 2000,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 6000,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": false,
+                    "mixBps": 2000,
+                    "reason": null,
+                    "status": "no-contract"
+                  }
+                ],
+                "code": "no-contract",
+                "reason": "No contract is listed yet, so the channels have no change to mix."
+              }
+            },
+            {
+              "basketWeightBps": 1000,
+              "bucketId": "746c635f32353667620000000000000000000000000000000000000000000000",
+              "components": [
+                {
+                  "changePpm": null,
+                  "channel": "spot",
+                  "index": 9,
+                  "indexWeightBps": 300,
+                  "label": "256Gb TLC Spot",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 256Gb TLC flash, immediately available inventory, open-market trade, as of the observation date.",
+                  "sentenceHash": "57732b3fa70f4ac43b7bd4f9fcbcb4f336fadc49ab27299557d721b6d297ab27",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": null,
+                  "channel": "contract",
+                  "index": 10,
+                  "indexWeightBps": 550,
+                  "label": "256Gb TLC Contract",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 256Gb TLC flash, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+                  "sentenceHash": "5239f54c99a9b641005aca1d213f37679bb6b557c7b3ce99577ba8fe1001d52f",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                },
+                {
+                  "changePpm": null,
+                  "channel": "lta",
+                  "index": 11,
+                  "indexWeightBps": 150,
+                  "label": "256Gb TLC LTA",
+                  "liveOrigins": 0,
+                  "liveSources": 0,
+                  "origins": [],
+                  "reading": {
+                    "changePpm": null,
+                    "status": "no-contract"
+                  },
+                  "sentence": "USD per chip, new standard-production single-die packaged 3D NAND 256Gb TLC flash, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+                  "sentenceHash": "85122cc871f6f4b4898b2c73b68c5afcf1723bcab033d0298812211639bd5967",
+                  "sentenceMatches": true,
+                  "settles": true,
+                  "sources": []
+                }
+              ],
+              "index": 3,
+              "mixBasis": "assumed",
+              "mixBps": {
+                "contract": 5500,
+                "lta": 1500,
+                "spot": 3000
+              },
+              "mixReason": "A legacy low-density die for consumer and embedded storage, traded heavily in the spot channel and rarely under LTAs.",
+              "name": "256Gb TLC",
+              "reference": {
+                "available": false,
+                "channel": null,
+                "channels": [
+                  {
+                    "changePpm": null,
+                    "channel": "spot",
+                    "degraded": false,
+                    "mixBps": 3000,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "contract",
+                    "degraded": false,
+                    "mixBps": 5500,
+                    "reason": null,
+                    "status": "no-contract"
+                  },
+                  {
+                    "changePpm": null,
+                    "channel": "lta",
+                    "degraded": false,
+                    "mixBps": 1500,
+                    "reason": null,
+                    "status": "no-contract"
+                  }
+                ],
+                "code": "no-contract",
+                "reason": "No contract is listed yet, so the channels have no change to mix."
+              }
+            }
+          ],
+          "params": {
+            "alphaBps": 2500,
+            "baseFillPrize": "5000000",
+            "baseUpdatePrize": "1000000",
+            "betaBps": 5000,
+            "challengeBond": "1000000",
+            "challengeExtensionSecs": 21600,
+            "challengeWindowSecs": 86400,
+            "claimBond": "1000000",
+            "cooldownSecs": 1209600,
+            "fillPrizeSlopePpb": "0",
+            "floorActivate": "2000000000000",
+            "floorPost": "1000000000000",
+            "headTtlSecs": 1209600,
+            "maxLiabilityBps": 1900,
+            "maxStrikes": 2,
+            "minDelegators": 2,
+            "minLiveSources": 1,
+            "minSettleWeight": "1000000000000",
+            "prizeCutBps": 2000,
+            "proposerSlashBps": 10000,
+            "settlementBusinessDays": 5,
+            "slashRateBps": 1000,
+            "updatePrizeSlopePpb": "0"
+          },
+          "product": "NANDX",
+          "quarter": "Q4 2026",
+          "settlementTarget": "fixed-mix",
+          "thresholds": {
+            "activation": "5000000000000",
+            "minPost": "3441666666666"
+          },
+          "totals": {
+            "delegation": "41300000000000",
+            "liveDelegation": "35000000000000",
+            "prizePool": "312500000",
+            "reserve": "1250000000"
+          }
+        }
+      ],
+      "updatedAt": 1793250000
+    },
+    "owner": "CWWW969MEtHSRY7ud58pCYZAfz9Qb7aiBuL7L9iQZHmf",
+    "terms": {
+      "document": "amoeba-oracle-listing-terms-v1\n{\"schema\":\"amoeba.oracle-listing-terms.v1\",\"molds\":\"channel-molds-v1-placeholder\",\"moldsSha256\":\"d8311ecaf0678196ede01d3cc10d9e7bbacaeafdcacd62b4a6bfe6625c694d8c\",\"product\":\"RAMX\",\"expiryTs\":1798761600,\"quarter\":\"2026-Q4\",\"settlementTarget\":\"fixed_mix_reference\",\"disclosure\":\"This contract settles on a fixed-mix procurement reference: each item's spot, periodic-contract and long-term-agreement prices, weighted by the mix published with this listing (an assumed scenario until matched evidence backs it).\",\"mixCitation\":\"Assumed scenario, no matched evidence yet: suppliers say a large and rising share of forward DRAM capacity is under multi-year LTAs (a capacity disclosure, which the brief's section 4 rules out as matched evidence), monthly and quarterly OEM contracts remain the price the industry quotes, and spot is a thin channel market.\",\"mixCommitment\":\"6c472f01096b01979176b39cc44e903b8aaead399f854ac9c93bcd316df71129\",\"items\":[{\"bucket\":\"DDR5_16GBIT\",\"name\":\"DDR5 16Gb\",\"basketWeightBps\":4000,\"mixBps\":[1000,5000,4000],\"mixBasis\":\"assumed\",\"mixReason\":\"The mainstream PC and server DDR5 die: large OEMs and ODMs buy it on monthly contracts while hyperscalers and top OEMs have moved much of their volume to LTAs; spot is a small channel market.\",\"components\":[{\"index\":0,\"channel\":\"spot\",\"sentenceSha256\":\"ab895236be2044df7df7149689c5f16ac00b6354f6585061011c666fe4298ff7\"},{\"index\":1,\"channel\":\"contract\",\"sentenceSha256\":\"e4b04c941ee4f943172691cee8fa53947e9dff2e6dd16a13bff608a6dacd0864\"},{\"index\":2,\"channel\":\"lta\",\"sentenceSha256\":\"37ebaf0d25c93bd22da0b0c7e2b9a16de6e23954bec7d431f6b52c68b94c5660\"}]},{\"bucket\":\"DDR5_24GBIT\",\"name\":\"DDR5 24Gb\",\"basketWeightBps\":2000,\"mixBps\":[500,4500,5000],\"mixBasis\":\"assumed\",\"mixReason\":\"Goes mostly into server RDIMMs bought by hyperscalers and server OEMs, the buyers most likely to hold LTAs; there is almost no spot market.\",\"components\":[{\"index\":3,\"channel\":\"spot\",\"sentenceSha256\":\"f97cfdbbaf1f069659e1e90c9c2ebbd469fb6f1819a1374c03e3f9091f717771\"},{\"index\":4,\"channel\":\"contract\",\"sentenceSha256\":\"372ea42ac9eb9e8b9f042704a70457cbaa09037b332ae9ef6e05f244ec892e33\"},{\"index\":5,\"channel\":\"lta\",\"sentenceSha256\":\"3822dac5786acdab7f5ae50b892d78f19b64d316653bfbf53201e6692d3ed01f\"}]},{\"bucket\":\"DDR4_16GBIT\",\"name\":\"DDR4 16Gb\",\"basketWeightBps\":2500,\"mixBps\":[1500,5500,3000],\"mixBasis\":\"assumed\",\"mixReason\":\"A legacy die the major suppliers are winding down: industrial and networking buyers fix prices on contract or last-time buys, and spot trade has grown as supply tightens.\",\"components\":[{\"index\":6,\"channel\":\"spot\",\"sentenceSha256\":\"f5691918e7690b71770134730f40be1ebfe13e6df24ab3f6c6355327087fbe7c\"},{\"index\":7,\"channel\":\"contract\",\"sentenceSha256\":\"5bf7a21ede8d0ebd11febe89607cbec3a6acdd31f73d4bb05fbb4175ad9941bc\"},{\"index\":8,\"channel\":\"lta\",\"sentenceSha256\":\"2251710de3acbce14d9ba43251f964144c5c7e66c4bca32784858dd8c8d878ea\"}]},{\"bucket\":\"DDR4_8GBIT\",\"name\":\"DDR4 8Gb\",\"basketWeightBps\":1500,\"mixBps\":[2000,5500,2500],\"mixBasis\":\"assumed\",\"mixReason\":\"The most spot-traded DRAM chip (the usual spot benchmark), bought by consumer-electronics and module makers on short contracts with little multi-year commitment.\",\"components\":[{\"index\":9,\"channel\":\"spot\",\"sentenceSha256\":\"8a8b781ddf1949ac030d7f144dcd62561311a537915de58571237cb2e1eda805\"},{\"index\":10,\"channel\":\"contract\",\"sentenceSha256\":\"25bc0c9bc6290d329d93ab9a573e76720d9b0575def1bb6574483894ef51acfe\"},{\"index\":11,\"channel\":\"lta\",\"sentenceSha256\":\"2db7db5beb0688a363c130ca1f6680d62980a98001e98a7516c99dd0fa8e9ef3\"}]}]}",
+      "documentSha256": "e5e7eefe598ba479e953ee4976d1fc8b805c2b47d42276449c9c8d08804b7eb5",
+      "expiry": 1798761600,
+      "matches": true,
+      "molds": "channel-molds-v1-placeholder",
+      "moldsSha256": "d8311ecaf0678196ede01d3cc10d9e7bbacaeafdcacd62b4a6bfe6625c694d8c",
+      "period": "7DMte6cNycfBVg6hwqQ5cQYDxRoanur9jMsPFeoF7SBu",
+      "product": "RAMX",
+      "sentences": [
+        {
+          "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+          "channel": "spot",
+          "index": 0,
+          "item": 0,
+          "matches": true,
+          "onChain": "ab895236be2044df7df7149689c5f16ac00b6354f6585061011c666fe4298ff7",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+          "sentenceSha256": "ab895236be2044df7df7149689c5f16ac00b6354f6585061011c666fe4298ff7"
+        },
+        {
+          "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+          "channel": "contract",
+          "index": 1,
+          "item": 0,
+          "matches": true,
+          "onChain": "e4b04c941ee4f943172691cee8fa53947e9dff2e6dd16a13bff608a6dacd0864",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+          "sentenceSha256": "e4b04c941ee4f943172691cee8fa53947e9dff2e6dd16a13bff608a6dacd0864"
+        },
+        {
+          "bucketId": "444452355f313647424954000000000000000000000000000000000000000000",
+          "channel": "lta",
+          "index": 2,
+          "item": 0,
+          "matches": true,
+          "onChain": "37ebaf0d25c93bd22da0b0c7e2b9a16de6e23954bec7d431f6b52c68b94c5660",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR5 16Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+          "sentenceSha256": "37ebaf0d25c93bd22da0b0c7e2b9a16de6e23954bec7d431f6b52c68b94c5660"
+        },
+        {
+          "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+          "channel": "spot",
+          "index": 3,
+          "item": 1,
+          "matches": true,
+          "onChain": "f97cfdbbaf1f069659e1e90c9c2ebbd469fb6f1819a1374c03e3f9091f717771",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+          "sentenceSha256": "f97cfdbbaf1f069659e1e90c9c2ebbd469fb6f1819a1374c03e3f9091f717771"
+        },
+        {
+          "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+          "channel": "contract",
+          "index": 4,
+          "item": 1,
+          "matches": true,
+          "onChain": "372ea42ac9eb9e8b9f042704a70457cbaa09037b332ae9ef6e05f244ec892e33",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation quarter, price fixed during this negotiation period.",
+          "sentenceSha256": "372ea42ac9eb9e8b9f042704a70457cbaa09037b332ae9ef6e05f244ec892e33"
+        },
+        {
+          "bucketId": "444452355f323447424954000000000000000000000000000000000000000000",
+          "channel": "lta",
+          "index": 5,
+          "item": 1,
+          "matches": true,
+          "onChain": "3822dac5786acdab7f5ae50b892d78f19b64d316653bfbf53201e6692d3ed01f",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR5 24Gb SDRAM, price in effect for deliveries during the observation quarter under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+          "sentenceSha256": "3822dac5786acdab7f5ae50b892d78f19b64d316653bfbf53201e6692d3ed01f"
+        },
+        {
+          "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+          "channel": "spot",
+          "index": 6,
+          "item": 2,
+          "matches": true,
+          "onChain": "f5691918e7690b71770134730f40be1ebfe13e6df24ab3f6c6355327087fbe7c",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+          "sentenceSha256": "f5691918e7690b71770134730f40be1ebfe13e6df24ab3f6c6355327087fbe7c"
+        },
+        {
+          "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+          "channel": "contract",
+          "index": 7,
+          "item": 2,
+          "matches": true,
+          "onChain": "5bf7a21ede8d0ebd11febe89607cbec3a6acdd31f73d4bb05fbb4175ad9941bc",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+          "sentenceSha256": "5bf7a21ede8d0ebd11febe89607cbec3a6acdd31f73d4bb05fbb4175ad9941bc"
+        },
+        {
+          "bucketId": "444452345f313647424954000000000000000000000000000000000000000000",
+          "channel": "lta",
+          "index": 8,
+          "item": 2,
+          "matches": true,
+          "onChain": "2251710de3acbce14d9ba43251f964144c5c7e66c4bca32784858dd8c8d878ea",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR4 16Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+          "sentenceSha256": "2251710de3acbce14d9ba43251f964144c5c7e66c4bca32784858dd8c8d878ea"
+        },
+        {
+          "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+          "channel": "spot",
+          "index": 9,
+          "item": 3,
+          "matches": true,
+          "onChain": "8a8b781ddf1949ac030d7f144dcd62561311a537915de58571237cb2e1eda805",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, immediately available inventory, open-market trade, as of the observation date.",
+          "sentenceSha256": "8a8b781ddf1949ac030d7f144dcd62561311a537915de58571237cb2e1eda805"
+        },
+        {
+          "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+          "channel": "contract",
+          "index": 10,
+          "item": 3,
+          "matches": true,
+          "onChain": "25bc0c9bc6290d329d93ab9a573e76720d9b0575def1bb6574483894ef51acfe",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, supplier → OEM/ODM purchase not under an LTA, delivered during the observation month, price fixed during this negotiation period.",
+          "sentenceSha256": "25bc0c9bc6290d329d93ab9a573e76720d9b0575def1bb6574483894ef51acfe"
+        },
+        {
+          "bucketId": "444452345f384742495400000000000000000000000000000000000000000000",
+          "channel": "lta",
+          "index": 11,
+          "item": 3,
+          "matches": true,
+          "onChain": "2db7db5beb0688a363c130ca1f6680d62980a98001e98a7516c99dd0fa8e9ef3",
+          "sentence": "USD per chip, new standard-production single-die packaged DDR4 8Gb SDRAM, price in effect for deliveries during the observation month under an agreement of ≥ 1 year with committed volume. Evidence shows the price in effect, the period it covers, the next reset date, and any floor/ceiling.",
+          "sentenceSha256": "2db7db5beb0688a363c130ca1f6680d62980a98001e98a7516c99dd0fa8e9ef3"
+        }
+      ],
+      "settlementTarget": "fixed-mix",
+      "termsHash": "e5e7eefe598ba479e953ee4976d1fc8b805c2b47d42276449c9c8d08804b7eb5"
+    }
+  }
+}

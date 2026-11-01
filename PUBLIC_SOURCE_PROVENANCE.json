@@ -39,6 +39,11 @@
       "executable": false
     },
     {
+      "path": "api/api/fixtures/oracle-heads.json",
+      "sha256": "2464bb1004437a39edd4bf60ef0cc8f30bee4d6a77dc0ba82b576ca050ab6207",
+      "executable": false
+    },
+    {
       "path": "cli/.cargo/config.toml",
       "sha256": "9a1cc3d22bbcb0ef444d7b1a37797f8e6d2d6d29eb158ef0d3ed7f8309f67cde",
       "executable": false
