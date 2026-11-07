@@ -278,7 +278,7 @@ the defaults and what Petri trusts:
 
 | Profile | Futures API | Solana RPC | Programs |
 | --- | --- | --- | --- |
-| `production` (a release build's default) | `https://api.amoeba.farm` | `https://api.mainnet-beta.solana.com` | mainnet-beta and the production oracle, futures program and governance controller only; an API naming others is refused |
+| `production` (a release build's default) | `https://api.amoeba.farm` | `https://api.mainnet-beta.solana.com` | mainnet-beta and the production oracle (or its compiled-in successor, when a release sets one), futures program and governance controller only; an API naming others is refused |
 | `dev` (the dev build's default) | `http://127.0.0.1:4500` | `http://127.0.0.1:8899` | what the API names, with the dev chain's own controller |
 
 ```bash

@@ -32,7 +32,7 @@ pub use compact_error::{ProgramError, ProgramResult};
 // The production (mainnet) oracle address, reserved by the user and bound in source:
 // ship/releases/2026-10-15-preflight.md, "Decisions" 4. Dev builds keep their own key below.
 #[cfg(not(any(feature = "localnet-dev-authority", feature = "localnet-governance")))]
-solana_program::declare_id!("45YCerssGjg2M29RFc9D4fAJh7dfFpMJ3ZcZtaTnRXRS");
+solana_program::declare_id!("GvUVxt2qT5rRHMpCNzQ3VnvSW63yAqgrSW6epdU9Yem7");
 
 // The localnet dev profile deploys under a key the operator holds; its public key is supplied at
 // build time and validated as base58 at compile time.

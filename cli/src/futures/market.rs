@@ -125,16 +125,31 @@ impl Deployment {
     }
 
     fn from_api_config(c: ApiConfig, source: &str, profile: Profile) -> Result<Self> {
+        Self::from_api_trusting(c, source, profile, settings::PRODUCTION_ORACLE_SUCCESSOR)
+    }
+
+    /// [`Self::from_api_config`] with the oracle's successor as an argument, so
+    /// tests can set one. Outside them it is always the compiled-in constant.
+    fn from_api_trusting(
+        c: ApiConfig,
+        source: &str,
+        profile: Profile,
+        successor: &str,
+    ) -> Result<Self> {
         let futures = c
             .programs
             .futures
             .as_deref()
             .map(|f| pubkey(f, "futures program"))
             .transpose()?;
+        let oracle = match c.programs.oracle.trim() {
+            "" if profile == Profile::Production => settings::PRODUCTION_ORACLE,
+            named => named,
+        };
         let mut d = Self {
             oracle_release_tag: c.oracle_release_tag,
             governance_controller: c.governance_controller,
-            oracle: pubkey(&c.programs.oracle, "oracle program")?,
+            oracle: pubkey(oracle, "oracle program")?,
             futures,
             usdc_mint: pubkey(&c.usdc_mint, "USDC mint")?,
             sponsor: Pubkey::from_str(&c.sponsor).ok(),
@@ -143,7 +158,7 @@ impl Deployment {
             profile,
         };
         if profile == Profile::Production {
-            d = d.pin_production()?;
+            d = d.pin_production(successor)?;
         }
         d.validate()?;
         Ok(d)
@@ -160,11 +175,14 @@ impl Deployment {
 
     /// The production profile trusts only the production deployment: Solana
     /// mainnet-beta, the production oracle and futures programs and the
-    /// production governance controller. What the API names must be those;
-    /// what it leaves out is filled in with them (the controller gating both
-    /// programs). Anything else is refused, so a wrong or compromised API can
-    /// never point a production Petri at other programs.
-    fn pin_production(mut self) -> Result<Self> {
+    /// production governance controller. The oracle may also be `successor`
+    /// (`settings::PRODUCTION_ORACLE_SUCCESSOR`, unless that is unset). What
+    /// the API names must be those, and is used as named; what it leaves out
+    /// is filled in with them (the oracle by `from_api_trusting`, the current
+    /// one; the controller gating both programs). Anything else is refused,
+    /// so a wrong or compromised API can never point a production Petri at
+    /// other programs.
+    fn pin_production(mut self, successor: &str) -> Result<Self> {
         let refuse = |what: &str, got: &str, want: &str| {
             Err(Error::msg(format!(
                 "refusing {}: it names {what} {got}, but the production profile trusts only {want}; \
@@ -179,12 +197,19 @@ impl Deployment {
             Some(_) => {}
             None => self.genesis_hash = Some(settings::MAINNET_GENESIS.to_string()),
         }
-        let oracle = pubkey(settings::PRODUCTION_ORACLE, "oracle program")?;
-        if self.oracle != oracle {
+        let mut oracles = vec![settings::PRODUCTION_ORACLE];
+        if successor != settings::ORACLE_SUCCESSOR_UNSET {
+            oracles.push(successor);
+        }
+        let trusted = oracles
+            .iter()
+            .map(|o| pubkey(o, "oracle program"))
+            .collect::<Result<Vec<_>>>()?;
+        if !trusted.contains(&self.oracle) {
             return refuse(
                 "the oracle program",
                 &self.oracle.to_string(),
-                settings::PRODUCTION_ORACLE,
+                &oracles.join(" or "),
             );
         }
         let futures = pubkey(settings::PRODUCTION_FUTURES, "futures program")?;
@@ -212,7 +237,7 @@ impl Deployment {
             None => {
                 self.governance_controller = Some(GovernanceDeployment {
                     program: controller.to_string(),
-                    targets: vec![futures.to_string(), oracle.to_string()],
+                    targets: vec![futures.to_string(), self.oracle.to_string()],
                 });
             }
         }
@@ -466,6 +491,120 @@ mod tests {
         assert_eq!(d.oracle.to_string(), other);
         assert!(d.dev_chain());
         assert!(Deployment::from_api_config(served, "API fixture", Profile::Production).is_err());
+    }
+
+    /// The production deployment an API naming `oracle` gives, with `successor`
+    /// as the compiled-in constant.
+    fn served(oracle: &str, successor: &str) -> Result<Deployment> {
+        let c = api_config(settings::MAINNET_GENESIS, oracle, None);
+        Deployment::from_api_trusting(c, "API fixture", Profile::Production, successor)
+    }
+
+    #[test]
+    fn an_unset_successor_trusts_the_current_oracle_alone() {
+        use settings::{ORACLE_SUCCESSOR_UNSET as UNSET, PRODUCTION_ORACLE};
+        // The API names the current oracle.
+        let d = served(PRODUCTION_ORACLE, UNSET).unwrap();
+        assert_eq!(d.oracle.to_string(), PRODUCTION_ORACLE);
+        // It names anything else, the would-be successor included: refused in
+        // the words a Petri with no successor has always used.
+        let other = Pubkey::new_from_array([9; 32]).to_string();
+        assert_eq!(
+            served(&other, UNSET).unwrap_err().message,
+            format!(
+                "refusing API fixture: it names the oracle program {other}, but the production \
+                 profile trusts only {PRODUCTION_ORACLE}; for another deployment use --profile \
+                 dev (or `petri config set profile dev`)"
+            )
+        );
+        // The placeholder itself is no address.
+        assert!(served(UNSET, UNSET).is_err());
+    }
+
+    #[test]
+    fn a_set_successor_is_trusted_beside_the_current_oracle() {
+        use settings::{PRODUCTION_FUTURES, PRODUCTION_ORACLE};
+        let successor = Pubkey::new_from_array([8; 32]).to_string();
+
+        // The API names the current oracle: nothing changes.
+        let d = served(PRODUCTION_ORACLE, &successor).unwrap();
+        assert_eq!(d.oracle.to_string(), PRODUCTION_ORACLE);
+        assert_eq!(
+            d.governance_controller.unwrap().targets,
+            vec![PRODUCTION_FUTURES, PRODUCTION_ORACLE]
+        );
+
+        // It names the successor: the deployment is the successor's, and what
+        // is filled in around it is too.
+        let d = served(&successor, &successor).unwrap();
+        assert_eq!(d.oracle.to_string(), successor);
+        assert_eq!(
+            d.governance_controller.unwrap().targets,
+            vec![PRODUCTION_FUTURES, successor.as_str()]
+        );
+
+        // It names a third key: refused, naming both it could have been.
+        let other = Pubkey::new_from_array([9; 32]).to_string();
+        assert_eq!(
+            served(&other, &successor).unwrap_err().message,
+            format!(
+                "refusing API fixture: it names the oracle program {other}, but the production \
+                 profile trusts only {PRODUCTION_ORACLE} or {successor}; for another deployment \
+                 use --profile dev (or `petri config set profile dev`)"
+            )
+        );
+    }
+
+    #[test]
+    fn an_api_that_omits_the_oracle_gets_the_current_one() {
+        use settings::{ORACLE_SUCCESSOR_UNSET as UNSET, PRODUCTION_ORACLE};
+        let omitted = || -> ApiConfig {
+            serde_json::from_value(serde_json::json!({
+                "genesisHash": settings::MAINNET_GENESIS,
+                "usdcMint": Pubkey::new_from_array([4; 32]).to_string(),
+            }))
+            .unwrap()
+        };
+        let successor = Pubkey::new_from_array([8; 32]).to_string();
+        for trusting in [UNSET, successor.as_str()] {
+            let d = Deployment::from_api_trusting(
+                omitted(),
+                "API fixture",
+                Profile::Production,
+                trusting,
+            )
+            .unwrap();
+            assert_eq!(d.oracle.to_string(), PRODUCTION_ORACLE);
+            assert!(
+                d.governance_controller
+                    .unwrap()
+                    .targets
+                    .contains(&PRODUCTION_ORACLE.to_string())
+            );
+        }
+        // The dev profile fills in nothing.
+        assert!(Deployment::from_api_config(omitted(), "API fixture", Profile::Dev).is_err());
+    }
+
+    /// The trusted set is the compiled-in one, whatever the constant holds:
+    /// the current oracle and the successor pass, a third key doesn't.
+    #[test]
+    fn the_api_path_trusts_exactly_the_compiled_in_oracles() {
+        use settings::{
+            MAINNET_GENESIS, ORACLE_SUCCESSOR_UNSET, PRODUCTION_ORACLE,
+            PRODUCTION_ORACLE_SUCCESSOR as SUCCESSOR,
+        };
+        let production = |oracle: &str| {
+            let c = api_config(MAINNET_GENESIS, oracle, None);
+            Deployment::from_api_config(c, "API fixture", Profile::Production)
+        };
+        production(PRODUCTION_ORACLE).unwrap();
+        assert!(production(&Pubkey::new_from_array([9; 32]).to_string()).is_err());
+        if SUCCESSOR == ORACLE_SUCCESSOR_UNSET {
+            assert!(production(SUCCESSOR).is_err());
+        } else {
+            assert_eq!(production(SUCCESSOR).unwrap().oracle.to_string(), SUCCESSOR);
+        }
     }
 
     #[test]

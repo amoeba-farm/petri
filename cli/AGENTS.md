@@ -138,7 +138,8 @@ contracts:
   `production` (the API `https://api.amoeba.farm`, Solana's public RPC
   `https://api.mainnet-beta.solana.com`, never the API's `/rpc` gateway, which
   lacks methods petri calls: `rpc::METHODS`; only mainnet-beta, the production
-  oracle and futures programs and controller `8fhNi6…`, `Deployment::pin_production`).
+  oracle (or `PRODUCTION_ORACLE_SUCCESSOR`, once set: the API picks which) and
+  futures programs and controller `8fhNi6…`, `Deployment::pin_production`).
   `dev` (the loopback API and validator) is the default of the `dev-chain`
   build (`scripts/install-dev.sh`) and `--profile dev` elsewhere. The dev
   chain's exceptions (its own controller, the oracle's `localnet-dev`

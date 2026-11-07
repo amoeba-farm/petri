@@ -29,6 +29,14 @@ pub const MAINNET_GENESIS: &str = "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d"
 /// The production programs (`ship/targets.md`, "First mainnet launch"). The
 /// controller is the SDK's `PRODUCTION_CONTROLLER_PROGRAM_ID` (`8fhNi6…`).
 pub const PRODUCTION_ORACLE: &str = "45YCerssGjg2M29RFc9D4fAJh7dfFpMJ3ZcZtaTnRXRS";
+/// The oracle that replaces `PRODUCTION_ORACLE`, trusted beside it so a
+/// released Petri keeps working when the API switches over (the oracle reboot
+/// of 2026-11-07). Set it to the new address once that is known. Like every
+/// production id it is compiled in: nothing at run time can add to this.
+pub const PRODUCTION_ORACLE_SUCCESSOR: &str = "GvUVxt2qT5rRHMpCNzQ3VnvSW63yAqgrSW6epdU9Yem7";
+/// The successor before its address is known: no address at all, so nothing
+/// can name it, and the production profile trusts `PRODUCTION_ORACLE` alone.
+pub const ORACLE_SUCCESSOR_UNSET: &str = "UNSET";
 pub const PRODUCTION_FUTURES: &str = "Bvp9kiRtJ7dT8unxP4Da39gv2eXDLEHLpcDfzcEuRKMu";
 
 /// The dev chain: the dev VM's loopback futures API and validator.
@@ -233,12 +241,29 @@ mod tests {
         ] {
             assert!(id.parse::<Pubkey>().is_ok(), "{id}");
         }
-        // The production oracle build binds its address in source.
-        assert_eq!(ameba_oracle::ID.to_string(), PRODUCTION_ORACLE);
+        // The production oracle build binds its address in source: one Petri
+        // trusts, the successor's once the oracle crate moves to it.
+        let bound = ameba_oracle::ID.to_string();
+        assert!(
+            bound == PRODUCTION_ORACLE || bound == PRODUCTION_ORACLE_SUCCESSOR,
+            "the oracle crate is bound to {bound}, which Petri does not trust"
+        );
         assert_eq!(
             ameba_sdk_futures::futures::governance::PRODUCTION_CONTROLLER_PROGRAM_ID.to_string(),
             "8fhNi6QHU5TYNhoPDM4vs89ZBztnpxp3LnBXRgkBVKtx"
         );
+    }
+
+    /// A mistyped or leftover successor must fail here, not in a release.
+    #[test]
+    fn the_oracle_successor_is_unset_or_a_new_address() {
+        use solana_program::pubkey::Pubkey;
+        assert!(ORACLE_SUCCESSOR_UNSET.parse::<Pubkey>().is_err());
+        if PRODUCTION_ORACLE_SUCCESSOR != ORACLE_SUCCESSOR_UNSET {
+            let successor: Pubkey = PRODUCTION_ORACLE_SUCCESSOR.parse().unwrap();
+            assert_ne!(successor, Pubkey::default());
+            assert_ne!(PRODUCTION_ORACLE_SUCCESSOR, PRODUCTION_ORACLE);
+        }
     }
 
     #[test]

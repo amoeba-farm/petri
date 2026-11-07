@@ -199,10 +199,29 @@ fn bind_oracle(gate: Option<&GateBinding>, ixs: Vec<Instruction>) -> Result<Vec<
         .collect()
 }
 
+/// What a write says while the oracle's gate has it stopped.
+const ORACLE_PAUSED: &str = "The oracle is paused right now, so nothing was sent. Try again later.";
+
+/// The oracle's gate, read fresh. An oracle that governance has stopped (frozen,
+/// or retired, as the old address is while the API still names it during a
+/// move to a new one) is a plain sentence, not a gate error.
+fn oracle_gate(
+    dep: &crate::futures::market::Deployment,
+    rpc: &crate::futures::rpc::Rpc,
+) -> Result<Option<GateBinding>> {
+    governance::gate(dep, rpc, &dep.oracle).map_err(|e| {
+        if governance::stopped(dep, rpc, &dep.oracle) {
+            Error::msg(ORACLE_PAUSED)
+        } else {
+            e
+        }
+    })
+}
+
 fn instructions(ctx: &Ctx, tx: &Tx) -> Result<Vec<Instruction>> {
     let dep = ctx.deployment()?;
     validate_governance(dep)?;
-    let gate = governance::gate(dep, &ctx.rpc, &dep.oracle)?;
+    let gate = oracle_gate(dep, &ctx.rpc)?;
     bind_oracle(gate.as_ref(), tx.instructions())
 }
 
@@ -885,6 +904,115 @@ mod tests {
             targets: vec![dep.oracle.to_string()],
         });
         validate_governance(&dep).unwrap();
+    }
+
+    /// A loopback RPC that answers every account read with `gate`.
+    fn rpc_with_gate(gate: Option<serde_json::Value>) -> crate::futures::rpc::Rpc {
+        use std::io::{Read, Write};
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}", listener.local_addr().unwrap());
+        std::thread::spawn(move || {
+            for stream in listener.incoming() {
+                let mut stream = stream.unwrap();
+                // The whole request: its head and body may come apart.
+                let (mut request, mut chunk) = (Vec::new(), [0u8; 4096]);
+                let text = loop {
+                    let read = stream.read(&mut chunk).unwrap_or(0);
+                    request.extend_from_slice(&chunk[..read]);
+                    let text = String::from_utf8_lossy(&request).to_string();
+                    if read == 0 || text.contains("Accounts") || text.contains("AccountInfo") {
+                        break text;
+                    }
+                };
+                let value = if text.contains("getMultipleAccounts") {
+                    json!([gate])
+                } else {
+                    json!(gate)
+                };
+                let body = json!({
+                    "jsonrpc": "2.0", "id": 1,
+                    "result": { "context": { "slot": 1 }, "value": value },
+                })
+                .to_string();
+                let reply = format!(
+                    "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                let _ = stream.write_all(reply.as_bytes());
+            }
+        });
+        crate::futures::rpc::Rpc::new(&url)
+    }
+
+    /// The gate account `controller` keeps for `target`, as the RPC returns it
+    /// (`ProtocolGateV1`'s layout).
+    fn gate_account(controller: &Pubkey, target: &Pubkey, status: u8) -> serde_json::Value {
+        use ameba_sdk_futures::futures::governance::gate_address;
+        use base64::Engine;
+        let mut data = vec![0u8; 192];
+        data[..8].copy_from_slice(b"AGVGAT01");
+        data[8] = 1;
+        data[9] = gate_address(controller, target).1;
+        data[10] = 1;
+        data[11] = status;
+        let config =
+            Pubkey::find_program_address(&[b"ameba-governance-v3", b"council"], controller).0;
+        let loader = Pubkey::from_str_const("BPFLoaderUpgradeab1e11111111111111111111111");
+        let programdata = Pubkey::find_program_address(&[target.as_ref()], &loader).0;
+        data[12..44].copy_from_slice(config.as_ref());
+        data[44..76].copy_from_slice(target.as_ref());
+        data[76..108].copy_from_slice(programdata.as_ref());
+        data[108] = 1; // Epoch.
+        if status == 1 {
+            data[116..148].fill(7); // The upgrade's proposal.
+        }
+        if status != 0 {
+            data[148] = 1; // Freeze slot.
+            data[156] = 4; // Freeze reason: `RetireTarget` writes 4.
+        }
+        json!({
+            "lamports": 1, "owner": controller.to_string(), "executable": false,
+            "data": [base64::engine::general_purpose::STANDARD.encode(data), "base64"],
+        })
+    }
+
+    #[test]
+    fn a_stopped_oracle_is_one_plain_sentence() {
+        use crate::futures::{governance::GovernanceDeployment, market::Deployment, settings};
+        use ameba_sdk_futures::futures::governance::PRODUCTION_CONTROLLER_PROGRAM_ID as CONTROLLER;
+        let oracle = Pubkey::new_unique();
+        let dep = Deployment {
+            oracle_release_tag: None,
+            governance_controller: Some(GovernanceDeployment {
+                program: CONTROLLER.to_string(),
+                targets: vec![oracle.to_string()],
+            }),
+            oracle,
+            futures: None,
+            usdc_mint: Pubkey::new_unique(),
+            sponsor: None,
+            genesis_hash: None,
+            source: "fixture".into(),
+            profile: settings::Profile::Production,
+        };
+        let gate = |account| oracle_gate(&dep, &rpc_with_gate(account));
+
+        // Running: bound as ever.
+        let active = gate(Some(gate_account(&CONTROLLER, &oracle, 0)));
+        assert_eq!(active.unwrap().unwrap().target, oracle);
+        // Frozen for an upgrade, frozen on the way to retiring (and still,
+        // once retired), then the gate's record reclaimed.
+        for account in [
+            Some(gate_account(&CONTROLLER, &oracle, 1)),
+            Some(gate_account(&CONTROLLER, &oracle, 2)),
+            None,
+        ] {
+            assert_eq!(gate(account).unwrap_err().message, ORACLE_PAUSED);
+        }
+        // A gate that isn't the oracle's is no pause: it stays a refusal.
+        let substituted = gate_account(&Pubkey::new_unique(), &oracle, 2);
+        let e = gate(Some(substituted)).unwrap_err();
+        assert!(e.message.starts_with("governance gate refused"), "{e}");
     }
 
     #[test]

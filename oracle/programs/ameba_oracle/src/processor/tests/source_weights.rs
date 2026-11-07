@@ -335,6 +335,7 @@ fn observation_shape_rejects_noncanonical_history() {
     assert!(validate_oracle_observation_shape(&mismatched_current_state, &duplicate_time).is_err());
 }
 
+#[cfg(feature = "v1-months")] // Settlement (75) and the council keep a bucket's contribution.
 #[test]
 fn month_bucket_contribution_replaces_prior_value_exactly() {
     let mut month = OracleMonthState {
@@ -683,6 +684,7 @@ fn source_local_delta_rejects_zero_and_covers_rounding_and_overflow_boundaries()
     assert!(source_delta_bps(1, u64::MAX).is_err());
 }
 
+#[cfg(feature = "v1-months")] // Tag 197.
 #[test]
 fn bucket_median_recompute_allows_only_required_signer_writable_promotion() {
     let program_id = Pubkey::new_unique();
@@ -825,6 +827,7 @@ fn equal_state_update_remains_rejected_when_carry_supplies_freshness() {
     );
 }
 
+#[cfg(feature = "v1-months")] // Tags 198 and 199.
 #[test]
 fn update_claim_handlers_allow_only_required_signer_writable_promotion() {
     let program_id = Pubkey::new_unique();

@@ -1,8 +1,9 @@
 // Without `v1-formation` (the production artifact) the formation handlers are unrouted
-// (`governance_manifest::V1_FORMATION_INSTRUCTION_TAGS`), and so is the code only they use: the
-// modules that hold nothing else are compiled out below, and the formation code inside modules the
-// kept instructions share is dropped by the link (fat LTO). Builds with the feature (the dev
-// profiles, the tests, the chain) lint dead code as usual.
+// (`governance_manifest::V1_FORMATION_INSTRUCTION_TAGS`), and without `v1-months` the v1 months'
+// machinery after formation (`V1_MONTH_INSTRUCTION_TAGS`); so is the code only they use: the
+// modules that hold nothing else are compiled out below, and the rest inside modules the kept
+// instructions share is dropped by the link (fat LTO). Builds that form months (the dev profiles,
+// the tests, the chain) lint dead code as usual.
 #![cfg_attr(not(feature = "v1-formation"), allow(dead_code))]
 
 mod account_addresses;
@@ -11,10 +12,12 @@ mod account_io_tokens;
 #[cfg(feature = "v1-formation")]
 mod active_weights;
 mod adapters;
+#[cfg(feature = "v1-months")]
 mod bucket_medians;
 mod carry;
 #[cfg(feature = "v1-formation")]
 mod cfm_launch;
+#[cfg(feature = "v1-months")]
 mod cfm_receipt;
 pub use carry::{
     history_median_address, history_median_cursor, read_source_checkpoint, read_source_journal,
@@ -30,10 +33,12 @@ mod dev_formation;
 #[cfg(any(feature = "localnet-dev-authority", feature = "localnet-governance"))]
 mod dev_reset;
 mod dispatch;
+#[cfg(feature = "v1-months")]
 mod failed_month;
 #[cfg(feature = "heads")]
 mod heads;
 mod median;
+#[cfg(feature = "v1-months")]
 mod month_terminal;
 mod oracle_core;
 mod oracle_economics;
@@ -46,6 +51,7 @@ mod oracle_validation;
 mod period;
 #[cfg(feature = "v1-formation")]
 mod recipe_weights;
+#[cfg(feature = "v1-months")]
 mod rewards;
 mod schedule;
 mod settlement;
@@ -57,7 +63,9 @@ mod sku_coverage;
 mod sku_coverage_resolution;
 #[cfg(feature = "v1-formation")]
 mod sku_manifest;
+#[cfg(feature = "v1-months")]
 mod sponsorship;
+#[cfg(feature = "v1-months")]
 mod terminal_cleanup;
 mod usdc;
 
@@ -67,6 +75,7 @@ use account_io_tokens::*;
 #[cfg(feature = "v1-formation")]
 use active_weights::*;
 use adapters::*;
+#[cfg(feature = "v1-months")]
 use bucket_medians::*;
 use collateral_accounts::*;
 use config::*;
@@ -75,15 +84,20 @@ pub use council::{
 };
 use dispatch::*;
 use median::{
-    advance_oracle_bucket_source_snapshot, append_oracle_source_observation,
-    initial_oracle_bucket_source_snapshot, oracle_bucket_bounty_share,
-    update_month_bucket_contribution, validate_oracle_observation_shape,
+    advance_oracle_bucket_source_snapshot, initial_oracle_bucket_source_snapshot,
+    validate_oracle_observation_shape,
 };
+// The carry and source-weight unit tests read it too.
+#[cfg(any(feature = "v1-months", test))]
+use median::append_oracle_source_observation;
 pub use median::{
     bucket_index_contribution_bps, bucket_settlement_floor, deterministic_bucket_median,
     minimum_oracle_bucket_eligible_sources, oracle_bucket_security_cap,
     oracle_settlement_window_start, oracle_temporal_median_state,
 };
+#[cfg(feature = "v1-months")]
+use median::{oracle_bucket_bounty_share, update_month_bucket_contribution};
+#[cfg(feature = "v1-months")]
 use month_terminal::*;
 use oracle_core::*;
 use oracle_economics::*;

@@ -35,6 +35,7 @@ pub(crate) fn decode_u64_payload(payload: &[u8]) -> Result<u64, ProgramError> {
     Ok(u64::from_le_bytes(bytes))
 }
 
+#[cfg(feature = "v1-months")]
 #[inline(never)]
 pub(crate) fn decode_u8_payload(payload: &[u8]) -> Result<u8, ProgramError> {
     match payload {
@@ -43,6 +44,7 @@ pub(crate) fn decode_u8_payload(payload: &[u8]) -> Result<u8, ProgramError> {
     }
 }
 
+#[cfg(feature = "v1-months")]
 #[inline(never)]
 pub(crate) fn decode_u8_u64_payload(payload: &[u8]) -> Result<(u8, u64), ProgramError> {
     let bytes: [u8; 9] = payload

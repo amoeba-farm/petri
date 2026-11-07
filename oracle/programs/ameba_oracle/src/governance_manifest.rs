@@ -32,31 +32,52 @@ pub const FEATURE_GATED_INSTRUCTION_TAGS: [u8; 7] = [
     DEV_INSTRUCTION_TAGS[5],
 ];
 
-/// The v1 monthly formation (feature `v1-formation`): instructions that only form a v1 month or
-/// serve one mainnet no longer has, routed only by builds that form months (the dev profiles, the
-/// test-sbf build, the chain). Mainnet forms no more v1 months (quarters go through heads, 210/28),
-/// so the production artifact classifies these bytes as unassigned and refuses them before any
-/// account is read. Groups: one-time setup that already ran on mainnet (0, 90, 128, 154); month
-/// creation (1, 110, 181, 190); reward budgets (155-158); proposals and coverage (182, 183, 184,
-/// 186, 196); source challenges (161, 185, 192); openings and the move to Game (80, 81, 162-165);
-/// recipe weights and the recipe index (84, 86, 187, 200); active weights (121, 122, 124); the CFM
-/// launch (130); CloseOracleMonth (59; 30/24 closes a month itself). Each runs before its month
-/// lists, except 200 (any phase but Closed): mainnet's Live months have complete recipe indexes.
-/// Ascending.
-pub const V1_FORMATION_INSTRUCTION_TAGS: [u8; 35] = [
-    0, 1, 59, 80, 81, 84, 86, 90, 110, 121, 122, 124, 128, 130, 154, 155, 156, 157, 158, 161, 162,
-    163, 164, 165, 181, 182, 183, 184, 185, 186, 187, 190, 192, 196, 200,
+/// The v1 monthly formation (feature `v1-formation`): instructions that only form a v1 month,
+/// routed only by builds that form months (the dev profiles, the test-sbf build, the chain). The
+/// production artifact is a lean oracle booted at a new address: it never has a v1 month
+/// (quarters go through heads, 210/28), so it classifies these bytes as unassigned and refuses
+/// them before any account is read. Groups: month creation and its economics (1, 110, 181, 190);
+/// the reward vault and budgets (154-158); proposals and coverage (182, 183, 184, 186, 196);
+/// source challenges (161, 185, 192); openings and the move to Game (80, 81, 162-165); recipe
+/// weights and the recipe index (84, 86, 187, 200); active weights (121, 122, 124); the CFM launch
+/// (130); CloseOracleMonth (59; 30/24 closes a month itself). The address's own setup (0, 90, 128,
+/// then 129) stays out of this set: a fresh address needs it, and heads reads neither 110's
+/// economics nor 154's vault (`tests/production_fresh_boot.rs`). Ascending.
+pub const V1_FORMATION_INSTRUCTION_TAGS: [u8; 32] = [
+    1, 59, 80, 81, 84, 86, 110, 121, 122, 124, 130, 154, 155, 156, 157, 158, 161, 162, 163, 164,
+    165, 181, 182, 183, 184, 185, 186, 187, 190, 192, 196, 200,
 ];
 
 /// Tag 30 selectors of the v1 formation, routed only with `v1-formation`: carry formation (0-7),
-/// the median certificates (8-13: 197 reads one only for a source of more than 32 observations or
-/// a bucket of more than eight eligible sources; mainnet's Live months have one source per bucket
-/// and a few observations each, and its v1 sources take no more) and the evidence backfills (16,
-/// 17). Without the feature they reject like an unassigned selector. Selector 22's Activate (an
-/// underwritten source's proposal) rejects the same way; its reconcile, bounty and reserve
-/// withdrawal stay, as money exits of any agreement that exists. Ascending.
+/// the median certificates (8-13) and the evidence backfills (16, 17). Without the feature they
+/// reject like an unassigned selector. Selector 22's Activate (an underwritten source's proposal)
+/// rejects the same way; the rest of selector 22 is `V1_MONTH_CARRY_SELECTORS`. Ascending.
 pub const V1_FORMATION_CARRY_SELECTORS: [u8; 16] =
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17];
+
+/// The v1 months' machinery after formation (feature `v1-months`, which `v1-formation` implies):
+/// everything a v1 month needs from Game to its last refund. The production artifact boots at an
+/// address that has no v1 month, so no account any of these reads can exist there: it refuses
+/// these bytes as unassigned, before any account is read. The dev profiles, the test-sbf build
+/// and the chain keep them. Groups: settlement (75, 113, 116, 197) and the rotation of its signer
+/// set (91-94; only 116 reads the set, heads settles without signers, 109 and 129 read it as it
+/// stands); Game updates (166, 168, 198, 199, 201); the v1 escrow and bond refunds (167, 169, 191,
+/// 194, 195: each holds a bond a v1 month took); reward registration and claims (170, 171, 173,
+/// 174). Every way the heads oracle's money leaves stays in every build: collateral (9, 10, 11,
+/// 140), the evidence writer (30/14, 30/15) and heads (210); so do the address's setup and admin
+/// (0, 2, 90, 109, 128, 129) and FailPeriod (79, which also fails a heads period that never
+/// lists). Ascending.
+pub const V1_MONTH_INSTRUCTION_TAGS: [u8; 22] = [
+    75, 91, 92, 93, 94, 113, 116, 166, 167, 168, 169, 170, 171, 173, 174, 191, 194, 195, 197, 198,
+    199, 201,
+];
+
+/// Tag 30 selectors of the v1 months' machinery, routed only with `v1-months`: the council (18,
+/// with the CFM launch receipt check; heads reads the controller's council without it),
+/// sponsorship settlement (22; Activate is formation-only), the terminal cleanup (24) and the
+/// failed-month closes (25). Without the feature they reject like an unassigned selector.
+/// Ascending.
+pub const V1_MONTH_CARRY_SELECTORS: [u8; 4] = [18, 22, 24, 25];
 
 /// Which feature-gated families a build routes.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -67,6 +88,9 @@ pub struct FeatureGates {
     pub heads: bool,
     /// The v1 monthly formation (`V1_FORMATION_INSTRUCTION_TAGS`).
     pub v1_formation: bool,
+    /// The v1 months' machinery after formation (`V1_MONTH_INSTRUCTION_TAGS`); every build with
+    /// `v1_formation` has it.
+    pub v1_months: bool,
 }
 
 impl FeatureGates {
@@ -74,11 +98,13 @@ impl FeatureGates {
         dev: false,
         heads: false,
         v1_formation: false,
+        v1_months: false,
     };
     pub const ALL: Self = Self {
         dev: true,
         heads: true,
         v1_formation: true,
+        v1_months: true,
     };
 
     /// The families the currently compiled build routes.
@@ -90,6 +116,7 @@ impl FeatureGates {
             )),
             heads: cfg!(feature = "heads"),
             v1_formation: cfg!(feature = "v1-formation"),
+            v1_months: cfg!(feature = "v1-months"),
         }
     }
 
@@ -131,6 +158,16 @@ pub fn classify_instruction_tag_for_build(
     tag: u8,
     gates: FeatureGates,
 ) -> InstructionGovernanceClass {
+    if !gates.v1_months && is_v1_month_tag(tag) {
+        return InstructionGovernanceClass::Unknown;
+    }
+    classify_before_v1_months(tag, gates)
+}
+
+/// Every class but the v1 months' bytes (`classify_instruction_tag_for_build`). The program
+/// classifies through this, checking those bytes first only in a build without `v1-months`
+/// (`classify_active_instruction_tag`), so a build with it routes exactly as before the feature.
+fn classify_before_v1_months(tag: u8, gates: FeatureGates) -> InstructionGovernanceClass {
     if OracleInstructionTag::from_byte(tag).is_some() {
         if !gates.v1_formation && is_v1_formation_tag(tag) {
             InstructionGovernanceClass::Unknown
@@ -158,6 +195,8 @@ const fn byte_set<const N: usize>(bytes: [u8; N]) -> [u64; 4] {
 
 const V1_FORMATION_TAG_SET: [u64; 4] = byte_set(V1_FORMATION_INSTRUCTION_TAGS);
 const V1_FORMATION_CARRY_SELECTOR_SET: [u64; 4] = byte_set(V1_FORMATION_CARRY_SELECTORS);
+const V1_MONTH_TAG_SET: [u64; 4] = byte_set(V1_MONTH_INSTRUCTION_TAGS);
+const V1_MONTH_CARRY_SELECTOR_SET: [u64; 4] = byte_set(V1_MONTH_CARRY_SELECTORS);
 
 /// Whether `tag` belongs to the v1 formation (`V1_FORMATION_INSTRUCTION_TAGS`).
 #[inline(always)]
@@ -171,12 +210,29 @@ pub fn is_v1_formation_carry_selector(selector: u8) -> bool {
     V1_FORMATION_CARRY_SELECTOR_SET[usize::from(selector >> 6)] & (1 << (selector & 63)) != 0
 }
 
+/// Whether `tag` belongs to the v1 months' machinery (`V1_MONTH_INSTRUCTION_TAGS`).
+#[inline(always)]
+pub fn is_v1_month_tag(tag: u8) -> bool {
+    V1_MONTH_TAG_SET[usize::from(tag >> 6)] & (1 << (tag & 63)) != 0
+}
+
+/// Whether `selector` is a tag-30 selector of the v1 months' machinery
+/// (`V1_MONTH_CARRY_SELECTORS`).
+#[inline(always)]
+pub fn is_v1_month_carry_selector(selector: u8) -> bool {
+    V1_MONTH_CARRY_SELECTOR_SET[usize::from(selector >> 6)] & (1 << (selector & 63)) != 0
+}
+
 /// Classify one byte exactly as the currently compiled feature build routes it.
 pub fn classify_active_instruction_tag(tag: u8) -> InstructionGovernanceClass {
     if cfg!(feature = "localnet-governance") && tag == 243 {
         return InstructionGovernanceClass::Unknown;
     }
-    classify_instruction_tag_for_build(tag, FeatureGates::active())
+    #[cfg(not(feature = "v1-months"))]
+    if is_v1_month_tag(tag) {
+        return InstructionGovernanceClass::Unknown;
+    }
+    classify_before_v1_months(tag, FeatureGates::active())
 }
 
 #[cfg(test)]
@@ -203,7 +259,7 @@ mod tests {
                     classify_instruction_tag_for_build(tag, FeatureGates::active())
                 }
             );
-            if !gated && !is_v1_formation_tag(tag) {
+            if !gated && !is_v1_formation_tag(tag) && !is_v1_month_tag(tag) {
                 assert_eq!(
                     class,
                     classify_instruction_tag_for_build(tag, FeatureGates::ALL)
@@ -227,6 +283,11 @@ mod tests {
                     0
                 } else {
                     V1_FORMATION_INSTRUCTION_TAGS.len()
+                }
+                - if gates.v1_months {
+                    0
+                } else {
+                    V1_MONTH_INSTRUCTION_TAGS.len()
                 }
         );
         assert_eq!(
@@ -259,6 +320,7 @@ mod tests {
                     dev: true,
                     heads: false,
                     v1_formation: true,
+                    v1_months: true,
                 },
                 InstructionGovernanceClass::Unknown,
             ),
@@ -267,6 +329,7 @@ mod tests {
                     dev: false,
                     heads: true,
                     v1_formation: true,
+                    v1_months: true,
                 },
                 InstructionGovernanceClass::FeatureGatedMutating,
             ),
@@ -339,6 +402,7 @@ mod tests {
                         dev: true,
                         heads: true,
                         v1_formation: false,
+                        v1_months: true,
                     },
                     InstructionGovernanceClass::Unknown,
                 ),
@@ -347,6 +411,7 @@ mod tests {
                         dev: false,
                         heads: false,
                         v1_formation: true,
+                        v1_months: true,
                     },
                     InstructionGovernanceClass::RecognizedMutating,
                 ),
@@ -370,10 +435,10 @@ mod tests {
                 }
             );
         }
-        // Every other assigned byte routes in every build; the dev profiles and the test-sbf
-        // build form months.
+        // Every other assigned byte outside the v1 months' machinery routes in every build; the
+        // dev profiles and the test-sbf build form months.
         for tag in OracleInstructionTag::ALL {
-            if !is_v1_formation_tag(tag as u8) {
+            if !is_v1_formation_tag(tag as u8) && !is_v1_month_tag(tag as u8) {
                 assert_eq!(
                     classify_instruction_tag_for_build(tag as u8, FeatureGates::NONE),
                     InstructionGovernanceClass::RecognizedMutating
@@ -386,6 +451,152 @@ mod tests {
             feature = "test-sbf"
         )) {
             assert!(cfg!(feature = "v1-formation"));
+        }
+    }
+
+    #[test]
+    fn v1_month_bytes_route_only_where_v1_months_is_compiled_in() {
+        for set in [
+            &V1_MONTH_INSTRUCTION_TAGS[..],
+            &V1_MONTH_CARRY_SELECTORS[..],
+        ] {
+            assert!(set.windows(2).all(|pair| pair[0] < pair[1]), "ascending");
+        }
+        for byte in 0u8..=u8::MAX {
+            assert_eq!(
+                is_v1_month_tag(byte),
+                V1_MONTH_INSTRUCTION_TAGS.contains(&byte),
+                "{byte}"
+            );
+            assert_eq!(
+                is_v1_month_carry_selector(byte),
+                V1_MONTH_CARRY_SELECTORS.contains(&byte),
+                "{byte}"
+            );
+            // The two families never share a byte or a selector.
+            assert!(
+                !(is_v1_month_tag(byte) && is_v1_formation_tag(byte)),
+                "{byte}"
+            );
+            assert!(
+                !(is_v1_month_carry_selector(byte) && is_v1_formation_carry_selector(byte)),
+                "{byte}"
+            );
+        }
+        let production = FeatureGates {
+            heads: true,
+            ..FeatureGates::NONE
+        };
+        let live = FeatureGates {
+            v1_months: true,
+            ..production
+        };
+        for tag in V1_MONTH_INSTRUCTION_TAGS {
+            // An assigned registry byte, never a feature or reserved one.
+            assert!(OracleInstructionTag::from_byte(tag).is_some(), "{tag}");
+            assert!(!FEATURE_GATED_INSTRUCTION_TAGS.contains(&tag));
+            for (gates, expected) in [
+                (FeatureGates::NONE, InstructionGovernanceClass::Unknown),
+                (production, InstructionGovernanceClass::Unknown),
+                (live, InstructionGovernanceClass::RecognizedMutating),
+                (
+                    FeatureGates::ALL,
+                    InstructionGovernanceClass::RecognizedMutating,
+                ),
+            ] {
+                assert_eq!(
+                    classify_instruction_tag_for_build(tag, gates),
+                    expected,
+                    "{gates:?} byte {tag}"
+                );
+            }
+            assert_eq!(
+                classify_active_instruction_tag(tag),
+                if cfg!(feature = "v1-months") {
+                    InstructionGovernanceClass::RecognizedMutating
+                } else {
+                    InstructionGovernanceClass::Unknown
+                }
+            );
+        }
+        // The build with the v1 months and no formation routes every assigned byte outside the
+        // formation; the production artifact also refuses these.
+        for tag in OracleInstructionTag::ALL {
+            let tag = tag as u8;
+            assert_eq!(
+                classify_instruction_tag_for_build(tag, live),
+                if is_v1_formation_tag(tag) {
+                    InstructionGovernanceClass::Unknown
+                } else {
+                    InstructionGovernanceClass::RecognizedMutating
+                },
+                "{tag}"
+            );
+            assert_eq!(
+                classify_instruction_tag_for_build(tag, production)
+                    == InstructionGovernanceClass::RecognizedMutating,
+                !is_v1_formation_tag(tag) && !is_v1_month_tag(tag),
+                "{tag}"
+            );
+        }
+        // Forming months implies running them.
+        if cfg!(feature = "v1-formation") {
+            assert!(cfg!(feature = "v1-months"));
+        }
+    }
+
+    /// The bytes the production artifact routes, listed apart from the two sets on purpose:
+    /// dropping one, or letting a v1 byte back in, is a failure here.
+    #[test]
+    fn the_production_artifact_routes_exactly_a_fresh_address_setup_and_the_heads_oracle() {
+        let production = FeatureGates {
+            heads: true,
+            ..FeatureGates::NONE
+        };
+        let routed: Vec<u8> = (0u8..=u8::MAX)
+            .filter(|tag| {
+                matches!(
+                    classify_instruction_tag_for_build(*tag, production),
+                    InstructionGovernanceClass::RecognizedMutating
+                        | InstructionGovernanceClass::FeatureGatedMutating
+                )
+            })
+            .collect();
+        assert_eq!(
+            routed,
+            [
+                0,
+                2,
+                9,
+                10,
+                11,
+                30,
+                79,
+                90,
+                109,
+                128,
+                129,
+                140,
+                HEADS_INSTRUCTION_TAG
+            ]
+        );
+        // A fresh address's setup stays out of the formation; what heads does not read stays in.
+        for tag in [0, 90, 128, 129] {
+            assert!(!is_v1_formation_tag(tag) && !is_v1_month_tag(tag), "{tag}");
+        }
+        for tag in [110, 154] {
+            assert!(is_v1_formation_tag(tag), "{tag}");
+        }
+        for tag in [167, 169, 191, 194, 195] {
+            assert!(is_v1_month_tag(tag), "{tag}");
+        }
+        // Tag 30 keeps the evidence writer; the terminal cleanup goes with the months.
+        assert!(is_v1_month_carry_selector(24));
+        for selector in [14, 15] {
+            assert!(
+                !is_v1_formation_carry_selector(selector) && !is_v1_month_carry_selector(selector),
+                "{selector}"
+            );
         }
     }
 

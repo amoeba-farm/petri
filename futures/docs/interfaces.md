@@ -219,6 +219,26 @@ builds every one of them.
 | 40 | `PoolPrice` (the AMBA price from mainnet's Meteora AMBA/SOL pool and Pyth's SOL/USD EMA; below) | anyone, alone in its transaction |
 | 41 | `StartUnstake { shares }` (`u64::MAX` = all not unstaking yet; capped at them; none: `InsufficientFunds`; restarts the timer for all the position's unstaking shares) | staker |
 | 42 | `CancelUnstake` (the unstaking shares back to active; none: `InsufficientFunds`) | staker |
+| 43 | `CreditAuthorize` (section 7) | the Earn vault's operator |
+| 44 | `WithdrawFor` (all of `owner`'s free cash to a token account of `owner`'s with no delegate or close authority, else `Custody`; accounts as `Withdraw`, the owner (w) not signing; a final market whose credit, if any, settled: else `NotSettled`. An Earn vault's cash goes to its cash account (account 2), counted, as `VaultDefund` moves it; any other state of this program's, a pool: `Unauthorized`; an account it owns with no state is a key like a wallet's) | anyone |
+| 45 | `CloseMarket` (below) | anyone; the rent goes only to the market's creator |
+
+`CloseMarket` (since 2026-11-01, the user: unrecoverable market rent): accounts
+0 market (w); 1 vault (w); 2 vault authority; 3 creator (w, the header's
+`creator`); 4 the creator's token account of the quote mint (w; read only
+when the vault holds a stray balance; no delegate or close authority, else
+`Custody`); 5 token program; then any Earn vaults
+(w). A market that is open, holds a claim, an order, a ladder, free or
+reserved cash, custody, backing or debt, or whose credit isn't settled:
+`NotEmpty` (34). Otherwise the vault's balance (custody is 0, so only what
+was sent to it) goes to the creator's token account, the vault closes, the
+market is emptied and handed to the system program, and both accounts'
+lamports go to the creator; it logs `ARCLOS01` (market, creator, rent
+lamports, stray atoms). The registry PDA stays, so `CreateMarket` never
+takes the index and expiry again. Each Earn vault passed drops the market
+from its markets. An Earn vault that still lists a closed market counts it
+as worth nothing (`VaultDeposit` and `VaultWithdraw` name it as before) and
+drops it at its next deposit or withdrawal.
 
 `PoolPrice` accounts (`StakeAddrs::pool_price` builds them): 0 stake pool
 (w); 1 the Meteora DAMM v2 pool `DxUB19khkvd3FehY8sovQ1FTTcEktPL4CM6yc49coWQH`

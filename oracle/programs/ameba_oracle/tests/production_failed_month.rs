@@ -1,5 +1,8 @@
-//! BATX Dec 1 (`BATX-1796083200`) ended on the production artifact, from every state the
-//! program deployed on mainnet before the heads upgrade lets anyone reach (the formation build
+//! BATX Dec 1 (`BATX-1796083200`) ended on mainnet on 2026-10-31. These tests keep its end
+//! covered on the `v1-months` build (the production profile with `v1-months`, which the dev
+//! chain's machinery shares; the production artifact without it refuses 30/25, 191, 194 and 195,
+//! `tests/production_artifact.rs`), from every state the
+//! program deployed on mainnet before the heads upgrade let anyone reach (the formation build
 //! here) while the month waits in source submission with complete coverage:
 //!
 //! - **source submission**, as on mainnet on 2026-10-30 (more sources and supports may come);
@@ -18,7 +21,7 @@
 //! fallback without kind 0, from Scramble after the submission deadline (2026-11-27 for BATX).
 //!
 //! After the upgrade these tests move the clock only (`clock`), and each ends by checking that
-//! the production artifact still answers (`still_production`): this harness runs the code the
+//! the `v1-months` build still answers (`still_v1_months`): this harness runs the code the
 //! program started with again after a warp unless it reinstalls the upgrade
 //! (`Harness::upgraded`; seen 2026-10-30).
 #![cfg(all(
@@ -99,10 +102,16 @@ impl Batx {
     }
 }
 
+/// The formation build, upgradeable to the `v1-months` build (`None`: skip).
+async fn start_v1_months() -> Option<(Harness, Vec<u8>)> {
+    let (h, v1_months, _production) = start_formation_v1_months().await?;
+    Some((h, v1_months))
+}
+
 /// The formation build forms the month to source submission with complete coverage, as
-/// mainnet's BATX Dec 1 stands (`None`: no production artifact, skip).
+/// mainnet's BATX Dec 1 stood (`None`: no artifacts, skip).
 async fn batx() -> Option<(Harness, Vec<u8>, Batx)> {
-    let (mut h, production) = start_formation().await?;
+    let (mut h, v1_months) = start_v1_months().await?;
     let cohort = h.open_cohort(2).await;
     h.fund_schedule(&cohort).await;
     h.at(cohort.scramble).await;
@@ -150,7 +159,7 @@ async fn batx() -> Option<(Harness, Vec<u8>, Batx)> {
     );
     Some((
         h,
-        production,
+        v1_months,
         Batx {
             cohort,
             wallets,
@@ -238,8 +247,8 @@ async fn clock(h: &mut Harness, unix_timestamp: u64) {
     set_unix_timestamp(&h.ctx, unix_timestamp).await;
 }
 
-/// The production artifact still runs: a v1 formation byte (186) is refused as unassigned.
-async fn still_production(h: &mut Harness, b: &Batx) {
+/// The `v1-months` build still runs: a v1 formation byte (186) is refused as unassigned.
+async fn still_v1_months(h: &mut Harness, b: &Batx) {
     let cranker = h.payer();
     assert_oracle_error(
         h.send(
@@ -529,16 +538,16 @@ async fn finish_month(h: &mut Harness, b: &Batx, expected: &[u64], before: Befor
     assert_eq!(released.total_reserved, before.reserved - before.budget);
     close_everything(h, b, &before.recipient).await;
     assert_eq!(balances(h, &b.owners()).await, expected);
-    still_production(h, b).await;
+    still_v1_months(h, b).await;
 }
 
 /// Mainnet now (2026-10-30): source submission, coverage complete, nothing pending.
 #[tokio::test]
-async fn batx_ends_from_source_submission_on_the_production_artifact() {
-    let Some((mut h, production, b)) = batx().await else {
+async fn batx_ends_from_source_submission_on_the_v1_months_build() {
+    let Some((mut h, v1_months, b)) = batx().await else {
         return;
     };
-    h.upgrade_oracle(&production).await;
+    h.upgrade_oracle(&v1_months).await;
     let everyone = vec![PARTICIPANT_USDC; b.owners().len()];
     end_month(&mut h, &b, &everyone).await;
 }
@@ -546,13 +555,13 @@ async fn batx_ends_from_source_submission_on_the_production_artifact() {
 /// Anyone ran 184 before the upgrade: Scramble, coverage final, in the kill window. Kind 0
 /// needs the coverage manifest it reopens.
 #[tokio::test]
-async fn batx_ends_from_scramble_on_the_production_artifact() {
-    let Some((mut h, production, b)) = batx().await else {
+async fn batx_ends_from_scramble_on_the_v1_months_build() {
+    let Some((mut h, v1_months, b)) = batx().await else {
         return;
     };
     close_sources(&mut h, &b, b.cohort.placement_end()).await;
-    h.upgrade_oracle(&production).await;
-    // 184 and 186 are gone from the production build; kind 0 without the manifest is refused.
+    h.upgrade_oracle(&v1_months).await;
+    // 184 and 186 are gone from the `v1-months` build; kind 0 without the manifest is refused.
     let cranker = h.payer();
     assert_oracle_error(
         h.send(
@@ -592,8 +601,8 @@ async fn batx_ends_from_scramble_on_the_production_artifact() {
 /// each bond to the challenger, releases the guards and clears the pending count; the closes
 /// take the challenges and the guards too.
 #[tokio::test]
-async fn batx_ends_from_scramble_with_open_challenges_on_the_production_artifact() {
-    let Some((mut h, production, mut b)) = batx().await else {
+async fn batx_ends_from_scramble_with_open_challenges_on_the_v1_months_build() {
+    let Some((mut h, v1_months, mut b)) = batx().await else {
         return;
     };
     close_sources(&mut h, &b, b.cohort.placement_end()).await;
@@ -606,7 +615,7 @@ async fn batx_ends_from_scramble_with_open_challenges_on_the_production_artifact
     );
     let month: OracleMonthState = h.read_state(b.cohort.month).await;
     assert_eq!(month.pending_resolution_count, 2);
-    h.upgrade_oracle(&production).await;
+    h.upgrade_oracle(&v1_months).await;
     // 185 and 192 are gone; 194 waits for the failure.
     let cranker = h.payer();
     let early = instruction::settle_failed_oracle_month_escrow_v2(
@@ -630,9 +639,8 @@ async fn batx_ends_from_scramble_with_open_challenges_on_the_production_artifact
 /// submission with a challenge pending: kind 0 takes it; 194 returns the called-off and the open
 /// one to the challenger.
 #[tokio::test]
-async fn batx_ends_after_the_scramble_with_settled_and_open_challenges_on_the_production_artifact()
-{
-    let Some((mut h, production, mut b)) = batx().await else {
+async fn batx_ends_after_the_scramble_with_settled_and_open_challenges_on_the_v1_months_build() {
+    let Some((mut h, v1_months, mut b)) = batx().await else {
         return;
     };
     close_sources(&mut h, &b, b.cohort.placement_end()).await;
@@ -681,7 +689,7 @@ async fn batx_ends_after_the_scramble_with_settled_and_open_challenges_on_the_pr
             OracleEscrowDisposition::Slashed
         )
     );
-    h.upgrade_oracle(&production).await;
+    h.upgrade_oracle(&v1_months).await;
     // The dismissed challenge's bond went to source 0's proposer, wallet 0, before the upgrade.
     let mut expected = vec![PARTICIPANT_USDC; b.owners().len()];
     expected[0] += CHALLENGE_MIN_BOND;
@@ -690,15 +698,15 @@ async fn batx_ends_after_the_scramble_with_settled_and_open_challenges_on_the_pr
 }
 
 /// Nobody ended it before expiry: 79 failed the period with its month left in Scramble and a
-/// challenge open. The production build has no 186; kind 0 on the Failed period only reopens.
+/// challenge open. The `v1-months` build has no 186; kind 0 on the Failed period only reopens.
 #[tokio::test]
-async fn batx_failed_at_expiry_in_scramble_still_ends_on_the_production_artifact() {
-    let Some((mut h, production, mut b)) = batx().await else {
+async fn batx_failed_at_expiry_in_scramble_still_ends_on_the_v1_months_build() {
+    let Some((mut h, v1_months, mut b)) = batx().await else {
         return;
     };
     close_sources(&mut h, &b, b.cohort.placement_end()).await;
     challenge(&mut h, &mut b, 1, None, 1).await;
-    h.upgrade_oracle(&production).await;
+    h.upgrade_oracle(&v1_months).await;
     clock(&mut h, b.cohort.expiry).await;
     let cranker = h.payer();
     h.send(
@@ -732,20 +740,20 @@ async fn batx_failed_at_expiry_in_scramble_still_ends_on_the_production_artifact
     end_month(&mut h, &b, &everyone).await;
 }
 
-/// The calendar fallback, no kind 0: anyone ran 184 and challenged before the upgrade. On the
-/// production build, from the submission deadline (expiry less four days; 2026-11-27 00:00 UTC
+/// The calendar fallback, no kind 0: anyone ran 184 and challenged before the upgrade. On
+/// the `v1-months` build, from the submission deadline (expiry less four days; 2026-11-27 00:00 UTC
 /// for BATX Dec 1): 79 refuses a month in Scramble until expiry, so 169 first dismisses the
 /// unruled challenge (its bond to the proposer, the deployed rule), 191 times one candidate out,
 /// which puts the month back in source submission, then 79, the other refunds, 195 and the
 /// closes.
 #[tokio::test]
-async fn batx_calendar_fallback_from_scramble_after_the_deadline_on_the_production_artifact() {
-    let Some((mut h, production, mut b)) = batx().await else {
+async fn batx_calendar_fallback_from_scramble_after_the_deadline_on_the_v1_months_build() {
+    let Some((mut h, v1_months, mut b)) = batx().await else {
         return;
     };
     close_sources(&mut h, &b, b.cohort.placement_end()).await;
     challenge(&mut h, &mut b, 0, None, 1).await;
-    h.upgrade_oracle(&production).await;
+    h.upgrade_oracle(&v1_months).await;
     // The formation build's calendar runs on 15-second test days; mainnet's on real ones. Give
     // the month the calendar mainnet's 184 writes: from four days before it to four after.
     // (`scramble_start_ts` and `listing_ts` sit at bytes 70 and 78, the phase at 86.)
@@ -825,7 +833,7 @@ async fn batx_calendar_fallback_from_scramble_after_the_deadline_on_the_producti
     assert_eq!(h.token_balance(vault).await, vault_before);
     let recipient = Keypair::new().pubkey();
     close_everything(&mut h, &b, &recipient).await;
-    still_production(&mut h, &b).await;
+    still_v1_months(&mut h, &b).await;
 }
 
 /// A challenge the oracle authority sent to the council before the upgrade (185, then 30/18 opens
@@ -836,7 +844,7 @@ async fn batx_calendar_fallback_from_scramble_after_the_deadline_on_the_producti
 /// each case unapplied, cancels its challenge and releases its guards; 194 then returns each bond
 /// to the challenger, and the rest ends as ever. The cases and their rounds stay (no close).
 #[tokio::test]
-async fn batx_ends_with_challenges_before_the_council_on_the_production_artifact() {
+async fn batx_ends_with_challenges_before_the_council_on_the_v1_months_build() {
     use ameba_oracle::{
         governance_gate::PINNED_CONTROLLER_PROGRAM_ID,
         instruction::OracleCouncilActionV1,
@@ -844,7 +852,7 @@ async fn batx_ends_with_challenges_before_the_council_on_the_production_artifact
         state::{OracleEmergencyDisputeKind, OracleSourceChallengeOutcome},
     };
     use solana_sdk::instruction::AccountMeta;
-    let Some((mut h, production, mut b)) = batx().await else {
+    let Some((mut h, v1_months, mut b)) = batx().await else {
         return;
     };
     close_sources(&mut h, &b, b.cohort.placement_end()).await;
@@ -972,7 +980,7 @@ async fn batx_ends_with_challenges_before_the_council_on_the_production_artifact
         PARTICIPANT_USDC - 2 * CHALLENGE_MIN_BOND
     );
 
-    h.upgrade_oracle(&production).await;
+    h.upgrade_oracle(&v1_months).await;
     // Before the failure, operation 3 ends no source case.
     assert!(h
         .send(council_ix(&b, 0, action(&b, 0, 3, hashes[0], 0), None), &[])
@@ -1075,7 +1083,7 @@ async fn council_with_view(h: &mut Harness) -> (common::cfm::Council, u64, [u8; 
 /// resolutions cleared), and 169 pays the claim's stake and the challenge's bond to the
 /// challenger, as before f067295f.
 #[tokio::test]
-async fn an_opening_case_still_settles_after_79_fails_the_period_on_the_production_artifact() {
+async fn an_opening_case_still_settles_after_79_fails_the_period_on_the_v1_months_build() {
     use ameba_oracle::{
         instruction::{
             ChallengeOracleOpeningClaimParams, OracleCouncilActionV1,
@@ -1088,7 +1096,7 @@ async fn an_opening_case_still_settles_after_79_fails_the_period_on_the_producti
         },
     };
     use solana_sdk::instruction::AccountMeta;
-    let Some((mut h, production)) = start_formation().await else {
+    let Some((mut h, v1_months)) = start_v1_months().await else {
         return;
     };
     let cohort = h.open_cohort(1).await;
@@ -1219,7 +1227,7 @@ async fn an_opening_case_still_settles_after_79_fails_the_period_on_the_producti
     );
 
     // The upgrade; the month never lists, and at expiry 79 fails its period.
-    h.upgrade_oracle(&production).await;
+    h.upgrade_oracle(&v1_months).await;
     h.at(cohort.expiry).await;
     let cranker = h.payer();
     h.send(
@@ -1281,7 +1289,7 @@ async fn an_opening_case_still_settles_after_79_fails_the_period_on_the_producti
         h.collateral(&claimant.pubkey()).await.available_balance,
         PARTICIPANT_USDC - OPENING_BOND
     );
-    // All of it on the production artifact: a formation byte (186) is refused as unassigned.
+    // All of it on the `v1-months` build: a formation byte (186) is refused as unassigned.
     assert_oracle_error(
         h.send(
             instruction::reopen_oracle_sku_coverage(

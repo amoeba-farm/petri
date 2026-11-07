@@ -23,6 +23,7 @@ fn current_update_commitment_matches_bundled_client_vector() {
     assert_eq!(hex, expected);
 }
 
+#[cfg(feature = "v1-months")] // Game updates (199).
 #[test]
 fn public_reveal_gets_the_profile_window_independent_of_commit_slots() {
     let claim = OracleUpdateClaimV2 {
@@ -52,6 +53,7 @@ fn public_reveal_gets_the_profile_window_independent_of_commit_slots() {
     .is_err());
 }
 
+#[cfg(feature = "v1-months")] // Game updates (201).
 #[test]
 fn grace_cannot_timeout_a_current_challenge_or_an_open_vote() {
     let anchor = crate::processor::tests::sample_anchor(100);

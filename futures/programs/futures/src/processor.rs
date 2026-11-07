@@ -138,7 +138,9 @@ fn execute(
             },
         ),
         FuturesInstruction::Deposit { amount } => deposit(program_id, accounts, amount),
-        FuturesInstruction::Withdraw { amount } => withdraw(program_id, accounts, amount),
+        FuturesInstruction::Withdraw { amount } => withdraw(program_id, accounts, amount, false),
+        FuturesInstruction::WithdrawFor => withdraw(program_id, accounts, u64::MAX, true),
+        FuturesInstruction::CloseMarket => close_market(program_id, accounts),
         FuturesInstruction::Submit {
             side,
             lo,
@@ -1094,16 +1096,47 @@ fn deposit(program_id: &Pubkey, a: &[AccountInfo], amount: u64) -> ProgramResult
     store(&mut b, &h)
 }
 
+/// `Withdraw`, or with `pushed` `WithdrawFor`: anyone sends a final
+/// market's leftover cash to its owner.
 #[inline(never)]
-fn withdraw(program_id: &Pubkey, a: &[AccountInfo], amount: u64) -> ProgramResult {
+fn withdraw(program_id: &Pubkey, a: &[AccountInfo], amount: u64, pushed: bool) -> ProgramResult {
     let [market, owner, owner_token, vault, token_program, ..] = a else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
     if *token_program.key != spl_token::id() {
         return Err(FuturesError::InvalidInstruction.into());
     }
+    // A pushed owner this program owns: an Earn vault, whose cash goes back
+    // to its own cash account, counted; any other state of the program's (a
+    // pool, a market) leaves through its own instructions; an account it
+    // owns with no state is a key, paid as a wallet is.
+    let vault_owner = pushed && owner.owner == program_id && {
+        let d = owner.try_borrow_data()?;
+        // `load_vault` checks the rest.
+        let is_vault =
+            (d.len() == VAULT_LEN || d.len() == VAULT_REWARDS_LEN) && d[..8] == VAULT_MAGIC;
+        if !is_vault && d.iter().any(|&x| x != 0) {
+            return Err(FuturesError::Unauthorized.into());
+        }
+        is_vault
+    };
     let (mut b, mut h) = load(program_id, market)?;
-    let i = owned_trader(&b, &h, owner)?;
+    let i = if pushed {
+        need_final(&h)?;
+        if h.has_credit() && !h.credit_settled() {
+            return Err(FuturesError::NotSettled.into());
+        }
+        if vault_owner {
+            drop(b);
+            let v = load_vault(program_id, owner)?;
+            let authority = a.get(5).ok_or(ProgramError::NotEnoughAccountKeys)?;
+            let accounts = [market, owner, owner_token, vault, token_program, authority];
+            return defund(program_id, accounts, v, u64::MAX);
+        }
+        find_trader(&b, &h, owner.key).ok_or(FuturesError::Unauthorized)?
+    } else {
+        owned_trader(&b, &h, owner)?
+    };
     let free = trader(&b, &h, i).free;
     let amount = if amount == u64::MAX { free } else { amount };
     if amount > 0 {
@@ -1112,6 +1145,7 @@ fn withdraw(program_id: &Pubkey, a: &[AccountInfo], amount: u64) -> ProgramResul
             || owner_token.key == vault.key
             || dest.owner != *owner.key
             || dest.mint != h.quote_mint
+            || (pushed && !unattended(&dest))
         {
             return Err(FuturesError::Custody.into());
         }
@@ -1146,6 +1180,122 @@ fn withdraw(program_id: &Pubkey, a: &[AccountInfo], amount: u64) -> ProgramResul
     }
     sol_log_data(&[b"ARWDRW01", owner.key.as_ref(), &amount.to_le_bytes()]);
     store(&mut b, &h)
+}
+
+/// Whether a token account picked by someone other than its owner is safe
+/// to pay: no delegate the owner once approved could spend what arrives, and
+/// no close authority could take it (a native-mint account closes with its
+/// balance).
+fn unattended(dest: &spl_token::state::Account) -> bool {
+    dest.delegate.is_none() && dest.close_authority.is_none()
+}
+
+/// `CloseMarket`: a final market that holds nothing of anyone's gives its
+/// rent and its vault's back to its creator (the user, 2026-11-01).
+#[inline(never)]
+fn close_market(program_id: &Pubkey, a: &[AccountInfo]) -> ProgramResult {
+    let [market, vault, authority, creator, creator_token, token_program, vaults @ ..] = a else {
+        return Err(ProgramError::NotEnoughAccountKeys);
+    };
+    need_writable(creator)?;
+    if *token_program.key != spl_token::id() {
+        return Err(FuturesError::InvalidInstruction.into());
+    }
+    let h = {
+        let (b, h) = load(program_id, market)?;
+        let busy = (0..h.trader_cap).any(|t| {
+            let tr = trader(&b, &h, t);
+            tr.owner != Pubkey::default() && !tr.idle()
+        });
+        if h.status == STATUS_OPEN
+            || (h.has_credit() && !h.credit_settled())
+            || h.claims_open != 0
+            || h.custody != 0
+            || h.debt != 0
+            || h.backing != 0
+            || h.total_free != 0
+            || h.total_reserved != 0
+            || busy
+        {
+            return Err(FuturesError::NotEmpty.into());
+        }
+        h
+    };
+    if *vault.key != h.vault || *creator.key != h.creator {
+        return Err(FuturesError::InvalidAccount.into());
+    }
+    let bump = [h.authority_bump];
+    let seeds: &[&[u8]] = &[NAMESPACE, AUTHORITY_SEED, market.key.as_ref(), &bump];
+    if Pubkey::create_program_address(seeds, program_id) != Ok(*authority.key) {
+        return Err(FuturesError::InvalidAccount.into());
+    }
+    // Custody is 0, so whatever the vault still holds was sent to it, not
+    // deposited: nobody's cash.
+    let stray = token_account(vault)?.amount;
+    if stray > 0 {
+        let dest = token_account(creator_token)?;
+        if creator_token.key == vault.key
+            || dest.owner != h.creator
+            || dest.mint != h.quote_mint
+            || !unattended(&dest)
+        {
+            return Err(FuturesError::Custody.into());
+        }
+        invoke_signed(
+            &spl_token::instruction::transfer(
+                &spl_token::id(),
+                vault.key,
+                creator_token.key,
+                authority.key,
+                &[],
+                stray,
+            )?,
+            &[
+                vault.clone(),
+                creator_token.clone(),
+                authority.clone(),
+                token_program.clone(),
+            ],
+            &[seeds],
+        )?;
+    }
+    invoke_signed(
+        &spl_token::instruction::close_account(
+            &spl_token::id(),
+            vault.key,
+            creator.key,
+            authority.key,
+            &[],
+        )?,
+        &[
+            vault.clone(),
+            creator.clone(),
+            authority.clone(),
+            token_program.clone(),
+        ],
+        &[seeds],
+    )?;
+    for info in vaults {
+        need_writable(info)?;
+        let mut v = load_vault(program_id, info)?;
+        v.markets.retain(|m| m != market.key);
+        v.write(&mut info.try_borrow_mut_data()?);
+    }
+    // Emptied and handed back to the system program, so nothing later in
+    // the transaction can fund it back to life.
+    let rent = market.lamports();
+    **creator.try_borrow_mut_lamports()? = add(creator.lamports(), rent)?;
+    **market.try_borrow_mut_lamports()? = 0;
+    market.resize(0)?;
+    market.assign(&solana_system_interface::program::ID);
+    sol_log_data(&[
+        b"ARCLOS01",
+        market.key.as_ref(),
+        creator.key.as_ref(),
+        &rent.to_le_bytes(),
+        &stray.to_le_bytes(),
+    ]);
+    Ok(())
 }
 
 // ---------------------------------------------------------------- claims
@@ -2918,8 +3068,11 @@ fn vault_value(
     let (mut low, mut high) = (u128::from(v.cash), u128::from(v.cash));
     let mut work = Vec::new();
     for (info, want) in markets.iter().zip(&v.markets) {
-        if info.key != want || info.owner != program_id {
+        if info.key != want {
             return Err(FuturesError::InvalidAccount.into());
+        }
+        if closed(program_id, info) {
+            continue;
         }
         let b = info.try_borrow_data()?;
         let h = Header::read(&b)?;
@@ -2936,6 +3089,26 @@ fn vault_value(
     }
     let fit = |x: u128| u64::try_from(x).map_err(|_| ProgramError::from(FuturesError::Overflow));
     Ok((fit(low)?, fit(high)?))
+}
+
+/// Whether a market the vault lists is gone. Only `CloseMarket` takes a
+/// market's header away, and only once nobody (the vault included) holds
+/// anything in it, so whatever sits at its address since (nothing, a system
+/// account someone funded, an account recreated by the market key's holder)
+/// is worth nothing.
+/// An account it can't read counts as open: its read fails where it's valued.
+fn closed(program_id: &Pubkey, info: &AccountInfo) -> bool {
+    info.owner != program_id
+        || info
+            .try_borrow_data()
+            .is_ok_and(|d| d.len() < HEADER_LEN || d[..8] != MAGIC || d[8] != VERSION)
+}
+
+/// Drops the [`closed`] markets from the vault's markets, which `markets`
+/// names as [`vault_value`] checked.
+fn forget_closed(program_id: &Pubkey, v: &mut Vault, markets: &[AccountInfo]) {
+    v.markets
+        .retain(|m| !markets.iter().any(|i| i.key == m && closed(program_id, i)));
 }
 
 /// The owner's vault position: loaded, or created (rent from `payer`).
@@ -3064,6 +3237,7 @@ fn vault_deposit(program_id: &Pubkey, a: &[AccountInfo], amount: u64) -> Program
     lp.shares = add(lp.shares, shares)?;
     lp.deposited = add(lp.deposited, amount)?;
     lp.write(&mut lp_info.try_borrow_mut_data()?);
+    forget_closed(program_id, &mut v, markets);
     store_vault(vault_info, &v, cash)?;
     sol_log_data(&[
         b"ARVDEP01",
@@ -3279,6 +3453,7 @@ fn vault_withdraw(program_id: &Pubkey, a: &[AccountInfo], shares: u64) -> Progra
     lp.shares -= shares;
     lp.withdrawn = add(lp.withdrawn, amount)?;
     lp.write(&mut lp_info.try_borrow_mut_data()?);
+    forget_closed(program_id, &mut v, markets);
     store_vault(vault_info, &v, cash)?;
     sol_log_data(&[
         b"ARVWDR01",
@@ -3351,13 +3526,37 @@ fn vault_defund(program_id: &Pubkey, a: &[AccountInfo], amount: u64) -> ProgramR
         return Err(ProgramError::NotEnoughAccountKeys);
     };
     need_signer(operator)?;
+    let v = load_vault(program_id, vault_info)?;
+    if *operator.key != v.operator {
+        return Err(FuturesError::Unauthorized.into());
+    }
+    defund(
+        program_id,
+        [
+            market,
+            vault_info,
+            cash,
+            market_vault,
+            token_program,
+            authority,
+        ],
+        v,
+        amount,
+    )
+}
+
+/// Moves up to `amount` of the vault's free cash in `market` to its cash
+/// account: `VaultDefund`, or `WithdrawFor` once the market is final.
+#[inline(never)]
+fn defund<'a>(
+    program_id: &Pubkey,
+    [market, vault_info, cash, market_vault, token_program, authority]: [&AccountInfo<'a>; 6],
+    mut v: Vault,
+    amount: u64,
+) -> ProgramResult {
     need_writable(vault_info)?;
     if *token_program.key != spl_token::id() {
         return Err(FuturesError::InvalidInstruction.into());
-    }
-    let mut v = load_vault(program_id, vault_info)?;
-    if *operator.key != v.operator {
-        return Err(FuturesError::Unauthorized.into());
     }
     if *cash.key != v.cash_account {
         return Err(FuturesError::InvalidAccount.into());

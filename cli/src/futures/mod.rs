@@ -158,6 +158,28 @@ pub fn resolve(ctx: &Ctx, query: &str, expiry: Option<&str>) -> Result<api::Mark
     api::market(&ctx.api, &address)
 }
 
+/// [`resolve`] for reads: a market the listed ones don't match is looked
+/// up among every market the API has recorded (`?all=1`), so retired and
+/// closed markets are reachable by label or address. A closed one is its
+/// listing entry (it has no account to read; check `closed`).
+pub fn resolve_any(ctx: &Ctx, query: &str, expiry: Option<&str>) -> Result<api::MarketView> {
+    let listed = markets(ctx)?;
+    let refs: Vec<MarketRef> = listed.iter().filter_map(reference).collect();
+    let miss = match market::resolve(query, expiry, &refs) {
+        Ok(found) => return api::market(&ctx.api, &found.address.to_string()),
+        Err(e) => e,
+    };
+    let all = api::all_markets(&ctx.api)?;
+    let refs: Vec<MarketRef> = all.iter().filter_map(reference).collect();
+    let Ok(found) = market::resolve(query, expiry, &refs) else {
+        return Err(miss);
+    };
+    match all.iter().find(|m| m.market == found.address.to_string()) {
+        Some(m) if m.closed => Ok(m.clone()),
+        _ => api::market(&ctx.api, &found.address.to_string()),
+    }
+}
+
 /// The command-line name of a market: `ramx-nov26`.
 pub fn slug(m: &api::MarketView) -> String {
     slug_of(&m.label, &m.symbol)

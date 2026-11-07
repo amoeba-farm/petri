@@ -170,6 +170,20 @@ pub async fn start_with(
 /// first build made meet the second build as they would after a mainnet upgrade.
 pub async fn start_upgradeable(elf: &[u8], capacity: usize) -> Harness {
     let upgrade_authority = Keypair::new();
+    let recorded = upgrade_authority.pubkey();
+    harness(loader_v3_test(elf, capacity, recorded), upgrade_authority).await
+}
+
+/// The oracle deployed as `elf` at exact size at an otherwise empty address: its loader-v3
+/// accounts, the controller's protocol gate and nothing of its own, with `recorded` as the upgrade
+/// authority (the controller's per-target PDA after `RegisterTarget`, which has no key:
+/// `Harness::upgrade_authority` is then unused).
+pub async fn start_deployed(elf: &[u8], recorded: Pubkey) -> Harness {
+    harness(loader_v3_test(elf, elf.len(), recorded), Keypair::new()).await
+}
+
+/// A `ProgramTest` with the oracle as a loader-v3 program running `elf` and the protocol gate.
+fn loader_v3_test(elf: &[u8], capacity: usize, recorded: Pubkey) -> ProgramTest {
     let mut test = ProgramTest::default();
     add_protocol_gate(&mut test);
     let rent = solana_sdk::rent::Rent::default();
@@ -179,7 +193,7 @@ pub async fn start_upgradeable(elf: &[u8], capacity: usize) -> Harness {
     let mut data = vec![0u8; 45 + capacity.max(elf.len())];
     data[0..4].copy_from_slice(&3u32.to_le_bytes());
     data[12] = 1;
-    data[13..45].copy_from_slice(upgrade_authority.pubkey().as_ref());
+    data[13..45].copy_from_slice(recorded.as_ref());
     data[45..45 + elf.len()].copy_from_slice(elf);
     test.add_account(
         program_data_key,
@@ -205,7 +219,7 @@ pub async fn start_upgradeable(elf: &[u8], capacity: usize) -> Harness {
             rent_epoch: 0,
         },
     );
-    harness(test, upgrade_authority).await
+    test
 }
 
 async fn harness(test: ProgramTest, upgrade_authority: Keypair) -> Harness {

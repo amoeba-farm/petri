@@ -1097,6 +1097,19 @@ settles a market. (It did until 2026-10-15, as a dev placeholder.)
 `Settle`, `SettleMaker` and `Prune` then pay claims and ladders into free
 cash and release dead orders. All are permissionless.
 
+**Closing a finished market (2026-11-01).** A market account's rent (about
+0.49 SOL for the mainnet shape) used to stay locked for good; the user asked
+for it back. Once a market is final, its credit settled and every claim,
+order and ladder paid out, anyone may send each holder's leftover free cash
+to a token account of theirs with no delegate or close authority
+(`WithdrawFor`), and an Earn
+vault's back to its cash account, counted, so nobody can hold a finished
+market open by sitting on cash in it. When nobody holds anything, `CloseMarket`
+deletes the market and its vault and returns both rents to the market's
+creator (the treasury on mainnet). The registry stays, so no second market
+ever takes that index and expiry; history stays in the API's database.
+`futures-ops close-market` does both steps.
+
 ## Dev deployment (2026-10-14)
 
 On the loopback dev chain (genesis `A5ZLaudx…`), deployed from main by what

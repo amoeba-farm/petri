@@ -33,7 +33,9 @@ mod opening;
 #[cfg(feature = "v1-formation")]
 mod schedule;
 mod sources;
+#[cfg(feature = "v1-months")]
 mod update_claims;
+#[cfg(feature = "v1-months")]
 mod update_settlement;
 
 pub(super) use accounting::*;
@@ -42,7 +44,9 @@ pub(super) use opening::*;
 #[cfg(feature = "v1-formation")]
 pub(super) use schedule::*;
 pub(super) use sources::*;
+#[cfg(feature = "v1-months")]
 pub(super) use update_claims::*;
+#[cfg(feature = "v1-months")]
 pub(super) use update_settlement::*;
 
 #[cfg(test)]

@@ -38,14 +38,26 @@ heads = []
 # `localnet-dev-authority` in code); the production artifact does not: mainnet has no Head accounts.
 heads-migrate = ["heads"]
 # The v1 monthly formation (governance_manifest::V1_FORMATION_INSTRUCTION_TAGS and
-# V1_FORMATION_CARRY_SELECTORS): one-time setup, month creation, reward budgets, proposals and
-# coverage, source challenges, openings and the move to Game, recipe weights and index, active
-# weights, the CFM launch, carry formation, median certificates, evidence backfills, sponsorship's
-# Activate and tag 59. Mainnet forms no more v1 months, so the production (mainnet) artifact leaves
-# it out and rejects those bytes exactly like unassigned ones; its Live months keep everything up to
-# their payout. The dev profiles, the test-sbf build and the chain enable it. Builders, payloads
-# and the tag table compile in every build.
-v1-formation = []
+# V1_FORMATION_CARRY_SELECTORS): month creation and its economics, the reward vault and budgets,
+# proposals and coverage, source challenges, openings and the move to Game, recipe weights and
+# index, active weights, the CFM launch, carry formation, median certificates, evidence backfills,
+# sponsorship's Activate and tag 59. The production (mainnet) artifact boots at a new address where
+# no v1 month ever exists, so it leaves this out and rejects those bytes exactly like unassigned
+# ones. A fresh address's own setup (0, 90, 128, 129) is not part of it. The dev profiles, the
+# test-sbf build and the chain enable it. Builders, payloads and the tag table compile in every
+# build. Forming months implies running them (`v1-months`).
+v1-formation = ["v1-months"]
+# The v1 months' machinery after formation (governance_manifest::V1_MONTH_INSTRUCTION_TAGS and
+# V1_MONTH_CARRY_SELECTORS): Game updates, settlement and its signer set, the council (with the CFM
+# launch receipt), reward registration and claims, the escrow and bond refunds (167, 169, 191, 194,
+# 195), sponsorship settlement, the terminal cleanup (30/24) and the failed-month closes. Without it
+# the production artifact refuses those bytes like unassigned ones: its address has no v1 month, so
+# nothing they read can exist there. It keeps the setup (0, 90, 128, 129), collateral (9, 10, 11,
+# 140), the admin paths (2, 109), FailPeriod (79), the evidence writer (30/14, 30/15) and heads
+# (210). `v1-formation` implies it, so the dev profiles, the test-sbf build and the chain keep it.
+# Alone (`--features v1-months`) it is a test build: tests/production_artifact.rs and
+# tests/production_failed_month.rs run the v1 months on it without the formation.
+v1-months = []
 
 [dependencies]
 ameba-governance-interface = { path = "../../../governance/crates/governance-interface" }

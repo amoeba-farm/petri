@@ -63,6 +63,11 @@ Every market command takes `MARKET` as:
 `--expiry` picks the expiry for a bare symbol: `nov26`, `2026-11` or unix
 seconds (`petri book ramx --expiry nov26`). Expiries follow the cluster clock.
 
+`market`, `book`, `trades` and `chart` also reach markets no longer listed
+(a past expiry) by name or address. A **closed** market, one paid out and
+removed from the chain, keeps its trades and chart: `petri market` shows
+its settlement, and `petri book` says it is closed.
+
 ## Command overview
 
 ```text
@@ -1510,7 +1515,9 @@ saved `profile`) sets their defaults and what Petri trusts:
 
 In the production profile an API that names another cluster, other programs or
 another controller is refused, so a wrong API can never point Petri at other
-programs. Program ids come from the API's `/v1/config`, or from a deployment
+programs. When the oracle moves to a new address, a release compiles in that
+successor beside the address above and Petri uses whichever of the two the API
+names; nothing outside the release can add one. Program ids come from the API's `/v1/config`, or from a deployment
 manifest you trust (`--deployment`, `PETRI_DEPLOYMENT`; the production ids are
 not imposed on a manifest).
 
@@ -1560,8 +1567,10 @@ genesis hash must be the deployment's, and the oracle and futures programs must
 be deployed programs there; oracle writes also check the
 oracle config's bond mint. Governed deployments also have their controller gate
 accounts and epochs checked, for local transactions and sponsor-prepared ones;
-a stale epoch or a substituted gate is refused. `petri status` shows the
-result.
+a stale epoch or a substituted gate is refused. While the oracle's gate is
+frozen or closed (an upgrade, or a retired oracle during a move to a new
+address) oracle writes say the oracle is paused and send nothing; reads go on
+working. `petri status` shows the result.
 
 ## Safety Notes
 

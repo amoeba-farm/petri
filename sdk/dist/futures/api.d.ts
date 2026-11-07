@@ -89,6 +89,12 @@ export interface MarketView {
     readonly tradable: boolean;
     /** No longer in the deployment manifest: open to withdrawals and settlement only. */
     readonly retired: boolean;
+    /**
+     * The market account is gone (`CloseMarket`, once final and paid out): listed only by `GET /v1/markets?all=1`,
+     * from the API's registry and indexed trades, with its final `status` and `settlementValue`. Its trades, candles
+     * and index remain; its account reads (`market`, `book`, `depth`), quotes and prepares answer 404.
+     */
+    readonly closed: boolean;
     readonly period: string;
     readonly periodState: FuturesPeriodState | null;
     readonly vault: string;

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "d892799c605001955d2f760eb128a0174c180671",
+  "sourceCommit": "d24e7eff0bb57b9df8e07f4eb82e92e44d9f6117",
   "component": "cli",
-  "cliVersion": "0.1.22",
-  "publicationType": "source of the unsigned petri v0.1.22 preview release and of ameba-sdk 0.4.1",
+  "cliVersion": "0.1.23",
+  "publicationType": "source of the unsigned petri v0.1.23 preview release and of ameba-sdk 0.4.1",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
-  "deployedContractSourceCommit": "bcf0601606617fda7e00a818e7663d031339858f",
-  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from bcf06016, the oracle from 2af39bf9); this source mirror makes no reproducible ELF claim. The unsigned preview packages are built from sourceCommit; npm publication of the SDK is not claimed.",
+  "deployedContractSourceCommit": "1ced0f671f9205620166d43bee34ebb0b9512603",
+  "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from 1ced0f67, the oracle from 6ccceadd); this source mirror makes no reproducible ELF claim. The unsigned preview packages are built from sourceCommit; npm publication of the SDK is not claimed.",
   "retainedPublicLegalFiles": [
     ".gitattributes",
     ".gitignore",
@@ -35,7 +35,7 @@
     },
     {
       "path": "api/API.md",
-      "sha256": "6c0ecad4db1d0f10b4b145789832bd5e82150e18adbc8b9b3ab5f15616736580",
+      "sha256": "4d331677da27d8734e20b8b4291ac5f39739c911f9883e58074dd0ca41a2a8c7",
       "executable": false
     },
     {
@@ -60,17 +60,17 @@
     },
     {
       "path": "cli/AGENTS.md",
-      "sha256": "3c79c8ad0598d9093312e1ce99a52c4fd8bc526073d8683e0c985171c9b05106",
+      "sha256": "f17bdc3c9c5a35af0c75c0d8e19acef2387e572128e5799c9fa4026efab46e20",
       "executable": false
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "8d48fcd94c6ec508483bab3a4746bcedcd166a0bc657403bdd44e6e065cfebd6",
+      "sha256": "3d4d5cf1b6f8739628f16cf3cdeb9667ec37327eabc832142cead1279fbfc55b",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "030b895ac025bc89e1b49bfee452a98ea16bb44e1a0907fe8d45f95f66344a99",
+      "sha256": "299930baf3d6be53abe9659bf476f4c4a385bfca092b00ba7508969dec7b95c0",
       "executable": false
     },
     {
@@ -90,7 +90,7 @@
     },
     {
       "path": "cli/README.md",
-      "sha256": "e8a3e6a953276ff598c9a40f6b1adbc09a36794048368fabae65b31284663605",
+      "sha256": "fc8b9be039c43521735ee8719e8fac7a070efc94d083456b43525cdd2b508c85",
       "executable": false
     },
     {
@@ -115,7 +115,7 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "424765e4c28107a27af7f19e78cad0ba9433dcdcb92aaa93c533efda476ffd73",
+      "sha256": "dee47c0c69ae1e1346a5f619d08b624be7e9984aad128d4dc5b2dee20643fdea",
       "executable": false
     },
     {
@@ -255,7 +255,7 @@
     },
     {
       "path": "cli/docs/amoeba-cli-command-guide.md",
-      "sha256": "eab80d907fd7d97eccb1132ae5431d2e580d541527ce8d632ed738fc22ddd4ad",
+      "sha256": "a84e2174047bdf05c1cc56c3a5595657d5383a05be30cf1516ca11348ccd0dc2",
       "executable": false
     },
     {
@@ -280,7 +280,7 @@
     },
     {
       "path": "cli/docs/html/source-map.html",
-      "sha256": "a9a88bd3eaa74d8c78a0e268b3b81f7b05d58148f397d19fb73b38a145d6739e",
+      "sha256": "3b7e00237ee118d445ab72bf9ef2c249a9862484d82f087618800cd9a4844032",
       "executable": false
     },
     {
@@ -315,7 +315,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "d745b60d0af1f67b3578dea2a8a51dccfcc9bd3bd7914fa1451a03b06ba23d0b",
+      "sha256": "f2205d4ba06cd42952fc57a379d1bd2baafded1b3941cbf7afacf6048bf5bff2",
       "executable": false
     },
     {
@@ -570,7 +570,7 @@
     },
     {
       "path": "cli/src/futures/api.rs",
-      "sha256": "3661951cb52c9317a633a21b98830d062b9ff19fdbbceaa03ab841f208376bd2",
+      "sha256": "3857ad44bad6c2f810e9b11217a1f82f0ac61b6a7219affdc733d18deeb31a00",
       "executable": false
     },
     {
@@ -605,7 +605,7 @@
     },
     {
       "path": "cli/src/futures/governance.rs",
-      "sha256": "ac8d9b5b5ae1cb1fcdd05ee6a82e283d23620a7d7871cb1c38b5ec8f4b866de9",
+      "sha256": "c564e47cbd2ff7ba8b8f1b21c566bd330cbd2ed5fec6bcee3d6fe62022e7912f",
       "executable": false
     },
     {
@@ -615,12 +615,12 @@
     },
     {
       "path": "cli/src/futures/market.rs",
-      "sha256": "17e566df5c3ec0b4def638131ea721b5a2504ad042fa9cb072e6ae171159c08c",
+      "sha256": "7645d1a12f1f1ad101df683aef0c4cc47fa983aca6b7582ce6418ff52b57554c",
       "executable": false
     },
     {
       "path": "cli/src/futures/mod.rs",
-      "sha256": "521568d9ed94034c10997f909bc1f31992fada45a29001b8a347fb42cbf02e26",
+      "sha256": "995d9bd86c677084ef8c3e3afa442a512cfc5782aeba615484367dcb196ccad6",
       "executable": false
     },
     {
@@ -630,7 +630,7 @@
     },
     {
       "path": "cli/src/futures/reads.rs",
-      "sha256": "e58b2fbb0875440c39673c8a1c380c0b422ae81368360c2141f140c852d6566a",
+      "sha256": "b8cd4bf0b50d9a74c00af6a5a0bf83308938fb0a6959687f87e193c45c82b95c",
       "executable": false
     },
     {
@@ -640,7 +640,7 @@
     },
     {
       "path": "cli/src/futures/settings.rs",
-      "sha256": "1e4bf5c0a394d7e77a024b96df93fd82fa72587f745c4eadd25bde8f6a205a0a",
+      "sha256": "1cc3b9a63c0c3edef40a3fbd059df19fb2f826906817ff89e1e8d132d9523539",
       "executable": false
     },
     {
@@ -785,7 +785,7 @@
     },
     {
       "path": "cli/src/oracle/send.rs",
-      "sha256": "785ab6aa4f2b58848f4055ee3f7e08c0ed70dfae0c166a585168ac7aaa00e609",
+      "sha256": "ad5fbb5fbc38f23dbb2e84f4dc4255aef1f14d1fd8f92fce1e99320d8de9ad3f",
       "executable": false
     },
     {
@@ -1424,7 +1424,7 @@
     },
     {
       "path": "futures/crates/futures-client/src/lib.rs",
-      "sha256": "093e95ce61ac28e37ba69b646c0062e48fd4344372adf6b6a7c9fd59149f17b8",
+      "sha256": "291daefd2a14ebf04ef5a5c7071b7aca98969de35060cf17040795b7a4f16b70",
       "executable": false
     },
     {
@@ -1519,12 +1519,12 @@
     },
     {
       "path": "futures/docs/futures.md",
-      "sha256": "37ee082a8cbfc15bd7514adb850a8a542bc1cbf4e020902052bcc4fc6ec784ad",
+      "sha256": "e860c389c90e90268e2a7c0b62f140a83f4d4c7c6af3783d5d43a6af75a74636",
       "executable": false
     },
     {
       "path": "futures/docs/interfaces.md",
-      "sha256": "23358a4bcb6e2406af7c695a32870e331c9f883a05eb37e0614a6ae17c1befa2",
+      "sha256": "6050fc52f4e1056833613872e39e12eeab97ad22a57bc360bec8f9f7ce803aef",
       "executable": false
     },
     {
@@ -1539,7 +1539,7 @@
     },
     {
       "path": "futures/programs/futures/src/lib.rs",
-      "sha256": "7e66836e7a22c0669e7c7e4df77e7ab566249ce7ab4f307a33279f9103652c76",
+      "sha256": "526b6430046362537fccccf8d77b3eb6bdbb0d3d2bda4650b54d3cc9cf5f0174",
       "executable": false
     },
     {
@@ -1549,7 +1549,7 @@
     },
     {
       "path": "futures/programs/futures/src/processor.rs",
-      "sha256": "2ada1c6587fc3e80e1ad04dc0fd929ad2c5042741c6c8b6f2cd7dfc4bc95a3f6",
+      "sha256": "ab8fadbe489f89576bc7640bcdcd3e0e962a74914fdbf202fab51eda7e56ebe0",
       "executable": false
     },
     {
@@ -2539,7 +2539,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/Cargo.toml",
-      "sha256": "ef159f6140e8e87e45622783889c0c447a07dca3e7b9e1acd9917d60f757b40c",
+      "sha256": "452318710a9175578a441b43aa183f3d9e7068fdf60aa84ad636f379173ede33",
       "executable": false
     },
     {
@@ -2674,7 +2674,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/governance_manifest.rs",
-      "sha256": "9b2ee2c0ab71d7e77a80e9afa7a3cb77b9cc79a15aeedf0ba31a8fa727800081",
+      "sha256": "20c17973c1aa9f063ca646e453fdfe776ce35ceda3634ec226a7ce819552472e",
       "executable": false
     },
     {
@@ -2754,7 +2754,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/instruction/payloads.rs",
-      "sha256": "db7cf8997b9b77c709afeb872466af35559f96cb3d3ae8066434e613cc80d909",
+      "sha256": "6530b8f1543324bb8448503c1eaacd6fbdcf6fae00875c20a877d8186b1d02b8",
       "executable": false
     },
     {
@@ -2779,7 +2779,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/lib.rs",
-      "sha256": "8a23328071aebc62c6d959650b65a445f14db8509781e7fbbd8eb0644f38e7be",
+      "sha256": "7c71f42a5141d6b06c8d7fde9853751bdd45e5752a5f144a76e0f9d1f285ff93",
       "executable": false
     },
     {
@@ -2814,7 +2814,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/adapters.rs",
-      "sha256": "8170ded2d416b058e39cfff65703003d9e459942538a391f3d5b0aa47060888b",
+      "sha256": "d130b2bb780d44870030d67acdebc00f7964e4d9eb17a816eb7b099455132700",
       "executable": false
     },
     {
@@ -2844,7 +2844,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/carry/mod.rs",
-      "sha256": "8bf03edac0f69b125f87a88f7580446f5d84c290f7e0526983f41e5e2a52b6c0",
+      "sha256": "8c028cd69b12ca4e6867711e4cd1547338ef962f2f5826949225e1cab95d670c",
       "executable": false
     },
     {
@@ -2914,7 +2914,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/council/mod.rs",
-      "sha256": "7fd7bdd68a7252d8a46627448fdd29775e9c6f467cdb2d33cc9f48efb01d18fa",
+      "sha256": "f9266f970f92e940ea4ed79c763a4f04d6bf1e7fc464cc7b4972cd2d6c879153",
       "executable": false
     },
     {
@@ -2949,7 +2949,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/dispatch.rs",
-      "sha256": "0c4baf2ec819ca7d07f3f4f0ebd260de4c84489a8edfd97e6cc2b4d696617e3a",
+      "sha256": "589aebfce4e903b746e53427f42dd10c102a7949acbe388886619fec5bef117f",
       "executable": false
     },
     {
@@ -3034,7 +3034,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/mod.rs",
-      "sha256": "e103c7f5a362c99611e2ad40a2ff506c86067bc126aaac722443375d60f4dc39",
+      "sha256": "6f21cd2e6fc6ad946a0320fd6a44fe13d98b353d2709e993d12eb947dd4c91bf",
       "executable": false
     },
     {
@@ -3094,7 +3094,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/rewards.rs",
-      "sha256": "d48c4cd353f9b8992bc54ec50e73fed952e32c7ad183bc80d95031f180c274c6",
+      "sha256": "c53782c2b21466f0ecb7670c6a25e8b2b0e4ab75c13401c2caa93cf116602947",
       "executable": false
     },
     {
@@ -3224,7 +3224,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/tests/source_weights.rs",
-      "sha256": "31e1c2b2c6468b79376bb991bdacd1ce42dff9d3532b2d2321d2812e4f1926b7",
+      "sha256": "70dcd7787954a9d4effbf5647c618ef82481aa6673afc2878d4ff996ef3073e5",
       "executable": false
     },
     {
@@ -3234,7 +3234,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/usdc.rs",
-      "sha256": "f7f7dcb0e9bea4af08de5fae0d52ebccaf252ed25e9522ba5833ac12d3034bd7",
+      "sha256": "f1aaff713dc1c0f2b67ee55094aad4c45a724d37e3c2bab5f9a2037cc0ed7280",
       "executable": false
     },
     {
@@ -3259,7 +3259,7 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/src/processor/usdc/tests.rs",
-      "sha256": "ee629fde843325c9666b809774845b19307ba13ce2444e4537ac360ce95eaed3",
+      "sha256": "4c92a7963a011570f7ad7edfff7672c294a72dc0dcd76681cc4eb6405f2c5388",
       "executable": false
     },
     {
@@ -3414,12 +3414,12 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/common/mod.rs",
-      "sha256": "ca07147719710640445d516b1626b8d41cf9ec2e6bdb49d887ec14a9c4572a6f",
+      "sha256": "9fa784144d005376cb1afd1a77ec8e79afc834f4d0ee97abd60581e95fa71283",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/common/production.rs",
-      "sha256": "e18e2ebf9faea7c2a3ee13d19596b34efa9ffe00c2dc9275ea375e9745617441",
+      "sha256": "2f76d5616b8b065cf94a4d4da77bbe94c6b1936b35dc370fd711c46c286b4505",
       "executable": false
     },
     {
@@ -3554,12 +3554,17 @@
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/production_artifact.rs",
-      "sha256": "6ab4757375182b43e67a18f31a4340e90cc3f1bc7d49d3c27c2f309955110bb2",
+      "sha256": "86e0eb4e0b7334bee8e15684b7cbed37d97b907f0fabe15573f57653a2eb1d37",
       "executable": false
     },
     {
       "path": "oracle/programs/ameba_oracle/tests/production_failed_month.rs",
-      "sha256": "b42a36032f62399d0b6d13d76d521369d7c09bd03acc1862e49aeadb2c4be5f0",
+      "sha256": "ea516626745995666a58fbc1d592f82b7e5d73b3448ff5e2294eaf337d0a0ff8",
+      "executable": false
+    },
+    {
+      "path": "oracle/programs/ameba_oracle/tests/production_fresh_boot.rs",
+      "sha256": "beff808020b5975737349ce481127b864715227afb942de1c4e93d4b6fd0ab82",
       "executable": false
     },
     {
@@ -3614,7 +3619,7 @@
     },
     {
       "path": "scripts/check.sh",
-      "sha256": "3a055c2792ee5e4bfda8e722b277cb2651c93f0ba5dc75078c43f387d32e25ae",
+      "sha256": "f49b86ebc38edd297fbe653ba9dacff4ce898e4fdd98973b60b041793cbbda29",
       "executable": true
     },
     {
@@ -3654,7 +3659,7 @@
     },
     {
       "path": "sdk/CHANGELOG.md",
-      "sha256": "fb3ceed54e55f0adb9bbb0da2034cab57c747aae03ecda7e475cd78ac02c0973",
+      "sha256": "a61be9dbc03e154248f3ed01e0a6ca41f014657415f0568e8ca7e1873024ded3",
       "executable": false
     },
     {
@@ -3734,12 +3739,12 @@
     },
     {
       "path": "sdk/dist/futures/api.d.ts",
-      "sha256": "1f9a74fb853c0e5da5215810afe4dae82473dd02efc2999f4fcfc5ea9275bbf4",
+      "sha256": "997c0f4fe65bd53fb934482e4806e64597ae1a07e67c44e572c7aacae14149f3",
       "executable": false
     },
     {
       "path": "sdk/dist/futures/api.d.ts.map",
-      "sha256": "de0974fd77ceaea992e674f9fd776d60f3a7b93dd7a0f1cd43dd4e5a2c398404",
+      "sha256": "77f9b723635e64c140cae385e1c51acc3bfae564ef0b7f8d70aa9e3285ba9094",
       "executable": false
     },
     {
@@ -3749,7 +3754,7 @@
     },
     {
       "path": "sdk/dist/futures/api.js.map",
-      "sha256": "8a2a53107e5c6a92d0d2126c579677f93e04e571dc6885fe17d9c2b9e1a6b751",
+      "sha256": "0bfa8971848fe6659efebf2f2ed2875859cecef0b13cd7dd1e7482fd058638e4",
       "executable": false
     },
     {
@@ -3989,7 +3994,7 @@
     },
     {
       "path": "sdk/src/futures/api.ts",
-      "sha256": "702f26c757df9bf3ff47d8742adec4495058c5c2284960f17858bc7e505dce55",
+      "sha256": "6e3e1e04168fefa87f47112e707d6afdd3fd2b3ad388ba9d7dda6ffa1982526f",
       "executable": false
     },
     {
@@ -4095,8 +4100,8 @@
   ],
   "lineEndingQualification": "2 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.1",
-  "sourceRelease": "release/2026-11-01-petri-heads",
-  "deployedOracleSourceCommit": "2af39bf9f69f783bacf929daf9b1baa103ade351",
+  "sourceRelease": "d24e7eff0bb57b9df8e07f4eb82e92e44d9f6117",
+  "deployedOracleSourceCommit": "6ccceaddacd40d8a15a3ee054bf2442d636605ba",
   "candidateContractSourceCommit": "bcf0601606617fda7e00a818e7663d031339858f",
   "candidateContractPublicSource": "https://github.com/amoeba-farm/amoeba-program/commit/059bd727fb61b68adf7d5ee3067ed5158674cbbc"
 }

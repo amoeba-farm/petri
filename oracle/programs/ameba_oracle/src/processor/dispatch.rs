@@ -224,7 +224,11 @@ pub(super) fn process_instruction_with_context(
         0..=63 => dispatch_0_63(program_id, accounts, tag, payload),
         64..=127 => dispatch_64_127(program_id, accounts, tag, payload),
         128..=160 => dispatch_128_160(program_id, accounts, tag, payload),
+        #[cfg(feature = "v1-months")]
         161..=255 => dispatch_161_255(program_id, accounts, tag, payload),
+        // Every assigned byte above 160 is the v1 months' or the formation's.
+        #[cfg(not(feature = "v1-months"))]
+        161..=255 => Err(OracleError::InvalidInstructionData.into()),
     }
 }
 
@@ -263,7 +267,6 @@ fn dispatch_0_63(
         return process_close_oracle_month(program_id, accounts);
     }
     let handler: fn(&Pubkey, &[AccountInfo], &[u8]) -> ProgramResult = match tag {
-        #[cfg(feature = "v1-formation")]
         OracleInstructionTag::InitializeConfig => process_initialize_config_instruction,
         #[cfg(feature = "v1-formation")]
         OracleInstructionTag::CreatePeriod => process_create_period_instruction,
@@ -310,6 +313,7 @@ fn dispatch_64_127(
         OracleInstructionTag::FinalizeOracleRecipeWeightsV2 => {
             process_finalize_oracle_recipe_weights_v2_instruction(program_id, accounts, payload)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::AccumulateOracleSettlementSourceBucket => {
             process_accumulate_oracle_settlement_source_bucket_instruction(
                 program_id, accounts, payload,
@@ -327,6 +331,7 @@ fn dispatch_64_127(
         OracleInstructionTag::FinalizeOracleActiveWeights => {
             process_finalize_oracle_active_weights_instruction(program_id, accounts, payload)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::FinalizeOracleMonth => {
             expect_empty_payload(payload)?;
             process_finalize_oracle_month(program_id, accounts)
@@ -335,30 +340,34 @@ fn dispatch_64_127(
             expect_empty_payload(payload)?;
             process_fail_period(program_id, accounts)
         }
-        #[cfg(feature = "v1-formation")]
         OracleInstructionTag::InitializeSettlementSignerRegistry => {
             let params: InitializeSettlementSignerRegistryParams =
                 decode_instruction_payload(payload)?;
             process_initialize_settlement_signer_registry(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::ProposeSettlementSignerRotation => {
             let params: ProposeSettlementSignerRotationParams =
                 decode_instruction_payload(payload)?;
             process_propose_settlement_signer_rotation(program_id, accounts, params, false)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::ActivateSettlementSignerRotation => {
             expect_empty_payload(payload)?;
             process_activate_settlement_signer_rotation(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::CancelSettlementSignerRotation => {
             expect_empty_payload(payload)?;
             process_cancel_settlement_signer_rotation(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::ProposeEmergencySettlementSignerRecovery => {
             let params: ProposeSettlementSignerRotationParams =
                 decode_instruction_payload(payload)?;
             process_propose_settlement_signer_rotation(program_id, accounts, params, true)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::UpsertSettlementV3 => {
             let params: UpsertSettlementParams = decode_instruction_payload(payload)?;
             settlement::process_upsert_settlement(program_id, accounts, Box::new(params.settlement))
@@ -375,7 +384,6 @@ fn dispatch_128_160(
     payload: &[u8],
 ) -> ProgramResult {
     match tag {
-        #[cfg(feature = "v1-formation")]
         OracleInstructionTag::BootstrapVaultGovernanceV2 => {
             let params = BootstrapVaultGovernanceV2Params {
                 new_oracle_authority: Pubkey::new_from_array(decode_bytes32_payload(payload)?),
@@ -429,6 +437,7 @@ fn dispatch_128_160(
     }
 }
 
+#[cfg(feature = "v1-months")]
 #[inline(never)]
 fn dispatch_161_255(
     program_id: &Pubkey,
@@ -453,6 +462,7 @@ fn dispatch_161_255(
             let params: ChallengeOracleSourceParams = decode_instruction_payload(payload)?;
             usdc::process_challenge_oracle_source_v2(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::SettleOracleUsdcEscrow => {
             let params = SettleOracleEscrowParams {
                 kind: decode_escrow_kind_payload(payload)?,
@@ -492,6 +502,7 @@ fn dispatch_161_255(
             expect_empty_payload(payload)?;
             process_reopen_oracle_sku_coverage(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::ExpireUnlistableOracleSourceV2 => {
             expect_empty_payload(payload)?;
             process_expire_unlistable_oracle_source_v2(program_id, accounts)
@@ -501,12 +512,14 @@ fn dispatch_161_255(
             expect_empty_payload(payload)?;
             process_cancel_stale_oracle_source_challenge_v2(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::SettleFailedOracleMonthEscrowV2 => {
             let params = SettleOracleEscrowParams {
                 kind: decode_escrow_kind_payload(payload)?,
             };
             rewards::process_settle_failed_oracle_month_escrow_v2(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::AbortOracleUsdcRewardScheduleV2 => {
             expect_empty_payload(payload)?;
             rewards::process_abort_oracle_usdc_reward_schedule_v2(program_id, accounts)
@@ -554,6 +567,7 @@ fn dispatch_161_255(
             };
             process_begin_oracle_recipe_weights_v2(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::RecomputeOracleBucketMedianV1 => {
             let params: RecomputeOracleBucketMedianV1Params = decode_instruction_payload(payload)?;
             process_recompute_oracle_bucket_median_v1(program_id, accounts, params)
@@ -563,22 +577,27 @@ fn dispatch_161_255(
             let params: IndexOracleRecipeSourceV1Params = decode_instruction_payload(payload)?;
             oracle_membership::process_index_oracle_recipe_source(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::CommitOracleUpdateClaimV3 => {
             let params: CommitOracleUpdateClaimV2Params = decode_instruction_payload(payload)?;
             usdc::process_commit_oracle_update_claim_v3(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::SettleExpiredOracleUpdateCommitmentV3 => {
             expect_empty_payload(payload)?;
             usdc::process_settle_expired_oracle_update_commitment_v3(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::ChallengeOracleUpdateClaimV2 => {
             let params: ChallengeOracleUpdateClaimParams = decode_instruction_payload(payload)?;
             usdc::process_challenge_oracle_update_claim_v2(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::RevealOracleUpdateClaimV3 => {
             let params: RevealOracleUpdateClaimV3Params = decode_instruction_payload(payload)?;
             usdc::process_reveal_oracle_update_claim_v3(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::FinalizeOracleUpdateClaimV2 => {
             let (outcome, current_step) = decode_u8_u64_payload(payload)?;
             let params = FinalizeOracleUpdateClaimV2Params {
@@ -592,22 +611,27 @@ fn dispatch_161_255(
             };
             usdc::process_finalize_oracle_update_claim_v2(program_id, accounts, params)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::CancelStaleOracleUpdateClaimV2 => {
             expect_empty_payload(payload)?;
             usdc::process_cancel_stale_oracle_update_claim_v2(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::RegisterOracleUsdcRewardSource => {
             expect_empty_payload(payload)?;
             rewards::process_register_oracle_usdc_reward_source(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::RegisterOracleUsdcRewardUpdate => {
             expect_empty_payload(payload)?;
             rewards::process_register_oracle_usdc_reward_update(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::FinalizeOracleUsdcRewardEntitlements => {
             expect_empty_payload(payload)?;
             rewards::process_finalize_oracle_usdc_reward_entitlements(program_id, accounts)
         }
+        #[cfg(feature = "v1-months")]
         OracleInstructionTag::ClaimOracleUsdcReward => {
             let params = ClaimOracleUsdcRewardParams {
                 kind: match decode_u8_payload(payload)? {
@@ -624,6 +648,7 @@ fn dispatch_161_255(
     }
 }
 
+#[cfg(feature = "v1-months")]
 fn decode_escrow_kind_payload(payload: &[u8]) -> Result<OracleEscrowKind, ProgramError> {
     Ok(match decode_u8_payload(payload)? {
         0 => OracleEscrowKind::ListingBond,
@@ -1100,11 +1125,16 @@ mod governance_precedence_tests {
 
         for (index, tag) in OracleInstructionTag::ALL.into_iter().enumerate() {
             let legacy_data = vec![tag as u8, 0x10 + index as u8, 0x20, 0x30];
-            // A build without the v1 formation routes none of its bytes: they stop at
-            // classification, as an unassigned byte does, before the envelope.
+            // A build without the v1 formation (or the v1 months) routes none of its bytes:
+            // they stop at classification, as an unassigned byte does, before the envelope.
             if classify_active_instruction_tag(tag as u8) == InstructionGovernanceClass::Unknown {
-                assert!(crate::governance_manifest::is_v1_formation_tag(tag as u8));
-                assert!(!cfg!(feature = "v1-formation"));
+                let byte = tag as u8;
+                if crate::governance_manifest::is_v1_formation_tag(byte) {
+                    assert!(!cfg!(feature = "v1-formation"));
+                } else {
+                    assert!(crate::governance_manifest::is_v1_month_tag(byte));
+                    assert!(!cfg!(feature = "v1-months"));
+                }
                 assert_eq!(
                     process_top_level_instruction(&crate::id(), &accounts, &legacy_data),
                     Err(ProgramError::Custom(

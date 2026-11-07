@@ -1,18 +1,31 @@
-//! The production (mainnet) artifact, built without `v1-formation`
+//! The production (mainnet) artifact, built without `v1-formation` and `v1-months`
 //! (`target/deploy/ameba_oracle.so`; `scripts/check.sh oracle` builds it before these tests, and
-//! `AMEBA_ORACLE_PRODUCTION_SO` names another), loaded the way mainnet will take it: as an upgrade
-//! of an oracle running the formation build (`SBF_OUT_DIR`, the build every other test runs).
+//! `AMEBA_ORACLE_PRODUCTION_SO` names another), beside the two builds that keep what it leaves
+//! out: the formation build (`SBF_OUT_DIR`, the build every other test runs) and the `v1-months`
+//! build (the production profile with `v1-months`, `target/deploy-v1-months`, or
+//! `AMEBA_ORACLE_V1_MONTHS_SO`). The production artifact boots at a new address
+//! (`tests/production_fresh_boot.rs`), so mainnet takes none of these upgrades: loading each
+//! build over the last is only how one harness runs all three against the same probes.
 //!
-//! - Its first-byte table: exactly the instructions a Live v1 month needs until it pays out (and
-//!   the admin, collateral and cleanup paths) reach the governance envelope (`KEPT`, a list kept
-//!   here on purpose, apart from the program's own), plus 210 when the build routes heads; every
-//!   v1 formation byte is refused as an unassigned byte is, before any account is read.
+//! - Its first-byte table: exactly a fresh address's setup, collateral, the admin paths,
+//!   FailPeriod and the evidence writer reach the governance envelope (`KEPT`, a list kept here on
+//!   purpose, apart from the program's own), plus 210 when the build routes heads; every v1
+//!   formation byte and every byte of the v1 months' machinery (`MONTHS`) is refused as an
+//!   unassigned byte is, before any account is read. The `v1-months` build routes `KEPT` and
+//!   `MONTHS`.
 //! - Every kept instruction and tag-30 selector still decodes and reaches its own checks, with
-//!   the formation build's result; the formation selectors (and sponsorship's Activate) are
-//!   refused.
-//! - A month formed, listed and updated by the formation build updates, settles and pays out on
-//!   the production artifact after the upgrade: 199, 167, 201, 169, 197, 75, 113, 116, 170, 171,
-//!   173, 174 and 30/24.
+//!   the formation build's result, on all three builds. The months' instructions and selectors
+//!   (the refunds, the council, sponsorship settlement, the terminal cleanup, the failed-month
+//!   closes) reach theirs on the formation and `v1-months` builds and are refused by the
+//!   production artifact; the formation selectors (and sponsorship's Activate) are refused by
+//!   both.
+//! - The v1 months without their formation: a month formed, listed and updated by the formation
+//!   build updates, settles and pays out on the `v1-months` build (199, 167, 201, 169, 197, 75,
+//!   113, 116, 170, 171, 173, 174), the last update stake and the collateral get out (169, 11) and
+//!   the terminal cleanup (30/24) closes the month. Until 2026-11-07 this went on through an
+//!   upgrade to the production artifact, which kept the exits for mainnet's Oct 26 months; the
+//!   artifact has no v1 month to serve now, so the sequence ends on the `v1-months` build the dev
+//!   chain's machinery shares.
 #![cfg(all(
     feature = "test-sbf",
     not(feature = "localnet-dev-authority"),
@@ -30,15 +43,16 @@ use ameba_oracle::{
     governance_manifest::{
         classify_instruction_tag_for_build, FeatureGates, InstructionGovernanceClass,
         HEADS_INSTRUCTION_TAG, V1_FORMATION_CARRY_SELECTORS, V1_FORMATION_INSTRUCTION_TAGS,
+        V1_MONTH_CARRY_SELECTORS, V1_MONTH_INSTRUCTION_TAGS,
     },
     instruction::{
         self, AccumulateOracleSettlementSourceBucketParams, ChallengeOracleUpdateClaimParams,
-        CommitOracleUpdateClaimV2Params, OracleCarryForwardActionV1 as Action,
-        OracleCouncilActionV1, OracleInstructionTag, OracleSponsoredActionV1,
-        ProposeOracleSourceV3Params, ProposeSettlementSignerRotationParams,
-        RecomputeOracleBucketMedianV1Params, RevealOracleUpdateClaimV3Params,
-        RotateVaultAuthoritiesV2Params, SettlementLeaf, TerminalCleanupParams, UpdateFinalization,
-        UpsertSettlementParams,
+        CommitOracleUpdateClaimV2Params, InitializeSettlementSignerRegistryParams,
+        OracleCarryForwardActionV1 as Action, OracleCouncilActionV1, OracleInstructionTag,
+        OracleSponsoredActionV1, ProposeOracleSourceV3Params,
+        ProposeSettlementSignerRotationParams, RecomputeOracleBucketMedianV1Params,
+        RevealOracleUpdateClaimV3Params, RotateVaultAuthoritiesV2Params, SettlementLeaf,
+        TerminalCleanupParams, UpdateFinalization, UpsertSettlementParams,
     },
     sponsorship::{SponsorTerms, DEFAULT_RESEARCHER_BPS, DEFAULT_RETENTION_BPS},
     state::{
@@ -64,25 +78,42 @@ use solana_sdk::{
 const DAY: u64 = 86_400;
 
 /// Every instruction byte the production artifact must route, independent of the program's own
-/// manifest (`governance_manifest::V1_FORMATION_INSTRUCTION_TAGS`), so that dropping one is a
-/// test failure rather than a quiet change. Collateral: 9, 10, 11, 140. Admin: 2, 109, 129 (the
-/// only unpause). Updates during Game: 166, 167, 168, 198, 199, 201. Settlement: 75, 79, 113, 116,
-/// 197. Signer rotation: 91-94. Rewards: 170, 171, 173, 174. Escrows and failure refunds: 169,
-/// 191, 194, 195. Tag 30: council, terminal cleanup, evidence and sponsorship settlement (the
-/// failed-month cleanup, 30/25, lives there too).
-const KEPT: [u8; 31] = [
-    2, 9, 10, 11, 30, 75, 79, 91, 92, 93, 94, 109, 113, 116, 129, 140, 166, 167, 168, 169, 170,
-    171, 173, 174, 191, 194, 195, 197, 198, 199, 201,
+/// manifest (`governance_manifest::V1_FORMATION_INSTRUCTION_TAGS`, `V1_MONTH_INSTRUCTION_TAGS`),
+/// so that dropping one is a test failure rather than a quiet change. A fresh address's setup: 0,
+/// 128, 90, 129 (also the only unpause). Collateral: 9, 10, 11, 140. Admin: 2 (pause), 109.
+/// FailPeriod: 79 (heads periods too). Tag 30: the evidence writer.
+const KEPT: [u8; 12] = [0, 2, 9, 10, 11, 30, 79, 90, 109, 128, 129, 140];
+
+/// The v1 months' machinery: what the `v1-months` build routes and the production artifact
+/// refuses, kept here on purpose too. Settlement: 75, 113, 116, 197; signer rotation: 91-94. Game
+/// updates: 166, 168, 198, 199, 201. Escrow and bond refunds: 167, 169, 191, 194, 195. Rewards:
+/// 170, 171, 173, 174.
+const MONTHS: [u8; 22] = [
+    75, 91, 92, 93, 94, 113, 116, 166, 167, 168, 169, 170, 171, 173, 174, 191, 194, 195, 197, 198,
+    199, 201,
 ];
 
-/// The first-byte classes each build routes: the production artifact without the v1 formation
-/// (heads as this test crate's default features say, which `--features test-sbf` leaves as the
-/// production build has them), the formation build with it.
-fn gates(formation: bool) -> FeatureGates {
+/// The three builds, in the order this harness loads them.
+#[derive(Clone, Copy, Debug, PartialEq)]
+enum Build {
+    /// Forms v1 months (`test-sbf`), as the dev profiles do.
+    Formation,
+    /// The production profile with `v1-months`: the v1 months without their formation.
+    V1Months,
+    /// The production artifact: neither.
+    Production,
+}
+
+const BUILDS: [Build; 3] = [Build::Formation, Build::V1Months, Build::Production];
+
+/// The first-byte classes each build routes (heads as this test crate's default features say,
+/// which `--features test-sbf` leaves as the production build has them).
+fn gates(build: Build) -> FeatureGates {
     FeatureGates {
         dev: false,
         heads: cfg!(feature = "heads"),
-        v1_formation: formation,
+        v1_formation: build == Build::Formation,
+        v1_months: build != Build::Production,
     }
 }
 
@@ -164,10 +195,12 @@ fn bytes<T: BorshSerialize>(value: &T) -> Vec<u8> {
     value.try_to_vec().unwrap()
 }
 
-/// A decodable payload for every kept byte but 30.
-fn kept_probes() -> Vec<(u8, Instruction)> {
+/// A decodable payload for every byte of `KEPT` (but 30) and `MONTHS`.
+fn tag_probes() -> Vec<(u8, Instruction)> {
     let key = Pubkey::new_unique;
     let payloads: Vec<(u8, Vec<u8>)> = vec![
+        // InitializeConfig: the admin.
+        (0, key().to_bytes().to_vec()),
         // UpdateConfig: five absent options.
         (2, vec![0; 5]),
         (9, vec![]),
@@ -175,6 +208,17 @@ fn kept_probes() -> Vec<(u8, Instruction)> {
         (11, 1u64.to_le_bytes().to_vec()),
         (75, vec![]),
         (79, vec![]),
+        (
+            90,
+            bytes(&InitializeSettlementSignerRegistryParams {
+                signer_set_version: 1,
+                threshold: 1,
+                signer_count: 1,
+                signers: [key(); 8],
+                rotation_delay_slots: 0,
+                recovery_authority: key(),
+            }),
+        ),
         (
             91,
             bytes(&ProposeSettlementSignerRotationParams {
@@ -222,6 +266,8 @@ fn kept_probes() -> Vec<(u8, Instruction)> {
                 },
             }),
         ),
+        // BootstrapVaultGovernanceV2: the new oracle authority.
+        (128, key().to_bytes().to_vec()),
         // ActivateVaultV2: no freeze authority.
         (129, vec![0]),
         (140, 1u64.to_le_bytes().to_vec()),
@@ -284,8 +330,7 @@ fn kept_probes() -> Vec<(u8, Instruction)> {
         .collect()
 }
 
-/// Tag 30 actions the production artifact keeps: the evidence writer (14, 15), the council (18),
-/// sponsorship settlement (22: reconcile, bounty, reserve) and the terminal cleanup (24).
+/// Tag 30 actions the production artifact keeps: the evidence writer (14, 15).
 fn kept_carry_probes() -> Vec<(&'static str, Instruction)> {
     vec![
         (
@@ -299,6 +344,13 @@ fn kept_carry_probes() -> Vec<(&'static str, Instruction)> {
             }),
         ),
         ("30/15", carry(Action::CloseEvidenceDraft)),
+    ]
+}
+
+/// The v1 months' tag-30 actions: the council (18), sponsorship settlement (22: reconcile,
+/// bounty, reserve), the terminal cleanup (24) and the failed-month closes (25).
+fn month_carry_probes() -> Vec<(&'static str, Instruction)> {
+    vec![
         (
             "30/18",
             carry(Action::Council(OracleCouncilActionV1 {
@@ -336,6 +388,7 @@ fn kept_carry_probes() -> Vec<(&'static str, Instruction)> {
                 expected_lamports: 0,
             })),
         ),
+        ("30/25", carry(Action::FailedMonth { kind: 0 })),
     ]
 }
 
@@ -413,19 +466,24 @@ fn formation_carry_probes() -> Vec<(&'static str, Instruction)> {
 }
 
 #[tokio::test]
-async fn the_production_artifact_routes_exactly_what_a_live_month_needs() {
-    let Some((mut h, production)) = start_formation().await else {
+async fn the_production_artifact_routes_the_setup_and_refuses_the_v1_months() {
+    let Some((mut h, v1_months, production)) = start_formation_v1_months().await else {
         return;
     };
-    // The manifest's formation set is exactly the assigned bytes outside `KEPT`.
+    // The manifest's sets are exactly the assigned bytes outside `KEPT`: the months' are `MONTHS`.
     let assigned: Vec<u8> = OracleInstructionTag::ALL.iter().map(|t| *t as u8).collect();
-    for tag in KEPT {
-        assert!(assigned.contains(&tag), "{tag} is not an assigned byte");
+    for tag in KEPT.iter().chain(&MONTHS) {
+        assert!(assigned.contains(tag), "{tag} is not an assigned byte");
+        assert!(
+            !(KEPT.contains(tag) && MONTHS.contains(tag)),
+            "{tag} is in both"
+        );
     }
+    assert_eq!(MONTHS, V1_MONTH_INSTRUCTION_TAGS);
     let formation_tags: Vec<u8> = assigned
         .iter()
         .copied()
-        .filter(|tag| !KEPT.contains(tag))
+        .filter(|tag| !KEPT.contains(tag) && !MONTHS.contains(tag))
         .collect();
     assert_eq!(formation_tags, V1_FORMATION_INSTRUCTION_TAGS);
     let carry_selectors: Vec<u8> = formation_carry_probes()
@@ -434,85 +492,136 @@ async fn the_production_artifact_routes_exactly_what_a_live_month_needs() {
         .map(|(_, ix)| ix.data[1])
         .collect();
     assert_eq!(carry_selectors, V1_FORMATION_CARRY_SELECTORS);
+    let mut month_selectors: Vec<u8> = month_carry_probes()
+        .iter()
+        .map(|(_, ix)| ix.data[1])
+        .collect();
+    month_selectors.dedup();
+    assert_eq!(month_selectors, V1_MONTH_CARRY_SELECTORS);
 
     let bytes: Vec<Instruction> = (0u8..=u8::MAX).map(bare).collect();
-    let kept = kept_probes();
-    let kept_ix: Vec<Instruction> = kept.iter().map(|(_, ix)| ix.clone()).collect();
+    let tags = tag_probes();
+    let mut probed: Vec<u8> = tags.iter().map(|(tag, _)| *tag).collect();
+    probed.push(30);
+    probed.sort_unstable();
+    let mut routed_tags: Vec<u8> = KEPT.iter().chain(&MONTHS).copied().collect();
+    routed_tags.sort_unstable();
+    assert_eq!(
+        probed, routed_tags,
+        "a probe for every kept and months byte"
+    );
+    let tags_ix: Vec<Instruction> = tags.iter().map(|(_, ix)| ix.clone()).collect();
     let carry_kept = kept_carry_probes();
     let carry_kept_ix: Vec<Instruction> = carry_kept.iter().map(|(_, ix)| ix.clone()).collect();
+    let carry_months = month_carry_probes();
+    let carry_months_ix: Vec<Instruction> = carry_months.iter().map(|(_, ix)| ix.clone()).collect();
     let carry_formation = formation_carry_probes();
     let carry_formation_ix: Vec<Instruction> =
         carry_formation.iter().map(|(_, ix)| ix.clone()).collect();
 
     let mut runs = Vec::new();
-    for formation in [true, false] {
-        if !formation {
-            h.upgrade_oracle(&production).await;
+    for build in BUILDS {
+        match build {
+            Build::Formation => {}
+            Build::V1Months => h.upgrade_oracle(&v1_months).await,
+            Build::Production => h.upgrade_oracle(&production).await,
         }
         runs.push((
             outcomes(&mut h, &bytes, false).await,
-            outcomes(&mut h, &kept_ix, true).await,
+            outcomes(&mut h, &tags_ix, true).await,
             outcomes(&mut h, &carry_kept_ix, true).await,
+            outcomes(&mut h, &carry_months_ix, true).await,
             outcomes(&mut h, &carry_formation_ix, true).await,
         ));
     }
     let routed = program_error(OracleError::MissingGovernanceTail);
     let refused = program_error(OracleError::InvalidInstructionData);
-    for ((bare, kept_out, carry_kept_out, carry_formation_out), formation) in
-        runs.iter().zip([true, false])
+    for ((bare, tags_out, carry_kept_out, carry_months_out, carry_formation_out), build) in
+        runs.iter().zip(BUILDS)
     {
         // A bare byte: an assigned one the build routes reaches the envelope (and finds no
         // tail); any other is refused before it.
         for (byte, result) in bare.iter().enumerate() {
             let byte = byte as u8;
-            let class = classify_instruction_tag_for_build(byte, gates(formation));
+            let class = classify_instruction_tag_for_build(byte, gates(build));
             let expected = match class {
                 InstructionGovernanceClass::RecognizedMutating
                 | InstructionGovernanceClass::FeatureGatedMutating => &routed,
                 _ => &refused,
             };
-            assert_eq!(
-                code(result),
-                *expected,
-                "byte {byte}, formation {formation}"
-            );
-            if !formation {
-                let production_routes = KEPT.contains(&byte)
-                    || (byte == HEADS_INSTRUCTION_TAG && cfg!(feature = "heads"));
-                assert_eq!(code(result) == routed, production_routes, "byte {byte}");
+            assert_eq!(code(result), *expected, "byte {byte}, {build:?}");
+            let heads = byte == HEADS_INSTRUCTION_TAG && cfg!(feature = "heads");
+            match build {
+                Build::Formation => {}
+                Build::V1Months => assert_eq!(
+                    code(result) == routed,
+                    KEPT.contains(&byte) || MONTHS.contains(&byte) || heads,
+                    "byte {byte}, {build:?}"
+                ),
+                Build::Production => assert_eq!(
+                    code(result) == routed,
+                    KEPT.contains(&byte) || heads,
+                    "byte {byte}, {build:?}"
+                ),
             }
         }
-        // Kept instructions decode and reach their handlers, which refuse the empty account list.
-        for ((tag, _), result) in kept.iter().zip(kept_out) {
-            assert_ne!(code(result), refused, "tag {tag}, formation {formation}");
+        // Kept instructions decode and reach their handlers, which refuse the empty account
+        // list; the months' do too, except on the production artifact, which refuses them first.
+        for ((tag, _), result) in tags.iter().zip(tags_out) {
+            if build == Build::Production && MONTHS.contains(tag) {
+                assert_eq!(code(result), refused, "tag {tag}, {build:?}");
+            } else {
+                assert_ne!(code(result), refused, "tag {tag}, {build:?}");
+            }
         }
         for ((label, _), result) in carry_kept.iter().zip(carry_kept_out) {
-            assert_ne!(code(result), refused, "{label}, formation {formation}");
+            assert_ne!(code(result), refused, "{label}, {build:?}");
+        }
+        for ((label, _), result) in carry_months.iter().zip(carry_months_out) {
+            if build == Build::Production {
+                assert_eq!(code(result), refused, "{label}");
+            } else {
+                assert_ne!(code(result), refused, "{label}, {build:?}");
+            }
         }
         // Formation selectors reach their handlers only in the formation build.
         for ((label, _), result) in carry_formation.iter().zip(carry_formation_out) {
-            if formation {
+            if build == Build::Formation {
                 assert_ne!(code(result), refused, "{label}");
             } else {
-                assert_eq!(code(result), refused, "{label}");
+                assert_eq!(code(result), refused, "{label}, {build:?}");
             }
         }
     }
-    // The kept paths answer exactly as the formation build's.
-    let (formation_run, production_run) = (&runs[0], &runs[1]);
-    for (index, (tag, _)) in kept.iter().enumerate() {
-        assert_eq!(
-            code(&formation_run.1[index]),
-            code(&production_run.1[index]),
-            "tag {tag}"
-        );
-    }
-    for (index, (label, _)) in carry_kept.iter().enumerate() {
-        assert_eq!(
-            code(&formation_run.2[index]),
-            code(&production_run.2[index]),
-            "{label}"
-        );
+    // The paths a build keeps answer exactly as the formation build's.
+    let formation_run = &runs[0];
+    for (run, build) in runs.iter().zip(BUILDS).skip(1) {
+        for (index, (tag, _)) in tags.iter().enumerate() {
+            if build == Build::Production && MONTHS.contains(tag) {
+                continue;
+            }
+            assert_eq!(
+                code(&formation_run.1[index]),
+                code(&run.1[index]),
+                "tag {tag}, {build:?}"
+            );
+        }
+        for (index, (label, _)) in carry_kept.iter().enumerate() {
+            assert_eq!(
+                code(&formation_run.2[index]),
+                code(&run.2[index]),
+                "{label}, {build:?}"
+            );
+        }
+        if build == Build::V1Months {
+            for (index, (label, _)) in carry_months.iter().enumerate() {
+                assert_eq!(
+                    code(&formation_run.3[index]),
+                    code(&run.3[index]),
+                    "{label}"
+                );
+            }
+        }
     }
 }
 
@@ -541,11 +650,11 @@ fn update_escrow(
     )
 }
 
-/// The mainnet sequence: months formed and listed by today's program, then the upgrade, then
-/// everything up to the payout on the production artifact.
+/// The v1 months without their formation: a month formed and listed by the formation build, its
+/// updates, settlement, payouts, last refund and cleanup on the `v1-months` build.
 #[tokio::test]
-async fn a_month_listed_before_the_upgrade_settles_and_pays_out_on_the_production_artifact() {
-    let Some((mut h, production)) = start_formation().await else {
+async fn a_month_runs_from_game_to_closed_on_the_v1_months_build() {
+    let Some((mut h, v1_months, _production)) = start_formation_v1_months().await else {
         return;
     };
     let wide = wide_live(&mut h).await;
@@ -597,12 +706,12 @@ async fn a_month_listed_before_the_upgrade_settles_and_pays_out_on_the_productio
         .await
         .unwrap();
 
-    // The upgrade: formation bytes are refused as unassigned from the next slot on.
-    h.upgrade_oracle(&production).await;
-    // The formation build formed the month on 15-second test days; mainnet's months were formed
-    // on real ones, which the production artifact checks them against. Give the month the
-    // calendar mainnet's have: its Scramble starts eight real days before its listing
-    // (`scramble_start_ts`, byte 70).
+    // The upgrade to the `v1-months` build: formation bytes are refused as unassigned from the
+    // next slot on.
+    h.upgrade_oracle(&v1_months).await;
+    // The formation build formed the month on 15-second test days; the `v1-months` build checks
+    // months against real ones. Give the month a real calendar: its Scramble starts eight real
+    // days before its listing (`scramble_start_ts`, byte 70).
     let mut account = h.account(cohort.month).await.unwrap();
     let start = cohort.listing
         - ameba_oracle::constants::ORACLE_PRE_LISTING_WINDOW_SECONDS
@@ -618,8 +727,8 @@ async fn a_month_listed_before_the_upgrade_settles_and_pays_out_on_the_productio
         (month.scramble_start_ts, month.listing_ts),
         (start, cohort.listing)
     );
-    // Likewise the settlement signer set: mainnet's has the production rotation delay (216,000
-    // slots, byte 336; outside the set hash), the formation build's the test one.
+    // Likewise the settlement signer set: this build reads the production rotation delay
+    // (216,000 slots, byte 336; outside the set hash), the formation build wrote the test one.
     let set_key = ameba_oracle::state::derive_settlement_signer_set_pda(&program(), 1).0;
     let mut account = h.account(set_key).await.unwrap();
     let delay = ameba_oracle::constants::PRODUCTION_MIN_SETTLEMENT_SIGNER_ROTATION_DELAY_SLOTS;
@@ -694,7 +803,7 @@ async fn a_month_listed_before_the_upgrade_settles_and_pays_out_on_the_productio
     let expired: OracleUpdateClaimV2 = h.read_state(claims[1].key).await;
     assert_eq!(expired.claim.status, OracleClaimStatus::TimedOut);
 
-    // At expiry and grace: 201 times C out and 169 refunds it; then 197, 75 and 113.
+    // At expiry and grace: 201 times C out (its stake waits for the end); then 197, 75 and 113.
     h.at(cohort.expiry + ORACLE_SETTLEMENT_GRACE_SECONDS).await;
     h.send(
         instruction::cancel_stale_oracle_update_claim_v2(
@@ -710,23 +819,6 @@ async fn a_month_listed_before_the_upgrade_settles_and_pays_out_on_the_productio
     )
     .await
     .unwrap();
-    h.send(
-        update_escrow(
-            cohort,
-            &payer.pubkey(),
-            &source2,
-            &claims[2].key,
-            &updater.pubkey(),
-        ),
-        &[],
-    )
-    .await
-    .unwrap();
-    assert_eq!(
-        h.collateral(&updater.pubkey()).await.available_balance,
-        funded,
-        "every update stake is back"
-    );
     let month: OracleMonthState = h.read_state(cohort.month).await;
     assert_eq!(month.pending_resolution_count, 0);
     h.finalize_wide(&wide).await;
@@ -848,12 +940,51 @@ async fn a_month_listed_before_the_upgrade_settles_and_pays_out_on_the_productio
         .unwrap();
     assert_eq!(update_paid, UPDATE_REWARD);
 
+    // 169: C's stake comes back; every update stake is back, with A's reward.
+    h.send(
+        update_escrow(
+            cohort,
+            &payer.pubkey(),
+            &source2,
+            &claims[2].key,
+            &updater.pubkey(),
+        ),
+        &[],
+    )
+    .await
+    .unwrap();
+    let available = h.collateral(&updater.pubkey()).await.available_balance;
+    assert_eq!(
+        available,
+        funded + update_paid,
+        "every update stake is back"
+    );
+
     // 30/24: the terminal cleanup closes the month.
     h.cleanup(cohort, 0, [0; 32], None, None).await.unwrap();
     let closed: OracleMonthState = h.read_state(cohort.month).await;
     assert_eq!(closed.phase, OraclePhase::Closed);
-    // All of it ran on the production artifact (the harness reinstalls it after each warp): a
-    // formation byte is still refused as unassigned.
+    // 11: the updater takes everything out.
+    let token = h
+        .create_token_account(&h.usdc_mint.clone(), &updater.pubkey())
+        .await;
+    let usdc_mint = h.usdc_mint;
+    h.send(
+        instruction::withdraw_collateral(
+            &program(),
+            &updater.pubkey(),
+            &token,
+            &usdc_mint,
+            available,
+        ),
+        &[&updater],
+    )
+    .await
+    .unwrap();
+    assert_eq!(h.token_balance(token).await, available);
+    assert_eq!(h.collateral(&updater.pubkey()).await.available_balance, 0);
+    // All of it after the upgrade ran on the `v1-months` build (the harness reinstalls it after
+    // each warp): a formation byte is still refused as unassigned.
     let period = instruction::create_period(
         &program(),
         &payer.pubkey(),

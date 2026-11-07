@@ -3,18 +3,25 @@ use super::*;
 use crate::compact_error::CompactAccountInfo;
 use borsh::{BorshDeserialize, BorshSerialize};
 mod authority;
+#[cfg(feature = "v1-months")]
 mod effects;
 mod helpers;
 mod state;
+#[cfg(feature = "v1-months")]
 mod targets;
+#[cfg(feature = "v1-months")]
 use crate::instruction::OracleCouncilActionV1;
+#[cfg(any(feature = "heads", feature = "v1-months"))]
 pub(in crate::processor) use authority::council;
 use authority::*;
 pub use authority::{decode_council, decode_council_v3_with_profile};
+#[cfg(feature = "v1-months")]
 use effects::*;
+#[cfg(feature = "v1-months")]
 pub(super) use helpers::*;
 use state::*;
 pub use state::{council_decision, CouncilCase, CouncilRound};
+#[cfg(feature = "v1-months")]
 use targets::*;
 
 pub(super) fn validate_cleanup_case(
@@ -62,6 +69,7 @@ pub(super) fn validate_cleanup_round(
     Ok(())
 }
 
+#[cfg(feature = "v1-months")]
 fn evidence(target: &AccountInfo) -> Result<[u8; 32], ProgramError> {
     Ok(hashv(&[
         b"amoeba-council-evidence-v1",
@@ -70,9 +78,11 @@ fn evidence(target: &AccountInfo) -> Result<[u8; 32], ProgramError> {
     ])
     .to_bytes())
 }
+#[cfg(feature = "v1-months")]
 fn scope() -> &'static [u8] {
     b"solana-devnet:council-oracle-v1"
 }
+#[cfg(feature = "v1-months")]
 fn case_hash(program: &Pubkey, controller: &Pubkey, case: &CouncilCase) -> [u8; 32] {
     hashv(&[
         b"amoeba-council-case-v1",
@@ -94,6 +104,7 @@ fn case_hash(program: &Pubkey, controller: &Pubkey, case: &CouncilCase) -> [u8; 
 // Keep the large month value in a separate loader frame and on the heap. Council processing
 // retains case/ballot state across several resolver calls; copying the month into that frame
 // otherwise exceeds the SBF frame budget when the real council adapter is reachable.
+#[cfg(feature = "v1-months")]
 #[inline(never)]
 fn load_council_month(
     program: &Pubkey,
@@ -108,6 +119,7 @@ fn load_council_month(
 /// of a source case whose period Failed (`cancel_failed_source`): a Failed period's source cases
 /// take only 3. Common accounts: payer, period, month, case, target, canonical controller Config,
 /// current-epoch round, system. Ballot adds readonly seat signer; then target-specific accounts.
+#[cfg(feature = "v1-months")]
 #[inline(never)]
 pub(super) fn process(
     program: &Pubkey,
@@ -439,6 +451,7 @@ type ResolutionAccounts<'a, 'i> = (
     )>,
     &'a [AccountInfo<'i>],
 );
+#[cfg(feature = "v1-months")]
 fn resolution_accounts<'a, 'i>(
     kind: OracleEmergencyDisputeKind,
     a: &'a [AccountInfo<'i>],
@@ -463,6 +476,7 @@ fn resolution_accounts<'a, 'i>(
     }
 }
 
+#[cfg(feature = "v1-months")]
 fn abort_stale_update(
     program: &Pubkey,
     accounts: &[AccountInfo],
@@ -536,6 +550,7 @@ fn abort_stale_update(
 /// are released and the pending count drops; 194 (or 169) then returns the bond to its own
 /// challenger. Remaining accounts as for applying it: source, source guard[, comparison source,
 /// comparison guard].
+#[cfg(feature = "v1-months")]
 #[inline(never)]
 fn cancel_failed_source(
     program: &Pubkey,
@@ -607,7 +622,7 @@ fn save_council_state<T: BorshSerialize>(
     Ok(())
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "v1-months"))]
 mod checkpoint_runtime_tests;
 
 #[cfg(test)]

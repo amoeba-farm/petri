@@ -80,6 +80,21 @@ pub fn gate(dep: &Deployment, rpc: &Rpc, target: &Pubkey) -> Result<Option<GateB
         .next())
 }
 
+/// Whether `target` is stopped: its gate frozen, or closed, as it is once the
+/// target has retired. Only what that read shows: a gate that isn't `target`'s
+/// is no stop, and stays [`gate`]'s refusal.
+pub fn stopped(dep: &Deployment, rpc: &Rpc, target: &Pubkey) -> bool {
+    let Some(Ok(controller)) = dep.governance_controller.as_ref().map(|g| g.controller()) else {
+        return false;
+    };
+    let address = gate::gate_address(&controller, target).0;
+    rpc.account(&address).is_ok_and(|account| match account {
+        Some(a) => gate::read_gate(&controller, target, &address, &a.owner, &a.data)
+            .is_ok_and(|g| g.status != gate::GateStatusV1::Active),
+        None => true,
+    })
+}
+
 /// The gates of the governed targets among `wanted`.
 pub fn bindings(dep: &Deployment, rpc: &Rpc, wanted: &[Pubkey]) -> Result<Vec<GateBinding>> {
     let Some(g) = &dep.governance_controller else {

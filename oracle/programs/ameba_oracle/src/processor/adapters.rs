@@ -1,6 +1,5 @@
 use super::*;
 
-#[cfg(feature = "v1-formation")]
 #[inline(always)]
 pub(super) fn process_initialize_config_instruction(
     program_id: &Pubkey,

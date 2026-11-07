@@ -780,7 +780,9 @@ start. The samples are kept in `futures.index_samples` (see
 ### `GET /v1/markets?all=1` → `{ markets: MarketView[] }`
 
 The manifest's markets. **[added]** With `all=1` the retired ones follow
-them (see "Retired markets").
+them (see "Retired markets"). **[added 2026-11-01]** A closed market (its
+account gone, see "Closed markets") is listed only with `all=1`, in its
+place, with `closed: true`, once its final settlement is recorded.
 
 ### `GET /v1/markets/:market` → `MarketView`
 
@@ -802,9 +804,17 @@ MarketView = {
                   bidLots, askLots, inventoryLots, payoutMin, payoutMax },
   pool: null | { address, operator, shares, valueLow, valueHigh, free, reserved, deposited, withdrawn },
   credit: null | { owner, limit, debt, exposure, makerCash, lends, lendsUntil, settled, shortfall, recoveryAmba },
+  retired (bool), closed (bool),
   slot, chainTime
 }
 ```
+
+* `retired` is true for a market the manifest no longer lists (see
+  "Retired markets"). **[added 2026-11-01]** `closed` is true for a closed
+  market (see "Closed markets"), listed by `?all=1` only, and false for
+  every other view: `status` stays its final `"settled"` or `"failed"`,
+  `tradable` is false and the rest comes from its registry row and indexed
+  trades.
 
 * `tradable` is whether the market takes orders now. A market can be listed
   on a Forming oracle period, ahead of its month; it takes no trade until
@@ -996,7 +1006,10 @@ number in index points. `from`/`to` default to the last 24 hours of wall
 time; `limit` (default 5000, at most 20,000) keeps the newest points in the
 range. `month` is the oracle month the market settles on: the canonical
 month PDA of its period (`[ameba-oracle-v1, g3-oracle_month, period,
-expiry_le]`).
+expiry_le]`), under the oracle its market account stores. **[added
+2026-11-07]** A closed market has no account: a period of a retired oracle
+takes its month from the archive ("Oracle archive"), and only any other
+period is derived under the configured oracle.
 
 ### `GET /v1/accounts/:owner`
 
@@ -1082,11 +1095,14 @@ Response:
   `MinFill`, `InsufficientFunds` (`deposit` exceeds the ATA plus the
   compressed USDC), and for `close`
   `ClaimNotFound`, `NotComplement` or `ClaimReserved`. `close` needs `owner`.
+* **[added 2026-11-01]** A closed market (see "Closed markets") is 404, no
+  longer 503 "loading".
 
 ### Market transactions (`POST /v1/tx/prepare`)
 
-`params` name the market as `market` (address or symbol). Every transaction
-starts with `SetComputeUnitLimit(1_400_000)`; `submit` steps also request a
+`params` name the market as `market` (address or symbol). **[added
+2026-11-01]** A closed market (see "Closed markets") is 404 for every
+action. Every transaction starts with `SetComputeUnitLimit(1_400_000)`; `submit` steps also request a
 256 KiB heap frame (`heapFrame`), which `Submit` needs. The sponsor pays the
 fee (the owner with `payer: "owner"`, see "Owner-paid transactions"); the
 1232-byte limit applies.
@@ -1237,6 +1253,7 @@ never served from the wrong table.
 | `earnWithdraw` (`ARVWDR01`) **[added]** | `owner`, `vault`, `shares` (redeemed), `amount` (paid) |
 | `earnFund` (`ARVFND01`), `earnDefund` (`ARVDFD01`) **[added]** | `vault` (the owner), `market`, `amount` (moved into, or back out of, the market) |
 | `earnMigrate` (`ARVMIG01`) **[added]** | `owner` (the holder), `vault`, `pool`, `amount` (the pool's lowest value), `shares` (vault shares minted) |
+| `closeMarket` (`ARCLOS01`) **[added 2026-11-01]** | `market`, `creator` (paid the account's rent and any USDC sent to its vault), `rentLamports`, `strayAmount` (USDC atoms) |
 
 Earn deposits and withdrawals are in the depositor's history (and, with
 the vault as counterparty, in the vault address's); amounts and shares are
@@ -1308,6 +1325,52 @@ Transactions: only `withdraw`, `poolWithdraw`, `cancel`, `finalize` and
 `/v1/tx/quote-prepare`, is refused with 400 `RetiredMarket`. Quotes
 (`/v1/quote`) still answer.
 
+### Closed markets [added 2026-11-01]
+
+`CloseMarket` deletes a market account once the market is final, paid
+out and every trader idle (`futures/docs/futures.md`): its rent goes to
+its creator, its USDC vault is closed, and the address is left to the
+system program. A market is **closed** when the account cache knows its
+account is gone: no account, or a plain system account (the system
+program's, no data: lamports someone sent to the address). The registry
+keeps its row and every event stays, so it is served from Postgres:
+
+* `/v1/markets/:market/trades`, `/candles` and `/index`, the owner
+  history and the leaderboard answer as for any recorded market (from its
+  registry row);
+* `?all=1` in `/v1/markets` lists it with `closed: true` once its final
+  status and settlement are recorded: `status`, `settlementValue`,
+  `expiryTs`, the parameters and `referenceValue` from the row; `trades`,
+  `volumeLots`, `volumePremium`, `volume24hLots`, `lastEntryValue` and
+  `lastTradeTs` from its indexed trades; `backing`, `reserved` and
+  `custody` `"0"`, `claimsOpen` 0, `periodState`, `maker`, `pool`,
+  `credit` and `change24hValue` null; `suggestion` centred on the
+  settlement; `tradable` false. The default listing leaves it out.
+  **[added 2026-11-07]** Its `index` is the product's reading; on a period
+  of a retired oracle ("Oracle archive"), which nothing samples any more,
+  with no reading it is the settlement, at the time it settled;
+* what needs the account answers 404 ("no longer exists on chain; its
+  trades, candles and index remain"): `/v1/markets/:market`, `/book`,
+  `/depth`, `/v1/stream` naming it, `/v1/quote` and `/v1/tx/prepare` (a
+  retired one's `/v1/tx/quote-prepare` is still 400 `RetiredMarket`);
+* the Earn vault may list it until its next deposit or withdrawal (see
+  "Earn"): valued at 0, its `expiryTs` and `status` from its row.
+
+Its final settlement is recorded from its account while it is there, else
+from its indexed `finalize` event (`Finalize` and `CouncilSettle` both log
+one), and its indexed `closeMarket` event sets the row's `closed_ts`
+(`futures.markets`, added in place, nullable). Nothing reads a closed
+market over RPC again, nor follows its account (a manifest market whose
+account is absent stays followed until its close is indexed: it may not
+have been created yet). The indexer follows a closed market until its
+`CloseMarket` is indexed (a retired one without it, a pass after it was
+first seen gone), so every transaction before the close, `WithdrawFor`s
+included (`withdraw` events), is indexed first; a retired market drained
+earlier is read again with the registry (at start and every 10 minutes),
+so its close is seen too. A market that closed before it got a registry
+row stays unrecorded (its events do not carry its grid, `k` or step); its
+events and trades stay in the tables.
+
 ## Earn [added]
 
 One Earn vault for the whole futures product (`futures/docs/futures.md`,
@@ -1340,7 +1403,10 @@ EarnRewards = { mint, decimals, account, house | null, startTs, endTs, amount, d
   escrowed (`reserved`) cash there and what it holds there is worth
   (`valueLow`/`valueHigh`, over every settlement outcome; the settlement
   once final). `symbol`, `label`, `expiryTs` and `status` are `null` for a
-  market the service does not know.
+  market the service does not know. **[added 2026-11-01]** A closed market
+  (see "Closed markets") the vault still lists, until its next deposit or
+  withdrawal, is valued at 0 and never `tradable`; its `expiryTs` and
+  final `status` come from its registry row.
 * `valueLow`/`valueHigh`: `cash` plus every market's values, the program's
   own valuation (markets settle independently, so the extremes add).
 * `rewards` is the vault's AMBA stream (`futures/docs/futures.md`, "Earn
@@ -1625,7 +1691,8 @@ Any parameter may be omitted, but not both. `market` names a market
 (address, symbol, label or series key, as `:market` of
 `/v1/markets/:market`).
 `instrument` is accepted as another name for it, and both may be given (an
-unknown one is 404).
+unknown one is 404; **[added 2026-11-01]** so is a closed one, see "Closed
+markets", which no longer answers 503).
 
 * `owner` adds `event: tx` events for that owner's submitted transactions.
   Data is the `/wait` body without `timedOut` and `waitedMs`. An event is
@@ -1756,7 +1823,8 @@ Routing   = { status (a spec status: "ELIGIBLE_FOR_CONTRACT", …), reasons: [{ 
 * One fact per oracle `Period` (product, expiry): the manifest's
   `oracle.periods` when it lists any (other periods of the program, such as
   test periods, are not served unless `FUTURES_DISCOVER_INSTRUMENTS=1`),
-  else every period of the program. `marketId` is the
+  else every period of the program, and **[added 2026-11-07]** the months of
+  a retired oracle's archive ("Oracle archive"). `marketId` is the
   lowercase product id; `expiryId` is `PRODUCT-YYYYMM` with the UTC month of
   `expiry_ts - 1` (the futures label month: 1793491200 → `202610`).
 * **[added]** The month's calendar (`schedule`, ISO times, `null` for an
@@ -1911,7 +1979,8 @@ served the same way.
 ```
 
 Each product's periods, from the same read as the snapshot (same protocol
-and freshness), for the research service.
+and freshness), for the research service. An archive's months are included
+("Oracle archive").
 
 ### `GET /v1/oracle/accounts` [added 2026-10-28]
 
@@ -1968,7 +2037,8 @@ Solana's public RPC turns a caller away after a few scans in a row.
   "releaseCommit": "<oracle source commit>",
   "periods": { "RAMX-1793491200": "<Period>", "NANDX-1793491200": "<Period>" },
   "months":  { "RAMX-1793491200": "<OracleMonth>", "NANDX-1793491200": "<OracleMonth>" },
-  "sponsorLookupTables": { "RAMX-1798761600": "<address lookup table>" }
+  "sponsorLookupTables": { "RAMX-1798761600": "<address lookup table>" },
+  "archive": "oracle-archive.json"
 }
 ```
 
@@ -1988,7 +2058,94 @@ every SKU pool by bucket id; an entry that is not a series key and an
 address is left out (logged). The section drives
 `programs.oracle`, the index months and the `/v1/oracle/*` reads.
 `FUTURES_ORACLE_PROGRAM` names the oracle program for the reads only (not the
-index) while the manifest has no `oracle` section.
+index) while the manifest has no `oracle` section. **[added 2026-11-07]**
+`archive` is the file of a retired oracle's history ("Oracle archive"):
+absolute, or relative to the manifest's folder.
+
+### Oracle archive [added 2026-11-07]
+
+The service reads one oracle program, so a move to a new address would take
+the old one's months, sources and sponsorships out of every document with no
+error. `oracle.archive` names a JSON file of that history, off-chain: no RPC
+reads the retired program. It is loaded at start and merged read-only into
+each oracle read. With no `oracle.archive` nothing below applies.
+
+**What it adds**, in the shapes the program's own read has, so a reader can't
+tell an entry from a live one and no client changes (the site's snapshot
+parser refuses unknown fields):
+
+* `/v1/oracle/public-snapshot`: the months' facts in `state.markets`,
+  `months`, `history` and `latest`, and their inventories in `sourceLinks`.
+  `status` is `current` with any archived month. An inventory's `observedAt`
+  is the read's, as a live one's, since the site calls an older one stale.
+  `protocol` stays the configured oracle's, so an archived `oracleMonthAddress`
+  is an address under the retired program;
+* `/v1/oracle/catalog`: the months' expiries;
+* `/oracle/sponsorships`: the archived agreements after the live ones (a
+  `funder` filters both);
+* `/oracle/source-candidates/recent`: `onChain` and `sponsorship` join
+  archived sources and agreements as they do live ones.
+
+The hosted MCP's oracle reads follow the snapshot. Closed markets take their
+`month` and `index` from it too ("Closed markets"). `/v1/oracle/accounts` and
+`/v1/oracle/heads` are not merged: they answer for the configured program.
+
+**Live wins.** A series (`expiryId`) the read has is served from the read: its
+archived fact, inventory, catalog entry and sources stay out. So do an
+archived source id, locator or agreement a live one has.
+
+**Read-only.** `POST /oracle/source-candidates/:contentHash/prepare` and
+`/refresh` refuse a candidate of an archived month, or whose content hash is
+an archived source's id, with 409 `ORACLE_SPONSOR_ARCHIVED`, unless a live read
+serves that month. `POST /oracle/observations` for one answers 404
+`ORACLE_OBSERVATION_MONTH_NOT_FOUND`, saying it is archived. Stored candidates
+and observation records stay readable.
+
+**The manifest with an archive.** `oracle.periods` is then the complete list,
+even when empty: nothing scans the new program for periods (it holds boards'
+quarterly periods, which have no month), and the served products are the
+listed ones, the archived months' and the boards', never every product. A
+period the file names as the retired program's, listed in `oracle.periods` or
+`oracle.months`, is taken out of the reads and the reference index, so nothing
+warns about its owner at every pass; while the file's program is still the
+configured one they stay, and the merge changes nothing. A file that is
+missing or fails its checks stops the service at start (a change to the key
+restarts it, "Deployment changes"): going on without it would lose the history
+with no error.
+
+**The file.** One document, `format: "ameba-oracle-archive-v1"`:
+
+```text
+{ format, contentSha256 (sha256 of content's compact JSON, keys sorted),
+  export: { at (ISO), from (the API read), observedAtSlot },
+  coverage: { counts, serves: [text], recordsOnly: [text], leavesOut: [text] },
+  content: { cluster, genesisHash, program, releaseTag, releaseCommit,
+             facts: Fact[], sourceLinks: [inventory without observedAt], catalog, sponsorships: Sponsorship[],
+             sources: [{ sourceAddress, sourceId, expiryId, status, proposer, bucketId, canonicalLocatorHash }],
+             periods: [{ address, symbol, expiryTs, month }],
+             accounts: [{ layout, address, lamports, data (base64) }] } }
+```
+
+`sources` is every source account of the months, a proposal left out of a
+recipe too (the feed joins those; `sourceLinks` lists the recipe). `periods` is
+every period of the program. `accounts` is what `/v1/oracle/accounts` serves,
+kept for the record; nothing is served from it.
+
+**Making it.** Before the switch, from any machine, read-only (GETs only, no
+manifest, key, database or RPC):
+
+```bash
+ameba-futures-api --export-oracle-archive <file> https://amoeba.farm/api/futures <oracle program>
+```
+
+It reads `/v1/config`, the snapshot, the catalog, `/oracle/sponsorships` and
+each `/v1/oracle/accounts` layout, verifies each month against its accounts
+(canonical addresses, inventory counts, ids and statuses), then replaces the
+file whole. It refuses, leaving the file as it was, if the API serves another
+oracle (after the switch the old one is gone from it), the snapshot is not
+read-ready, or a month doesn't verify. The same oracle state gives the same
+`contentSha256`: it prints the new and previous digests, and a different one
+means the old oracle changed.
 
 ## Oracle heads [added 2026-10-29]
 
@@ -2347,7 +2504,11 @@ database is ready every route but `GET /oracle/sponsorships` answers 503
 **[added 2026-10-21] Only the oracle's products.** These routes serve the
 products and months the oracle serves: those of the manifest's
 `oracle.periods` (every one while it lists none, or with
-`FUTURES_DISCOVER_INSTRUMENTS=1`), read on each request, so a month that
+`FUTURES_DISCOVER_INSTRUMENTS=1`), plus products with a verified v2 board in
+its cached heads snapshot. A board accepts source discoveries before its
+first contract lists and without a v1 month. This adds no chain read per
+request and does not change monthly sponsorship eligibility. The scope is
+read on each request, so a month that
 `open-month` or `list-next` adds is served at once. A candidate whose
 `marketId` (any case) is not one of those products is refused at
 submission (422 `ORACLE_SPONSOR_REJECTED`, "`<MARKET>` isn't one of the
@@ -2651,7 +2812,7 @@ Another parameter, or a `funder` that is not a wallet, is 400
 | 403 | `ORACLE_AGENT_BINDING_MISMATCH` |
 | 404 | `ORACLE_AGENT_NOT_FOUND`, `ORACLE_CANDIDATE_NOT_FOUND`, `ORACLE_OBSERVATION_MONTH_NOT_FOUND`, `ORACLE_OBSERVATION_SOURCE_NOT_FOUND` |
 | 405 | `METHOD_NOT_ALLOWED` |
-| 409 | `ORACLE_SPONSOR_CLOSED`, `ORACLE_SPONSOR_EXISTS`, `ORACLE_SPONSOR_COLLATERAL` |
+| 409 | `ORACLE_SPONSOR_CLOSED`, `ORACLE_SPONSOR_ARCHIVED` (a month of a retired oracle: "Oracle archive"), `ORACLE_SPONSOR_EXISTS`, `ORACLE_SPONSOR_COLLATERAL` |
 | 413 | `REQUEST_TOO_LARGE`, `ORACLE_CANDIDATE_TOO_LARGE` |
 | 415 | `UNSUPPORTED_MEDIA_TYPE` |
 | 422 | `ORACLE_SPONSOR_REJECTED` (invalid payout authority or candidate; a candidate that can't be sponsored as it is), `ORACLE_EVIDENCE_REJECTED` (the named bundle was not uploaded, does not verify or does not fit the candidate), `ORACLE_OBSERVATION_UNVERIFIED` |

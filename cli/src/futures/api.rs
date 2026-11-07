@@ -258,6 +258,9 @@ pub struct MarketView {
     pub expiry_ts: u64,
     pub status: String,
     pub tradable: bool,
+    /// The market account is gone (`CloseMarket`): only `/v1/markets?all=1`
+    /// lists it, from its history (`api/API.md`, "Closed markets").
+    pub closed: bool,
     pub period: String,
     pub period_state: Option<PeriodState>,
     pub grid: u16,
@@ -470,6 +473,13 @@ pub fn markets(api: &Api) -> Result<Vec<MarketView>> {
     parse(v.get("markets").cloned().unwrap_or(Value::Array(vec![])))
 }
 
+/// Every market the API has recorded (`/v1/markets?all=1`): the listed
+/// ones, then the retired ones; closed ones with `closed: true`.
+pub fn all_markets(api: &Api) -> Result<Vec<MarketView>> {
+    let v = api.get("/v1/markets?all=1")?;
+    parse(v.get("markets").cloned().unwrap_or(Value::Array(vec![])))
+}
+
 pub fn market(api: &Api, market: &str) -> Result<MarketView> {
     parse(api.get(&path(market))?)
 }
@@ -605,6 +615,7 @@ mod tests {
         .unwrap();
         assert_eq!(m.volume24h_lots, 7);
         assert_eq!(m.change24h_value.as_deref(), Some("0.2239"));
+        assert!(!m.closed, "absent from older services: not closed");
         // No last trade: the index is the reference.
         assert_eq!(m.reference().as_deref(), Some("102.05"));
         let q: Quote = serde_json::from_value(json!({

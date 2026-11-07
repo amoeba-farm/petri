@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- `MarketView.closed`: the market account is gone (the futures program's
+  `CloseMarket`, once a market is final and paid out). The API lists closed
+  markets only with `GET /v1/markets?all=1`, with their final status and
+  settlement; their trades, candles and index remain, and their account
+  reads, quotes and prepares answer 404.
+
 ## 0.4.1
 
 - Decode markets carrying the operator credit assessment extension while

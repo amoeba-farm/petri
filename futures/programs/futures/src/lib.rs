@@ -90,6 +90,9 @@ pub enum FuturesError {
     /// `Transfer` and `Redeem` after finalization while the market's credit
     /// isn't settled or settled short: claims leave only through settlement.
     NeedsRecovery,
+    /// `CloseMarket` on a market that is open or still holds a claim, an
+    /// order, a ladder, cash or debt, or whose credit isn't settled.
+    NotEmpty,
 }
 
 pub const ERROR_BASE: u32 = 0x4652_0000;
@@ -567,6 +570,32 @@ pub enum FuturesInstruction {
         exposure: u64,
         action: Vec<u8>,
     },
+    /// Permissionless, once the market is final and its credit (if any)
+    /// settled: pays `owner`'s whole free cash to a token account of
+    /// `owner`'s with no delegate or close authority (else `Custody`), as `Withdraw` would
+    /// without their signature, so a finished market can empty out and close
+    /// (the user, 2026-11-01: "push leftover cash back to owners"). An Earn
+    /// vault's goes to its cash account, counted, as `VaultDefund` moves it;
+    /// any other state of this program's (a pool) is refused.
+    ///
+    /// Accounts as `Withdraw`, the owner (w) not signing; for an Earn vault,
+    /// 2 is its cash account.
+    WithdrawFor,
+    /// Permissionless: deletes a final market nobody holds anything in
+    /// (every claim settled, every trader idle, no custody, backing or debt,
+    /// its credit settled; else `NotEmpty`). A balance its vault holds beyond
+    /// that (a stray transfer) goes to the creator's token account, the vault
+    /// closes, and both accounts' rent goes to the market's creator. The
+    /// registry stays, so no second market takes the index and expiry. Each
+    /// Earn vault passed drops the market from its markets; one not passed
+    /// counts it as worth nothing and drops it at its next deposit or
+    /// withdrawal.
+    ///
+    /// Accounts: 0 market (w); 1 vault (w); 2 vault authority; 3 creator (w);
+    /// 4 creator's token account (w; read only when the vault holds a stray
+    /// balance; no delegate or close authority); 5 token program; then any
+    /// Earn vaults (w).
+    CloseMarket,
 }
 
 #[cfg(not(feature = "no-entrypoint"))]

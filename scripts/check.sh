@@ -34,7 +34,7 @@ JOBS="${JOBS:-$(( ($(nproc) + 1) / 2 ))}"
 AGAVE_BIN="${AGAVE_BIN:-$HOME/.local/share/solana/install/releases/4.0.0/solana-release/bin}"
 export PATH="$AGAVE_BIN:$PATH"
 export CARGO_BUILD_JOBS="$JOBS"
-ALL=(governance oracle evidence futures chain api sdk cli web research docs ops-dashboard plugins)
+ALL=(governance oracle evidence futures api sdk cli web research docs ops-dashboard plugins stimuli tensor)
 # Node tests in research/ that fail on main today (pre-existing; the research
 # oracle reader test expects a catalog shape the API no longer serves).
 # Skipped in the gating run, then run and reported; fix and remove.
@@ -281,13 +281,23 @@ check_oracle() {
   release_markers target/deploy/ameba_oracle.so
   sbpf_v1 target/deploy/ameba_oracle.so
   ls -l target/deploy/ameba_oracle.so
+  # Heads with the v1 months and no formation, a test build (target/deploy-v1-months): the
+  # production profile with `v1-months`.
+  sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
+    "${SBPF_ARCH[@]}" --features v1-months --sbf-out-dir target/deploy-v1-months -- --locked -j "$JOBS"
+  release_markers target/deploy-v1-months/ameba_oracle.so
+  sbpf_v1 target/deploy-v1-months/ameba_oracle.so
+  ls -l target/deploy-v1-months/ameba_oracle.so
   # Test-only artifact on the shortened test calendar, on the production arch
   # so the SBF tests run what ships, with the v1 formation the tests form months
-  # with; never deployed. tests/production_artifact.rs upgrades it to the
-  # production artifact above (which must route everything a Live month needs).
+  # with; never deployed. tests/production_artifact.rs compares it with the
+  # v1-months build above (which must run a month from Game to closed) and the
+  # production artifact, which tests/production_fresh_boot.rs boots from an empty
+  # address.
   sbf_build "$sbf_target:ameba_oracle" -- env CARGO_TARGET_DIR="$sbf_target" cargo-build-sbf --manifest-path programs/ameba_oracle/Cargo.toml \
     "${SBPF_ARCH[@]}" --features test-sbf --sbf-out-dir target/deploy-test -- --locked -j "$JOBS"
   SBF_OUT_DIR="$PWD/target/deploy-test" AMEBA_ORACLE_PRODUCTION_SO="$PWD/target/deploy/ameba_oracle.so" \
+    AMEBA_ORACLE_V1_MONTHS_SO="$PWD/target/deploy-v1-months/ameba_oracle.so" \
     run cargo test -p ameba_oracle --locked -j "$JOBS" --features test-sbf
   # The dev artifacts (heads too) get the same stack check. The governed localnet one is
   # the profile dev runs (futures/scripts/build-governed-localnet.sh: its arch, the dev oracle and
@@ -316,18 +326,36 @@ check_evidence() {
   (subtarget msrv-1.93 && run cargo +1.93.1 check --locked -j "$JOBS" -p amoeba-evidence)
 }
 
-check_chain() {
-  cd "$root/chain"
+check_tensor() {
+  cd "$root/tensor"
+  run python3 tests/state_vectors.py
   run cargo fmt --all -- --check
   run clippy --workspace --all-targets --locked -j "$JOBS" -- -D warnings
   run cargo test --workspace --locked -j "$JOBS"
-  # The oracle mirror is its own workspace (futures-ops and its RPC crates
-  # stay out of the node's build); in a worktree it shares futures-ops' cache.
-  (cd oracle-mirror \
-    && if [ -n "${AMEBA_CARGO_CACHE:-}" ]; then shared_cargo_env futures-ops "$PWD"; else subtarget oracle-mirror; fi \
-    && run cargo fmt -- --check \
-    && run clippy --all-targets --locked -j "$JOBS" -- -D warnings \
-    && run cargo test --locked -j "$JOBS")
+  # The kernels, where nvcc is installed (tensor/scripts/install-cuda.sh). They only
+  # run on a GPU: tensor/scripts/gpu.sh run selftest.
+  export TENSOR_NVCC="${TENSOR_NVCC:-/opt/ameba-dev/cache/cuda-12.9/bin/nvcc}"
+  if [ -x "$TENSOR_NVCC" ]; then
+    run clippy -p tensor-node --features cuda --all-targets --locked -j "$JOBS" -- -D warnings
+  elif [ "${TENSOR_REQUIRE_CUDA:-0}" = 1 ]; then
+    echo "tensor: CUDA compilation required, but TENSOR_NVCC is not executable" >&2
+    return 1
+  else
+    echo "tensor: no nvcc, so the CUDA build was not checked"
+  fi
+  export TENSOR_GPUNETIO_ROOT="${TENSOR_GPUNETIO_ROOT:-/opt/ameba-dev/cache/doca-3.5.0098}"
+  if [ -x "$TENSOR_NVCC" ] && [ -f "$TENSOR_GPUNETIO_ROOT/opt/mellanox/doca/include/doca_gpunetio_dev_eth_txq.cuh" ]; then
+    run clippy -p tensor-node --features gpunetio-sim --all-targets --locked -j "$JOBS" -- -D warnings
+    run cargo test --workspace --features tensor-node/gpunetio-sim --locked -j "$JOBS"
+  elif [ "${TENSOR_REQUIRE_GPUNETIO:-0}" = 1 ]; then
+    echo "tensor: GPUNetIO compilation required; install pinned headers and nvcc" >&2
+    return 1
+  else
+    echo "tensor: GPUNetIO device-code simulation build was NOT checked (headers or nvcc missing)"
+  fi
+  # Overflow used to wrap silently only in optimized builds.
+  run cargo test -p tensor-stake --release --locked -j "$JOBS"
+  echo "tensor: host checks complete; GPU execution and GPUNetIO were NOT tested here"
 }
 
 check_futures() {
@@ -435,6 +463,13 @@ check_ops-dashboard() {
   cd "$root/ops-dashboard"
   for file in server.mjs lib/*.mjs public/*.mjs test/*.mjs; do run node --check "$file"; done
   run bash -n deploy/install.sh
+  run node --test test/*.test.mjs
+}
+
+check_stimuli() {
+  cd "$root/stimuli"
+  run bash -n deploy/install.sh
+  run bash -n deploy/remote-install.sh
   run node --test test/*.test.mjs
 }
 

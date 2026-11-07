@@ -12,7 +12,7 @@ use super::{
     atoms,
     ctx::Ctx,
     error::{Error, Result},
-    group, money, resolve,
+    group, money, resolve_any,
     shape::{self, Grid},
     signed_money, slug, txbuild,
     units::{short, sol, usdc},
@@ -46,15 +46,17 @@ fn now(ctx: &Ctx, list: &[api::MarketView]) -> i64 {
         .unwrap_or_else(|| chrono::Utc::now().timestamp())
 }
 
-/// `open`, `paused` (open, but its oracle period is not tradable now) or
-/// `settled at 104.20`.
+/// `open`, `paused` (open, but its oracle period is not tradable now),
+/// `settled at 104.20`, or `settled at 104.20, closed` once its account is
+/// gone.
 pub fn status(m: &api::MarketView) -> String {
-    match (m.status.as_str(), &m.settlement_value) {
+    let s = match (m.status.as_str(), &m.settlement_value) {
         ("open", _) if m.tradable => "open".into(),
         ("open", _) => "paused".into(),
         (s, Some(v)) => format!("{s} at {}", price(v)),
         (s, None) => s.to_string(),
-    }
+    };
+    if m.closed { format!("{s}, closed") } else { s }
 }
 
 /// The market's day of settlement: `"Nov 1"` (the expiry instant).
@@ -142,7 +144,7 @@ fn best(
 
 /// `petri market <market>`
 pub fn market(ctx: &Ctx, p: Paint, arg: &MarketArg) -> Result<Report> {
-    let m = resolve(ctx, &arg.market, arg.expiry.as_deref())?;
+    let m = resolve_any(ctx, &arg.market, arg.expiry.as_deref())?;
     let now = if m.chain_time > 0 {
         m.chain_time
     } else {
@@ -172,7 +174,7 @@ pub fn market(ctx: &Ctx, p: Paint, arg: &MarketArg) -> Result<Report> {
         ));
     }
     let suggestion = m.suggestion.as_ref().map(|s| (s.lo, s.hi));
-    if let Some(s) = &m.suggestion {
+    if let Some(s) = m.suggestion.as_ref().filter(|_| !m.closed) {
         lines.push(format!(
             "  Suggested   {}–{}, where the index can reach by expiry (2σ)",
             s.low_value, s.high_value
@@ -204,9 +206,15 @@ pub fn market(ctx: &Ctx, p: Paint, arg: &MarketArg) -> Result<Report> {
     ));
     lines.push(p.dim(&lot_note([m.lot_usd_per_point.as_str()])));
     let name = slug(&m);
-    lines.push(p.dim(&format!(
-        "Next: petri book {name} · petri chart {name} · petri long {name} 100"
-    )));
+    if m.closed {
+        lines.push(p.dim(&format!(
+            "Closed: everyone was paid out and the market is gone from the chain. Next: petri trades {name} · petri chart {name}"
+        )));
+    } else {
+        lines.push(p.dim(&format!(
+            "Next: petri book {name} · petri chart {name} · petri long {name} 100"
+        )));
+    }
     Ok(Report::new(
         json!({ "ok": true, "command": "market", "name": name, "market": m }),
         lines.join("\n"),
@@ -221,7 +229,25 @@ pub fn book(
     range: Option<&str>,
     levels: usize,
 ) -> Result<Report> {
-    let m = resolve(ctx, &arg.market, arg.expiry.as_deref())?;
+    let m = resolve_any(ctx, &arg.market, arg.expiry.as_deref())?;
+    if m.closed {
+        let name = slug(&m);
+        let lines = [
+            format!(
+                "{} is closed ({}): everyone was paid out and it has no book any more.",
+                p.bold(&m.label),
+                status(&m)
+            ),
+            p.dim(&format!(
+                "Its trades and chart remain: petri trades {name} · petri chart {name}"
+            )),
+        ];
+        return Ok(Report::new(
+            json!({ "ok": true, "command": "book", "market": m.market, "label": m.label,
+                    "closed": true, "depth": null }),
+            lines.join("\n"),
+        ));
+    }
     let grid = Grid::of_view(&m)?;
     let shape = match range {
         Some(text) => {
@@ -292,7 +318,7 @@ pub fn book(
 
 /// `petri trades <market>`
 pub fn trades(ctx: &Ctx, p: Paint, arg: &MarketArg, limit: u32) -> Result<Report> {
-    let m = resolve(ctx, &arg.market, arg.expiry.as_deref())?;
+    let m = resolve_any(ctx, &arg.market, arg.expiry.as_deref())?;
     let list = api::trades(&ctx.api, &m.market, limit)?;
     let mut t = Table::new(&["TIME (UTC)", "SIDE", "LOTS", "PRICE", "RANGE"]).right(&[2, 3]);
     for x in &list {
@@ -329,7 +355,7 @@ pub fn chart(
     window: ChartRangeValue,
     height: usize,
 ) -> Result<Report> {
-    let m = resolve(ctx, &arg.market, arg.expiry.as_deref())?;
+    let m = resolve_any(ctx, &arg.market, arg.expiry.as_deref())?;
     let res = chart::resolution_for(window);
     let now = if m.chain_time > 0 {
         m.chain_time
@@ -767,6 +793,21 @@ mod tests {
         assert!(lot_note(["0.05"]).starts_with("A lot pays $0.05 per index point"));
         assert!(lot_note(["0.01", "0.05"]).starts_with("A lot pays a fixed amount"));
         assert!(lot_note([]).starts_with("A lot pays a fixed amount"));
+    }
+
+    #[test]
+    fn a_closed_market_says_so() {
+        let mut m = api::MarketView {
+            status: "settled".into(),
+            settlement_value: Some("101.5".into()),
+            ..Default::default()
+        };
+        assert_eq!(status(&m), "settled at 101.50");
+        m.closed = true;
+        assert_eq!(status(&m), "settled at 101.50, closed");
+        m.tradable = true;
+        (m.status, m.closed) = ("open".into(), false);
+        assert_eq!(status(&m), "open");
     }
 
     #[test]

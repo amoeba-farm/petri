@@ -315,6 +315,45 @@ impl Market {
         )
     }
 
+    /// `WithdrawFor`: anyone sends `owner`'s whole free cash in a final
+    /// market to `owner_token`, a token account of `owner`'s (an Earn
+    /// vault's: its cash account).
+    pub fn withdraw_for(&self, owner: &Pubkey, owner_token: &Pubkey) -> Instruction {
+        ix(
+            self.program,
+            FuturesInstruction::WithdrawFor,
+            vec![
+                AccountMeta::new(self.market, false),
+                AccountMeta::new(*owner, false),
+                AccountMeta::new(*owner_token, false),
+                AccountMeta::new(self.vault, false),
+                AccountMeta::new_readonly(spl_token::id(), false),
+                AccountMeta::new_readonly(self.authority, false),
+            ],
+        )
+    }
+
+    /// `CloseMarket`: the rent to `creator` (the market's), a stray vault
+    /// balance to `creator_token`; each of `vaults` drops the market from
+    /// its markets.
+    pub fn close_market(
+        &self,
+        creator: &Pubkey,
+        creator_token: &Pubkey,
+        vaults: &[Pubkey],
+    ) -> Instruction {
+        let mut accounts = vec![
+            AccountMeta::new(self.market, false),
+            AccountMeta::new(self.vault, false),
+            AccountMeta::new_readonly(self.authority, false),
+            AccountMeta::new(*creator, false),
+            AccountMeta::new(*creator_token, false),
+            AccountMeta::new_readonly(spl_token::id(), false),
+        ];
+        accounts.extend(vaults.iter().map(|v| AccountMeta::new(*v, false)));
+        ix(self.program, FuturesInstruction::CloseMarket, accounts)
+    }
+
     /// `Submit`; send it with [`heap_frame`] and a 1.4M [`compute_limit`].
     pub fn submit(&self, owner: &Pubkey, a: &SubmitArgs, proposal: Vec<u8>) -> Instruction {
         let (close_claim, close_seq) = a.close.unwrap_or((NO_CLAIM, 0));
