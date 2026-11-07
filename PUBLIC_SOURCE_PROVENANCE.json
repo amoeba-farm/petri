@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "sourceRepository": "https://github.com/spacematter78/amoeba",
-  "sourceCommit": "d24e7eff0bb57b9df8e07f4eb82e92e44d9f6117",
+  "sourceCommit": "bc49b6a2d6324b0a030cd5294441eb1d2a4fabd5",
   "component": "cli",
-  "cliVersion": "0.1.23",
-  "publicationType": "source of the unsigned petri v0.1.23 preview release and of ameba-sdk 0.4.1",
+  "cliVersion": "0.1.24",
+  "publicationType": "source of the unsigned petri v0.1.24 preview release and of ameba-sdk 0.4.1",
   "sourceLayout": "Original monorepo relative Cargo paths retained",
   "deployedContractSourceCommit": "1ced0f671f9205620166d43bee34ebb0b9512603",
   "qualification": "CLI and SDK source and contract deployed artifact provenance are distinct (the Mainnet futures program is built from 1ced0f67, the oracle from 6ccceadd); this source mirror makes no reproducible ELF claim. The unsigned preview packages are built from sourceCommit; npm publication of the SDK is not claimed.",
@@ -20,7 +20,7 @@
   "mirroredFiles": [
     {
       "path": ".github/workflows/cli-preview.yml",
-      "sha256": "39edba402669b40d654b0c9c8da54dc2cc99b90cd142bb361efaad970d935637",
+      "sha256": "8a5c5f15a44e6ba0dc8b920186374561f0eb5df55c8aa695269e81c2b22a5b1e",
       "executable": false
     },
     {
@@ -65,12 +65,12 @@
     },
     {
       "path": "cli/Cargo.lock",
-      "sha256": "3d4d5cf1b6f8739628f16cf3cdeb9667ec37327eabc832142cead1279fbfc55b",
+      "sha256": "2097868f6f967f98d0d6fc4fa12982a0d353ef462923dde1487d521082303ce9",
       "executable": false
     },
     {
       "path": "cli/Cargo.toml",
-      "sha256": "299930baf3d6be53abe9659bf476f4c4a385bfca092b00ba7508969dec7b95c0",
+      "sha256": "751809291b9e9265d7f00416f22bb86ee7adfbac17ed885170809c385efee4e9",
       "executable": false
     },
     {
@@ -115,7 +115,7 @@
     },
     {
       "path": "cli/THIRD_PARTY_LICENSES.md",
-      "sha256": "dee47c0c69ae1e1346a5f619d08b624be7e9984aad128d4dc5b2dee20643fdea",
+      "sha256": "2c849289b447dda4b648e96877e1c74530c7317e736ca8b2798c084bf1248554",
       "executable": false
     },
     {
@@ -315,7 +315,7 @@
     },
     {
       "path": "cli/release/preview-notes.md",
-      "sha256": "f2205d4ba06cd42952fc57a379d1bd2baafded1b3941cbf7afacf6048bf5bff2",
+      "sha256": "1eb7d022c6d36f2f7415beeb62c7cf21396696b5163767bff0a238cb0b4caf0f",
       "executable": false
     },
     {
@@ -4100,7 +4100,7 @@
   ],
   "lineEndingQualification": "2 PowerShell text files are stored as LF by the public repository Git attributes; source and mirrored SHA256 are both recorded. All other mirrored Git blob bytes and executable modes match upstream.",
   "sdkVersion": "0.4.1",
-  "sourceRelease": "d24e7eff0bb57b9df8e07f4eb82e92e44d9f6117",
+  "sourceRelease": "bc49b6a2d6324b0a030cd5294441eb1d2a4fabd5",
   "deployedOracleSourceCommit": "6ccceaddacd40d8a15a3ee054bf2442d636605ba",
   "candidateContractSourceCommit": "bcf0601606617fda7e00a818e7663d031339858f",
   "candidateContractPublicSource": "https://github.com/amoeba-farm/amoeba-program/commit/059bd727fb61b68adf7d5ee3067ed5158674cbbc"

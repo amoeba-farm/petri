@@ -6,10 +6,10 @@ source dependencies they build against. Start with [Petri's guide](cli/README.md
 or [the SDK](sdk/README.md).
 
 The source is mirrored from Amoeba monorepo commit
-`d24e7eff0bb57b9df8e07f4eb82e92e44d9f6117` (release `2026-11-07-oracle-reboot`);
-its CLI version is `0.1.23` and its SDK source version is `0.4.1`.
-Petri 0.1.23 recognizes both Mainnet Oracle addresses through the Oracle cutover.
-Unsigned v0.1.23 preview packages for Windows and macOS are built by the Preview binaries workflow.
+`bc49b6a2d6324b0a030cd5294441eb1d2a4fabd5` (release `2026-11-07-oracle-reboot`);
+its CLI version is `0.1.24` and its SDK source version is `0.4.1`.
+Petri 0.1.24 recognizes both Mainnet Oracle addresses through the Oracle cutover.
+Unsigned v0.1.24 preview packages for Windows and macOS are built by the Preview binaries workflow.
 The selected backend credit policy is not included in this repository.
 
 Build from `cli/` with Rust 1.95.0: `cargo build --release --locked`.
